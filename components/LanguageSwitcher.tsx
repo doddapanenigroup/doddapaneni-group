@@ -14,9 +14,9 @@ export default function LanguageSwitcher({ isTransparent }: { isTransparent?: bo
 
   const languages = [
     { code: 'en', name: 'English' },
-    { code: 'te', name: 'తెలుగు' },
     { code: 'hi', name: 'हिंदी' },
-    { code: 'es', name: 'Español' }
+    { code: 'te', name: 'తెలుగు' },
+    { code: 'es', name: 'Español' },
   ];
 
   const onSelectChange = (nextLocale: string) => {
@@ -47,7 +47,7 @@ export default function LanguageSwitcher({ isTransparent }: { isTransparent?: bo
             <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true"></div>
                 <div 
-                    className={`absolute right-0 mt-2 w-40 rounded-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] backdrop-blur-xl border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    className={`absolute right-0 mt-2 w-40 max-h-[70vh] overflow-y-auto rounded-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] backdrop-blur-xl border overflow-x-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
                         isTransparent
                             ? 'bg-slate-900/60 border-white/20'
                             : 'bg-white/90 border-slate-200'

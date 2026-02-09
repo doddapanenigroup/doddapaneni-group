@@ -4,8 +4,17 @@ import { translateText, delay } from '@/lib/translate';
 import { getLeafKeys, getNestedKey, setNestedKey } from '@/lib/i18n-sync';
 
 const SOURCE_LOCALE = 'en';
-const TARGET_LOCALES = ['te', 'hi', 'es'];
-const DELAY_MS = 300;
+const TARGET_LOCALES = [
+  'te', 'hi', 'es',
+  'bn', 'mr', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks',
+];
+const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 500;
+
+/** Skip translating long HTML blog content here; use scripts/translate-blog-content.mjs to preserve structure. */
+function shouldSkipKey(keyPath: string, value: string): boolean {
+  if (!/^Blog\.posts\.[^.]+\.content$/.test(keyPath)) return false;
+  return value.includes('<');
+}
 
 export type TranslateAllResult = {
   locale: string;
@@ -41,6 +50,10 @@ export async function runTranslateAll(): Promise<{
     const errors: string[] = [];
 
     for (const { path: keyPath, value: enValue } of enLeaves) {
+      if (shouldSkipKey(keyPath, enValue)) {
+        skipped++;
+        continue;
+      }
       const existing = getNestedKey(targetData, keyPath);
       if (existing !== undefined && existing !== enValue) {
         skipped++;

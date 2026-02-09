@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 // Base URL - Update this when deploying to production
-const BASE_URL = 'https://doddapaneni-group.com';
+const BASE_URL = 'https://doddapanenigroup.net';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
@@ -42,7 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'entrepreneurship-startup-success'
   ];
 
-  const locales = ['en', 'te', 'hi', 'es'];
+  const locales = ['en', 'te', 'hi', 'es', 'bn', 'mr', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks'];
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
 

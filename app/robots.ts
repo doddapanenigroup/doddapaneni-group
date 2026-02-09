@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://doddapaneni-group.com/sitemap.xml', // Update with actual domain
+    sitemap: 'https://doddapanenigroup.net/sitemap.xml', // Update with actual domain
   };
 }

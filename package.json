@@ -8,6 +8,8 @@
     "start": "next start -H 0.0.0.0",
     "lint": "eslint",
     "i18n:sync": "node scripts/sync-locales.mjs",
+    "i18n:translate": "node scripts/translate-all-locales.mjs",
+    "i18n:translate-blog": "node scripts/translate-blog-content.mjs",
     "db:seed": "node scripts/seed.mjs",
     "db:reset": "node scripts/reset-and-seed.mjs"
   },

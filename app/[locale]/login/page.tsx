@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 export default function LoginPage() {
@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams<{ locale?: string }>();
   const locale = params?.locale ?? 'en';
@@ -34,15 +33,14 @@ export default function LoginPage() {
       });
       if (res?.error) {
         setError('Invalid email or password.');
-        setLoading(false);
         return;
       }
-      // Ensure the session cookie is reflected in server components + middleware redirects.
-      if (res?.url) router.replace(res.url);
-      else router.replace(callbackUrl);
-      router.refresh();
+      // Full-page redirect so the next request sends the session cookie (avoids redirect not working after login).
+      const url = res?.url ?? callbackUrl;
+      window.location.href = url.startsWith('http') ? url : `${window.location.origin}${url}`;
     } catch {
       setError('Something went wrong. Please try again.');
+    } finally {
       setLoading(false);
     }
   }

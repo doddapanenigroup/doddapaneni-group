@@ -5,9 +5,10 @@ import "../globals.css";
 import LayoutWithNav from "../../components/LayoutWithNav";
 import Providers from "@/components/Providers";
 import {NextIntlClientProvider} from 'next-intl';
-import {getMessages, getTranslations} from 'next-intl/server';
+import {getTranslations, setRequestLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
+import {messagesByLocale} from '@/lib/messages';
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export async function generateMetadata({
       icon: '/logo.png',
       apple: '/logo.png',
     },
+    other: { google: 'notranslate' },
   };
 }
 
@@ -40,24 +42,28 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
+  const { locale: paramLocale } = await params;
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') ?? '';
+  // Prefer route param (from URL segment); fallback to pathname so /hi/blog and /es/blog get correct locale
+  const fromPath = pathname.split('/').filter(Boolean)[0];
+  const locale =
+    routing.locales.includes(paramLocale as any) ? paramLocale
+    : fromPath && routing.locales.includes(fromPath as any) ? fromPath
+    : routing.defaultLocale;
 
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
-  const messages = await getMessages();
+  setRequestLocale(locale);
+  const messages = messagesByLocale[locale] ?? messagesByLocale.en;
 
   return (
     <html lang={locale}>
       <body className={`${inter.className} antialiased min-h-screen flex flex-col`}>
         <Providers>
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider locale={locale} messages={messages}>
             <LayoutWithNav initialPathname={pathname}>{children}</LayoutWithNav>
           </NextIntlClientProvider>
         </Providers>

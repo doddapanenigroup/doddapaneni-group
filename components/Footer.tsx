@@ -72,6 +72,7 @@ export default function Footer() {
                 <li><Link href="/privacy-policy" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('privacyPolicy')}</Link></li>
                 <li><Link href="/terms-conditions" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('termsConditions')}</Link></li>
                 <li><Link href="/disclaimer" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('disclaimer')}</Link></li>
+                <li><a href="/sitemap.xml" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('sitemap')}</a></li>
               </ul>
             </div>
           </div>
@@ -179,6 +180,8 @@ export default function Footer() {
             <Link href="/terms-conditions" className="hover:text-white transition-colors">{t('termsConditions')}</Link>
             <span className="hidden md:inline">|</span>
             <Link href="/disclaimer" className="hover:text-white transition-colors">{t('disclaimer')}</Link>
+            <span className="hidden md:inline">|</span>
+            <a href="/sitemap.xml" className="hover:text-white transition-colors">{t('sitemap')}</a>
           </div>
         </div>
       </div>
