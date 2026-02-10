@@ -47,18 +47,18 @@ export default function Services() {
   }, []);
 
   const serviceKeys = [
-    "healthcare",
+    "software",
+    "digitalMarketing",
     "ecommerce",
     "media",
-    "digitalMarketing",
-    "software",
     "staffing",
+    "healthcare",
     "construction",
-    "importExport",
-    "food",
     "education",
+    "food",
+    "manufacturing",
     "logistics",
-    "manufacturing"
+    "importExport"
   ];
 
   const containerVariants = {
