@@ -3,7 +3,7 @@
 import {Link} from '@/i18n/routing';
 import {useTranslations} from 'next-intl';
 import Image from 'next/image';
-import { Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
+import { Facebook, Linkedin, Instagram, Youtube, X, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
   const t = useTranslations('Footer');
@@ -26,9 +26,11 @@ export default function Footer() {
   };
 
   const socialLinks = {
-    facebook: "https://www.facebook.com/doddapanenigroup",
+    facebook: "https://www.facebook.com/profile.php?id=61588007971937",
+    twitter: "https://x.com/DoddapanenGroup",
+    instagram: "https://www.instagram.com/doddapanrnigroup/",
+    whatsapp: "https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33",
     linkedin: "https://www.linkedin.com/company/doddapaneni-group",
-    instagram: "https://www.instagram.com/doddapanenigroup",
     youtube: "https://www.youtube.com/@doddapanenigroup"
   };
 
@@ -138,13 +140,13 @@ export default function Footer() {
               <Facebook size={16} className="md:w-6 md:h-6" />
             </a>
             <a
-              href={socialLinks.linkedin}
+              href={socialLinks.twitter}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-300 hover:text-white transition-colors"
-              aria-label="LinkedIn"
+              aria-label="Twitter"
             >
-              <Linkedin size={16} className="md:w-6 md:h-6" />
+              <X size={16} className="md:w-6 md:h-6" />
             </a>
             <a
               href={socialLinks.instagram}
@@ -154,6 +156,24 @@ export default function Footer() {
               aria-label="Instagram"
             >
               <Instagram size={16} className="md:w-6 md:h-6" />
+            </a>
+            <a
+              href={socialLinks.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-300 hover:text-white transition-colors"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle size={16} className="md:w-6 md:h-6" />
+            </a>
+            <a
+              href={socialLinks.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-300 hover:text-white transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={16} className="md:w-6 md:h-6" />
             </a>
             <a
               href={socialLinks.youtube}
