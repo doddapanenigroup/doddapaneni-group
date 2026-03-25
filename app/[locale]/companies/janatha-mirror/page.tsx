@@ -24,7 +24,7 @@ export default function JanathaMirror() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/janathamirror.jpeg"
+            src="/janathamirror.webp"
             alt="Janatha Mirror Logo"
             width={140}
             height={56}
@@ -59,7 +59,7 @@ export default function JanathaMirror() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/news.jpg"
+                src="/news.webp"
                 alt="Journalist working"
                 fill
                 className="object-cover"

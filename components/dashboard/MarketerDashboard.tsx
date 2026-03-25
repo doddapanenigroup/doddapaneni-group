@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import VisitStats from './VisitStats';
+import MyActivityPanel from './MyActivityPanel';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -56,6 +57,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     status: 'draft' as CampaignStatus,
     startDate: '',
     endDate: '',
+    seoNote: '',
   });
 
   useEffect(() => {
@@ -76,6 +78,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         status: c.status,
         startDate: c.startDate ? c.startDate.slice(0, 10) : '',
         endDate: c.endDate ? c.endDate.slice(0, 10) : '',
+        seoNote: '',
       });
     } else {
       setEditingCampaignId(null);
@@ -86,6 +89,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         status: 'draft',
         startDate: '',
         endDate: '',
+        seoNote: '',
       });
     }
     setShowCampaignForm(true);
@@ -150,6 +154,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     url: '',
     description: '',
     type: 'resource' as MarketingLinkType,
+    seoNote: '',
   });
 
   useEffect(() => {
@@ -168,10 +173,11 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         url: l.url,
         description: l.description,
         type: l.type,
+        seoNote: '',
       });
     } else {
       setEditingLinkId(null);
-      setLinkForm({ name: '', url: '', description: '', type: 'resource' });
+      setLinkForm({ name: '', url: '', description: '', type: 'resource', seoNote: '' });
     }
     setShowLinkForm(true);
   }
@@ -187,6 +193,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       url: linkForm.url.trim(),
       description: linkForm.description.trim(),
       type: linkForm.type,
+      seoNote: linkForm.seoNote.trim() || undefined,
     };
     if (!payload.name || !payload.url) return;
     try {
@@ -301,6 +308,13 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 placeholder="Description"
                 value={campaignForm.description}
                 onChange={(e) => setCampaignForm((f) => ({ ...f, description: e.target.value }))}
+                rows={2}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+              <textarea
+                placeholder="SEO / tracking note (e.g. target keyword, landing page) — stored in activity log"
+                value={campaignForm.seoNote}
+                onChange={(e) => setCampaignForm((f) => ({ ...f, seoNote: e.target.value }))}
                 rows={2}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
               />
@@ -442,6 +456,13 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 onChange={(e) => setLinkForm((f) => ({ ...f, description: e.target.value }))}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
               />
+              <input
+                type="text"
+                placeholder="SEO note (optional) — logged with this change"
+                value={linkForm.seoNote}
+                onChange={(e) => setLinkForm((f) => ({ ...f, seoNote: e.target.value }))}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
               <div className="flex flex-wrap gap-3 items-center">
                 <select
                   value={linkForm.type}
@@ -527,6 +548,8 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
           )}
         </div>
       </section>
+
+      <MyActivityPanel />
     </div>
   );
 }

@@ -1,336 +1,336 @@
 {
   "Metadata": {
-    "title": "Doddapaneni Group - Building Businesses Across Industries",
-    "description": "Doddapaneni Group is a diversified business conglomerate delivering innovative, scalable solutions across technology, healthcare, construction, and more."
+    "title": "ডডাপানেনি গ্রুপ - শিল্প জুড়ে ব্যবসা গড়ে তোলা",
+    "description": "ডডাপানেনি গ্রুপ একটি বৈচিত্র্যময় ব্যবসায়িক গোষ্ঠী যা প্রযুক্তি, স্বাস্থ্যসেবা, নির্মাণ এবং আরও অনেক কিছুতে উদ্ভাবনী, স্কেলযোগ্য সমাধান সরবরাহ করে ।"
   },
   "Navbar": {
-    "home": "Home",
-    "about": "About Us",
-    "services": "Services",
-    "blog": "Blog",
-    "contact": "Contact Us",
-    "language": "Language"
+    "home": "প্রধান পৃষ্ঠা",
+    "about": "আমাদের সম্পর্কে",
+    "services": "পরিষেবা",
+    "blog": "ব্লগ",
+    "contact": "আমাদের সাথে যোগাযোগ করুন",
+    "language": "ভাষা"
   },
   "Footer": {
-    "tagline": "Building Businesses Across Industries",
-    "quickLinks": "Quick Links",
-    "contact": "Contact",
-    "rights": "All rights reserved.",
-    "phone": "Phone",
-    "address": "Address",
-    "email": "Email",
-    "newsletter": "Newsletter",
-    "emailPlaceholder": "Enter your email",
-    "subscribe": "Subscribe",
-    "subscribed": "Thank you for subscribing!",
-    "legal": "Legal",
-    "privacyPolicy": "Privacy Policy",
-    "termsConditions": "Terms & Conditions",
-    "disclaimer": "Disclaimer",
-    "faq": "FAQ / Support",
-    "sitemap": "Sitemap",
-    "followUs": "Follow Us"
+    "tagline": "শিল্প জুড়ে ব্যবসা গড়ে তোলা",
+    "quickLinks": "দ্রুত লিঙ্ক",
+    "contact": "যোগাযোগ",
+    "rights": "সর্বস্বত্ব সংরক্ষিত। ",
+    "phone": "ফোন",
+    "address": "ঠিকানা",
+    "email": "ইমেইল",
+    "newsletter": "নিউজলেটার",
+    "emailPlaceholder": "আপনার ইমেল ঠিকানা লিখুন",
+    "subscribe": "সদস্যতা",
+    "subscribed": "সাবস্ক্রাইব করার জন্য আপনাকে ধন্যবাদ!",
+    "legal": "আইনী",
+    "privacyPolicy": "ব্যক্তিগত গোপনীয়তার নীতি",
+    "termsConditions": "শর্তাবলী",
+    "disclaimer": "ঘোষণা:",
+    "faq": "প্রায়শই জিজ্ঞাসিত প্রশ্নাবলী / সহায়তা",
+    "sitemap": "সাইটম্যাপ",
+    "followUs": "আমাদের ফলো করুন"
   },
   "Home": {
-    "innovating": "Innovating Across Industries",
-    "heroTitle": "Building <highlight>Future-Ready</highlight> Businesses",
-    "heroTitleLine1": "Building <highlight>Future-Ready</highlight>",
-    "heroTitleLine2": "Businesses",
-    "heroSubtitle": "Building Businesses Across Industries. Delivering innovative, scalable, and sustainable solutions for a complex world.",
-    "exploreServices": "Explore Our Services",
-    "learnAboutUs": "Learn About Us",
-    "globalReach": "Global Reach",
-    "globalReachDesc": "Operating across multiple continents with a diverse portfolio of successful ventures.",
-    "sustainableGrowth": "Sustainable Growth",
-    "sustainableGrowthDesc": "Focusing on long-term value creation through ethical and scalable business practices.",
-    "trustedPartner": "Trusted Partner",
-    "trustedPartnerDesc": "Building lasting relationships based on integrity, transparency, and operational excellence.",
-    "whoWeAre": "Who We Are",
-    "buildingSustainable": "Building Sustainable Businesses",
-    "description": "Doddapaneni Group is a diversified business conglomerate delivering innovative, scalable, and future-ready solutions across multiple industries. Our presence spans technology, healthcare, construction, global trade, logistics, manufacturing, education, media, and workforce solutions. We focus on building sustainable businesses that create long-term value for clients, partners, and communities. With a strong foundation rooted in integrity, operational excellence, and innovation, Doddapaneni Group enables organizations to adapt, scale, and lead in competitive markets. Our integrated business model allows us to deliver end-to-end solutions under one trusted group.",
-    "readStory": "Read our full story",
-    "ourGroupCompanies": "Our Group Companies",
-    "drivingExcellence": "Driving excellence across key sectors.",
-    "ourServices": "Our Services",
-    "diverseSolutions": "Diverse solutions tailored for a complex, evolving world.",
-    "viewAllServices": "View all services",
-    "learnMore": "Learn more",
-    "readyToTransform": "Ready to Transform Your Business?",
-    "partnerWithUs": "Partner with Doddapaneni Group for innovative solutions and sustainable growth.",
-    "getInTouch": "Get in Touch",
+    "innovating": "শিল্প জুড়ে উদ্ভাবন",
+    "heroTitle": "ভবিষ্যতের জন্য প্রস্তুত <highlight>ব্যবসা</highlight> গড়ে তোলা",
+    "heroTitleLine1": "ভবিষ্যত <highlight>নির্মাণ-প্রস্তুত</highlight>",
+    "heroTitleLine2": "ব্যবসা",
+    "heroSubtitle": "শিল্প জুড়ে ব্যবসা গড়ে তোলা । একটি জটিল বিশ্বের জন্য উদ্ভাবনী, স্কেলযোগ্য এবং টেকসই সমাধান প্রদান করা ।",
+    "exploreServices": "আমাদের পরিষেবাগুলি অন্বেষণ করুন",
+    "learnAboutUs": "আমাদের সম্পর্কে আরও জানুন",
+    "globalReach": "গ্লোবাল রিচ",
+    "globalReachDesc": "সফল উদ্যোগের বিভিন্ন পোর্টফোলিও সহ একাধিক মহাদেশ জুড়ে অপারেটিং ।",
+    "sustainableGrowth": "টেকসই বৃদ্ধি",
+    "sustainableGrowthDesc": "নৈতিক এবং স্কেলেবল ব্যবসায়িক অনুশীলনের মাধ্যমে দীর্ঘমেয়াদী মান তৈরির দিকে মনোনিবেশ করা ।",
+    "trustedPartner": "বিশ্বস্ত পার্টনার",
+    "trustedPartnerDesc": "অখণ্ডতা, স্বচ্ছতা এবং কর্মক্ষম শ্রেষ্ঠত্বের উপর ভিত্তি করে দীর্ঘস্থায়ী সম্পর্ক গড়ে তোলা ।",
+    "whoWeAre": "আমাদের পরিচয়।",
+    "buildingSustainable": "টেকসই ব্যবসা গড়ে তোলা",
+    "description": "ডডাপানেনি গ্রুপ একটি বৈচিত্র্যময় ব্যবসায়িক গোষ্ঠী যা একাধিক শিল্প জুড়ে উদ্ভাবনী, স্কেলযোগ্য এবং ভবিষ্যতের জন্য প্রস্তুত সমাধান সরবরাহ করে । আমাদের উপস্থিতি প্রযুক্তি, স্বাস্থ্যসেবা, নির্মাণ, বৈশ্বিক বাণিজ্য, সরবরাহ, উত্পাদন, শিক্ষা, মিডিয়া এবং কর্মশক্তি সমাধান । আমরা টেকসই ব্যবসা গড়ে তোলার দিকে মনোনিবেশ করি যা ক্লায়েন্ট, অংশীদার এবং অংশীদারদের জন্য দীর্ঘমেয়াদী মূল্য তৈরি করে সম্প্রদায় । অখণ্ডতা, অপারেশনাল এক্সিলেন্স এবং উদ্ভাবনে নিহিত একটি শক্তিশালী ভিত্তির সাথে, ডডডাপানেনি গ্রুপ সংস্থাগুলিকে প্রতিযোগিতামূলক বাজারে মানিয়ে নিতে, স্কেল করতে এবং নেতৃত্ব দিতে সক্ষম করে । আমাদের ইন্টিগ্রেটেড বিজনেস মডেল আমাদের একটি বিশ্বস্ত গ্রুপের অধীনে এন্ড-টু-এন্ড সমাধান সরবরাহ করতে দেয় ।",
+    "readStory": "আমাদের সম্পূর্ণ গল্প পড়ুন",
+    "ourGroupCompanies": "আমাদের গ্রুপ কোম্পানি",
+    "drivingExcellence": "মূল ক্ষেত্রগুলিতে শ্রেষ্ঠত্ব বজায় রাখা ।",
+    "ourServices": "আমাদের সেবাসমূহ",
+    "diverseSolutions": "একটি জটিল, বিবর্তিত বিশ্বের জন্য উপযোগী বিভিন্ন সমাধান ।",
+    "viewAllServices": "সমস্ত পরিষেবা দেখুন",
+    "learnMore": "আরও জানুন",
+    "readyToTransform": "আপনার ব্যবসাকে রূপান্তরের জন্য প্রস্তুত?",
+    "partnerWithUs": "উদ্ভাবনী সমাধান এবং টেকসই বৃদ্ধির জন্য ডডাপানেনি গ্রুপের অংশীদার ।",
+    "getInTouch": "টাচ পান",
     "servicesList": {
       "ecommerce": {
-        "title": "E-Commerce & Marketplaces",
-        "description": "We design, develop, and manage scalable e-commerce ecosystems that support modern business models. Our solutions include online retail platforms, multi-vendor marketplaces, global trading portals, and dropshipping and wholesale systems optimized for performance and growth."
+        "title": "ই-কমার্স এবং মার্কেটপ্লেস",
+        "description": "আমরা আধুনিক ব্যবসায়িক মডেলগুলিকে সমর্থন করে এমন স্কেলেবল ই-কমার্স ইকোসিস্টেম ডিজাইন, বিকাশ এবং পরিচালনা করি । আমাদের সমাধানগুলির মধ্যে রয়েছে অনলাইন খুচরা প্ল্যাটফর্ম, মাল্টি-ভেন্ডর মার্কেটপ্লেস, গ্লোবাল ট্রেডিং পোর্টাল এবং ড্রপশিপিং এবং পারফরম্যান্স এবং বৃদ্ধির জন্য অনুকূলিত পাইকারি সিস্টেম ।"
       },
       "software": {
-        "title": "Software, IT & AI Technologies",
-        "description": "We provide end-to-end digital solutions including web and mobile application development, AI-powered automation, chatbots, cloud services, SaaS platforms, and IT consulting. Our technology solutions are designed to enhance efficiency, security, and scalability."
+        "title": "সফটওয়্যার, আইটি এবং এআই টেকনোলজিস",
+        "description": "আমরা ওয়েব এবং মোবাইল অ্যাপ্লিকেশন ডেভেলপমেন্ট, এআই-চালিত অটোমেশন, চ্যাটবট, ক্লাউড পরিষেবা, SaaS প্ল্যাটফর্ম এবং আইটি পরামর্শ সহ এন্ড-টু-এন্ড ডিজিটাল সমাধান প্রদান করি । আমাদের প্রযুক্তি সমাধানগুলি দক্ষতা, সুরক্ষা এবং স্কেলিবিলিটি বাড়ানোর জন্য ডিজাইন করা হয়েছে ।"
       },
       "digitalMarketing": {
-        "title": "Digital Marketing Services",
-        "description": "Our digital marketing services focus on building brand visibility and driving measurable growth. We offer SEO and keyword optimization, social media management, branding and advertising campaigns, and lead generation through performance-driven strategies."
+        "title": "ডিজিটাল বিপণন পরিষেবা",
+        "description": "আমাদের ডিজিটাল বিপণন পরিষেবাগুলি ব্র্যান্ডের দৃশ্যমানতা তৈরি এবং পরিমাপযোগ্য বৃদ্ধির দিকে মনোনিবেশ করে । আমরা এসইও এবং কীওয়ার্ড অপ্টিমাইজেশান, সোশ্যাল মিডিয়া ম্যানেজমেন্ট, ব্র্যান্ডিং এবং বিজ্ঞাপন প্রচারাভিযান এবং পারফরম্যান্স-চালিত কৌশলগুলির মাধ্যমে লিড জেনারেশন অফার করি ।"
       },
       "healthcare": {
-        "title": "Healthcare, Medical Supplies & Medical Billing",
-        "description": "We support healthcare providers with medical equipment trading and comprehensive backend services. Our offerings include CPAP and BiPAP devices, medical consumables, wholesale distribution, medical billing and coding, insurance claims processing, EHR/EMR integration, telehealth billing, and complete Revenue Cycle Management solutions."
+        "title": "স্বাস্থ্যসেবা, মেডিকেল সাপ্লাই এবং মেডিকেল বিলিং",
+        "description": "আমরা চিকিৎসা সরঞ্জামের ট্রেডিং এবং ব্যাপক ব্যাকএন্ড পরিষেবা সহ স্বাস্থ্যসেবা প্রদানকারীদের সমর্থন করি । আমাদের অফারের মধ্যে রয়েছে CPAP এবং BIPAP ডিভাইস, চিকিৎসা উপভোক্তা, পাইকারি বিতরণ, চিকিৎসা বিলিং এবং কোডিং, বীমা দাবি প্রক্রিয়াকরণ, EHR/EMR ইন্টিগ্রেশন, টেলিহেলথ বিলিং এবং সম্পূর্ণ রাজস্ব চক্র ব্যবস্থাপনা সমাধান ।"
       },
       "construction": {
-        "title": "Construction, Architecture & Real Estate",
-        "description": "We deliver construction and real estate solutions covering building construction, architectural design, real estate development, and property consulting, ensuring quality, compliance, and timely execution."
+        "title": "নির্মাণ, স্থাপত্য এবং রিয়েল এস্টেট",
+        "description": "আমরা বিল্ডিং নির্মাণ, স্থাপত্য নকশা, রিয়েল এস্টেট উন্নয়ন এবং সম্পত্তি পরামর্শ, গুণমান, সম্মতি এবং সময়মত কার্যকরকরণ নিশ্চিত করে নির্মাণ এবং রিয়েল এস্টেট সমাধান সরবরাহ করি ।"
       },
       "importExport": {
-        "title": "Import & Export (All Commodities)",
-        "description": "We facilitate international trade through global sourcing, wholesale exports, international trading, and cross-border logistics, enabling smooth and compliant global operations."
+        "title": "আমদানি ও রপ্তানি (সমস্ত পণ্য)",
+        "description": "আমরা বিশ্বব্যাপী সোর্সিং, পাইকারি রফতানি, আন্তর্জাতিক বাণিজ্য এবং আন্তঃসীমান্ত সরবরাহের মাধ্যমে আন্তর্জাতিক বাণিজ্যকে সহজতর করি, যা মসৃণ এবং অনুবর্তী বিশ্বব্যাপী ক্রিয়াকলাপ সক্ষম করে ।"
       },
       "food": {
-        "title": "Food Processing & Beverages",
-        "description": "Our food processing and beverage division focuses on packaged food production, beverage manufacturing, and efficient food supply chain distribution."
+        "title": "খাদ্য প্রক্রিয়াকরণ এবং পানীয়",
+        "description": "আমাদের খাদ্য প্রক্রিয়াকরণ এবং পানীয় বিভাগ প্যাকেজযুক্ত খাদ্য উত্পাদন, পানীয় উত্পাদন এবং দক্ষ খাদ্য সরবরাহ চেইন বিতরণের উপর দৃষ্টি নিবদ্ধ করে ।"
       },
       "education": {
-        "title": "Education & Skill Development",
-        "description": "We provide training programs, vocational courses, e-learning platforms, and certification programs designed to build industry-relevant skills and career-ready professionals."
+        "title": "শিক্ষা ও দক্ষতা উন্নয়ন",
+        "description": "আমরা প্রশিক্ষণ প্রোগ্রাম, বৃত্তিমূলক কোর্স, ই-লার্নিং প্ল্যাটফর্ম এবং শিল্প-সম্পর্কিত দক্ষতা এবং ক্যারিয়ার-প্রস্তুত পেশাদার তৈরির জন্য ডিজাইন করা শংসাপত্র প্রোগ্রাম সরবরাহ করি ।"
       },
       "logistics": {
-        "title": "Logistics & Warehousing",
-        "description": "We offer end-to-end logistics solutions including freight and cargo handling, storage and warehousing, supply chain management, and last-mile delivery services."
+        "title": "লজিস্টিক এবং গুদামজাতকরণ",
+        "description": "আমরা মালবাহী এবং কার্গো হ্যান্ডলিং, স্টোরেজ এবং গুদামজাতকরণ, সাপ্লাই চেইন ম্যানেজমেন্ট এবং শেষ মাইল ডেলিভারি পরিষেবা সহ এন্ড-টু-এন্ড লজিস্টিক সলিউশন অফার করি ।"
       },
       "media": {
-        "title": "Media, News & Entertainment",
-        "description": "Our media division manages digital news portals, media production, video and content creation, and advertising network management."
+        "title": "মিডিয়া, সংবাদ এবং বিনোদন",
+        "description": "আমাদের মিডিয়া বিভাগ ডিজিটাল নিউজ পোর্টাল, মিডিয়া প্রোডাকশন, ভিডিও এবং কন্টেন্ট তৈরি এবং বিজ্ঞাপন নেটওয়ার্ক ম্যানেজমেন্ট পরিচালনা করে ।"
       },
       "manufacturing": {
-        "title": "Manufacturing & Wholesale Trading",
-        "description": "We operate industrial manufacturing units, custom production facilities, and bulk wholesale trading operations to support diverse industry needs."
+        "title": "ম্যানুফ্যাকচারিং এবং পাইকারি ট্রেডিং",
+        "description": "আমরা বিভিন্ন শিল্প চাহিদা সমর্থন করার জন্য শিল্প উত্পাদন ইউনিট, কাস্টম উত্পাদন সুবিধা এবং বাল্ক পাইকারি ট্রেডিং অপারেশন পরিচালনা করি ।"
       },
       "staffing": {
-        "title": "Employee Consultancy & Staffing Services",
-        "description": "We assist organizations with recruitment and staffing, HR consulting, and workforce management, helping businesses build efficient and high-performing teams."
+        "title": "এমপ্লয়ী কনসালটেন্সি এবং স্টাফিং সার্ভিস",
+        "description": "আমরা সংস্থাগুলিকে নিয়োগ এবং কর্মী, এইচআর পরামর্শ এবং কর্মশক্তির ব্যবস্থাপনায় সহায়তা করি, ব্যবসাগুলিকে দক্ষ এবং উচ্চ-কর্মক্ষম দল গঠনে সহায়তা করি ।"
       }
     }
   },
   "About": {
-    "headerTitle": "About Us",
-    "headerSubtitle": "A multi-domain enterprise committed to excellence across diverse industries.",
-    "introTitle": "Our Story",
-    "introText": "Doddapaneni Group is a multi-domain enterprise committed to excellence across diverse industries. We operate with a clear vision to build future-focused businesses that combine technology, strategy, and execution. Our expertise spans IT & AI technologies, healthcare solutions, construction and real estate, import-export, manufacturing, logistics, education, media, and professional staffing services. Our strength lies in our ability to understand market needs and deliver customized solutions that drive efficiency, growth, and sustainability. By leveraging innovation, skilled professionals, and strong partnerships, we help businesses navigate complexity and achieve measurable results.",
-    "visionTitle": "Our Vision",
-    "visionText": "To become a globally respected business group recognized for innovation, reliability, and cross-industry leadership.",
-    "missionTitle": "Our Mission",
-    "missionText": "To deliver high-quality, scalable solutions across industries while fostering long-term partnerships, embracing innovation, and maintaining ethical business practices.",
-    "companiesTitle": "Our Group of Companies",
-    "companiesSubtitle": "A unified ecosystem of specialized businesses.",
-    "valuesTitle": "Core Values",
-    "valuesSubtitle": "The principles that guide our every action and decision.",
+    "headerTitle": "আমাদের সম্পর্কে",
+    "headerSubtitle": "একটি মাল্টি-ডোমেন এন্টারপ্রাইজ বিভিন্ন শিল্প জুড়ে শ্রেষ্ঠত্বের জন্য প্রতিশ্রুতিবদ্ধ ।",
+    "introTitle": "আমাদের গল্প",
+    "introText": "ডডাপানেনি গ্রুপ একটি মাল্টি-ডোমেন এন্টারপ্রাইজ যা বিভিন্ন শিল্প জুড়ে শ্রেষ্ঠত্বের জন্য প্রতিশ্রুতিবদ্ধ । আমরা ভবিষ্যত-কেন্দ্রিক ব্যবসা গড়ে তোলার জন্য একটি স্পষ্ট দৃষ্টি নিয়ে কাজ করি যা প্রযুক্তি, কৌশল, এবং মৃত্যুদন্ড কার্যকর করা । আমাদের দক্ষতা আইটি এবং এআই প্রযুক্তি, স্বাস্থ্যসেবা সমাধান, নির্মাণ এবং রিয়েল এস্টেট, আমদানি-রপ্তানি, উত্পাদন, সরবরাহ, শিক্ষা, মিডিয়া এবং পেশাদার কর্মীদের বিস্তৃত পরিষেবা । আমাদের শক্তি বাজারের চাহিদা বুঝতে এবং দক্ষতা, বৃদ্ধি এবং স্থায়িত্বকে চালিত করে এমন কাস্টমাইজড সমাধান সরবরাহ করার আমাদের ক্ষমতার মধ্যে নিহিত । উদ্ভাবন, দক্ষ পেশাদার এবং শক্তিশালী অংশীদারিত্বের মাধ্যমে, আমরা ব্যবসাগুলিকে জটিলতা নেভিগেট করতে এবং পরিমাপযোগ্য ফলাফল অর্জনে সহায়তা করি ।",
+    "visionTitle": "আমাদের দৃষ্টি",
+    "visionText": "উদ্ভাবন, নির্ভরযোগ্যতা এবং ক্রস-শিল্প নেতৃত্বের জন্য স্বীকৃত একটি বিশ্বব্যাপী সম্মানিত ব্যবসায়িক গ্রুপ হয়ে উঠতে ।",
+    "missionTitle": "আমাদের মিশন",
+    "missionText": "দীর্ঘমেয়াদী অংশীদারিত্ব গড়ে তোলা, উদ্ভাবনকে আলিঙ্গন করা এবং নৈতিক ব্যবসায়িক অনুশীলন বজায় রাখার সময় শিল্প জুড়ে উচ্চমানের, স্কেলযোগ্য সমাধান সরবরাহ করা ।",
+    "companiesTitle": "আমাদের গ্রুপ অফ কোম্পানি",
+    "companiesSubtitle": "বিশেষায়িত ব্যবসার একটি সমন্বিত বাস্তুতন্ত্র ।",
+    "valuesTitle": "মূল মূল্যবোধসমূহ",
+    "valuesSubtitle": "নীতিগুলি যা আমাদের প্রতিটি কর্ম এবং সিদ্ধান্তকে নির্দেশ করে ।",
     "valuesList": {
       "integrity": "Integrity",
-      "transparency": "Transparency",
-      "customerFocus": "Customer Focus",
-      "innovation": "Innovation",
-      "operationalExcellence": "Operational Excellence",
-      "sustainableGrowth": "Sustainable Growth"
+      "transparency": "ট্রান্সপারেন্সি",
+      "customerFocus": "কাস্টমার ফোকাস",
+      "innovation": "উদ্ভাবন",
+      "operationalExcellence": "অপারেশনাল এক্সিলেন্স",
+      "sustainableGrowth": "টেকসই বৃদ্ধি"
     },
     "industries": {
-      "it": "IT & AI",
-      "construction": "Construction",
-      "importExport": "Import/Export",
-      "healthcare": "Healthcare",
-      "logistics": "Logistics",
-      "manufacturing": "Manufacturing"
+      "it": "আইটি এবং এআই",
+      "construction": "নির্মাণ",
+      "importExport": "আমদানি রপ্তানি",
+      "healthcare": "স্বাস্থ্যসেবা",
+      "logistics": "লজিস্টিকস",
+      "manufacturing": "প্রস্তুতকারী প্রতিষ্ঠান"
     }
   },
   "ServicesPage": {
-    "title": "Our Services",
-    "description": "Comprehensive solutions tailored to meet the evolving needs of modern businesses. We deliver excellence across industries.",
-    "diverseVentures": "Doddapaneni Group operates across this sector.",
+    "title": "আমাদের সেবাসমূহ",
+    "description": "আধুনিক ব্যবসার ক্রমবর্ধমান চাহিদা মেটাতে তৈরি করা বিস্তৃত সমাধান । আমরা শিল্প জুড়ে শ্রেষ্ঠত্ব প্রদান করি ।",
+    "diverseVentures": "ডডাপানেনি গ্রুপ এই সেক্টর জুড়ে কাজ করে ।",
     "companyDesc": {
-      "dealsmedi": "Your trusted online marketplace for medical and health products in the USA—CPAP, BiPAP, mobility aids, and more.",
-      "dlsin": "A multivendor e-commerce platform connecting buyers and sellers worldwide with secure payments and fast logistics.",
-      "janathaMirror": "A digital-first media enterprise delivering reliable news and engaging content with journalistic integrity."
+      "dealsmedi": "ইউএসএ-সিপিএপি, বিআইপিএপি, মোবিলিটি এইডস এবং আরও অনেক কিছুতে চিকিৎসা ও স্বাস্থ্য পণ্যগুলির জন্য আপনার বিশ্বস্ত অনলাইন মার্কেটপ্লেস ।",
+      "dlsin": "একটি মাল্টিভেন্ডর ই-কমার্স প্ল্যাটফর্ম যা বিশ্বব্যাপী ক্রেতা এবং বিক্রেতাদের নিরাপদ পেমেন্ট এবং দ্রুত সরবরাহের সাথে সংযুক্ত করে ।",
+      "janathaMirror": "একটি ডিজিটাল-প্রথম মিডিয়া এন্টারপ্রাইজ যা নির্ভরযোগ্য সংবাদ সরবরাহ করে এবং সাংবাদিকতার সততার সাথে বিষয়বস্তু আকর্ষন করে ।"
     }
   },
   "ContactPage": {
-    "headerTitle": "Contact Us",
-    "headerSubtitle": "Get in touch with our team to discuss how we can help your business grow.",
-    "getInTouch": "Get In Touch",
-    "emailTitle": "Email",
+    "headerTitle": "আমাদের সাথে যোগাযোগ করুন",
+    "headerSubtitle": "আমরা কীভাবে আপনার ব্যবসা বাড়াতে সহায়তা করতে পারি তা নিয়ে আলোচনা করতে আমাদের টিমের সাথে যোগাযোগ করুন ।",
+    "getInTouch": "টাচ পান",
+    "emailTitle": "ইমেইল",
     "emailAddress": "",
-    "emailResponse": "We'll respond within 24 hours.",
-    "phoneTitle": "Phone",
-    "phoneAvailability": "Mon-Fri from 9am to 6pm.",
-    "locationsTitle": "Locations",
-    "locationIndia": "India (Main)",
-    "addressIndia": "Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, 500085",
-    "locationUSA": "USA",
-    "addressUSA": "5052 SW 40th PL, Ocala, Florida, 34474",
-    "formTitle": "Send us a Message",
-    "successTitle": "Message Sent!",
-    "successMessage": "Thank you for contacting us. We'll be in touch soon.",
-    "formName": "Full Name",
-    "formNamePlaceholder": "Enter Your Name",
-    "formEmail": "Email Address",
-    "formEmailPlaceholder": "Enter Your Email",
-    "formMessage": "Message",
-    "formMessagePlaceholder": "How can we help you?",
-    "sendButton": "Send Message",
-    "sendingButton": "Sending...",
-    "nameRequired": "Name is required",
-    "emailRequired": "Email is required",
-    "emailInvalid": "Please enter a valid email address",
-    "messageRequired": "Message is required",
-    "messageMinLength": "Message must be at least 10 characters"
+    "emailResponse": "আমরা 24 ঘন্টার মধ্যে উত্তর দেব ।",
+    "phoneTitle": "ফোন",
+    "phoneAvailability": "সোম-শুক্র সকাল 9টা থেকে সন্ধ্যা 6টা পর্যন্ত ।",
+    "locationsTitle": "ঠিকানা",
+    "locationIndia": "ভারত (প্রধান)",
+    "addressIndia": "প্লট নং 22,23,41,42 & 43, শ্রী কৃষ্ণ এভিনিউ, ভেঙ্কটরমানা কলোনি, গোকুল প্লট, বাসন্ত নগর, রাঙ্গা রেড্ডি জেলা, 500085",
+    "locationUSA": "ইউ এস এ",
+    "addressUSA": "5052 SW 40th PL, ওকালা, ফ্লোরিডা, 34474",
+    "formTitle": "একটি বার্তা পাঠান",
+    "successTitle": "বার্তা পাঠানো হয়েছে",
+    "successMessage": "আমাদের সাথে যোগাযোগ করার জন্য ধন্যবাদ । আমরা শীঘ্রই যোগাযোগ করব ।",
+    "formName": "সম্পূর্ণ নাম",
+    "formNamePlaceholder": "আপনার নাম লিখুন",
+    "formEmail": "আপনার ইমেইল",
+    "formEmailPlaceholder": "আপনার ইমেল ঠিকানা লিখুন ",
+    "formMessage": "মেসেজ",
+    "formMessagePlaceholder": "আমরা কীভাবে সাহায্য করতে পারি?",
+    "sendButton": "ম্যাসেজ সেন্ড করুন",
+    "sendingButton": "পাঠানো হচ্ছে ...",
+    "nameRequired": "নাম আবশ্যক",
+    "emailRequired": "ইমেইল আবশ্যক",
+    "emailInvalid": "দয়া করে একটি বৈধ ইমেইল ঠিকানা লিখুন",
+    "messageRequired": "মেসেজ প্রয়োজন",
+    "messageMinLength": "মেসেজ অবশ্যই কমপক্ষে 10টি অক্ষরের হতে হবে"
   },
   "Dlsin": {
-    "partOf": "Part of Doddapaneni Group",
-    "subtitle": "A Multivendor E-Commerce Platform Connecting the World.",
-    "sectionTitle": "Redefining Global Trade",
-    "p1": "Dlsin is a cutting-edge multivendor e-commerce ecosystem designed to empower businesses and delight customers. We bridge the gap between local sellers and global markets, offering a seamless shopping experience backed by robust technology.",
-    "p2": "From retail to wholesale, Dlsin provides the infrastructure for digital commerce to thrive. Our platform supports diverse categories, ensuring that quality products reach customers efficiently, no matter where they are.",
+    "partOf": "ডডাপানেনি গ্রুপের অংশ",
+    "subtitle": "একটি মাল্টিভেন্ডর ই-কমার্স প্ল্যাটফর্ম যা বিশ্বকে সংযুক্ত করছে ।",
+    "sectionTitle": "গ্লোবাল ট্রেডকে নতুন করে সংজ্ঞায়িত করা",
+    "p1": "Dlsin হল একটি অত্যাধুনিক মাল্টিভেন্ডর ই-কমার্স ইকোসিস্টেম যা ব্যবসার ক্ষমতায়ন এবং গ্রাহকদের আনন্দিত করার জন্য ডিজাইন করা হয়েছে । আমরা স্থানীয় বিক্রেতা এবং বৈশ্বিক বাজারের মধ্যে ব্যবধান তৈরি করি, যা শক্তিশালী প্রযুক্তি দ্বারা সমর্থিত একটি নির্বিঘ্ন শপিংয়ের অভিজ্ঞতা প্রদান করে ।",
+    "p2": "খুচরা থেকে পাইকারি, Dlsin ডিজিটাল কমার্সের সমৃদ্ধির জন্য অবকাঠামো সরবরাহ করে । আমাদের প্ল্যাটফর্ম বিভিন্ন বিভাগকে সমর্থন করে, নিশ্চিত করে যে মানের পণ্যগুলি গ্রাহকদের কাছে দক্ষতার সাথে পৌঁছায়, তারা যেখানেই থাকুক না কেন ।",
     "features": {
       "globalMarketplace": {
-        "title": "Global Marketplace",
-        "description": "Connecting buyers and sellers from around the world on a single, unified platform."
+        "title": "গ্লোবাল মার্কেটপ্লেস",
+        "description": "একটি একক, ইউনিফাইড প্ল্যাটফর্মে সারা বিশ্ব থেকে ক্রেতা এবং বিক্রেতাদের সংযুক্ত করা ।"
       },
       "securePayments": {
-        "title": "Secure Payments",
-        "description": "Advanced encryption and secure payment gateways ensuring safe transactions for all users."
+        "title": "নিরাপদ পেমেন্ট",
+        "description": "সমস্ত ব্যবহারকারীর জন্য নিরাপদ লেনদেন নিশ্চিত করার জন্য উন্নত এনক্রিপশন এবং নিরাপদ পেমেন্ট গেটওয়ে ।"
       },
       "fastLogistics": {
-        "title": "Fast Logistics",
-        "description": "Integrated logistics network for timely deliveries across borders."
+        "title": "দ্রুত লজিস্টিক",
+        "description": "সীমান্ত অতিক্রম করে সময়মত ডেলিভারির জন্য ইন্টিগ্রেটেড লজিস্টিক নেটওয়ার্ক ।"
       },
       "vendorTools": {
-        "title": "Vendor Tools",
-        "description": "Comprehensive dashboard and analytics for sellers to manage and grow their business."
+        "title": "বিক্রেতার সরঞ্জাম",
+        "description": "বিক্রেতাদের তাদের ব্যবসা পরিচালনা এবং বৃদ্ধি করার জন্য বিস্তৃত ড্যাশবোর্ড এবং বিশ্লেষণ ।"
       }
     }
   },
   "JanathaMirror": {
-    "partOf": "Part of Doddapaneni Group",
-    "subtitle": "Truth, Perspective, and the Power of Information.",
-    "followUs": "Follow us",
-    "sectionTitle": "The Voice of the People",
-    "p1": "Janatha Mirror is a dynamic media enterprise committed to journalistic integrity and public awareness. In an era of information overload, we strive to provide clarity, depth, and context to the stories that matter most.",
-    "p2": "Covering politics, business, entertainment, and social issues, Janatha Mirror connects communities through reliable news and engaging content. Our digital-first approach ensures that information is accessible, timely, and impactful.",
+    "partOf": "ডডাপানেনি গ্রুপের অংশ",
+    "subtitle": "সত্য, দৃষ্টিকোণ এবং তথ্যের ক্ষমতা ।",
+    "followUs": "আমাদের অনুসরণ করো",
+    "sectionTitle": "জনগণের কণ্ঠস্বর",
+    "p1": "জনতা মিরর একটি গতিশীল মিডিয়া এন্টারপ্রাইজ যা সাংবাদিকতা অখণ্ডতা এবং জনসচেতনতার জন্য প্রতিশ্রুতিবদ্ধ । তথ্য ওভারলোডের যুগে, আমরা সর্বাধিক গুরুত্বপূর্ণ গল্পগুলির স্পষ্টতা, গভীরতা এবং প্রসঙ্গ প্রদানের চেষ্টা করি ।",
+    "p2": "রাজনীতি, ব্যবসা, বিনোদন এবং সামাজিক বিষয়গুলি কভার করে, জনতা মিরর নির্ভরযোগ্য সংবাদ এবং আকর্ষক সামগ্রীর মাধ্যমে সম্প্রদায়গুলিকে সংযুক্ত করে । আমাদের ডিজিটাল-প্রথম পদ্ধতি নিশ্চিত করে যে তথ্য অ্যাক্সেসযোগ্য, সময়োপযোগী এবং প্রভাবশালী ।",
     "features": {
       "unbiasedReporting": {
-        "title": "Unbiased Reporting",
-        "description": "Delivering facts as they are, without bias or distortion."
+        "title": "পক্ষপাতহীন প্রতিবেদন",
+        "description": "পক্ষপাত বা বিকৃতি ছাড়াই তারা যেমন আছে তেমন তথ্য সরবরাহ করা ।"
       },
       "digitalFirst": {
-        "title": "Digital First",
-        "description": "Optimized for the modern web, mobile, and social platforms."
+        "title": "ডিজিটাল ফার্স্ট",
+        "description": "আধুনিক ওয়েব, মোবাইল এবং সামাজিক প্ল্যাটফর্মের জন্য অনুকূলিত ।"
       },
       "multimediaContent": {
-        "title": "Multimedia Content",
-        "description": "Rich video content, interviews, and documentaries."
+        "title": "মাল্টিমিডিয়া কন্টেন্ট",
+        "description": "সমৃদ্ধ ভিডিও সামগ্রী, সাক্ষাৎকার এবং ডকুমেন্টারি ।"
       },
       "globalPerspective": {
-        "title": "Global Perspective",
-        "description": "Local stories with global relevance and international coverage."
+        "title": "বৈশ্বিক দৃষ্টিভঙ্গি",
+        "description": "বিশ্বব্যাপী প্রাসঙ্গিকতা এবং আন্তর্জাতিক কভারেজ সহ স্থানীয় গল্প ।"
       }
     }
   },
   "DealsMedi": {
-    "partOf": "Part of Doddapaneni Group",
-    "subtitle": "Your trusted online marketplace for medical and health products in the USA.",
-    "followUs": "Follow us",
-    "sectionTitle": "Medical & Health Products for the USA",
-    "p1": "DealsMedi is a website which sells medical products only in the USA, including prescription-required products and non-prescription products. CPAP, BiPAP, oxygen concentrators, hospital beds, mobility chairs, and everything in between are available through our platform.",
-    "p2": "From respiratory care and sleep therapy to mobility aids, bathroom safety, orthopedic supports, and medical supplies—DealsMedi brings you a single trusted marketplace for healthcare and wellness products. Shop with confidence at dealsmedi.com.",
+    "partOf": "ডডাপানেনি গ্রুপের অংশ",
+    "subtitle": "মার্কিন যুক্তরাষ্ট্রে চিকিৎসা এবং স্বাস্থ্য পণ্যগুলির জন্য আপনার বিশ্বস্ত অনলাইন মার্কেটপ্লেস ।",
+    "followUs": "আমাদের অনুসরণ করো",
+    "sectionTitle": "মার্কিন যুক্তরাষ্ট্রের জন্য চিকিৎসা ও স্বাস্থ্য পণ্য",
+    "p1": "DealsMedi একটি ওয়েবসাইট যা শুধুমাত্র মার্কিন যুক্তরাষ্ট্রে চিকিৎসা পণ্য বিক্রি করে, যার মধ্যে রয়েছে প্রেসক্রিপশন-নির্ভর পণ্য এবং নন-প্রেসক্রিপশন পণ্য । সিপিএপি, বিপিএপি, অক্সিজেন কনসেন্ট্রেটর, হাসপাতালের বিছানা, চলাফেরার চেয়ার এবং এর মধ্যে থাকা সবকিছু আমাদের প্ল্যাটফর্মের মাধ্যমে পাওয়া যায় ।",
+    "p2": "শ্বাসযন্ত্রের যত্ন এবং ঘুমের থেরাপি থেকে শুরু করে গতিশীলতা সহায়তা, বাথরুমের নিরাপত্তা, অর্থোপেডিক সহায়তা এবং চিকিৎসা সরঞ্জাম- DealsMedi আপনাকে স্বাস্থ্যসেবা এবং সুস্থতা পণ্যগুলির জন্য একটি বিশ্বস্ত বাজার এনে দেয় । dealmedi.com-এ আত্মবিশ্বাসের সাথে কেনাকাটা করুন ।",
     "websiteUrl": "https://dealsmedi.com/",
-    "visitWebsite": "Visit DealsMedi",
+    "visitWebsite": "DealsMedi দেখুন",
     "features": {
       "respiratory": {
-        "title": "Respiratory & Sleep Therapy",
-        "description": "CPAP, BiPAP machines, oxygen concentrators, masks, and sleep apnea therapy products."
+        "title": "শ্বাসযন্ত্র এবং ঘুমের থেরাপি",
+        "description": "সিপিএপি, বিপিএপি মেশিন, অক্সিজেন কনসেন্ট্রেটর, মাস্ক এবং স্লিপ অ্যাপনিয়া থেরাপি পণ্য ।"
       },
       "mobility": {
-        "title": "Mobility & Daily Living",
-        "description": "Mobility scooters, wheelchairs, rollators, bathroom safety, and daily living aids."
+        "title": "গতিশীলতা এবং দৈনন্দিন জীবনযাত্রা",
+        "description": "গতিশীলতা স্কুটার, হুইলচেয়ার, রোলার, বাথরুমের নিরাপত্তা এবং দৈনন্দিন জীবনযাত্রার উপকরণ ।"
       },
       "bedsAndChairs": {
-        "title": "Hospital Beds & Chairs",
-        "description": "Hospital beds, electric beds, mobility chairs, and homecare equipment."
+        "title": "হাসপাতালের বিছানা ও চেয়ার",
+        "description": "হাসপাতালের বিছানা, বৈদ্যুতিক বিছানা, গতিশীলতা চেয়ার এবং হোম কেয়ার সরঞ্জাম ।"
       },
       "prescriptionAndOTC": {
-        "title": "Prescription & OTC",
-        "description": "Prescription-required and over-the-counter medical and health products."
+        "title": "প্রেসক্রিপশন এবং ওটিসি",
+        "description": "প্রেসক্রিপশন-নির্ধারিত এবং ওভার-দ্য-কাউন্টার মেডিকেল এবং স্বাস্থ্য পণ্য ।"
       }
     }
   },
   "NotFound": {
-    "title": "Page Not Found",
-    "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
-    "homeButton": "Go Back Home"
+    "title": "পেইজ খুঁজে পাওয়া যায়নি",
+    "description": "আপনি যে পাতাটি সন্ধান করছেন সেটি সম্ভবত মুছে ফেলা হয়েছে, এর নাম পরিবর্তন হয়েছে বা অস্থায়ীভাবে অনুপলব্ধ।",
+    "homeButton": "বাড়ি ফিরে যাও"
   },
   "Error": {
-    "title": "Something went wrong!",
-    "description": "We apologize for the inconvenience. An unexpected error has occurred.",
-    "retry": "Try again"
+    "title": "কিছু ভুল হয়েছে!",
+    "description": "অসুবিধার জন্য আমরা ক্ষমাপ্রার্থী । একটি অপ্রত্যাশিত ত্রুটি ঘটেছে ।",
+    "retry": "আবার চেষ্টা করুন"
   },
   "PrivacyPolicy": {
-    "title": "Privacy Policy",
-    "subtitle": "How we collect, use, and protect your personal information.",
-    "lastUpdated": "Last Updated: February 2026",
-    "introduction": "At Doddapaneni Group, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.",
-    "informationWeCollect": "Information We Collect",
-    "informationWeCollectDesc": "We may collect information that you provide directly to us, including your name, email address, phone number, and any other information you choose to provide when contacting us or subscribing to our newsletter.",
-    "howWeUse": "How We Use Your Information",
-    "howWeUseDesc": "We use the information we collect to provide, maintain, and improve our services, respond to your inquiries, send you newsletters and updates, and comply with legal obligations.",
-    "dataProtection": "Data Protection",
-    "dataProtectionDesc": "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.",
-    "cookies": "Cookies",
-    "cookiesDesc": "Our website may use cookies to enhance your browsing experience. You can control cookie preferences through your browser settings.",
-    "thirdParty": "Third-Party Services",
-    "thirdPartyDesc": "We may use third-party services that collect, monitor, and analyze information to help us improve our website and services.",
-    "yourRights": "Your Rights",
-    "yourRightsDesc": "You have the right to access, update, or delete your personal information. To exercise these rights, please contact us using the information provided in our Contact page.",
-    "changes": "Changes to This Policy",
-    "changesDesc": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page."
+    "title": "ব্যক্তিগত গোপনীয়তার নীতি",
+    "subtitle": "আমরা কীভাবে আপনার ব্যক্তিগত তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষা করি ।",
+    "lastUpdated": "সর্বশেষ আপডেট করা হয়েছে: ফেব্রুয়ারি 2026",
+    "introduction": "Doddapaneni গ্রুপে, আমরা আপনার গোপনীয়তা রক্ষা করতে প্রতিশ্রুতিবদ্ধ । এই গোপনীয়তা নীতিটি ব্যাখ্যা করে যে আপনি যখন আমাদের ওয়েবসাইটে যান তখন আমরা কীভাবে আপনার তথ্য সংগ্রহ, ব্যবহার, প্রকাশ এবং সুরক্ষা করি ।",
+    "informationWeCollect": "আমরা কী তথ্য সংগ্রহ করি?",
+    "informationWeCollectDesc": "আমাদের সাথে যোগাযোগ করার সময় বা আমাদের নিউজলেটার সাবস্ক্রাইব করার সময় আপনার নাম, ইমেল ঠিকানা, ফোন নম্বর এবং অন্য যে কোনও তথ্য সহ আপনি সরাসরি আমাদের যে তথ্য সরবরাহ করেন তা আমরা সংগ্রহ করতে পারি ।",
+    "howWeUse": "আমরা কীভাবে আপনার তথ্য ব্যবহার করি",
+    "howWeUseDesc": "আমরা আমাদের পরিষেবাগুলি প্রদান, রক্ষণাবেক্ষণ এবং উন্নত করতে, আপনার অনুসন্ধানের প্রতিক্রিয়া জানাতে, আপনাকে নিউজলেটার এবং আপডেট পাঠাতে এবং আইনি বাধ্যবাধকতাগুলি মেনে চলার জন্য সংগৃহীত তথ্য ব্যবহার করি ।",
+    "dataProtection": "ডেটা সুরক্ষা",
+    "dataProtectionDesc": "অননুমোদিত অ্যাক্সেস, পরিবর্তন, প্রকাশ বা ধ্বংসের বিরুদ্ধে আপনার ব্যক্তিগত তথ্য রক্ষা করার জন্য আমরা যথাযথ প্রযুক্তিগত এবং সাংগঠনিক ব্যবস্থা গ্রহণ করি ।",
+    "cookies": "কুকিজ",
+    "cookiesDesc": "আমাদের ওয়েবসাইট আপনার ব্রাউজিং অভিজ্ঞতা উন্নত করতে কুকি ব্যবহার করতে পারে । আপনি আপনার ব্রাউজার সেটিংসের মাধ্যমে কুকি পছন্দগুলি নিয়ন্ত্রণ করতে পারেন ।",
+    "thirdParty": "তৃতীয় পক্ষের পরিষেবাগুলি",
+    "thirdPartyDesc": "আমাদের ওয়েবসাইট এবং পরিষেবাগুলি উন্নত করতে সহায়তা করার জন্য আমরা তৃতীয় পক্ষের পরিষেবাগুলি ব্যবহার করতে পারি যা তথ্য সংগ্রহ, নিরীক্ষণ এবং বিশ্লেষণ করে ।",
+    "yourRights": "আপনার অধিকার",
+    "yourRightsDesc": "আপনার ব্যক্তিগত তথ্য অ্যাক্সেস, আপডেট বা মুছে ফেলার অধিকার আপনার আছে । এই অধিকারগুলি প্রয়োগ করতে, অনুগ্রহ করে আমাদের যোগাযোগ পৃষ্ঠায় প্রদত্ত তথ্য ব্যবহার করে আমাদের সাথে যোগাযোগ করুন ।",
+    "changes": "এই নীতিতে পরিবর্তন",
+    "changesDesc": "আমরা সময়ে সময়ে এই গোপনীয়তা নীতি আপডেট করতে পারি । এই পৃষ্ঠায় নতুন গোপনীয়তা নীতি পোস্ট করে আমরা আপনাকে কোনও পরিবর্তন সম্পর্কে অবহিত করব ।"
   },
   "TermsConditions": {
-    "title": "Terms & Conditions",
-    "subtitle": "Website usage rules and terms of service.",
-    "lastUpdated": "Last Updated: February 2026",
-    "acceptance": "Acceptance of Terms",
-    "acceptanceDesc": "By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement.",
-    "useLicense": "Use License",
-    "useLicenseDesc": "Permission is granted to temporarily download one copy of the materials on Doddapaneni Group's website for personal, non-commercial transitory viewing only.",
-    "restrictions": "Restrictions",
-    "restrictionsDesc": "You are specifically restricted from modifying or copying the materials, using the materials for any commercial purpose, or removing any copyright or other proprietary notations from the materials.",
-    "disclaimer": "Disclaimer",
-    "disclaimerDesc": "The materials on Doddapaneni Group's website are provided on an 'as is' basis. Doddapaneni Group makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.",
-    "limitations": "Limitations",
-    "limitationsDesc": "In no event shall Doddapaneni Group or its suppliers be liable for any damages arising out of the use or inability to use the materials on this website.",
-    "revisions": "Revisions and Errata",
-    "revisionsDesc": "The materials appearing on Doddapaneni Group's website could include technical, typographical, or photographic errors. We do not warrant that any of the materials are accurate, complete, or current.",
-    "links": "Links",
-    "linksDesc": "Doddapaneni Group has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site."
+    "title": "শর্তাবলী",
+    "subtitle": "ওয়েবসাইট ব্যবহারের নিয়ম এবং পরিষেবার শর্তাবলী ।",
+    "lastUpdated": "সর্বশেষ আপডেট করা হয়েছে: ফেব্রুয়ারি 2026",
+    "acceptance": "শর্তাবলীর গ্রহণযোগ্যতা",
+    "acceptanceDesc": "এই ওয়েবসাইট অ্যাক্সেস এবং ব্যবহার করে, আপনি এই চুক্তির শর্তাবলী এবং বিধান দ্বারা আবদ্ধ হতে সম্মত হন এবং সম্মত হন ।",
+    "useLicense": "লাইসেন্স ব্যবহার করুন",
+    "useLicenseDesc": "ব্যক্তিগত, অ-বাণিজ্যিক ট্রানজিটরি দেখার জন্য Doddapaneni গ্রুপের ওয়েবসাইটে সাময়িকভাবে উপকরণগুলির একটি অনুলিপি ডাউনলোড করার অনুমতি দেওয়া হয় ।",
+    "restrictions": "সীমাবদ্ধতা",
+    "restrictionsDesc": "আপনি বিশেষভাবে উপকরণগুলি পরিবর্তন বা অনুলিপি করা, কোনও বাণিজ্যিক উদ্দেশ্যে উপকরণগুলি ব্যবহার করা বা উপকরণগুলি থেকে কোনও কপিরাইট বা অন্যান্য মালিকানা নোটগুলি অপসারণ করা থেকে সীমাবদ্ধ ।",
+    "disclaimer": "ঘোষণা:",
+    "disclaimerDesc": "ডডাপানেনি গ্রুপের ওয়েবসাইটের উপকরণগুলি 'যেমন আছে' ভিত্তিতে সরবরাহ করা হয় । ডডাপানেনি গ্রুপ কোনও ওয়্যারেন্টি, প্রকাশ বা অন্তর্নিহিত করে না এবং এর মাধ্যমে অন্যান্য সমস্ত ওয়্যারেন্টি অস্বীকার করে এবং প্রত্যাখ্যান করে ।",
+    "limitations": "সীমাবদ্ধতা",
+    "limitationsDesc": "Doddapaneni গ্রুপ বা এর সরবরাহকারীরা এই ওয়েবসাইটে উপকরণগুলি ব্যবহার বা অক্ষমতা থেকে উদ্ভূত কোনও ক্ষতির জন্য দায়বদ্ধ হবে না ।",
+    "revisions": "সংশোধন এবং ত্রুটি",
+    "revisionsDesc": "Doddapaneni গ্রুপের ওয়েবসাইটে প্রদর্শিত উপকরণগুলিতে প্রযুক্তিগত, টাইপোগ্রাফিক বা ফটোগ্রাফিক ত্রুটি অন্তর্ভুক্ত থাকতে পারে । আমরা নিশ্চিত নই যে কোনও উপকরণ সঠিক, সম্পূর্ণ বা বর্তমান ।",
+    "links": "লিঙ্কসমূহ",
+    "linksDesc": "Doddapaneni গ্রুপ তার ওয়েবসাইটের সাথে লিঙ্ক করা সমস্ত সাইট পর্যালোচনা করেনি এবং এই জাতীয় কোনও লিঙ্কযুক্ত সাইটের সামগ্রীর জন্য দায়বদ্ধ নয় ।"
   },
   "Disclaimer": {
-    "title": "Disclaimer",
-    "subtitle": "General legal safety and website disclaimer.",
-    "lastUpdated": "Last Updated: February 2026",
-    "general": "General Disclaimer",
-    "generalDesc": "The information on this website is provided on an 'as is' basis. To the fullest extent permitted by law, Doddapaneni Group excludes all representations, warranties, and conditions relating to our website and the use of this website.",
-    "noWarranty": "No Warranty",
-    "noWarrantyDesc": "Doddapaneni Group does not warrant that the website will be available at all times or that the information on the website is complete, accurate, or up-to-date.",
-    "limitation": "Limitation of Liability",
-    "limitationDesc": "Doddapaneni Group will not be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your access to or use of this website.",
-    "externalLinks": "External Links",
-    "externalLinksDesc": "Our website may contain links to external websites. We are not responsible for the content or privacy practices of these external sites.",
-    "businessDisclaimer": "Business Disclaimer",
-    "businessDisclaimerDesc": "While we strive to provide accurate information about our services and businesses, we make no representations or warranties regarding the accuracy, completeness, or suitability of the information for any particular purpose.",
-    "jurisdiction": "Jurisdiction",
-    "jurisdictionDesc": "This disclaimer is governed by and construed in accordance with applicable laws. Any disputes relating to this disclaimer will be subject to the exclusive jurisdiction of the courts."
+    "title": "ঘোষণা:",
+    "subtitle": "সাধারণ আইনি নিরাপত্তা এবং ওয়েবসাইট অস্বীকৃতি ।",
+    "lastUpdated": "সর্বশেষ আপডেট করা হয়েছে: ফেব্রুয়ারি 2026",
+    "general": "সাধারণ অস্বীকৃতি",
+    "generalDesc": "এই ওয়েবসাইটের তথ্য 'যেমন আছে' ভিত্তিতে সরবরাহ করা হয় । আইন দ্বারা অনুমোদিত সর্বাধিক পরিমাণে, Doddapaneni গ্রুপ আমাদের ওয়েবসাইট এবং এই ওয়েবসাইটের ব্যবহার সম্পর্কিত সমস্ত উপস্থাপনা, ওয়্যারেন্টি এবং শর্তাদি বাদ দেয় ।",
+    "noWarranty": " নিশ্চয়তা নেই।",
+    "noWarrantyDesc": "Doddapaneni গ্রুপ নিশ্চয়তা দেয় না যে ওয়েবসাইটটি সর্বদা উপলব্ধ থাকবে বা ওয়েবসাইটের তথ্য সম্পূর্ণ, সঠিক বা আপ-টু-ডেট থাকবে ।",
+    "limitation": "দায়বদ্ধতার সীমাবদ্ধতা।",
+    "limitationDesc": "Doddapaneni গ্রুপ এই ওয়েবসাইটে আপনার অ্যাক্সেস বা ব্যবহারের ফলে উদ্ভূত কোনও প্রত্যক্ষ, পরোক্ষ, আনুষঙ্গিক, ফলস্বরূপ বা শাস্তিমূলক ক্ষতির জন্য দায়বদ্ধ হবে না ।",
+    "externalLinks": "বাহ্যিক লিঙ্ক",
+    "externalLinksDesc": "আমাদের ওয়েবসাইটে বহিরাগত ওয়েবসাইটগুলির লিঙ্ক থাকতে পারে । এই বাহ্যিক সাইটগুলির বিষয়বস্তু বা গোপনীয়তা অনুশীলনের জন্য আমরা দায়বদ্ধ নই ।",
+    "businessDisclaimer": "ব্যবসায়িক অস্বীকৃতি",
+    "businessDisclaimerDesc": "যদিও আমরা আমাদের পরিষেবা এবং ব্যবসা সম্পর্কে সঠিক তথ্য সরবরাহ করার চেষ্টা করি, আমরা কোনও নির্দিষ্ট উদ্দেশ্যে তথ্যের নির্ভুলতা, সম্পূর্ণতা বা উপযুক্ততা সম্পর্কিত কোনও উপস্থাপনা বা ওয়্যারেন্টি তৈরি করি না ।",
+    "jurisdiction": "আইনগত অধিকার: -",
+    "jurisdictionDesc": "এই দাবিত্যাগটি প্রযোজ্য আইন অনুসারে পরিচালিত এবং ব্যাখ্যা করা হয় । এই দাবিত্যাগ সম্পর্কিত যে কোনও বিরোধ আদালতের একচেটিয়া এখতিয়ারের অধীন হবে ।"
   },
   "FAQ": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about Doddapaneni Group.",
-    "contactSupport": "Still have questions?",
-    "contactSupportDesc": "If you can't find the answer you're looking for, please contact our support team.",
-    "contactButton": "Contact Support",
+    "title": "সচরাচর জিজ্ঞাসিত প্রশ্নাবলী",
+    "subtitle": "Doddapaneni গ্রুপ সম্পর্কে সাধারণ প্রশ্নের উত্তর খুঁজুন ।",
+    "contactSupport": "<ph dataRef=\"source5\" id=\"source5\"/>এখনও প্রশ্ন আছে?<ph dataRef=\"source6\" id=\"source6\"/>",
+    "contactSupportDesc": "আপনি যে উত্তরটি খুঁজছেন তা যদি খুঁজে না পান, তাহলে অনুগ্রহ করে আমাদের সহায়তা টিমের সাথে যোগাযোগ করুন ।",
+    "contactButton": "সাপোর্টে যোগাযোগ করুন",
     "questions": {
       "q1": {
         "question": "What services does Doddapaneni Group offer?",

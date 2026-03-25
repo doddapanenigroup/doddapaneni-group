@@ -35,7 +35,7 @@ export default function DealsMedi() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/dealsmedi.png"
+            src="/dealsmedi.webp"
             alt="DealsMedi Logo"
             width={140}
             height={56}
@@ -88,7 +88,7 @@ export default function DealsMedi() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/medical.jpg"
+                src="/medical.webp"
                 alt="Medical and health products" 
                 fill
                 className="object-cover"

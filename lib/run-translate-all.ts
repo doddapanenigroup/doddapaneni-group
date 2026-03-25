@@ -2,13 +2,35 @@ import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { translateText, delay } from '@/lib/translate';
 import { getLeafKeys, getNestedKey, setNestedKey } from '@/lib/i18n-sync';
+import { routing } from '@/i18n/routing';
 
 const SOURCE_LOCALE = 'en';
-const TARGET_LOCALES = [
-  'te', 'hi', 'es',
-  'bn', 'mr', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks',
-];
-const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 500;
+
+/** Sensible default for HTTP (Developer Dashboard): 3 locales finish in a few minutes. */
+const DASHBOARD_DEFAULT_LOCALES = ['te', 'hi', 'es'] as const;
+
+/**
+ * Locales to fill from `en.json`:
+ * - `TRANSLATE_ALL_APP_LOCALES=true` → every locale in i18n/routing except `en` (very slow; use CLI instead).
+ * - `TRANSLATE_LOCALES=bn,mr,ta` → explicit list (comma-separated).
+ * - Otherwise → te, hi, es only.
+ */
+export function getTargetLocalesForTranslateAll(): string[] {
+  if (process.env.TRANSLATE_ALL_APP_LOCALES === '1' || process.env.TRANSLATE_ALL_APP_LOCALES === 'true') {
+    return routing.locales.filter((l) => l !== SOURCE_LOCALE);
+  }
+  const raw = process.env.TRANSLATE_LOCALES?.trim();
+  if (raw) {
+    return raw
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean)
+      .filter((l) => l !== SOURCE_LOCALE);
+  }
+  return [...DASHBOARD_DEFAULT_LOCALES];
+}
+
+const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 250;
 
 /** Skip translating long HTML blog content here; use scripts/translate-blog-content.mjs to preserve structure. */
 function shouldSkipKey(keyPath: string, value: string): boolean {
@@ -34,8 +56,9 @@ export async function runTranslateAll(): Promise<{
   const enData = JSON.parse(enRaw) as Record<string, unknown>;
   const enLeaves = getLeafKeys(enData);
   const results: TranslateAllResult[] = [];
+  const targetLocales = getTargetLocalesForTranslateAll();
 
-  for (const locale of TARGET_LOCALES) {
+  for (const locale of targetLocales) {
     const localePath = path.join(messagesDir, `${locale}.json`);
     let targetData: Record<string, unknown> = {};
     try {

@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, DashboardVisit } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import type { Role } from '@/lib/constants';
-import mongoose from 'mongoose';
+import type { Role as DbRole } from '@/lib/prisma-generated';
 
 const DASHBOARD_PATHS = ['dashboard', 'super-admin', 'admin', 'developer', 'marketer', 'employees'] as const;
+
+function toDbRole(role: Role): DbRole {
+  return role as DbRole;
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -30,21 +34,16 @@ export async function POST(request: Request) {
   try {
     await connectDb();
 
-    const userId = mongoose.Types.ObjectId.isValid(session.user.id)
-      ? new mongoose.Types.ObjectId(session.user.id)
-      : null;
-    if (!userId) {
-      return NextResponse.json({ message: 'Invalid user' }, { status: 400 });
-    }
-
     const visitedAt = new Date();
-    await DashboardVisit.create({
-      userId,
-      path,
-      role: session.user.role as Role,
-      visitedAt,
-      visitedAtIST: formatInIST(visitedAt),
-      visitedAtET: formatInET(visitedAt),
+    await prisma.dashboardVisit.create({
+      data: {
+        userId: session.user.id,
+        path,
+        role: toDbRole(session.user.role as Role),
+        visitedAt,
+        visitedAtIST: formatInIST(visitedAt),
+        visitedAtET: formatInET(visitedAt),
+      },
     });
 
     return NextResponse.json({ ok: true });

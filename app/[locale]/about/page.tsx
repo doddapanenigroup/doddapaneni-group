@@ -24,17 +24,17 @@ export default function About() {
     <ContentPage pageKey="about" locale={locale}>
     <div className="min-h-screen bg-white">
       {/* Page heading – small blue strip */}
-      <section className="bg-blue-900 py-8 md:py-10 px-4 sm:px-6 lg:px-8">
+      <section className="bg-blue-900 py-6 md:py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-white">{t('headerTitle')}</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t('headerTitle')}</h1>
           <p className="mt-2 text-blue-200 text-sm md:text-base max-w-2xl mx-auto">{t('headerSubtitle')}</p>
         </div>
       </section>
 
       {/* Intro */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-8 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -42,10 +42,10 @@ export default function About() {
               transition={{ duration: 0.5 }}
             >
               <span className="inline-block w-12 h-0.5 rounded-full bg-blue-800 mb-4" />
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 tracking-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">
                 {t('introTitle')}
               </h2>
-              <p className="text-slate-700 text-lg leading-relaxed">
+              <p className="text-slate-700 text-base md:text-lg leading-relaxed">
                 {t('introText')}
               </p>
             </motion.div>
@@ -57,7 +57,7 @@ export default function About() {
               className="relative rounded-xl overflow-hidden border border-blue-100 aspect-[4/3]"
             >
               <Image
-                src="/about.jpg"
+                src="/about.webp"
                 alt="Strategic Meeting"
                 fill
                 className="object-cover"
@@ -68,23 +68,23 @@ export default function About() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
+      <section className="py-8 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="grid md:grid-cols-2 gap-4 sm:gap-8 mb-8 md:mb-12">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="bg-blue-900 p-8 rounded-xl text-white border border-blue-800"
+              className="bg-blue-900 p-5 sm:p-8 rounded-xl text-white border border-blue-800"
             >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-white">
-                  <Eye size={24} strokeWidth={1.75} />
+              <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/20 flex items-center justify-center text-white">
+                  <Eye className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.75} />
                 </div>
-                <h3 className="text-xl font-bold text-white pt-1">{t('visionTitle')}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white pt-0.5 sm:pt-1">{t('visionTitle')}</h3>
               </div>
-              <p className="text-blue-200 text-base leading-relaxed">
+              <p className="text-blue-200 text-sm sm:text-base leading-relaxed">
                 {t('visionText')}
               </p>
             </motion.div>
@@ -93,15 +93,15 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-blue-900 p-8 rounded-xl text-white border border-blue-800"
+              className="bg-blue-900 p-5 sm:p-8 rounded-xl text-white border border-blue-800"
             >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-white">
-                  <Target size={24} strokeWidth={1.75} />
+              <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/20 flex items-center justify-center text-white">
+                  <Target className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.75} />
                 </div>
-                <h3 className="text-xl font-bold text-white pt-1">{t('missionTitle')}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white pt-0.5 sm:pt-1">{t('missionTitle')}</h3>
               </div>
-              <p className="text-blue-200 text-base leading-relaxed">
+              <p className="text-blue-200 text-sm sm:text-base leading-relaxed">
                 {t('missionText')}
               </p>
             </motion.div>
@@ -110,11 +110,11 @@ export default function About() {
       </section>
 
       {/* Core Values */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-8 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="inline-block w-12 h-0.5 rounded-full bg-blue-800 mx-auto mb-3" />
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{t('valuesTitle')}</h2>
+          <div className="text-center mb-6 md:mb-8">
+            <span className="inline-block w-12 h-0.5 rounded-full bg-blue-800 mx-auto mb-2 sm:mb-3" />
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2">{t('valuesTitle')}</h2>
             <p className="text-slate-600 max-w-xl mx-auto text-sm">{t('valuesSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

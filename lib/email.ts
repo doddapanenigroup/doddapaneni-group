@@ -14,15 +14,60 @@ export function shouldSendLoginSuccessEmail(role: string): boolean {
   return ROLES_FOR_LOGIN_EMAIL.includes(role as (typeof ROLES_FOR_LOGIN_EMAIL)[number]);
 }
 
+/** SMTP login / From address (supports aliases for common .env setups). */
+export function getSmtpUser(): string | undefined {
+  const u =
+    process.env.EMAIL_USER?.trim() ||
+    process.env.SMTP_USER?.trim();
+  return u || undefined;
+}
+
+function getSmtpPassword(): string | undefined {
+  const p =
+    process.env.EMAIL_PASS?.trim() ||
+    process.env.SMTP_PASS?.trim() ||
+    process.env.GMAIL_APP_PASSWORD?.trim();
+  return p || undefined;
+}
+
+function mailFromHeader(): string {
+  const user = getSmtpUser() ?? 'noreply@localhost';
+  return `"Doddapaneni Group" <${user}>`;
+}
+
 function getTransporter() {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return null;
+  const user = getSmtpUser();
+  const pass = getSmtpPassword();
+  if (!user || !pass) return null;
+
+  const host = process.env.SMTP_HOST?.trim();
+  if (host) {
+    const port = Number(process.env.SMTP_PORT || '587');
+    const secure =
+      process.env.SMTP_SECURE === 'true' ||
+      process.env.SMTP_SECURE === '1' ||
+      port === 465;
+    return nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+    });
+  }
+
+  // Gmail app passwords are shown with spaces; nodemailer/auth often needs the 16 chars concatenated.
+  const gmailUser = user.trim().toLowerCase();
+  const gmailPass = pass.replace(/\s+/g, '');
+
   return nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
+    auth: { user: gmailUser, pass: gmailPass },
   });
+}
+
+/** True when outbound SMTP credentials are present (Gmail or custom SMTP_HOST). */
+export function isLoginEmailDeliveryConfigured(): boolean {
+  return !!(getSmtpUser() && getSmtpPassword());
 }
 
 /**
@@ -42,7 +87,7 @@ export async function sendLoginSuccessEmail(
   const { ist: timeIST, et: timeET } = formatDateISTAndET(now);
 
   await transporter.sendMail({
-    from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+    from: mailFromHeader(),
     to,
     subject: 'You have successfully logged in – Doddapaneni Group',
     text: `Hello ${displayName},\n\nYou have successfully logged in to the Doddapaneni Group dashboard (${role}).\n\nDate & time (IST): ${timeIST}\nDate & time (ET): ${timeET}\n\nIf you did not perform this login, please contact your administrator.\n\nBest regards,\nDoddapaneni Group`,
@@ -58,6 +103,73 @@ export async function sendLoginSuccessEmail(
           <p style="margin: 0;">Best regards,</p>
           <p style="margin: 5px 0 0; font-weight: bold; color: #1e3a8a;">Doddapaneni Group</p>
         </div>
+      </div>
+    `,
+  });
+}
+
+/**
+ * Send a one-time login verification code. Requires SMTP credentials (see getSmtpUser / isLoginEmailDeliveryConfigured).
+ */
+export async function sendLoginVerificationCodeEmail(
+  to: string,
+  name: string | null,
+  code: string
+): Promise<void> {
+  const transporter = getTransporter();
+  if (!transporter) {
+    throw new Error('Email is not configured (set EMAIL_USER + EMAIL_PASS, or SMTP_USER + SMTP_PASS, or SMTP_HOST + SMTP_USER + SMTP_PASS)');
+  }
+  const displayName = name?.trim() || to;
+  await transporter.sendMail({
+    from: mailFromHeader(),
+    to,
+    subject: 'Your login verification code – Doddapaneni Group',
+    text: `Hello ${displayName},\n\nYour verification code is: ${code}\n\nIt expires in 15 minutes. If you did not try to sign in, ignore this email.\n\nDoddapaneni Group`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+        <h2 style="color: #1e3a8a;">Login verification</h2>
+        <p>Hello <strong>${displayName}</strong>,</p>
+        <p>Use this code to finish signing in:</p>
+        <p style="font-size: 28px; letter-spacing: 0.2em; font-weight: bold; color: #1e3a8a;">${code}</p>
+        <p style="font-size: 14px; color: #666;">This code expires in 15 minutes. If you did not try to sign in, you can ignore this email.</p>
+        <p style="margin-top: 24px; font-size: 14px; color: #1e3a8a; font-weight: bold;">Doddapaneni Group</p>
+      </div>
+    `,
+  });
+}
+
+/**
+ * OTP emailed to Super Admin / Admin to confirm creating an employee account.
+ */
+export async function sendAdminEmployeeCreateOtpEmail(
+  adminEmail: string,
+  adminName: string | null,
+  newEmployeeEmail: string,
+  newUsername: string,
+  roleLabel: string,
+  code: string
+): Promise<void> {
+  const transporter = getTransporter();
+  if (!transporter) {
+    throw new Error('Email is not configured (set EMAIL_USER + EMAIL_PASS, or SMTP_USER + SMTP_PASS, or SMTP_HOST + SMTP_USER + SMTP_PASS)');
+  }
+  const displayName = adminName?.trim() || adminEmail;
+
+  await transporter.sendMail({
+    from: mailFromHeader(),
+    to: adminEmail,
+    subject: 'Verify new employee account – Doddapaneni Group',
+    text: `Hello ${displayName},\n\nUse this code to finish creating the employee account:\n\n${code}\n\nNew user: ${newEmployeeEmail} (@${newUsername}, ${roleLabel})\n\nThis code expires in 15 minutes. If you did not start this, change your password and contact support.\n\nDoddapaneni Group`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+        <h2 style="color: #1e3a8a;">Verify new employee</h2>
+        <p>Hello <strong>${displayName}</strong>,</p>
+        <p>Enter this code in the dashboard to finish creating the account:</p>
+        <p style="font-size: 28px; letter-spacing: 0.2em; font-weight: bold; color: #1e3a8a;">${code}</p>
+        <p><strong>New employee:</strong> ${newEmployeeEmail}<br/><strong>Username:</strong> ${newUsername}<br/><strong>Role:</strong> ${roleLabel}</p>
+        <p style="font-size: 14px; color: #666;">This code expires in 15 minutes. If you did not request this, secure your account and contact support.</p>
+        <p style="margin-top: 24px; font-size: 14px; color: #1e3a8a; font-weight: bold;">Doddapaneni Group</p>
       </div>
     `,
   });
@@ -82,7 +194,7 @@ export async function sendRoleCreatedEmailToCreator(
 
   const text = `${createdRoleLabel} role was created by ${creatorRoleLabel} at ${ist} and ${et}.`;
   await transporter.sendMail({
-    from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+    from: mailFromHeader(),
     to: creatorEmail,
     subject: `Role created: ${createdRoleLabel} – Doddapaneni Group`,
     text: `Hello,\n\n${text}\n\nBest regards,\nDoddapaneni Group`,
@@ -123,7 +235,7 @@ export async function sendRoleCreatedEmailToNewUser(
 
   const text = `You have been created as ${createdRoleLabel} for Doddapaneni Group by ${creatorDisplay}, at ${ist} and ${et}.`;
   await transporter.sendMail({
-    from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+    from: mailFromHeader(),
     to: newUserEmail,
     subject: `You have been added as ${createdRoleLabel} – Doddapaneni Group`,
     text: `Hello ${displayName},\n\n${text}\n\nLogin details:\nEmail: ${newUserEmail}\nPassword: ${password}\n\nUse the above to log in to the Doddapaneni Group dashboard.\n\nBest regards,\nDoddapaneni Group`,
@@ -167,7 +279,7 @@ export async function sendRoleDeletedEmailToDeleter(
 
   const text = `${deletedRoleLabel} role was deleted by ${deleterRoleLabel} at ${ist} and ${et}. Deleted user: ${deletedUserDisplay}.`;
   await transporter.sendMail({
-    from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+    from: mailFromHeader(),
     to: deleterEmail,
     subject: `Role deleted: ${deletedRoleLabel} – Doddapaneni Group`,
     text: `Hello,\n\n${text}\n\nBest regards,\nDoddapaneni Group`,
@@ -208,7 +320,7 @@ export async function sendRoleDeletedEmailToDeletedUser(
 
   const text = `Your ${deletedRoleLabel} account for Doddapaneni Group was deleted by ${deleterDisplay}, at ${ist} and ${et}.`;
   await transporter.sendMail({
-    from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+    from: mailFromHeader(),
     to: deletedUserEmail,
     subject: `Your ${deletedRoleLabel} account has been removed – Doddapaneni Group`,
     text: `Hello ${displayName},\n\n${text}\n\nIf you have questions, please contact your administrator.\n\nBest regards,\nDoddapaneni Group`,

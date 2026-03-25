@@ -7,10 +7,12 @@ import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import VisitStats from './VisitStats';
 import ManageEmployeesModal from './ManageEmployeesModal';
+import AdminOpsInsights from './AdminOpsInsights';
 
 type UserRow = {
   id: string;
   email: string;
+  username: string | null;
   name: string | null;
   role: Role;
   createdAt: Date;
@@ -35,17 +37,6 @@ export default function AdminDashboard({
   const employees = users
     .filter((u) => EMPLOYEE_ROLES_ADMIN.includes(u.role))
     .sort((a, b) => getRoleOrder(a.role) - getRoleOrder(b.role) || (a.name || a.email).localeCompare(b.name || b.email));
-
-  async function handleAddEmployee(data: { email: string; password: string; name?: string; role: Role }) {
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.message ?? 'Failed to create');
-    setUsers((prev) => [{ id: json.user.id, ...json.user, createdBy: { email: 'You', name: 'You' } }, ...prev]);
-  }
 
   async function handleDeleteEmployee(id: string) {
     const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
@@ -103,12 +94,16 @@ export default function AdminDashboard({
           allowedRoles={EMPLOYEE_ROLES_ADMIN}
           currentUserId={currentUserId}
           allowedRolesForPasswordChange={['DEVELOPER', 'DIGITAL_MARKETER']}
-          onAdd={handleAddEmployee}
+          onEmployeeCreated={(user) =>
+            setUsers((prev) => [{ ...user, createdBy: { email: 'You', name: 'You' } }, ...prev])
+          }
           onDelete={handleDeleteEmployee}
           onChangePassword={handleChangePassword}
           onClose={() => setShowManageModal(false)}
         />
       )}
+
+      <AdminOpsInsights />
 
       <VisitStats />
     </div>

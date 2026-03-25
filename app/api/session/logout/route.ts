@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, LoginLog } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
+import { formatInIST, formatInET } from '@/lib/date-timezones';
 
 export async function POST() {
   const session = await auth();
@@ -10,14 +11,21 @@ export async function POST() {
 
   try {
     await connectDb();
-    const latest = await LoginLog.findOne({
-      userId: session.user.id,
-      loggedOutAt: null,
-    }).sort({ loggedAt: -1 });
+    const latest = await prisma.loginLog.findFirst({
+      where: { userId: session.user.id, loggedOutAt: null },
+      orderBy: { loggedAt: 'desc' },
+    });
 
     if (latest) {
-      latest.loggedOutAt = new Date();
-      await latest.save();
+      const out = new Date();
+      await prisma.loginLog.update({
+        where: { id: latest.id },
+        data: {
+          loggedOutAt: out,
+          loggedOutAtIST: formatInIST(out),
+          loggedOutAtET: formatInET(out),
+        },
+      });
     }
 
     return NextResponse.json({ ok: true });

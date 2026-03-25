@@ -4,6 +4,8 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  // Prisma engine must stay external (local client lives under lib/prisma-generated)
+  serverExternalPackages: ["@prisma/client", "prisma", "nodemailer"],
   turbopack: {
     root: process.cwd(),
   },
@@ -44,7 +46,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/logo.png',
+        source: '/logo.webp',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],

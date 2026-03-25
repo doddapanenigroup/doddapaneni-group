@@ -1,8 +1,9 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import { connectDb, User } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
+import type { User as DbUser } from '@/lib/prisma-generated';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 
 export default async function AdminDashboardPage() {
@@ -15,15 +16,18 @@ export default async function AdminDashboardPage() {
 
   await connectDb();
 
-  const userDocs = await User.find().sort({ createdAt: -1 }).lean();
-  const users = userDocs.map((u: { _id: unknown; email: string; name: string | null; role: string; createdAt: Date; createdAtIST?: string | null; createdAtET?: string | null; createdAtUSA?: string | null }) => ({
-    id: String(u._id),
+  const userDocs = await prisma.user.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+  const users = userDocs.map((u: DbUser) => ({
+    id: u.id,
     email: u.email,
+    username: u.username ?? null,
     name: u.name ?? null,
     role: u.role as Role,
     createdAt: u.createdAt,
     createdAtIST: u.createdAtIST ?? null,
-    createdAtET: u.createdAtET ?? u.createdAtUSA ?? null,
+    createdAtET: u.createdAtET ?? null,
   }));
 
   return (

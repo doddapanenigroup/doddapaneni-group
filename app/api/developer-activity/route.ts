@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, LoginLog, DeveloperPageView } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
-import mongoose from 'mongoose';
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -27,30 +26,25 @@ export async function POST(request: Request) {
   try {
     await connectDb();
 
-    const currentSession = await LoginLog.findOne({
-      userId: session.user.id,
-      loggedOutAt: null,
-    }).sort({ loggedAt: -1 });
+    const currentSession = await prisma.loginLog.findFirst({
+      where: { userId: session.user.id, loggedOutAt: null },
+      orderBy: { loggedAt: 'desc' },
+    });
 
     if (!currentSession) {
       return NextResponse.json({ message: 'No active session' }, { status: 400 });
     }
 
     const visitedAt = new Date();
-    const userId = mongoose.Types.ObjectId.isValid(session.user.id)
-      ? new mongoose.Types.ObjectId(session.user.id)
-      : null;
-    if (!userId) {
-      return NextResponse.json({ message: 'Invalid user' }, { status: 400 });
-    }
-
-    await DeveloperPageView.create({
-      userId,
-      loginLogId: currentSession._id,
-      path,
-      visitedAt,
-      visitedAtIST: formatInIST(visitedAt),
-      visitedAtET: formatInET(visitedAt),
+    await prisma.developerPageView.create({
+      data: {
+        userId: session.user.id,
+        loginLogId: currentSession.id,
+        path,
+        visitedAt,
+        visitedAtIST: formatInIST(visitedAt),
+        visitedAtET: formatInET(visitedAt),
+      },
     });
 
     return NextResponse.json({ ok: true });

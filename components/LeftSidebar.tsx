@@ -24,7 +24,7 @@ export default function LeftSidebar() {
         onClick={handleLogoClick}
       >
         <Image
-          src="/logo.png"
+          src="/logo.webp"
           alt={companyName}
           width={120}
           height={120}

@@ -70,10 +70,12 @@ export default function Navbar() {
     { href: '/contact', label: t('contact') },
   ];
 
+  const inset = 'px-5 sm:px-8 lg:px-12 xl:px-16';
+
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navbarClasses}`}>
-      <div className="flex justify-between h-16">
-        <div className="flex items-center">
+      <div className={`max-w-[1600px] mx-auto w-full flex justify-between h-16 items-center ${inset}`}>
+        <div className="flex items-center min-w-0">
           <Link 
             href="/" 
             locale={useLocale()} 
@@ -81,7 +83,7 @@ export default function Navbar() {
             onClick={handleLogoClick}
           >
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt={companyName}
               width={200}
               height={80}
@@ -90,7 +92,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
-        <div className="hidden md:flex items-center space-x-8 pr-4 sm:pr-6 lg:pr-8">
+        <div className="hidden md:flex items-center space-x-8 shrink-0">
           {navLinks.filter(link => link.href !== pathname).map((link) => (
             <Link 
               key={link.href} 
@@ -106,7 +108,7 @@ export default function Navbar() {
           ))}
           <LanguageSwitcher isTransparent={isTransparent} />
         </div>
-        <div className="-mr-2 flex md:hidden items-center gap-4 pr-4">
+        <div className="flex md:hidden items-center gap-3 sm:gap-4 shrink-0">
            <LanguageSwitcher isTransparent={isTransparent} />
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -120,7 +122,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden border-t border-gray-100">
-          <div className="px-4 pt-2 pb-4 space-y-1 bg-white/95 backdrop-blur-lg">
+          <div className={`${inset} pt-2 pb-4 space-y-1 bg-white/95 backdrop-blur-lg`}>
             {navLinks.filter(link => link.href !== pathname).map((link) => (
               <Link 
                 key={link.href} 

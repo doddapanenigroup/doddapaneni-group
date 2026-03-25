@@ -16,6 +16,7 @@ type EmployeeSession = {
 type EmployeeWithStats = {
   id: string;
   email: string;
+  username: string | null;
   name: string | null;
   role: Role;
   sessions: EmployeeSession[];
@@ -94,7 +95,10 @@ export default function EmployeesPageView({
                   />
                   <span className="min-w-0 flex-1">
                     <p className="font-medium truncate">{emp.name || emp.email}</p>
-                    <p className="text-xs text-slate-500 truncate mt-0.5">{emp.email}</p>
+                    <p className="text-xs text-slate-500 truncate mt-0.5">
+                      {emp.username ? `@${emp.username} · ` : ''}
+                      {emp.email}
+                    </p>
                     <span className={`inline-block mt-1.5 px-2 py-0.5 rounded text-xs font-medium ${roleBadgeClass[String(emp.role)] ?? 'bg-slate-100 text-slate-700'}`}>
                       {roleLabel[String(emp.role)] ?? String(emp.role)}
                     </span>
@@ -115,7 +119,15 @@ export default function EmployeesPageView({
             <div className="p-6 space-y-6">
               <div className="border-b border-slate-100 pb-4">
                 <h2 className="text-lg font-bold text-slate-900">{selected.name || selected.email}</h2>
-                <p className="text-sm text-slate-600 mt-0.5">{selected.email}</p>
+                <p className="text-sm text-slate-600 mt-0.5">
+                  {selected.username ? (
+                    <>
+                      <span className="font-mono">@{selected.username}</span>
+                      <span className="text-slate-400 mx-1">·</span>
+                    </>
+                  ) : null}
+                  {selected.email}
+                </p>
                 <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-lg text-xs font-medium ${roleBadgeClass[String(selected.role)] ?? 'bg-slate-100 text-slate-700'}`}>
                   {roleLabel[String(selected.role)] ?? String(selected.role)}
                 </span>

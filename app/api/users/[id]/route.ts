@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, User, LoginLog, DeveloperPageView, PasswordChangeLog } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import { sendRoleDeletedEmailToDeleter, sendRoleDeletedEmailToDeletedUser } from '@/lib/email';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES = ['DEVELOPER', 'DIGITAL_MARKETER'] as const;
+type AdminAllowedPasswordChangeRole = (typeof ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES)[number];
+function isAdminAllowedPasswordChangeRole(
+  role: string
+): role is AdminAllowedPasswordChangeRole {
+  return ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES.includes(role as AdminAllowedPasswordChangeRole);
+}
 
 export async function PATCH(
   request: Request,
@@ -24,12 +29,15 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    if (!id?.trim()) {
       return NextResponse.json({ message: 'Invalid user id' }, { status: 400 });
     }
 
     if (id === currentUserId) {
-      return NextResponse.json({ message: 'Cannot change your own password here. Use profile/settings if available.' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'Cannot change your own password here. Use profile/settings if available.' },
+        { status: 400 }
+      );
     }
 
     let body: { password?: string };
@@ -40,17 +48,20 @@ export async function PATCH(
     }
     const newPassword = typeof body?.password === 'string' ? body.password.trim() : '';
     if (newPassword.length < 6) {
-      return NextResponse.json({ message: 'Password must be at least 6 characters' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'Password must be at least 6 characters' },
+        { status: 400 }
+      );
     }
 
     await connectDb();
-    const user = await User.findById(id).lean();
+    const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
     const targetRole = user.role as string;
-    if (isAdmin && !ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES.includes(targetRole as any)) {
+    if (isAdmin && !isAdminAllowedPasswordChangeRole(targetRole)) {
       return NextResponse.json(
         { message: 'Admin can only change password for Developer or Digital Marketer' },
         { status: 403 }
@@ -59,20 +70,21 @@ export async function PATCH(
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
     const passwordChangedAt = new Date();
-    await User.findByIdAndUpdate(id, { passwordHash, passwordChangedAt });
+    await prisma.user.update({
+      where: { id },
+      data: { passwordHash, passwordChangedAt },
+    });
 
-    const changedByObjectId = currentUserId && mongoose.Types.ObjectId.isValid(currentUserId)
-      ? new mongoose.Types.ObjectId(currentUserId)
-      : null;
-    const targetUserObjectId = new mongoose.Types.ObjectId(id);
-    if (changedByObjectId) {
-      await PasswordChangeLog.create({
-        changedById: changedByObjectId,
-        targetUserId: targetUserObjectId,
-        changedByRole: role ?? '',
-        changedAt: passwordChangedAt,
-        changedAtIST: formatInIST(passwordChangedAt),
-        changedAtET: formatInET(passwordChangedAt),
+    if (currentUserId) {
+      await prisma.passwordChangeLog.create({
+        data: {
+          changedById: currentUserId,
+          targetUserId: id,
+          changedByRole: role ?? '',
+          changedAt: passwordChangedAt,
+          changedAtIST: formatInIST(passwordChangedAt),
+          changedAtET: formatInET(passwordChangedAt),
+        },
       });
     }
 
@@ -99,7 +111,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    if (!id?.trim()) {
       return NextResponse.json({ message: 'Invalid user id' }, { status: 400 });
     }
 
@@ -108,7 +120,7 @@ export async function DELETE(
     }
 
     await connectDb();
-    const user = await User.findById(id).lean();
+    const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
@@ -117,22 +129,32 @@ export async function DELETE(
     if (targetRole === 'SUPER_ADMIN') {
       return NextResponse.json({ message: 'Cannot delete Super Admin' }, { status: 403 });
     }
-    if (isAdmin && (targetRole === 'ADMIN' || targetRole === 'SUPER_ADMIN')) {
-      return NextResponse.json({ message: 'Admin can only delete Developer or Digital Marketer' }, { status: 403 });
+    if (
+      isAdmin &&
+      (targetRole === 'ADMIN' || targetRole === 'SUPER_ADMIN')
+    ) {
+      return NextResponse.json(
+        { message: 'Admin can only delete Developer or Digital Marketer' },
+        { status: 403 }
+      );
     }
 
     const deletedUserEmail = user.email;
     const deletedUserName = user.name ?? null;
     const deletedUserRole = targetRole;
 
-    const objectId = new mongoose.Types.ObjectId(id);
-    const loginLogs = await LoginLog.find({ userId: objectId }).lean();
-    const loginLogIds = loginLogs.map((l) => l._id);
-    if (loginLogIds.length > 0) {
-      await DeveloperPageView.deleteMany({ loginLogId: { $in: loginLogIds } });
-    }
-    await LoginLog.deleteMany({ userId: objectId });
-    await User.findByIdAndDelete(id);
+    await prisma.$transaction(async (tx) => {
+      await tx.passwordChangeLog.deleteMany({
+        where: { OR: [{ targetUserId: id }, { changedById: id }] },
+      });
+      await tx.developerPageView.deleteMany({ where: { userId: id } });
+      await tx.dashboardVisit.deleteMany({ where: { userId: id } });
+      await tx.marketingActivityLog.deleteMany({ where: { userId: id } });
+      await tx.contentEditLog.deleteMany({ where: { userId: id } });
+      await tx.webVitalReport.deleteMany({ where: { userId: id } });
+      await tx.loginLog.deleteMany({ where: { userId: id } });
+      await tx.user.delete({ where: { id } });
+    });
 
     const deletedAt = new Date();
     const deleterEmail = session.user.email ?? '';

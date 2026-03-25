@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Building2, Pencil, Languages } from 'lucide-react';
 import EditContentModal from './EditContentModal';
+import MyActivityPanel from './MyActivityPanel';
 
 type SitePage = {
   href: string;
@@ -17,6 +18,7 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
   const [editingPage, setEditingPage] = useState<SitePage | null>(null);
   const [translateLoading, setTranslateLoading] = useState(false);
   const [translateResult, setTranslateResult] = useState<{ results: { locale: string; translated: number; skipped: number }[] } | null>(null);
+  const [translateError, setTranslateError] = useState<string | null>(null);
   const base = `/${locale}`;
   const sitePages: SitePage[] = [
     { href: `${base}`, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
@@ -119,7 +121,11 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
           Multi-lingual — automatic translation
         </h2>
         <p className="px-5 pt-3 text-sm text-slate-600">
-          App locales: <strong>en</strong> (source), <strong>te</strong>, <strong>hi</strong>, <strong>es</strong>. Translation uses a <strong>free</strong> service (MyMemory, no API key). After adding or editing keys in Messages (en), click below to translate all new or changed strings into te, hi, and es.
+          Default: fills <strong>te</strong>, <strong>hi</strong>, and <strong>es</strong> from English via MyMemory (free, no key)—usually a few minutes. For every app locale or a custom list, set{' '}
+          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_ALL_APP_LOCALES=true</code> or{' '}
+          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_LOCALES=bn,mr,ta</code> in{' '}
+          <code className="bg-slate-100 px-1 rounded text-xs">.env</code> (slow in the browser; prefer{' '}
+          <code className="bg-slate-100 px-1 rounded text-xs">npm run i18n:translate</code>).
         </p>
         <div className="p-5 flex flex-wrap items-center gap-3">
           <button
@@ -127,13 +133,23 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
             onClick={async () => {
               setTranslateLoading(true);
               setTranslateResult(null);
+              setTranslateError(null);
               try {
                 const res = await fetch('/api/i18n/translate-all', { method: 'POST' });
-                const data = await res.json();
-                if (res.ok && data.results) setTranslateResult(data);
-                else setTranslateResult(null);
+                const data = (await res.json()) as {
+                  results?: { locale: string; translated: number; skipped: number }[];
+                  message?: string;
+                };
+                if (res.ok && data.results) setTranslateResult({ results: data.results });
+                else {
+                  setTranslateResult(null);
+                  setTranslateError(typeof data.message === 'string' ? data.message : `Request failed (${res.status})`);
+                }
               } catch {
                 setTranslateResult(null);
+                setTranslateError(
+                  'Network error or request timed out. Try again, or run npm run i18n:translate in a terminal.'
+                );
               } finally {
                 setTranslateLoading(false);
               }
@@ -144,10 +160,15 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
             <Languages size={18} />
             {translateLoading ? 'Translating…' : 'Translate all locales'}
           </button>
+          {translateError && (
+            <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg max-w-2xl" role="alert">
+              {translateError}
+            </p>
+          )}
           {translateResult && (
             <div className="text-sm text-slate-600">
               {translateResult.results.map((r) => (
-                <span key={r.locale} className="mr-3">
+                <span key={r.locale} className="mr-3 block sm:inline sm:mr-3 mt-1 sm:mt-0">
                   <strong>{r.locale}</strong>: {r.translated} translated, {r.skipped} skipped
                 </span>
               ))}
@@ -155,6 +176,8 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
           )}
         </div>
       </section>
+
+      <MyActivityPanel />
 
       {editingPage && (
         <EditContentModal

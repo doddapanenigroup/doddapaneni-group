@@ -24,7 +24,7 @@ export default function Dlsin() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/dlsin.jpg"
+            src="/dlsin.webp"
             alt="Dlsin Logo"
             width={140}
             height={56}
@@ -59,7 +59,7 @@ export default function Dlsin() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/ecommerce.jpg"
+                src="/ecommerce.webp"
                 alt="Ecommerce"
                 fill
                 className="object-cover"

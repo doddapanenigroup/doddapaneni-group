@@ -3,28 +3,7 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
-const BLOG_POST_META: Record<string, { date: string; image: string }> = {
-  'future-of-ecommerce-2026': { date: '2026-02-06', image: '/home.jpg' },
-  'healthcare-technology-innovations': { date: '2026-02-06', image: '/about.jpg' },
-  'sustainable-construction-practices': { date: '2026-02-06', image: '/home.jpg' },
-  'digital-marketing-strategies': { date: '2026-02-06', image: '/about.jpg' },
-  'ai-transformation-business': { date: '2026-02-06', image: '/home.jpg' },
-  'global-trade-opportunities': { date: '2026-02-06', image: '/about.jpg' },
-  'logistics-automation': { date: '2026-02-06', image: '/home.jpg' },
-  'workforce-development-skills': { date: '2026-02-06', image: '/about.jpg' },
-  'media-digital-transformation': { date: '2026-02-06', image: '/home.jpg' },
-  'manufacturing-industry-4-0': { date: '2026-02-06', image: '/about.jpg' },
-  'food-processing-innovation': { date: '2026-02-06', image: '/home.jpg' },
-  'real-estate-investment-tips': { date: '2026-02-06', image: '/about.jpg' },
-  'cloud-computing-benefits': { date: '2026-02-06', image: '/home.jpg' },
-  'telemedicine-healthcare': { date: '2026-02-06', image: '/about.jpg' },
-  'sustainable-business-practices': { date: '2026-02-06', image: '/home.jpg' },
-  'customer-experience-digital-age': { date: '2026-02-06', image: '/about.jpg' },
-  'data-security-best-practices': { date: '2026-02-06', image: '/home.jpg' },
-  'remote-work-productivity': { date: '2026-02-06', image: '/home.jpg' },
-  'supply-chain-resilience': { date: '2026-02-06', image: '/home.jpg' },
-  'entrepreneurship-startup-success': { date: '2026-02-06', image: '/about.jpg' },
-};
+import { BLOG_POST_META } from '@/lib/blog-post-meta';
 
 type Props = {
   slug: string;

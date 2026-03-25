@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
+import { logContentEdit } from '@/lib/audit-log';
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { runTranslateAll } from '@/lib/run-translate-all';
@@ -81,6 +82,14 @@ export async function PUT(request: Request) {
 
   try {
     await writeFile(filePath, content, 'utf-8');
+    await logContentEdit({
+      userId: session.user.id,
+      userEmail: session.user.email ?? '',
+      userRole: role ?? '',
+      kind: 'file',
+      targetPath: PAGE_KEY_TO_PATH[pageKey],
+      summary: `${content.length} characters`,
+    });
     const response: { ok: boolean; filePath: string; translateAll?: Awaited<ReturnType<typeof runTranslateAll>> } = {
       ok: true,
       filePath: PAGE_KEY_TO_PATH[pageKey],

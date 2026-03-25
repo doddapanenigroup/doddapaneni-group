@@ -28,8 +28,8 @@ export async function generateMetadata({
     title: t('title'),
     description: t('description'),
     icons: {
-      icon: '/logo.png',
-      apple: '/logo.png',
+      icon: '/logo.webp',
+      apple: '/logo.webp',
     },
     other: { google: 'notranslate' },
   };
@@ -47,12 +47,14 @@ export default async function RootLayout({
   const pathname = headersList.get('x-pathname') ?? '';
   // Prefer route param (from URL segment); fallback to pathname so /hi/blog and /es/blog get correct locale
   const fromPath = pathname.split('/').filter(Boolean)[0];
+  type AppLocale = (typeof routing.locales)[number];
+  const isLocale = (l: string | undefined): l is AppLocale => !!l && routing.locales.includes(l as AppLocale);
   const locale =
-    routing.locales.includes(paramLocale as any) ? paramLocale
-    : fromPath && routing.locales.includes(fromPath as any) ? fromPath
+    isLocale(paramLocale) ? paramLocale
+    : isLocale(fromPath) ? fromPath
     : routing.defaultLocale;
 
-  if (!routing.locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 

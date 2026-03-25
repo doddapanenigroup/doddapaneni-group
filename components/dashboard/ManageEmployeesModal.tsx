@@ -2,12 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import { X, Plus, Trash2, Users, KeyRound } from 'lucide-react';
+import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 
 type UserRow = {
   id: string;
   email: string;
+  username: string | null;
   name: string | null;
   role: Role;
   createdAt: Date;
@@ -34,7 +36,7 @@ export default function ManageEmployeesModal({
   allowedRoles,
   currentUserId,
   allowedRolesForPasswordChange,
-  onAdd,
+  onEmployeeCreated,
   onDelete,
   onChangePassword,
   onClose,
@@ -44,7 +46,8 @@ export default function ManageEmployeesModal({
   currentUserId: string;
   /** Roles whose password the current user is allowed to change (e.g. Admin: Developer, Digital Marketer) */
   allowedRolesForPasswordChange?: Role[];
-  onAdd: (data: { email: string; password: string; name?: string; role: Role }) => Promise<void>;
+  /** Called after employee is created (OTP verified). */
+  onEmployeeCreated: (user: UserRow) => void;
   onDelete: (id: string) => Promise<void>;
   onChangePassword?: (id: string, newPassword: string) => Promise<void>;
   onClose: () => void;
@@ -65,31 +68,103 @@ export default function ManageEmployeesModal({
 
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<Role>(() => sortedAllowedRoles[0] ?? allowedRoles[0]);
   const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [createStep, setCreateStep] = useState<'details' | 'otp'>('details');
+  const [createOtp, setCreateOtp] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [changePasswordUserId, setChangePasswordUserId] = useState<string | null>(null);
   const [changePasswordValue, setChangePasswordValue] = useState('');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function resetAddForm() {
+    setCreateStep('details');
+    setCreateOtp('');
+    setInfo('');
+    setMessage('');
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setName('');
+    setRole(sortedAllowedRoles[0]);
+  }
+
+  async function handleSendCreateOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setMessage('');
+    setInfo('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/users/create-employee-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          username: username.trim(),
+          password: password.trim(),
+          name: name.trim() || undefined,
+          role,
+        }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { message?: string; codeSentTo?: string };
+      if (!res.ok) {
+        setMessage(typeof json.message === 'string' ? json.message : 'Could not send verification code.');
+        return;
+      }
+      setCreateStep('otp');
+      setCreateOtp('');
+      const dest = json.codeSentTo ?? 'your email';
+      setInfo(`Enter the 6-digit code sent to ${dest} to create this employee.`);
+    } catch {
+      setMessage('Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCreateEmployeeWithOtp(e: React.FormEvent) {
     e.preventDefault();
     setMessage('');
     setLoading(true);
     try {
-      await onAdd({ email: email.trim().toLowerCase(), password, name: name.trim() || undefined, role });
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          username: username.trim(),
+          password: password.trim(),
+          name: name.trim() || undefined,
+          role,
+          createOtp: createOtp.replace(/\s/g, ''),
+        }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        user?: UserRow;
+      };
+      if (!res.ok) {
+        setMessage(typeof json.message === 'string' ? json.message : 'Could not create employee.');
+        return;
+      }
+      if (json.user) {
+        onEmployeeCreated({
+          ...json.user,
+          createdAt: json.user.createdAt ? new Date(json.user.createdAt as unknown as string) : new Date(),
+        });
+      }
       setShowForm(false);
-      setEmail('');
-      setPassword('');
-      setName('');
-      setRole(sortedAllowedRoles[0]);
-    } catch (err: unknown) {
-      setMessage(err instanceof Error ? err.message : 'Something went wrong');
+      resetAddForm();
+    } catch {
+      setMessage('Something went wrong.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function handleDelete(id: string) {
@@ -103,11 +178,11 @@ export default function ManageEmployeesModal({
     setDeletingId(null);
   }
 
-  const canChangePasswordFor = useMemo(() => {
-    if (!onChangePassword || !allowedRolesForPasswordChange?.length) return () => false;
-    return (u: UserRow) =>
-      u.id !== currentUserId && allowedRolesForPasswordChange.includes(u.role);
-  }, [onChangePassword, allowedRolesForPasswordChange, currentUserId]);
+  const canChangePasswordFor = (u: UserRow) =>
+    !!onChangePassword &&
+    !!allowedRolesForPasswordChange?.length &&
+    u.id !== currentUserId &&
+    allowedRolesForPasswordChange.includes(u.role);
 
   async function handleChangePasswordSubmit() {
     if (!changePasswordUserId || !onChangePassword || changePasswordValue.trim().length < 6) return;
@@ -145,7 +220,15 @@ export default function ManageEmployeesModal({
             <p className="text-sm text-slate-600">{sortedEmployees.length} employee(s)</p>
             <button
               type="button"
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                if (showForm) {
+                  resetAddForm();
+                  setShowForm(false);
+                } else {
+                  resetAddForm();
+                  setShowForm(true);
+                }
+              }}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 shadow-md transition-colors"
             >
               <Plus size={18} />
@@ -154,74 +237,155 @@ export default function ManageEmployeesModal({
           </div>
 
           {showForm && (
-            <form onSubmit={handleSubmit} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
-                    placeholder="employee@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Name (optional)</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
-                    placeholder="Full name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as Role)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
-                  >
-                    {sortedAllowedRoles.map((r) => (
-                      <option key={r} value={r}>{roleLabel[r] ?? r}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              {message && <p className="text-sm text-slate-700">{message}</p>}
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
-                >
-                  {loading ? 'Adding…' : 'Add'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+              {createStep === 'details' ? (
+                <form onSubmit={handleSendCreateOtp} className="space-y-3">
+                  <p className="text-sm text-slate-600">
+                    We email a one-time code to <strong>your</strong> account email. Enter it on the next step to
+                    create the employee.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        placeholder="employee@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Username <span className="text-slate-400 font-normal">(for sign-in)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        minLength={2}
+                        maxLength={48}
+                        pattern="[a-zA-Z0-9._-]+"
+                        title="Letters, numbers, dots, underscores, hyphens"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        placeholder="e.g. jane.doe"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="manage-new-employee-password" className="block text-sm font-medium text-slate-700 mb-1">
+                        Password
+                      </label>
+                      <PasswordInputWithToggle
+                        id="manage-new-employee-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="flex w-full min-w-0 items-center rounded-lg border border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
+                        inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-slate-900 outline-none ring-0"
+                        placeholder="••••••••"
+                        autoComplete="new-password"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Name (optional)</label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        placeholder="Full name"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                      <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value as Role)}
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                      >
+                        {sortedAllowedRoles.map((r) => (
+                          <option key={r} value={r}>{roleLabel[r] ?? r}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  {message && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{message}</p>}
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                    >
+                      {loading ? 'Sending…' : 'Send verification code'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        resetAddForm();
+                      }}
+                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleCreateEmployeeWithOtp} className="space-y-3">
+                  {info && <p className="text-sm text-slate-700 bg-slate-100 px-3 py-2 rounded-lg">{info}</p>}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Verification code</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      value={createOtp}
+                      onChange={(e) => setCreateOtp(e.target.value)}
+                      required
+                      minLength={6}
+                      maxLength={12}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm tracking-widest text-center text-lg max-w-xs"
+                      placeholder="000000"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    New account: {email.trim().toLowerCase()} · @{username.trim().toLowerCase()} ·{' '}
+                    {roleLabel[role] ?? role}
+                  </p>
+                  {message && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{message}</p>}
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      type="submit"
+                      disabled={loading || createOtp.replace(/\s/g, '').length < 6}
+                      className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                    >
+                      {loading ? 'Creating…' : 'Create employee'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={() => {
+                        setCreateStep('details');
+                        setCreateOtp('');
+                        setInfo('');
+                        setMessage('');
+                      }}
+                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {changePasswordUserId && (() => {
@@ -230,16 +394,25 @@ export default function ManageEmployeesModal({
               <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
                 <KeyRound size={20} className="text-slate-600 shrink-0" />
                 <span className="text-sm text-slate-700">
-                  New password for <strong>{target?.email ?? changePasswordUserId}</strong>
+                  New password for{' '}
+                  <strong>
+                    {target?.username
+                      ? `${target.username} (${target.email})`
+                      : (target?.email ?? changePasswordUserId)}
+                  </strong>
                 </span>
-                <input
-                  type="password"
-                  value={changePasswordValue}
-                  onChange={(e) => setChangePasswordValue(e.target.value)}
-                  placeholder="Min 6 characters"
-                  minLength={6}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm w-48"
-                />
+                <div className="w-full sm:w-52 min-w-[12rem] shrink-0">
+                  <PasswordInputWithToggle
+                    id={`manage-change-pw-${changePasswordUserId}`}
+                    value={changePasswordValue}
+                    onChange={(e) => setChangePasswordValue(e.target.value)}
+                    placeholder="Min 6 characters"
+                    minLength={6}
+                    className="flex w-full min-w-0 items-center rounded-lg border border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
+                    inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-slate-900 outline-none ring-0"
+                    autoComplete="new-password"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={handleChangePasswordSubmit}
@@ -264,6 +437,7 @@ export default function ManageEmployeesModal({
               <thead className="bg-slate-100 border-b border-slate-200">
                 <tr>
                   <th className="text-left p-3 font-medium text-slate-700">Email</th>
+                  <th className="text-left p-3 font-medium text-slate-700">Username</th>
                   <th className="text-left p-3 font-medium text-slate-700">Name</th>
                   <th className="text-left p-3 font-medium text-slate-700">Role</th>
                   <th className="text-left p-3 font-medium text-slate-700">Created</th>
@@ -273,7 +447,7 @@ export default function ManageEmployeesModal({
               <tbody>
                 {sortedEmployees.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-6 text-slate-500 text-center">
+                    <td colSpan={6} className="p-6 text-slate-500 text-center">
                       No employees yet. Click &quot;Add employee&quot; to create one.
                     </td>
                   </tr>
@@ -281,6 +455,7 @@ export default function ManageEmployeesModal({
                   sortedEmployees.map((u) => (
                     <tr key={u.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                       <td className="p-3 text-slate-900">{u.email}</td>
+                      <td className="p-3 text-slate-800 font-mono text-xs">{u.username ?? '—'}</td>
                       <td className="p-3 text-slate-600">{u.name ?? '—'}</td>
                       <td className="p-3">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${roleBadgeClass[String(u.role)] ?? 'bg-slate-100 text-slate-700'}`}>

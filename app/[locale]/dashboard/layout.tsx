@@ -22,7 +22,9 @@ export default async function DashboardLayout({
       <RecordDeveloperPage />
       <RecordDashboardVisit />
       <DashboardHeader user={session.user} locale={locale} />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto max-w-[1400px] w-full mx-auto">{children}</main>
+      <main className="flex-1 overflow-auto w-full max-w-[1400px] mx-auto pt-4 pb-8 px-6 sm:px-8 lg:px-12 xl:px-16">
+        {children}
+      </main>
     </div>
   );
 }

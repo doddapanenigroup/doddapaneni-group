@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, PageContent } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
+import { logContentEdit } from '@/lib/audit-log';
 
-const PAGE_KEYS = ['home', 'about', 'services', 'contact', 'companies-dealsmedi', 'companies-dlsin', 'companies-janatha-mirror'] as const;
+const PAGE_KEYS = [
+  'home',
+  'about',
+  'services',
+  'contact',
+  'companies-dealsmedi',
+  'companies-dlsin',
+  'companies-janatha-mirror',
+] as const;
 
 function getPageKey(key: string): string | null {
   const k = key.toLowerCase().replace(/\s+/g, '-');
@@ -24,7 +33,9 @@ export async function GET(
 
   try {
     await connectDb();
-    const doc = await PageContent.findOne({ pageKey, locale }).lean();
+    const doc = await prisma.pageContent.findUnique({
+      where: { pageKey_locale: { pageKey, locale } },
+    });
     if (!doc) {
       return NextResponse.json(null, {
         headers: {
@@ -32,15 +43,18 @@ export async function GET(
         },
       });
     }
-    return NextResponse.json({
-      title: doc.title,
-      body: doc.body,
-      updatedAt: doc.updatedAt,
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    return NextResponse.json(
+      {
+        title: doc.title,
+        body: doc.body,
+        updatedAt: doc.updatedAt,
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error) {
     console.error('Content GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
@@ -53,7 +67,10 @@ export async function PUT(
 ) {
   const session = await auth();
   const role = session?.user?.role;
-  if (!session?.user || (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
+  if (
+    !session?.user ||
+    (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')
+  ) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
@@ -76,11 +93,25 @@ export async function PUT(
 
   try {
     await connectDb();
-    const doc = await PageContent.findOneAndUpdate(
-      { pageKey, locale },
-      { $set: { title, body: bodyContent } },
-      { new: true, upsert: true }
-    ).lean();
+    const doc = await prisma.pageContent.upsert({
+      where: { pageKey_locale: { pageKey, locale } },
+      create: {
+        pageKey,
+        locale,
+        title,
+        body: bodyContent,
+      },
+      update: { title, body: bodyContent },
+    });
+
+    await logContentEdit({
+      userId: session.user.id,
+      userEmail: session.user.email ?? '',
+      userRole: session.user.role ?? '',
+      kind: 'page_content',
+      targetPath: `${pageKey} (${locale})`,
+      summary: `title length ${title.length}, body length ${bodyContent.length}`,
+    });
 
     return NextResponse.json({
       title: doc.title,

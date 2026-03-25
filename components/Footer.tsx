@@ -36,12 +36,13 @@ export default function Footer() {
 
   return (
     <footer className="bg-blue-900 text-white pt-3 pb-3 md:pt-8 md:pb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-3 md:mb-6 px-4 sm:px-0">
+      <div className="max-w-[1600px] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-3 md:mb-6">
         {/* Company Info */}
         <div>
           <div className="mb-2 md:mb-4">
             <Image 
-              src="/logo.png" 
+              src="/logo.webp" 
               alt={companyName} 
               width={280} 
               height={112} 
@@ -54,7 +55,7 @@ export default function Footer() {
         </div>
 
         {/* Quick Links & Legal */}
-        <div className="pr-0 md:pr-4 sm:md:pr-6 lg:pr-8">
+        <div className="pr-0 md:pr-4 lg:pr-8">
           <div className="grid grid-cols-2 gap-2 md:gap-4">
             <div>
               <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('quickLinks')}</h3>
@@ -81,7 +82,7 @@ export default function Footer() {
         </div>
 
         {/* Contact Info */}
-        <div className="pr-0 md:pr-4 sm:md:pr-6 lg:pr-8">
+        <div className="pr-0 md:pr-4 lg:pr-8">
           <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('contact')}</h3>
           <div className="text-blue-400 text-xs md:text-sm space-y-1.5 md:space-y-4">
             {contact.locations.map((location, index) => {
@@ -127,7 +128,7 @@ export default function Footer() {
         </div>
 
         {/* Social Media */}
-        <div className="pr-0 md:pr-4 sm:md:pr-6 lg:pr-8">
+        <div className="pr-0 md:pr-4 lg:pr-8">
           <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('followUs')}</h3>
           <div className="flex flex-wrap gap-2 md:gap-4">
             <a
@@ -187,12 +188,12 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      
-      {/* Bottom Bar */}
-      <div className="border-t border-blue-800 pt-2 md:pt-6 px-4 sm:px-0">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-1.5 md:gap-3 pr-0 md:pr-4 sm:md:pr-6 lg:pr-8">
+
+      {/* Bottom bar - inset from wrapper above */}
+      <div className="border-t border-blue-800 pt-2 md:pt-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-1.5 md:gap-3">
           <p className="text-blue-400 text-xs md:text-sm text-center md:text-left">
-            &copy; {currentYear} {companyName}. {t('rights')}
+            © {currentYear} {companyName}. {t('rights')}
           </p>
           <div className="flex flex-wrap justify-center gap-1 md:gap-4 text-blue-400 text-xs md:text-sm">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">{t('privacyPolicy')}</Link>
@@ -204,6 +205,7 @@ export default function Footer() {
             <a href="/sitemap.xml" className="hover:text-white transition-colors">{t('sitemap')}</a>
           </div>
         </div>
+      </div>
       </div>
     </footer>
   );

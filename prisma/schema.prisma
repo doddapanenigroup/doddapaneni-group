@@ -1,34 +1,213 @@
 generator client {
   provider = "prisma-client-js"
+  // Workspace path so editors resolve model types without relying on node_modules/.prisma
+  output   = "../lib/prisma-generated"
 }
 
 datasource db {
-  provider = "sqlite"
-}
-
-model User {
-  id            String     @id @default(cuid())
-  email         String     @unique
-  passwordHash  String
-  name          String?
-  role          Role       @default(DEVELOPER)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  createdById   String?
-  createdBy     User?      @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  createdUsers  User[]     @relation("CreatedBy")
-  loginLogs     LoginLog[]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
   DEVELOPER
   DIGITAL_MARKETER
 }
 
-model LoginLog {
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  /// Lowercase login handle; sign in with this or with email. Optional for legacy rows.
+  username          String?   @unique @map("username")
+  passwordHash      String    @map("password_hash")
+  name              String?
+  role              Role      @default(DEVELOPER)
+  createdById       String?   @map("created_by_id")
+  createdAtIST      String?   @map("created_at_ist")
+  createdAtET       String?   @map("created_at_et")
+  passwordChangedAt DateTime? @map("password_changed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  loginLogs                  LoginLog[]
+  passwordChangeLogs         PasswordChangeLog[]      @relation("PasswordChangeTarget")
+  loginEmailOtps             LoginEmailOtp[]
+  adminEmployeeCreateOtps    AdminEmployeeCreateOtp[]
+}
+
+/// Pending employee row + OTP emailed to admin before POST /api/users finalizes create.
+model AdminEmployeeCreateOtp {
+  id           String   @id @default(cuid())
+  adminUserId  String   @map("admin_user_id")
+  adminUser    User     @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  codeHash     String   @map("code_hash")
+  expiresAt    DateTime @map("expires_at")
+  email        String
+  username     String
+  passwordHash String   @map("password_hash")
+  name         String?
+  role         Role
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([adminUserId, expiresAt])
+  @@map("admin_employee_create_otp")
+}
+
+/// One-time code sent by email to complete login after password check.
+model LoginEmailOtp {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  loggedAt  DateTime @default(now())
+  codeHash  String   @map("code_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, expiresAt])
+}
+
+model LoginLog {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  loggedAt      DateTime  @default(now()) @map("logged_at")
+  loggedAtIST   String    @map("logged_at_ist")
+  loggedAtET    String    @map("logged_at_et")
+  loggedOutAt   DateTime? @map("logged_out_at")
+  loggedOutAtIST String?  @map("logged_out_at_ist")
+  loggedOutAtET String?   @map("logged_out_at_et")
+
+  developerPageViews DeveloperPageView[]
+}
+
+model PasswordChangeLog {
+  id           String   @id @default(cuid())
+  changedById  String   @map("changed_by_id")
+  targetUserId String   @map("target_user_id")
+  targetUser   User     @relation("PasswordChangeTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  changedByRole String  @map("changed_by_role")
+  changedAt    DateTime @default(now()) @map("changed_at")
+  changedAtIST String  @map("changed_at_ist")
+  changedAtET  String  @map("changed_at_et")
+}
+
+model Visit {
+  id           String   @id @default(cuid())
+  visitedAt    DateTime @map("visited_at")
+  visitedAtIST String   @map("visited_at_ist")
+  visitedAtET  String   @map("visited_at_et")
+  ipAddress    String?  @map("ip_address")
+  pagePath     String?  @map("page_path")
+  userAgent    String?  @map("user_agent")
+}
+
+model DashboardVisit {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  path         String
+  role         Role
+  visitedAt    DateTime @map("visited_at")
+  visitedAtIST String   @map("visited_at_ist")
+  visitedAtET  String   @map("visited_at_et")
+  userAgent    String?  @map("user_agent")
+}
+
+model DeveloperPageView {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  loginLogId   String?   @map("login_log_id")
+  loginLog     LoginLog? @relation(fields: [loginLogId], references: [id], onDelete: SetNull)
+  path         String
+  visitedAt    DateTime  @map("visited_at")
+  visitedAtIST String    @map("visited_at_ist")
+  visitedAtET  String    @map("visited_at_et")
+  userAgent    String?   @map("user_agent")
+}
+
+model PageContent {
+  id        String   @id @default(cuid())
+  pageKey   String   @map("page_key")
+  locale    String   @default("en")
+  title     String
+  body      String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([pageKey, locale])
+}
+
+enum CampaignStatus {
+  draft
+  active
+  paused
+  ended
+}
+
+model Campaign {
+  id          String          @id @default(cuid())
+  name        String
+  description String          @default("")
+  url         String
+  status      CampaignStatus  @default(draft)
+  startDate   DateTime?       @map("start_date")
+  endDate     DateTime?       @map("end_date")
+  createdById String?         @map("created_by_id")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+}
+
+enum MarketingLinkType {
+  tool
+  integration
+  resource
+  other
+}
+
+model MarketingLink {
+  id          String            @id @default(cuid())
+  name        String
+  url         String
+  description String            @default("")
+  type        MarketingLinkType @default(resource)
+  createdById String?           @map("created_by_id")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+}
+
+model ContentEditLog {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  userEmail  String   @map("user_email")
+  userRole   String   @map("user_role")
+  kind       String   @map("kind")
+  targetPath String   @map("target_path")
+  summary    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+}
+
+model MarketingActivityLog {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  userEmail   String   @map("user_email")
+  userRole    String   @map("user_role")
+  entity      String   @map("entity")
+  entityId    String   @map("entity_id")
+  action      String   @map("action")
+  seoNote     String?  @map("seo_note") @db.Text
+  payloadJson String?  @map("payload_json") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+}
+
+model WebVitalReport {
+  id             String   @id @default(cuid())
+  name           String
+  value          Float
+  rating         String?
+  delta          Float?
+  idMetric       String?  @map("id_metric")
+  navigationType String?  @map("navigation_type")
+  pagePath       String?  @map("page_path")
+  userId         String?  @map("user_id")
+  userAgent      String?  @map("user_agent")
+  createdAt      DateTime @default(now()) @map("created_at")
 }

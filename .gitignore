@@ -34,7 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
-# local DB (app uses MongoDB)
+# Prisma client (generated into repo; includes native engine — do not commit)
+lib/prisma-generated/
+
+# local DB
 prisma/*.db
 
 # vercel

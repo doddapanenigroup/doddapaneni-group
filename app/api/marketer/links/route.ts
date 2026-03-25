@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, MarketingLink } from '@/lib/db';
-import mongoose from 'mongoose';
-import type { MarketingLinkType } from '@/models/MarketingLink';
+import {
+  connectDb,
+  MARKETING_LINK_TYPES,
+  type MarketingLinkTypeValue,
+  prisma,
+} from '@/lib/db';
+import { logMarketingActivity } from '@/lib/audit-log';
+import type { MarketingLink } from '@/lib/prisma-generated';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return (
+    role === 'DIGITAL_MARKETER' ||
+    role === 'ADMIN' ||
+    role === 'SUPER_ADMIN'
+  );
 }
+
+const TYPES = MARKETING_LINK_TYPES;
 
 export async function GET() {
   try {
@@ -16,17 +27,17 @@ export async function GET() {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
     await connectDb();
-    const list = await MarketingLink.find()
-      .sort({ updatedAt: -1 })
-      .lean();
-    const links = list.map((l: { _id: unknown; createdAt: Date; updatedAt: Date; [k: string]: unknown }) => ({
-      id: String(l._id),
+    const list = await prisma.marketingLink.findMany({
+      orderBy: { updatedAt: 'desc' },
+    });
+    const links = (list as MarketingLink[]).map((l) => ({
+      id: l.id,
       name: l.name,
       url: l.url,
       description: l.description ?? '',
-      type: l.type as MarketingLinkType,
-      createdAt: (l.createdAt as Date).toISOString(),
-      updatedAt: (l.updatedAt as Date).toISOString(),
+      type: l.type,
+      createdAt: l.createdAt.toISOString(),
+      updatedAt: l.updatedAt.toISOString(),
     }));
     return NextResponse.json({ links });
   } catch (error) {
@@ -38,10 +49,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user || !allowMarketer(session)) {
+    if (!session?.user?.id || !allowMarketer(session)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
-    let body: { name?: string; url?: string; description?: string; type?: MarketingLinkType };
+    let body: {
+      name?: string;
+      url?: string;
+      description?: string;
+      type?: string;
+      seoNote?: string;
+    };
     try {
       body = await request.json();
     } catch {
@@ -52,23 +69,38 @@ export async function POST(request: Request) {
     if (!name || !url) {
       return NextResponse.json({ message: 'name and url are required' }, { status: 400 });
     }
-    const description = typeof body.description === 'string' ? body.description.trim() : '';
-    const type = ['tool', 'integration', 'resource', 'other'].includes(body.type ?? '') ? body.type : 'resource';
-    const createdById = session.user.id && mongoose.Types.ObjectId.isValid(session.user.id)
-      ? new mongoose.Types.ObjectId(session.user.id)
-      : null;
+    const description =
+      typeof body.description === 'string' ? body.description.trim() : '';
+    const type: MarketingLinkTypeValue = TYPES.includes(
+      body.type as MarketingLinkTypeValue
+    )
+      ? (body.type as MarketingLinkTypeValue)
+      : 'resource';
+    const seoNote = typeof body.seoNote === 'string' ? body.seoNote.trim() : null;
 
     await connectDb();
-    const doc = await MarketingLink.create({
-      name,
-      url,
-      description,
-      type: type as MarketingLinkType,
-      createdById,
+    const doc = await prisma.marketingLink.create({
+      data: {
+        name,
+        url,
+        description,
+        type,
+        createdById: session.user.id,
+      },
+    });
+    await logMarketingActivity({
+      userId: session.user.id,
+      userEmail: session.user.email ?? '',
+      userRole: session.user.role ?? '',
+      entity: 'marketing_link',
+      entityId: doc.id,
+      action: 'create',
+      seoNote,
+      payload: { name: doc.name, url: doc.url, type: doc.type, description: doc.description },
     });
     return NextResponse.json({
       link: {
-        id: String(doc._id),
+        id: doc.id,
         name: doc.name,
         url: doc.url,
         description: doc.description ?? '',

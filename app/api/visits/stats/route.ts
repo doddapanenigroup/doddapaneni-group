@@ -1,18 +1,24 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { connectDb, Visit } from '@/lib/db';
+import { connectDb, prisma } from '@/lib/db';
 
 export async function GET() {
   try {
     const session = await auth();
     const role = session?.user?.role;
-    const allowed = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'DIGITAL_MARKETER';
+    const allowed =
+      role === 'ADMIN' ||
+      role === 'SUPER_ADMIN' ||
+      role === 'DIGITAL_MARKETER';
     if (!session?.user || !allowed) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     await connectDb();
-    const visits = await Visit.find().sort({ visitedAt: 1 }).lean();
+    const visits = await prisma.visit.findMany({
+      orderBy: { visitedAt: 'asc' },
+      select: { visitedAt: true },
+    });
     const total = visits.length;
     if (total === 0) {
       return NextResponse.json({
@@ -29,11 +35,13 @@ export async function GET() {
     const lastVisitAt = visits[visits.length - 1].visitedAt;
     const monthsSinceStart = Math.max(
       1,
-      (new Date(lastVisitAt).getTime() - new Date(firstVisitAt).getTime()) / (1000 * 60 * 60 * 24 * 30.44)
+      (new Date(lastVisitAt).getTime() - new Date(firstVisitAt).getTime()) /
+        (1000 * 60 * 60 * 24 * 30.44)
     );
     const yearsSinceStart = Math.max(
       0.08,
-      (new Date(lastVisitAt).getTime() - new Date(firstVisitAt).getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      (new Date(lastVisitAt).getTime() - new Date(firstVisitAt).getTime()) /
+        (1000 * 60 * 60 * 24 * 365.25)
     );
     const averagePerMonth = total / monthsSinceStart;
     const averagePerYear = total / yearsSinceStart;

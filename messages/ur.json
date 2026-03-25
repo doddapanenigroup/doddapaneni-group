@@ -187,10 +187,22 @@
     "p1": "Dlsin is a cutting-edge multivendor e-commerce ecosystem designed to empower businesses and delight customers. We bridge the gap between local sellers and global markets, offering a seamless shopping experience backed by robust technology.",
     "p2": "From retail to wholesale, Dlsin provides the infrastructure for digital commerce to thrive. Our platform supports diverse categories, ensuring that quality products reach customers efficiently, no matter where they are.",
     "features": {
-      "globalMarketplace": { "title": "Global Marketplace", "description": "Connecting buyers and sellers from around the world on a single, unified platform." },
-      "securePayments": { "title": "Secure Payments", "description": "Advanced encryption and secure payment gateways ensuring safe transactions for all users." },
-      "fastLogistics": { "title": "Fast Logistics", "description": "Integrated logistics network for timely deliveries across borders." },
-      "vendorTools": { "title": "Vendor Tools", "description": "Comprehensive dashboard and analytics for sellers to manage and grow their business." }
+      "globalMarketplace": {
+        "title": "Global Marketplace",
+        "description": "Connecting buyers and sellers from around the world on a single, unified platform."
+      },
+      "securePayments": {
+        "title": "Secure Payments",
+        "description": "Advanced encryption and secure payment gateways ensuring safe transactions for all users."
+      },
+      "fastLogistics": {
+        "title": "Fast Logistics",
+        "description": "Integrated logistics network for timely deliveries across borders."
+      },
+      "vendorTools": {
+        "title": "Vendor Tools",
+        "description": "Comprehensive dashboard and analytics for sellers to manage and grow their business."
+      }
     }
   },
   "JanathaMirror": {
@@ -201,10 +213,22 @@
     "p1": "Janatha Mirror is a dynamic media enterprise committed to journalistic integrity and public awareness. In an era of information overload, we strive to provide clarity, depth, and context to the stories that matter most.",
     "p2": "Covering politics, business, entertainment, and social issues, Janatha Mirror connects communities through reliable news and engaging content. Our digital-first approach ensures that information is accessible, timely, and impactful.",
     "features": {
-      "unbiasedReporting": { "title": "Unbiased Reporting", "description": "Delivering facts as they are, without bias or distortion." },
-      "digitalFirst": { "title": "Digital First", "description": "Optimized for the modern web, mobile, and social platforms." },
-      "multimediaContent": { "title": "Multimedia Content", "description": "Rich video content, interviews, and documentaries." },
-      "globalPerspective": { "title": "Global Perspective", "description": "Local stories with global relevance and international coverage." }
+      "unbiasedReporting": {
+        "title": "Unbiased Reporting",
+        "description": "Delivering facts as they are, without bias or distortion."
+      },
+      "digitalFirst": {
+        "title": "Digital First",
+        "description": "Optimized for the modern web, mobile, and social platforms."
+      },
+      "multimediaContent": {
+        "title": "Multimedia Content",
+        "description": "Rich video content, interviews, and documentaries."
+      },
+      "globalPerspective": {
+        "title": "Global Perspective",
+        "description": "Local stories with global relevance and international coverage."
+      }
     }
   },
   "DealsMedi": {
@@ -217,10 +241,22 @@
     "websiteUrl": "https://dealsmedi.com/",
     "visitWebsite": "Visit DealsMedi",
     "features": {
-      "respiratory": { "title": "Respiratory & Sleep Therapy", "description": "CPAP, BiPAP machines, oxygen concentrators, masks, and sleep apnea therapy products." },
-      "mobility": { "title": "Mobility & Daily Living", "description": "Mobility scooters, wheelchairs, rollators, bathroom safety, and daily living aids." },
-      "bedsAndChairs": { "title": "Hospital Beds & Chairs", "description": "Hospital beds, electric beds, mobility chairs, and homecare equipment." },
-      "prescriptionAndOTC": { "title": "Prescription & OTC", "description": "Prescription-required and over-the-counter medical and health products." }
+      "respiratory": {
+        "title": "Respiratory & Sleep Therapy",
+        "description": "CPAP, BiPAP machines, oxygen concentrators, masks, and sleep apnea therapy products."
+      },
+      "mobility": {
+        "title": "Mobility & Daily Living",
+        "description": "Mobility scooters, wheelchairs, rollators, bathroom safety, and daily living aids."
+      },
+      "bedsAndChairs": {
+        "title": "Hospital Beds & Chairs",
+        "description": "Hospital beds, electric beds, mobility chairs, and homecare equipment."
+      },
+      "prescriptionAndOTC": {
+        "title": "Prescription & OTC",
+        "description": "Prescription-required and over-the-counter medical and health products."
+      }
     }
   },
   "NotFound": {

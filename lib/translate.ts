@@ -42,15 +42,33 @@ export async function translateText(
   const chunks = chunkText(trimmed, MAX_CHUNK_BYTES);
   const translated: string[] = [];
 
+  const requestTimeoutMs = Number(process.env.TRANSLATE_FETCH_TIMEOUT_MS) || 20_000;
+
   for (const chunk of chunks) {
     const url = `${MYMEMORY_URL}?q=${encodeUriComponentSafe(chunk)}&langpair=${encodeURIComponent(langpair)}`;
-    const res = await fetch(url, { method: 'GET' });
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), requestTimeoutMs);
+    let res: Response;
+    try {
+      res = await fetch(url, { method: 'GET', signal: controller.signal });
+    } catch (e) {
+      clearTimeout(t);
+      if (e instanceof Error && e.name === 'AbortError') {
+        throw new Error('Translation request timed out (MyMemory slow or unreachable)');
+      }
+      throw e;
+    }
+    clearTimeout(t);
 
     if (!res.ok) {
       throw new Error(`Translation failed (${res.status})`);
     }
 
     const data = (await res.json()) as { responseData?: { translatedText?: string }; responseStatus?: number };
+    const status = data?.responseStatus;
+    if (typeof status === 'number' && status === 429) {
+      throw new Error('Translation rate limited (429). Increase TRANSLATE_DELAY_MS or try again later.');
+    }
     const translatedText = data?.responseData?.translatedText;
     if (typeof translatedText === 'string') {
       translated.push(translatedText);

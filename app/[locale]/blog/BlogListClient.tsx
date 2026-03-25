@@ -5,29 +5,9 @@ import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { BlogMessages } from '@/lib/messages';
+import { BLOG_POST_META } from '@/lib/blog-post-meta';
 
-const BLOG_SLUGS = [
-  { slug: 'future-of-ecommerce-2026', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'healthcare-technology-innovations', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'sustainable-construction-practices', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'digital-marketing-strategies', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'ai-transformation-business', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'global-trade-opportunities', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'logistics-automation', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'workforce-development-skills', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'media-digital-transformation', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'manufacturing-industry-4-0', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'food-processing-innovation', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'real-estate-investment-tips', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'cloud-computing-benefits', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'telemedicine-healthcare', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'sustainable-business-practices', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'customer-experience-digital-age', date: '2026-02-06', image: '/about.jpg' },
-  { slug: 'data-security-best-practices', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'remote-work-productivity', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'supply-chain-resilience', date: '2026-02-06', image: '/home.jpg' },
-  { slug: 'entrepreneurship-startup-success', date: '2026-02-06', image: '/about.jpg' },
-];
+const BLOG_SLUGS = Object.keys(BLOG_POST_META);
 
 type Props = { locale: string; blog: BlogMessages };
 
@@ -49,23 +29,24 @@ export default function BlogListClient({ locale, blog }: Props) {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {BLOG_SLUGS.map((post, index) => {
-              const postMsg = blog.posts[post.slug];
-              const title = postMsg?.title ?? post.slug;
+              const postMsg = blog.posts[post];
+              const title = postMsg?.title ?? post;
               const excerpt = postMsg?.excerpt ?? '';
               const category = postMsg?.category ?? '';
+              const meta = BLOG_POST_META[post];
               return (
                 <motion.article
-                  key={post.slug}
+                  key={post}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
                   className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
                 >
-                  <Link href={`/blog/${post.slug}`}>
+                  <Link href={`/blog/${post}`}>
                     <div className="relative h-48 w-full">
                       <Image
-                        src={post.image}
+                        src={meta.image}
                         alt={title}
                         fill
                         className="object-cover"
@@ -78,7 +59,7 @@ export default function BlogListClient({ locale, blog }: Props) {
                         </span>
                         <div className="flex items-center text-slate-500 text-xs">
                           <Calendar size={14} className="mr-1" />
-                          {new Date(post.date).toLocaleDateString(locale, {
+                          {new Date(meta.date).toLocaleDateString(locale, {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
