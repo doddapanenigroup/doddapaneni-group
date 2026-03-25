@@ -3,6 +3,34 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
+/** Allow next/image to optimize `/api/media/**` (absolute URLs need a matching pattern). */
+function apiMediaRemotePatterns(): NonNullable<
+  NonNullable<NextConfig['images']>['remotePatterns']
+> {
+  const seen = new Set<string>();
+  const out: NonNullable<NonNullable<NextConfig['images']>['remotePatterns']> = [];
+  const add = (hostname: string, protocol: 'https' | 'http' = 'https') => {
+    const h = hostname.toLowerCase();
+    if (!h || seen.has(h)) return;
+    seen.add(h);
+    out.push({ protocol, hostname: h, pathname: '/api/media/**' });
+  };
+
+  add('www.doddapanenigroup.net');
+  add('doddapanenigroup.net');
+
+  const raw = process.env.NEXTAUTH_URL?.trim();
+  if (raw) {
+    try {
+      const u = new URL(raw);
+      add(u.hostname, u.protocol === 'https:' ? 'https' : 'http');
+    } catch {
+      /* ignore */
+    }
+  }
+  return out;
+}
+
 const nextConfig: NextConfig = {
   // Docker / VPS: produces .next/standalone for `node server.js` (see Dockerfile)
   output: 'standalone',
@@ -53,8 +81,9 @@ const nextConfig: NextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
+      // Do not match .webp/.avif here — would also match /api/media/*.webp and break API caching.
       {
-        source: '/:path*\\.(jpg|jpeg|png|gif|svg|ico|webp|avif)',
+        source: '/:path*\\.(jpg|jpeg|png|gif|svg|ico)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
