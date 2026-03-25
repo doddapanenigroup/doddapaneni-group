@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
+import { mediaUrl } from '@/lib/media';
 
 export default function About() {
   const locale = useLocale();
@@ -57,9 +58,10 @@ export default function About() {
               className="relative rounded-xl overflow-hidden border border-blue-100 aspect-[4/3]"
             >
               <Image
-                src="/about.webp"
+                src={mediaUrl('about.webp')}
                 alt="Strategic Meeting"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </motion.div>

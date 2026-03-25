@@ -75,7 +75,7 @@ async function main() {
   }
 
   console.log(
-    'Seed done. Sign in with email or username and password at /en/login.'
+    'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.'
   );
 }
 

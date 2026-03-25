@@ -3,6 +3,7 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
+import { mediaUrl } from '@/lib/media';
 
 export default function LeftSidebar() {
   const pathname = usePathname();
@@ -24,7 +25,7 @@ export default function LeftSidebar() {
         onClick={handleLogoClick}
       >
         <Image
-          src="/logo.webp"
+          src={mediaUrl('logo.webp')}
           alt={companyName}
           width={120}
           height={120}

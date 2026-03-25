@@ -4,6 +4,7 @@ import {Link} from '@/i18n/routing';
 import {useTranslations} from 'next-intl';
 import Image from 'next/image';
 import { Facebook, Linkedin, Instagram, Youtube, X, MessageCircle } from 'lucide-react';
+import { mediaUrl } from '@/lib/media';
 
 export default function Footer() {
   const t = useTranslations('Footer');
@@ -35,14 +36,14 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-blue-900 text-white pt-3 pb-3 md:pt-8 md:pb-6">
-      <div className="max-w-[1600px] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+    <footer className="bg-blue-900 text-white pt-3 pb-3 md:pt-8 md:pb-6 w-full">
+      <div className="w-full px-5 sm:px-8 lg:px-12 xl:px-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-3 md:mb-6">
         {/* Company Info */}
         <div>
           <div className="mb-2 md:mb-4">
             <Image 
-              src="/logo.webp" 
+              src={mediaUrl('logo.webp')} 
               alt={companyName} 
               width={280} 
               height={112} 

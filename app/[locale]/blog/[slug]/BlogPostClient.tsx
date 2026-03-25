@@ -80,6 +80,7 @@ export default function BlogPostClient({
           src={meta.image}
           alt={title}
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />

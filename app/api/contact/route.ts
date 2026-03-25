@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import * as z from 'zod';
+import {
+  createMailTransporter,
+  getSmtpUser,
+  isLoginEmailDeliveryConfigured,
+} from '@/lib/email';
 
 const contactSchema = z.object({
   name: z.string().min(1),
@@ -21,27 +25,30 @@ export async function POST(request: Request) {
 
     const { name, email, message } = validationResult.data;
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('Email credentials are not set. Add EMAIL_USER and EMAIL_PASS to .env.local');
+    if (!isLoginEmailDeliveryConfigured()) {
+      console.error(
+        'Email is not configured. Set EMAIL_USER + EMAIL_PASS (and optional SMTP_HOST/SMTP_PORT/SMTP_SECURE for Hostinger).'
+      );
       return NextResponse.json(
-        { message: 'Email is not configured. Add EMAIL_USER and EMAIL_PASS to .env.local (use a Gmail App Password for Gmail).' },
+        {
+          message:
+            'Email is not configured on the server. Set EMAIL_USER, EMAIL_PASS, and SMTP_* if using Hostinger SMTP.',
+        },
         { status: 500 }
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    const fromAddr = getSmtpUser();
+    const transporter = createMailTransporter();
+    if (!transporter || !fromAddr) {
+      return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
+    }
 
     // Email to the user
     const userMailOptions = {
-      from: `"Doddapaneni Group" <${process.env.EMAIL_USER}>`,
+      from: `"Doddapaneni Group" <${fromAddr}>`,
       to: email,
-      replyTo: process.env.EMAIL_USER,
+      replyTo: fromAddr,
       subject: `Thank you for contacting Doddapaneni Group`,
       text: `Hello ${name},\n\nThank you for reaching out to Doddapaneni Group. We have received your message:\n\n"${message}"\n\nOur team will review your inquiry and get back to you shortly.\n\nBest regards,\nDoddapaneni Group Team`,
       html: `
@@ -64,8 +71,8 @@ export async function POST(request: Request) {
 
     // Email to the admin (notification)
     const adminMailOptions = {
-      from: `"DG Website Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER, // Sending to self
+      from: `"DG Website Contact" <${fromAddr}>`,
+      to: fromAddr,
       replyTo: email, // Reply directly to the user
       subject: `New Inquiry: ${name} - Doddapaneni Group`,
       text: `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,

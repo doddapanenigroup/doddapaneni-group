@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Newspaper, Globe, Video, Share2, Youtube, Facebook } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
+import { mediaUrl } from '@/lib/media';
 
 export default function JanathaMirror() {
   const locale = useLocale();
@@ -24,7 +25,7 @@ export default function JanathaMirror() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/janathamirror.webp"
+            src={mediaUrl('janathamirror.webp')}
             alt="Janatha Mirror Logo"
             width={140}
             height={56}
@@ -59,9 +60,10 @@ export default function JanathaMirror() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/news.webp"
+                src={mediaUrl('news.webp')}
                 alt="Journalist working"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </motion.div>

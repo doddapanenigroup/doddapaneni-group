@@ -35,7 +35,8 @@ function mailFromHeader(): string {
   return `"Doddapaneni Group" <${user}>`;
 }
 
-function getTransporter() {
+/** Nodemailer transport for Gmail (no SMTP_HOST) or custom SMTP (SMTP_HOST set). Returns null if creds missing. */
+export function createMailTransporter(): nodemailer.Transporter | null {
   const user = getSmtpUser();
   const pass = getSmtpPassword();
   if (!user || !pass) return null;
@@ -63,6 +64,10 @@ function getTransporter() {
     service: 'gmail',
     auth: { user: gmailUser, pass: gmailPass },
   });
+}
+
+function getTransporter(): nodemailer.Transporter | null {
+  return createMailTransporter();
 }
 
 /** True when outbound SMTP credentials are present (Gmail or custom SMTP_HOST). */

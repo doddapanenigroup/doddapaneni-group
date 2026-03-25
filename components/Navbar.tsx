@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
+import { mediaUrl } from '@/lib/media';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +75,7 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navbarClasses}`}>
-      <div className={`max-w-[1600px] mx-auto w-full flex justify-between h-16 items-center ${inset}`}>
+      <div className={`w-full flex justify-between h-16 items-center ${inset}`}>
         <div className="flex items-center min-w-0">
           <Link 
             href="/" 
@@ -83,7 +84,7 @@ export default function Navbar() {
             onClick={handleLogoClick}
           >
             <Image
-              src="/logo.webp"
+              src={mediaUrl('logo.webp')}
               alt={companyName}
               width={200}
               height={80}

@@ -80,6 +80,7 @@ async function main() {
   console.log('Connecting to PostgreSQL…', url.replace(/:[^:@]+@/, ':****@'));
 
   await prisma.$transaction(async (tx) => {
+    await tx.storedImage.deleteMany();
     await tx.adminEmployeeCreateOtp.deleteMany();
     await tx.loginEmailOtp.deleteMany();
     await tx.developerPageView.deleteMany();
@@ -120,7 +121,7 @@ async function main() {
     SUPER_ADMIN_EMAIL,
     '/',
     SUPER_ADMIN_USERNAME,
-    '+ password from SUPER_ADMIN_PASSWORD (default Lokesh@0317).'
+    '+ password from SUPER_ADMIN_PASSWORD (default Lokesh@0317), then enter the email OTP.'
   );
   console.log('Go to /en/login (or your locale) to sign in.');
 }

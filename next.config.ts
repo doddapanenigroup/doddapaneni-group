@@ -4,6 +4,8 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  // Docker / VPS: produces .next/standalone for `node server.js` (see Dockerfile)
+  output: 'standalone',
   // Prisma engine must stay external (local client lives under lib/prisma-generated)
   serverExternalPackages: ["@prisma/client", "prisma", "nodemailer"],
   turbopack: {
@@ -46,9 +48,9 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/logo.webp',
+        source: '/api/media/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
       {

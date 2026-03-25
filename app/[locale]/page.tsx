@@ -6,10 +6,10 @@ import { ArrowRight, CheckCircle, TrendingUp, Shield, Globe } from 'lucide-react
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
+import { mediaUrl } from '@/lib/media';
 
-// Banner only – use absolute path so next/image never receives a relative URL
-const BANNER_IMAGE = '/image.webp';
-const SECTION_IMAGE = '/home.webp';
+const BANNER_IMAGE = mediaUrl('image.webp');
+const SECTION_IMAGE = mediaUrl('home.webp');
 
 export default function Home() {
   const locale = useLocale();
@@ -97,11 +97,15 @@ export default function Home() {
             src={BANNER_IMAGE}
             alt="Corporate Architecture"
             fill
+            sizes="100vw"
             className="object-cover opacity-50"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/80 to-slate-900/90"></div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+          <div
+            className="absolute inset-0 opacity-10 bg-repeat"
+            style={{ backgroundImage: `url(${mediaUrl('grid.svg')})` }}
+          />
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto">
@@ -294,9 +298,9 @@ export default function Home() {
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="flex gap-8 sm:gap-16 md:gap-24 items-center shrink-0">
                     {[
-                      { src: '/dlsin.webp', link: '/companies/dlsin' },
-                      { src: '/janathamirror.webp', link: '/companies/janatha-mirror' },
-                      { src: '/dealsmedi.webp', link: '/companies/dealsmedi' },
+                      { src: mediaUrl('dlsin.webp'), link: '/companies/dlsin' },
+                      { src: mediaUrl('janathamirror.webp'), link: '/companies/janatha-mirror' },
+                      { src: mediaUrl('dealsmedi.webp'), link: '/companies/dealsmedi' },
                     ].map((logo, index) => (
                       <Link
                         key={`${i}-${index}`}
@@ -307,6 +311,7 @@ export default function Home() {
                           src={logo.src}
                           alt={`Group Company Logo ${index + 1}`}
                           fill
+                          sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 160px"
                           className="object-contain"
                         />
                       </Link>

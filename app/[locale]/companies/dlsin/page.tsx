@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Globe, Truck, CreditCard, Users } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
+import { mediaUrl } from '@/lib/media';
 
 export default function Dlsin() {
   const locale = useLocale();
@@ -24,7 +25,7 @@ export default function Dlsin() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/dlsin.webp"
+            src={mediaUrl('dlsin.webp')}
             alt="Dlsin Logo"
             width={140}
             height={56}
@@ -59,9 +60,10 @@ export default function Dlsin() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/ecommerce.webp"
+                src={mediaUrl('ecommerce.webp')}
                 alt="Ecommerce"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </motion.div>

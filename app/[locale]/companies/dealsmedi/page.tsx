@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Stethoscope, Truck, BedDouble, Pill, ExternalLink, Facebook, Youtube, Instagram, Twitter } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
+import { mediaUrl } from '@/lib/media';
 
 const WEBSITE_URL = 'https://dealsmedi.com/';
 
@@ -35,7 +36,7 @@ export default function DealsMedi() {
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <Image
-            src="/dealsmedi.webp"
+            src={mediaUrl('dealsmedi.webp')}
             alt="DealsMedi Logo"
             width={140}
             height={56}
@@ -88,9 +89,10 @@ export default function DealsMedi() {
               className="relative rounded-xl overflow-hidden border border-blue-200 aspect-[4/3]"
             >
               <Image
-                src="/medical.webp"
+                src={mediaUrl('medical.webp')}
                 alt="Medical and health products" 
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </motion.div>

@@ -211,3 +211,14 @@ model WebVitalReport {
   userAgent      String?  @map("user_agent")
   createdAt      DateTime @default(now()) @map("created_at")
 }
+
+/// Binary image assets served via GET /api/media/{key} (key = path relative to /public, POSIX slashes).
+model StoredImage {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  mimeType  String   @map("mime_type")
+  data      Bytes
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("stored_image")
+}

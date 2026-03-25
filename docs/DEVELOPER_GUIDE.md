@@ -44,7 +44,7 @@ Save the file; the dev server will reload so you can see changes in the browser.
 
 ## 5. Deploy (optional)
 
-When you’re happy with the changes, commit and push. Deployment depends on your host (e.g. Vercel, or your own server using the project’s deploy docs).
+When you’re happy with the changes, commit and push. See **[docs/DEPLOY.md](DEPLOY.md)** for production steps (env vars, `prisma db push`, Docker, PM2, HTTPS).
 
 ```bash
 git add .

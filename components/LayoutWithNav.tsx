@@ -26,7 +26,7 @@ export default function LayoutWithNav({
       <RecordVisit />
       <WebVitalsReporter />
       <Navbar />
-      <main className="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+      <main className="flex-grow w-full min-w-0">
         {children}
       </main>
       <Footer />
