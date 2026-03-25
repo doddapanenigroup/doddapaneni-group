@@ -63,8 +63,10 @@ export default function LoginFormClient({
           typeof json.message === 'string'
             ? json.message
             : res.status === 503 || res.status === 502
-              ? 'Email or database is not ready. Check the message above in dev or server logs.'
-              : 'Could not send code.'
+              ? 'Email or database is not ready. Check server logs or hosting env (AUTH_SECRET, DATABASE_URL, SMTP).'
+              : res.status === 500
+                ? 'Server error (500). Confirm the latest app is deployed and the host has AUTH_SECRET, DATABASE_URL, and email (SMTP) configured.'
+                : 'Could not send code.'
         );
         return;
       }

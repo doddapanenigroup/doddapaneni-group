@@ -84,7 +84,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (err) {
           console.error('[auth] authorize failed (check DB connection and that user exists):', err);
-          throw new Error('Authentication service unavailable. Check server logs.');
+          // Do not throw: NextAuth surfaces thrown errors as HTTP 500 on sign-in.
+          return null;
         }
       },
     }),

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { connectDb, prisma } from '@/lib/db';
+import { Prisma } from '@/lib/prisma-generated';
 import { getUserByLoginIdentifier } from '@/lib/get-user-for-login';
 import {
   generateLoginEmailOtpCode,
@@ -23,6 +24,16 @@ const bodySchema = z.object({
  */
 export async function POST(request: Request) {
   try {
+    if (!process.env.AUTH_SECRET?.trim()) {
+      return NextResponse.json(
+        {
+          message:
+            'AUTH_SECRET is not set on the server. Add it in your hosting environment (e.g. Heroku Config Vars), then restart the app.',
+        },
+        { status: 503 }
+      );
+    }
+
     if (!isLoginEmailDeliveryConfigured()) {
       return NextResponse.json(
         {
@@ -64,15 +75,14 @@ export async function POST(request: Request) {
     const codeHash = hashLoginEmailOtpCode(user.id, code);
     const expiresAt = loginEmailOtpExpiresAt();
 
-    await prisma.$transaction(async (tx) => {
-      await tx.loginEmailOtp.deleteMany({ where: { userId: user.id } });
-      await tx.loginEmailOtp.create({
-        data: {
-          userId: user.id,
-          codeHash,
-          expiresAt,
-        },
-      });
+    // Sequential writes: more reliable across hosts than batch $transaction([...]) with some Prisma/serverless setups.
+    await prisma.loginEmailOtp.deleteMany({ where: { userId: user.id } });
+    await prisma.loginEmailOtp.create({
+      data: {
+        userId: user.id,
+        codeHash,
+        expiresAt,
+      },
     });
 
     try {
@@ -90,19 +100,88 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error('[login-otp/request]', e);
     const msg = e instanceof Error ? e.message : String(e);
-    if (
-      /login_email_otp|LoginEmailOtp|relation .* does not exist/i.test(msg) ||
-      /Unknown arg|Unknown model/i.test(msg)
-    ) {
+    const code =
+      e && typeof e === 'object' && 'code' in e && typeof (e as { code: unknown }).code === 'string'
+        ? (e as { code: string }).code
+        : '';
+
+    if (e instanceof Prisma.PrismaClientInitializationError) {
       return NextResponse.json(
         {
           message:
-            'Database tables are missing. Stop the dev server, run: npx prisma db push && npx prisma generate, then start again.',
+            'Cannot connect to the database. Check DATABASE_URL (SSL, host, credentials) and that PostgreSQL is reachable from this server.',
         },
         { status: 503 }
       );
     }
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2021') {
+        return NextResponse.json(
+          {
+            message:
+              'Database is missing auth tables. On the server run: npx prisma db push — then restart the app.',
+          },
+          { status: 503 }
+        );
+      }
+      if (e.code === 'P1001') {
+        return NextResponse.json(
+          {
+            message:
+              'Cannot reach the database. Check DATABASE_URL in hosting settings (correct host, user, password) and that PostgreSQL allows this server.',
+          },
+          { status: 503 }
+        );
+      }
+    }
+
+    if (
+      /login_email_otp|LoginEmailOtp|relation .* does not exist/i.test(msg) ||
+      /Unknown arg|Unknown model/i.test(msg) ||
+      code === 'P2021'
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            'Database is missing auth tables. On the server run: npx prisma db push — then redeploy or restart the app.',
+        },
+        { status: 503 }
+      );
+    }
+
+    if (
+      code === 'P1001' ||
+      /Can't reach database|connection refused|ECONNREFUSED|timeout/i.test(msg)
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            'Cannot reach the database. Check DATABASE_URL in hosting settings (correct host, user, password) and that PostgreSQL allows this server.',
+        },
+        { status: 503 }
+      );
+    }
+
+    if (/AUTH_SECRET is required|AUTH_SECRET/i.test(msg)) {
+      return NextResponse.json(
+        {
+          message:
+            'AUTH_SECRET is missing or invalid on the server. Set AUTH_SECRET in your host’s environment (e.g. openssl rand -base64 32), then restart.',
+        },
+        { status: 503 }
+      );
+    }
+
+    console.error('[login-otp/request] full error detail:', msg, e);
+
+    return NextResponse.json(
+      {
+        message:
+          'Sign-in service failed. Check server logs. Common fixes: set AUTH_SECRET and DATABASE_URL, run npx prisma db push on the server.',
+      },
+      { status: 503 }
+    );
   }
 }
 
