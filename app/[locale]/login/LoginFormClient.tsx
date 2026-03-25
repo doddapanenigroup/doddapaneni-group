@@ -150,8 +150,9 @@ export default function LoginFormClient({
           <>
             <h1 className="text-slate-600 text-center text-sm mb-2">Sign in</h1>
             <p className="text-slate-500 text-center text-xs mb-6 leading-relaxed">
-              Enter your email <strong>or</strong> username and password. We email a one-time code to your
-              account&apos;s email address to finish sign-in.
+              Enter your email <strong>or</strong>{' '}
+              username and password. We email a one-time code to your account&apos;s email address to finish
+              sign-in.
             </p>
             <form onSubmit={handleSendCode} className="space-y-4">
               <div>
