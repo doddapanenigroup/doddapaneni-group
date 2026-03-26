@@ -4,8 +4,9 @@
  * Login: email or username + password, then email OTP code to finish sign-in.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import { mediaUrl } from '@/lib/media';
@@ -63,8 +64,25 @@ export default function LoginFormClient({
   locale: string;
   callbackUrlFromServer: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { status } = useSession();
   const callbackUrl = safeCallbackUrl(locale, callbackUrlFromServer);
+  const hasNavigatedRef = useRef(false);
+
+  // If the user intentionally opened /login to switch accounts, allow staying on the page:
+  // - /login?stay=1
+  // - /login?switch=1
+  // - /login?noRedirect=1
+  const stayOnLogin = useMemo(() => {
+    const v =
+      searchParams?.get('stay') ||
+      searchParams?.get('switch') ||
+      searchParams?.get('noRedirect');
+    if (!v) return false;
+    return v === '1' || v.toLowerCase() === 'true' || v.toLowerCase() === 'yes';
+  }, [searchParams]);
 
   useEffect(() => {
     authDebug('login-page-session-status', status);
@@ -72,11 +90,20 @@ export default function LoginFormClient({
 
   // If already signed in, do not show the login UI; redirect to dashboard.
   // Using `replace` avoids back button returning to login.
+  // Avoid redirect loops and repeated navigation calls.
   useEffect(() => {
     if (status !== 'authenticated') return;
+    if (stayOnLogin) {
+      authDebug('auto-redirect-skipped(stayOnLogin)', { pathname });
+      return;
+    }
+    // Only do this from the login page path.
+    if (!pathname?.endsWith('/login')) return;
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
     authDebug('auto-redirect-authenticated', { to: `/${locale}/dashboard` });
-    window.location.href = `/${locale}/dashboard`;
-  }, [status, locale]);
+    router.replace(`/${locale}/dashboard`);
+  }, [status, locale, router, pathname, stayOnLogin]);
 
   const [step, setStep] = useState<Step>('credentials');
   const [login, setLogin] = useState('');
@@ -88,10 +115,20 @@ export default function LoginFormClient({
 
   const passwordForAuth = password.trim();
 
-  // Prevent flicker: don't render the login form until we know the user is unauthenticated.
-  if (status === 'loading' || status === 'authenticated') {
-    return null;
+  // Prevent flicker: show a minimal loading state until we know auth status.
+  // Do NOT redirect while status === "loading".
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center text-slate-600">
+          Checking session…
+        </div>
+      </div>
+    );
   }
+
+  // If authenticated, effect above will redirect; keep UI clean.
+  if (status === 'authenticated') return null;
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
