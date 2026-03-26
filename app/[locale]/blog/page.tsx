@@ -3,11 +3,30 @@ import { headers } from 'next/headers';
 import { routing } from '@/i18n/routing';
 import { getBlogMessages } from '@/lib/messages';
 import { connectDb, prisma } from '@/lib/db';
+import { mediaUrl } from '@/lib/media';
 import BlogListClient from './BlogListClient';
 
 export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ locale: string }> };
+
+function normalizeStoredImage(value: string | null): string | null {
+  if (!value) return null;
+  const s = value.trim();
+  if (!s) return null;
+  if (s.startsWith('/api/media/')) return s;
+  if (s.startsWith('api/media/')) return `/${s}`;
+  if (s.startsWith('http://') || s.startsWith('https://')) {
+    try {
+      const u = new URL(s);
+      if (u.pathname.startsWith('/api/media/')) return u.pathname;
+    } catch {
+      // ignore
+    }
+    return s;
+  }
+  return mediaUrl(s.startsWith('/') ? s.slice(1) : s);
+}
 
 export default async function BlogPage({ params }: Props) {
   const { locale: paramLocale } = await params;
@@ -41,7 +60,7 @@ export default async function BlogPage({ params }: Props) {
             slug: r.slug,
             title: r.title,
             excerpt: first.length < plain.length ? `${first}...` : first,
-            image: r.featuredImage,
+            image: normalizeStoredImage(r.featuredImage),
             publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
             readTime: `${readMinutes} min read`,
             category: 'Blog',

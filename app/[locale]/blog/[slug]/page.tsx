@@ -3,11 +3,30 @@ import { headers } from 'next/headers';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { connectDb, prisma } from '@/lib/db';
+import { mediaUrl } from '@/lib/media';
 import BlogPostClient from './BlogPostClient';
 
 export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
+
+function normalizeStoredImage(value: string | null): string | null {
+  if (!value) return null;
+  const s = value.trim();
+  if (!s) return null;
+  if (s.startsWith('/api/media/')) return s;
+  if (s.startsWith('api/media/')) return `/${s}`;
+  if (s.startsWith('http://') || s.startsWith('https://')) {
+    try {
+      const u = new URL(s);
+      if (u.pathname.startsWith('/api/media/')) return u.pathname;
+    } catch {
+      // ignore
+    }
+    return s;
+  }
+  return mediaUrl(s.startsWith('/') ? s.slice(1) : s);
+}
 
 export default async function BlogPostPage({ params }: Props) {
   const { locale: paramLocale, slug } = await params;
@@ -66,7 +85,7 @@ export default async function BlogPostPage({ params }: Props) {
       title={dbPost.title}
       category="Blog"
       readTime={`${readMinutes} min read`}
-      image={dbPost.featuredImage}
+      image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
     />
   );
