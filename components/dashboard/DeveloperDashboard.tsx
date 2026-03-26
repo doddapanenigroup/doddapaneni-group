@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Building2, Pencil, Languages } from 'lucide-react';
 import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
+import type { Role } from '@/lib/constants';
 
 type SitePage = {
   href: string;
@@ -14,7 +15,13 @@ type SitePage = {
   icon: React.ReactNode;
 };
 
-export default function DeveloperDashboard({ locale }: { locale: string }) {
+export default function DeveloperDashboard({
+  locale,
+  viewerRole = 'DEVELOPER',
+}: {
+  locale: string;
+  viewerRole?: Role;
+}) {
   const [editingPage, setEditingPage] = useState<SitePage | null>(null);
   const [translateLoading, setTranslateLoading] = useState(false);
   const [translateResult, setTranslateResult] = useState<{ results: { locale: string; translated: number; skipped: number }[] } | null>(null);
@@ -31,15 +38,20 @@ export default function DeveloperDashboard({ locale }: { locale: string }) {
     { href: base, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
 
+  const isDeveloperView = viewerRole === 'DEVELOPER';
+
   return (
     <div className="space-y-8">
       <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Code2 size={28} className="opacity-90" />
-          Developer Dashboard
+          {isDeveloperView ? 'Developer Dashboard' : 'Content & SEO Dashboard'}
         </h1>
         <p className="mt-1 opacity-90 text-sm">
-          Quick links to site pages. Edit code in your editor and run <code className="bg-white/20 px-1.5 py-0.5 rounded text-sm">npm run dev</code>.
+          {isDeveloperView
+            ? 'Quick links to site pages. Edit code in your editor and run '
+            : 'Manage content and SEO-facing copy across all pages from your dashboard. Edit files and run '}
+          <code className="bg-white/20 px-1.5 py-0.5 rounded text-sm">npm run dev</code>.
         </p>
       </header>
 

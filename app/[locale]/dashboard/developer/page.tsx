@@ -7,9 +7,10 @@ export default async function DeveloperDashboardPage() {
   const session = await auth();
   const locale = await getLocale();
 
-  if (!session?.user || session.user.role !== 'DEVELOPER') {
+  const role = session?.user?.role;
+  if (!session?.user || (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
     redirect(`/${locale}/dashboard`);
   }
 
-  return <DeveloperDashboard locale={locale} />;
+  return <DeveloperDashboard locale={locale} viewerRole={role} />;
 }

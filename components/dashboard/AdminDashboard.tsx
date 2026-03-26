@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, UserCog, UserCircle } from 'lucide-react';
+import { Users, UserCog, UserCircle, Pencil } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import VisitStats from './VisitStats';
@@ -83,6 +83,13 @@ export default function AdminDashboard({
             >
               <UserCircle size={18} />
               Employees
+            </Link>
+            <Link
+              href={`/${locale}/dashboard/developer`}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
+            >
+              <Pencil size={18} />
+              Content & SEO
             </Link>
           </div>
         </div>
