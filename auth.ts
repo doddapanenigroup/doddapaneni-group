@@ -8,6 +8,9 @@ import { verifyLoginEmailOtpCode } from '@/lib/login-email-otp';
 import { shouldSendLoginSuccessEmail, sendLoginSuccessEmail } from '@/lib/email';
 import type { Role } from '@/lib/constants';
 
+// Ensure this file is treated as a module for TS module augmentation.
+export {};
+
 declare module 'next-auth' {
   interface User {
     id: string;
@@ -20,10 +23,10 @@ declare module 'next-auth' {
   }
 }
 
-declare module 'next-auth/jwt' {
+declare module '@auth/core/jwt' {
   interface JWT {
-    id: string;
-    role: Role;
+    id?: string;
+    role?: Role;
   }
 }
 
@@ -99,6 +102,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        // Token is typed from Auth.js. Custom fields are provided via module augmentation above.
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
@@ -108,10 +112,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
+        session.user.id = token.id ?? '';
         session.user.email = token.email ?? '';
         session.user.name = token.name ?? null;
-        session.user.role = token.role;
+        session.user.role = (token.role ?? 'DEVELOPER') as Role;
       }
       return session;
     },
