@@ -9,7 +9,6 @@ import {getTranslations, setRequestLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import {messagesByLocale} from '@/lib/messages';
-import { mediaUrl } from '@/lib/media';
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -30,12 +29,12 @@ export async function generateMetadata({
     description: t('description'),
     icons: {
       icon: [
-        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '32x32' },
-        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '192x192' },
-        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '512x512' },
+        { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
+        { url: '/favicon-192.png', type: 'image/png', sizes: '192x192' },
+        { url: '/favicon-512.png', type: 'image/png', sizes: '512x512' },
       ],
-      shortcut: [{ url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '32x32' }],
-      apple: [{ url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '180x180' }],
+      shortcut: [{ url: '/favicon-32.png', type: 'image/png', sizes: '32x32' }],
+      apple: [{ url: '/favicon-180.png', type: 'image/png', sizes: '180x180' }],
     },
     other: { google: 'notranslate' },
   };
