@@ -3,7 +3,7 @@
 import {Link} from '@/i18n/routing';
 import {useTranslations} from 'next-intl';
 import Image from 'next/image';
-import { Facebook, Linkedin, Instagram, Youtube, X, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Youtube, X, MessageCircle, Pin } from 'lucide-react';
 import { mediaUrl } from '@/lib/media';
 
 export default function Footer() {
@@ -31,7 +31,7 @@ export default function Footer() {
     twitter: "https://x.com/DoddapanenGroup",
     instagram: "https://www.instagram.com/doddapanrnigroup/",
     whatsapp: "https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33",
-    linkedin: "https://www.linkedin.com/company/doddapaneni-group",
+    pinterest: "https://www.pinterest.com/doddapanenigroup/",
     youtube: "https://www.youtube.com/@doddapanenigroup"
   };
 
@@ -169,13 +169,13 @@ export default function Footer() {
               <MessageCircle size={16} className="md:w-6 md:h-6" />
             </a>
             <a
-              href={socialLinks.linkedin}
+              href={socialLinks.pinterest}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-300 hover:text-white transition-colors"
-              aria-label="LinkedIn"
+              aria-label="Pinterest"
             >
-              <Linkedin size={16} className="md:w-6 md:h-6" />
+              <Pin size={16} className="md:w-6 md:h-6" />
             </a>
             <a
               href={socialLinks.youtube}

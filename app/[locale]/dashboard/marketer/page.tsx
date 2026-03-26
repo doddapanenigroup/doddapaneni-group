@@ -7,7 +7,10 @@ export default async function MarketerDashboardPage() {
   const session = await auth();
   const locale = await getLocale();
 
-  if (!session?.user || session.user.role !== 'DIGITAL_MARKETER') {
+  const role = session?.user?.role;
+  const canAccess =
+    role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  if (!session?.user || !canAccess) {
     redirect(`/${locale}/dashboard`);
   }
 

@@ -1,14 +1,11 @@
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
-import { getBlogContent } from '@/lib/blog-content';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
-import { BLOG_POST_META } from '@/lib/blog-post-meta';
+import { connectDb, prisma } from '@/lib/db';
 import BlogPostClient from './BlogPostClient';
 
 export const dynamic = 'force-dynamic';
-
-const VALID_SLUGS = new Set(Object.keys(BLOG_POST_META));
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -22,29 +19,39 @@ export default async function BlogPostPage({ params }: Props) {
     : fromPath && routing.locales.includes(fromPath as (typeof routing.locales)[number]) ? fromPath
     : routing.defaultLocale;
 
-  if (!routing.locales.includes(locale as (typeof routing.locales)[number]) || !VALID_SLUGS.has(slug)) {
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 
   const blog = getBlogMessages(locale);
-  const blogContent = getBlogContent(locale, slug);
-
   if (!blog) notFound();
 
-  const post = blog.posts[slug];
-  const title = post?.title ?? slug;
-  const category = post?.category ?? '';
-  const readTime = post?.readTime ?? '';
+  await connectDb();
+  const dbPost = await prisma.blog.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      content: true,
+      featuredImage: true,
+      publishedAt: true,
+      status: true,
+    },
+  });
+  if (!dbPost || dbPost.status !== 'published') notFound();
+
+  const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
 
   return (
     <BlogPostClient
-      slug={slug}
       locale={locale}
-      blogContent={blogContent}
+      blogContent={dbPost.content}
       backToBlog={blog.backToBlog}
-      title={title}
-      category={category}
-      readTime={readTime}
+      title={dbPost.title}
+      category="Blog"
+      readTime={`${readMinutes} min read`}
+      image={dbPost.featuredImage}
+      publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
     />
   );
 }

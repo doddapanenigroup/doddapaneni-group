@@ -85,11 +85,11 @@ export default function AdminDashboard({
               Employees
             </Link>
             <Link
-              href={`/${locale}/dashboard/developer`}
+              href={`/${locale}/dashboard/marketer`}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
             >
               <Pencil size={18} />
-              Content & SEO
+              Blogs & SEO
             </Link>
           </div>
         </div>

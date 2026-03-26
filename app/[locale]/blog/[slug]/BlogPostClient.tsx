@@ -3,42 +3,28 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
-import { BLOG_POST_META } from '@/lib/blog-post-meta';
 
 type Props = {
-  slug: string;
   locale: string;
   blogContent: string;
   backToBlog: string;
   title: string;
   category: string;
   readTime: string;
+  image: string | null;
+  publishedAt: string | null;
 };
 
 export default function BlogPostClient({
-  slug,
   locale,
   blogContent,
   backToBlog,
   title,
   category,
   readTime,
+  image,
+  publishedAt,
 }: Props) {
-  const meta = BLOG_POST_META[slug];
-
-  if (!meta) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Blog Post Not Found</h1>
-          <Link href="/blog" className="text-blue-600 hover:text-blue-800">
-            {backToBlog}
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white">
       <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
@@ -61,7 +47,7 @@ export default function BlogPostClient({
           <div className="flex items-center gap-4 text-blue-200 text-sm">
             <div className="flex items-center">
               <Calendar size={16} className="mr-2" />
-              {new Date(meta.date).toLocaleDateString(locale, {
+              {new Date(publishedAt ?? Date.now()).toLocaleDateString(locale, {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -75,16 +61,18 @@ export default function BlogPostClient({
         </div>
       </section>
 
-      <section className="relative h-64 md:h-96 w-full">
-        <Image
-          src={meta.image}
-          alt={title}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-      </section>
+      {image ? (
+        <section className="relative h-64 md:h-96 w-full">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        </section>
+      ) : null}
 
       <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <article className="max-w-4xl mx-auto">

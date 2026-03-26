@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { routing } from '@/i18n/routing';
 import { getBlogMessages } from '@/lib/messages';
+import { connectDb, prisma } from '@/lib/db';
 import BlogListClient from './BlogListClient';
 
 export const dynamic = 'force-dynamic';
@@ -25,5 +26,25 @@ export default async function BlogPage({ params }: Props) {
   const blog = getBlogMessages(locale);
   if (!blog) notFound();
 
-  return <BlogListClient locale={locale} blog={blog} />;
+  await connectDb();
+  const rows = await prisma.blog.findMany({
+    where: { status: 'published' },
+    orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
+  });
+  const posts = rows.map((r) => {
+    const plain = r.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const first = plain.slice(0, 180);
+    const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
+    return {
+      slug: r.slug,
+      title: r.title,
+      excerpt: first.length < plain.length ? `${first}...` : first,
+      image: r.featuredImage,
+      publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+      readTime: `${readMinutes} min read`,
+      category: 'Blog',
+    };
+  });
+
+  return <BlogListClient locale={locale} blog={blog} posts={posts} />;
 }
