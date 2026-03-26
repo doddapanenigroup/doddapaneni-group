@@ -9,6 +9,7 @@ import {getTranslations, setRequestLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import {messagesByLocale} from '@/lib/messages';
+import { mediaUrl } from '@/lib/media';
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -28,13 +29,8 @@ export async function generateMetadata({
     title: t('title'),
     description: t('description'),
     icons: {
-      icon: [
-        { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
-        { url: '/favicon-192.png', type: 'image/png', sizes: '192x192' },
-        { url: '/favicon-512.png', type: 'image/png', sizes: '512x512' },
-      ],
-      shortcut: [{ url: '/favicon-32.png', type: 'image/png', sizes: '32x32' }],
-      apple: [{ url: '/favicon-180.png', type: 'image/png', sizes: '180x180' }],
+      icon: [{ url: mediaUrl('logo.webp'), type: 'image/webp' }],
+      apple: [{ url: mediaUrl('logo.webp'), type: 'image/webp' }],
     },
     other: { google: 'notranslate' },
   };
