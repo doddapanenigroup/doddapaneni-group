@@ -18,6 +18,16 @@ import * as z from 'zod';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let t: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    t = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (t) clearTimeout(t);
+  });
+}
+
 const bodySchema = z.object({
   login: z.string().min(1, 'Enter email or username'),
   password: z.string().min(1),
@@ -90,7 +100,12 @@ export async function POST(request: Request) {
     });
 
     try {
-      await sendLoginVerificationCodeEmail(user.email, user.name, code);
+      // Prevent the request from hanging indefinitely if SMTP/DNS is blocked on the host.
+      await withTimeout(
+        sendLoginVerificationCodeEmail(user.email, user.name, code),
+        20_000,
+        'SMTP send'
+      );
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err);
       console.error('[login-otp/request] send mail failed:', detail, err);

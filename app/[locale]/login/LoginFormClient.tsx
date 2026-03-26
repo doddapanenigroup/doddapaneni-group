@@ -46,14 +46,18 @@ export default function LoginFormClient({
     setInfo('');
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 25_000);
       const res = await fetch('/api/auth/login-otp/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           login: login.trim(),
           password: passwordForAuth,
         }),
       });
+      clearTimeout(t);
       const json = (await res.json().catch(() => ({}))) as {
         message?: string;
         codeSentTo?: string;
@@ -74,7 +78,13 @@ export default function LoginFormClient({
       setEmailOtp('');
       const dest = json.codeSentTo ?? 'your email';
       setInfo(`We sent a 6-digit code to ${dest}. Enter it below to sign in.`);
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError(
+          'This is taking too long (timeout). The server may be blocked from sending email (SMTP) or DNS. Try again, or check Hostinger runtime logs.'
+        );
+        return;
+      }
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -86,21 +96,31 @@ export default function LoginFormClient({
     setInfo('');
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 25_000);
       const res = await fetch('/api/auth/login-otp/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           login: login.trim(),
           password: passwordForAuth,
         }),
       });
+      clearTimeout(t);
       const json = (await res.json().catch(() => ({}))) as { message?: string };
       if (!res.ok) {
         setError(typeof json.message === 'string' ? json.message : 'Could not resend code.');
         return;
       }
       setInfo('A new code was sent to your email.');
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError(
+          'Resend timed out. The server may be blocked from sending email (SMTP) or DNS. Check Hostinger runtime logs.'
+        );
+        return;
+      }
       setError('Could not resend code.');
     } finally {
       setLoading(false);
