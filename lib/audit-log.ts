@@ -4,7 +4,7 @@ export async function logContentEdit(params: {
   userId: string;
   userEmail: string;
   userRole: string;
-  kind: "file" | "page_content";
+  kind: "file" | "page_content" | "blog";
   targetPath: string;
   summary?: string | null;
 }) {
@@ -24,7 +24,7 @@ export async function logMarketingActivity(params: {
   userId: string;
   userEmail: string;
   userRole: string;
-  entity: "campaign" | "marketing_link";
+  entity: "campaign" | "marketing_link" | "page_content" | "blog" | "stored_image";
   entityId: string;
   action: "create" | "update" | "delete";
   seoNote?: string | null;

@@ -18,6 +18,24 @@ function getPageKey(key: string): string | null {
   return PAGE_KEYS.includes(k as (typeof PAGE_KEYS)[number]) ? k : null;
 }
 
+function pageKeyToSlugBase(pageKey: string): string {
+  switch (pageKey) {
+    case 'companies-dealsmedi':
+      return 'companies/dealsmedi';
+    case 'companies-dlsin':
+      return 'companies/dlsin';
+    case 'companies-janatha-mirror':
+      return 'companies/janatha-mirror';
+    default:
+      return pageKey;
+  }
+}
+
+function contentSlug(pageKey: string, locale: string): string {
+  const base = pageKeyToSlugBase(pageKey);
+  return locale === 'en' ? base : `${locale}/${base}`;
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ pageKey: string }> }
@@ -97,11 +115,12 @@ export async function PUT(
       where: { pageKey_locale: { pageKey, locale } },
       create: {
         pageKey,
+        slug: contentSlug(pageKey, locale),
         locale,
         title,
         body: bodyContent,
       },
-      update: { title, body: bodyContent },
+      update: { slug: contentSlug(pageKey, locale), title, body: bodyContent },
     });
 
     await logContentEdit({

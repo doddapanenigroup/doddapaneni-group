@@ -35,6 +35,7 @@ model User {
   passwordChangeLogs         PasswordChangeLog[]      @relation("PasswordChangeTarget")
   loginEmailOtps             LoginEmailOtp[]
   adminEmployeeCreateOtps    AdminEmployeeCreateOtp[]
+  blogs                      Blog[]
 }
 
 /// Pending employee row + OTP emailed to admin before POST /api/users finalizes create.
@@ -128,12 +129,47 @@ model DeveloperPageView {
 model PageContent {
   id        String   @id @default(cuid())
   pageKey   String   @map("page_key")
+  slug      String   @unique
   locale    String   @default("en")
   title     String
   body      String   @db.Text
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+  keywords        String?
+  canonicalUrl    String? @map("canonical_url")
+  ogTitle         String? @map("og_title")
+  ogDescription   String? @map("og_description")
+  ogImage         String? @map("og_image")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([pageKey, locale])
+}
+
+enum BlogStatus {
+  draft
+  published
+}
+
+model Blog {
+  id              String     @id @default(cuid())
+  title           String
+  slug            String     @unique
+  content         String     @db.Text
+  featuredImage   String?    @map("featured_image")
+  authorId        String     @map("author_id")
+  author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  status          BlogStatus @default(draft)
+  publishedAt     DateTime?  @map("published_at")
+  metaTitle       String?    @map("meta_title")
+  metaDescription String?    @map("meta_description")
+  keywords        String?
+  ogTitle         String?    @map("og_title")
+  ogDescription   String?    @map("og_description")
+  ogImage         String?    @map("og_image")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  @@index([authorId])
 }
 
 enum CampaignStatus {
@@ -216,6 +252,9 @@ model WebVitalReport {
 model StoredImage {
   id        String   @id @default(cuid())
   key       String   @unique
+  altText   String?  @map("alt_text")
+  fileName  String?  @map("file_name")
+  size      Int?
   mimeType  String   @map("mime_type")
   data      Bytes
   updatedAt DateTime @updatedAt @map("updated_at")

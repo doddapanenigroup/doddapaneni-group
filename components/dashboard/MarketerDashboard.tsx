@@ -14,6 +14,8 @@ import {
   Check,
   X,
   ExternalLink,
+  Image as ImageIcon,
+  Search,
 } from 'lucide-react';
 import VisitStats from './VisitStats';
 import MyActivityPanel from './MyActivityPanel';
@@ -42,8 +44,84 @@ type MarketingLink = {
   updatedAt: string;
 };
 
+type SeoFields = {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+};
+
+type PageContentRow = {
+  id: string;
+  pageKey: string;
+  slug: string;
+  locale: string;
+  title: string;
+  body: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  keywords: string | null;
+  canonicalUrl: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+};
+
+type BlogRow = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  featuredImage: string | null;
+  status: 'draft' | 'published';
+  publishedAt: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  keywords: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+};
+
+type StoredImageRow = {
+  id: string;
+  key: string;
+  url: string;
+  fileName: string | null;
+  altText: string | null;
+  size: number | null;
+  updatedAt: string;
+};
+
+function GoogleSnippetPreview({
+  title,
+  description,
+  url,
+}: {
+  title: string;
+  description: string;
+  url: string;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <p className="text-xs text-slate-500 mb-1">Google preview</p>
+      <p className="text-sm text-emerald-700 truncate">{url || 'https://example.com/page-url'}</p>
+      <p className="text-[18px] leading-6 text-blue-700 hover:underline truncate">
+        {title || 'Your page title appears here'}
+      </p>
+      <p className="text-sm text-slate-600 line-clamp-2">
+        {description || 'Your meta description appears here for search users.'}
+      </p>
+    </div>
+  );
+}
+
 export default function MarketerDashboard({ locale }: { locale: string }) {
   const base = `/${locale}`;
+  const [activeTab, setActiveTab] = useState<'campaigns' | 'links' | 'pages' | 'blogs'>('pages');
 
   // ——— Campaigns ———
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -230,6 +308,198 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     if (res.ok) setLinks((prev) => prev.filter((l) => l.id !== id));
   }
 
+  // ——— Content pages + SEO ———
+  const [pages, setPages] = useState<PageContentRow[]>([]);
+  const [pagesLoading, setPagesLoading] = useState(true);
+  const [selectedPageSlug, setSelectedPageSlug] = useState('');
+  const [pageForm, setPageForm] = useState({
+    title: '',
+    body: '',
+    seoNote: '',
+    metaTitle: '',
+    metaDescription: '',
+    keywords: '',
+    canonicalUrl: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+  });
+
+  // ——— Blog + SEO ———
+  const [blogs, setBlogs] = useState<BlogRow[]>([]);
+  const [blogsLoading, setBlogsLoading] = useState(true);
+  const [selectedBlogSlug, setSelectedBlogSlug] = useState('');
+  const [blogForm, setBlogForm] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    featuredImage: '',
+    status: 'draft' as 'draft' | 'published',
+    seoNote: '',
+    metaTitle: '',
+    metaDescription: '',
+    keywords: '',
+    canonicalUrl: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+  });
+
+  // ——— Stored media picker ———
+  const [images, setImages] = useState<StoredImageRow[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(true);
+  const [imageSearch, setImageSearch] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/marketer/page-content?locale=en')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const items = (d?.items ?? []) as PageContentRow[];
+        setPages(items);
+        if (items[0]) selectPage(items[0]);
+      })
+      .catch(() => setPages([]))
+      .finally(() => setPagesLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/marketer/blog')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const items = (d?.items ?? []) as BlogRow[];
+        setBlogs(items);
+        if (items[0]) selectBlog(items[0]);
+      })
+      .catch(() => setBlogs([]))
+      .finally(() => setBlogsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/marketer/stored-image')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setImages((d?.items ?? []) as StoredImageRow[]))
+      .catch(() => setImages([]))
+      .finally(() => setImagesLoading(false));
+  }, []);
+
+  function selectPage(page: PageContentRow) {
+    setSelectedPageSlug(page.slug);
+    setPageForm({
+      title: page.title ?? '',
+      body: page.body ?? '',
+      seoNote: '',
+      metaTitle: page.metaTitle ?? '',
+      metaDescription: page.metaDescription ?? '',
+      keywords: page.keywords ?? '',
+      canonicalUrl: page.canonicalUrl ?? '',
+      ogTitle: page.ogTitle ?? '',
+      ogDescription: page.ogDescription ?? '',
+      ogImage: page.ogImage ?? '',
+    });
+  }
+
+  function selectBlog(blog: BlogRow) {
+    setSelectedBlogSlug(blog.slug);
+    setBlogForm({
+      title: blog.title ?? '',
+      slug: blog.slug ?? '',
+      content: blog.content ?? '',
+      featuredImage: blog.featuredImage ?? '',
+      status: blog.status ?? 'draft',
+      seoNote: '',
+      metaTitle: blog.metaTitle ?? '',
+      metaDescription: blog.metaDescription ?? '',
+      keywords: blog.keywords ?? '',
+      canonicalUrl: '',
+      ogTitle: blog.ogTitle ?? '',
+      ogDescription: blog.ogDescription ?? '',
+      ogImage: blog.ogImage ?? '',
+    });
+  }
+
+  async function savePageSeo() {
+    if (!selectedPageSlug) return;
+    const res = await fetch(`/api/marketer/page-content/${encodeURIComponent(selectedPageSlug)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pageForm),
+    });
+    const data = await res.json();
+    if (!res.ok) return;
+    const item = data.item as PageContentRow;
+    setPages((prev) => prev.map((p) => (p.id === item.id ? ({ ...p, ...item }) : p)));
+    setPageForm((f) => ({ ...f, seoNote: '' }));
+  }
+
+  async function saveBlogSeo() {
+    if (!selectedBlogSlug) return;
+    const payload = {
+      ...blogForm,
+      featuredImage: blogForm.featuredImage || null,
+    };
+    const res = await fetch(`/api/marketer/blog/${encodeURIComponent(selectedBlogSlug)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) return;
+    const item = data.item as BlogRow;
+    setBlogs((prev) => prev.map((b) => (b.id === item.id ? ({ ...b, ...item }) : b)));
+    setBlogForm((f) => ({ ...f, seoNote: '' }));
+  }
+
+  async function createBlog() {
+    if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) return;
+    const res = await fetch('/api/marketer/blog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(blogForm),
+    });
+    const data = await res.json();
+    if (!res.ok) return;
+    const item = data.item as BlogRow;
+    setBlogs((prev) => [item, ...prev]);
+    selectBlog(item);
+  }
+
+  async function uploadImage(file: File, altText: string) {
+    const form = new FormData();
+    form.append('file', file);
+    if (altText.trim()) form.append('altText', altText.trim());
+    setUploading(true);
+    try {
+      const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok) return;
+      setImages((prev) => [
+        {
+          id: data.id ?? `${Date.now()}`,
+          key: data.key,
+          url: data.url,
+          fileName: data.fileName ?? null,
+          altText: data.altText ?? null,
+          size: data.size ?? null,
+          updatedAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const filteredImages = images.filter((i) => {
+    if (!imageSearch.trim()) return true;
+    const t = imageSearch.toLowerCase();
+    return (
+      i.key.toLowerCase().includes(t) ||
+      (i.fileName ?? '').toLowerCase().includes(t) ||
+      (i.altText ?? '').toLowerCase().includes(t)
+    );
+  });
+
   return (
     <div className="space-y-8">
       <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
@@ -271,7 +541,216 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
       <VisitStats />
 
+      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg p-4">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: 'pages', label: 'Pages' },
+            { id: 'blogs', label: 'Blogs' },
+            { id: 'campaigns', label: 'Campaigns' },
+            { id: 'links', label: 'Tools' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`px-3 py-2 rounded-lg text-sm border ${
+                activeTab === tab.id
+                  ? 'bg-slate-800 text-white border-slate-800'
+                  : 'bg-white text-slate-700 border-slate-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {activeTab === 'pages' && (
+        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-800">Pages management + SEO</h2>
+            <p className="text-sm text-slate-600 mt-1">Select a page, update content, then save.</p>
+          </div>
+          <div className="p-5 grid lg:grid-cols-3 gap-5">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700">Pages</p>
+              {pagesLoading ? (
+                <p className="text-sm text-slate-500">Loading pages...</p>
+              ) : (
+                <div className="max-h-[420px] overflow-auto space-y-2">
+                  {pages.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => selectPage(p)}
+                      className={`w-full text-left p-3 rounded-lg border ${
+                        selectedPageSlug === p.slug
+                          ? 'border-slate-700 bg-slate-100'
+                          : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-slate-900">{p.title}</p>
+                      <p className="text-xs text-slate-500">/{p.slug}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="lg:col-span-2 space-y-3">
+              <input
+                value={pageForm.title}
+                onChange={(e) => setPageForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder="Page title"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+              <textarea
+                value={pageForm.body}
+                onChange={(e) => setPageForm((f) => ({ ...f, body: e.target.value }))}
+                placeholder="Page content"
+                rows={6}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <input value={pageForm.metaTitle} onChange={(e) => setPageForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={pageForm.keywords} onChange={(e) => setPageForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords (comma-separated)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={pageForm.canonicalUrl} onChange={(e) => setPageForm((f) => ({ ...f, canonicalUrl: e.target.value }))} placeholder="Canonical URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+                <textarea value={pageForm.metaDescription} onChange={(e) => setPageForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+                <input value={pageForm.ogTitle} onChange={(e) => setPageForm((f) => ({ ...f, ogTitle: e.target.value }))} placeholder="OG title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={pageForm.ogImage} onChange={(e) => setPageForm((f) => ({ ...f, ogImage: e.target.value }))} placeholder="OG image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <textarea value={pageForm.ogDescription} onChange={(e) => setPageForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+              </div>
+              <input
+                value={pageForm.seoNote}
+                onChange={(e) => setPageForm((f) => ({ ...f, seoNote: e.target.value }))}
+                placeholder="Note for team (saved in logs)"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+              <GoogleSnippetPreview
+                title={pageForm.metaTitle || pageForm.title}
+                description={pageForm.metaDescription}
+                url={pageForm.canonicalUrl || `https://doddapanenigroup.net/${locale}/${selectedPageSlug || ''}`}
+              />
+              <button type="button" onClick={savePageSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">
+                Save page changes
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'blogs' && (
+        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-800">Blog management + SEO</h2>
+          </div>
+          <div className="p-5 grid lg:grid-cols-3 gap-5">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700">Blog posts</p>
+              {blogsLoading ? (
+                <p className="text-sm text-slate-500">Loading blogs...</p>
+              ) : (
+                <div className="max-h-[420px] overflow-auto space-y-2">
+                  {blogs.map((b) => (
+                    <button key={b.id} type="button" onClick={() => selectBlog(b)} className={`w-full text-left p-3 rounded-lg border ${selectedBlogSlug === b.slug ? 'border-slate-700 bg-slate-100' : 'border-slate-200 bg-white'}`}>
+                      <p className="text-sm font-medium text-slate-900">{b.title}</p>
+                      <p className="text-xs text-slate-500">/{b.slug}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="lg:col-span-2 space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <input value={blogForm.title} onChange={(e) => setBlogForm((f) => ({ ...f, title: e.target.value }))} placeholder="Blog title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={blogForm.slug} onChange={(e) => setBlogForm((f) => ({ ...f, slug: e.target.value }))} placeholder="Slug (example: best-packers-movers)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              </div>
+              <textarea value={blogForm.content} onChange={(e) => setBlogForm((f) => ({ ...f, content: e.target.value }))} placeholder="Blog content" rows={8} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <select value={blogForm.status} onChange={(e) => setBlogForm((f) => ({ ...f, status: e.target.value as 'draft' | 'published' }))} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+                <input value={blogForm.featuredImage} onChange={(e) => setBlogForm((f) => ({ ...f, featuredImage: e.target.value }))} placeholder="Featured image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={blogForm.metaTitle} onChange={(e) => setBlogForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={blogForm.keywords} onChange={(e) => setBlogForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <textarea value={blogForm.metaDescription} onChange={(e) => setBlogForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+                <input value={blogForm.ogTitle} onChange={(e) => setBlogForm((f) => ({ ...f, ogTitle: e.target.value }))} placeholder="OG title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={blogForm.ogImage} onChange={(e) => setBlogForm((f) => ({ ...f, ogImage: e.target.value }))} placeholder="OG image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <textarea value={blogForm.ogDescription} onChange={(e) => setBlogForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+              </div>
+              <input value={blogForm.seoNote} onChange={(e) => setBlogForm((f) => ({ ...f, seoNote: e.target.value }))} placeholder="Note for team (saved in logs)" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              <GoogleSnippetPreview title={blogForm.metaTitle || blogForm.title} description={blogForm.metaDescription} url={`https://doddapanenigroup.net/${locale}/blog/${blogForm.slug || ''}`} />
+              <div className="flex gap-2 flex-wrap">
+                <button type="button" onClick={saveBlogSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">Save blog</button>
+                <button type="button" onClick={createBlog} className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700">Create new blog</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {(activeTab === 'pages' || activeTab === 'blogs') && (
+        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+            <ImageIcon size={18} className="text-slate-600" />
+            <h2 className="text-lg font-semibold text-slate-800">Media library (StoredImage)</h2>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="grid sm:grid-cols-3 gap-3 items-center">
+              <label className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 cursor-pointer bg-white">
+                Upload image
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    uploadImage(file, '');
+                  }}
+                />
+              </label>
+              <div className="sm:col-span-2 flex items-center gap-2 border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                <Search size={16} className="text-slate-500" />
+                <input
+                  value={imageSearch}
+                  onChange={(e) => setImageSearch(e.target.value)}
+                  placeholder="Search by file name / alt text"
+                  className="w-full text-sm outline-none bg-transparent"
+                />
+              </div>
+            </div>
+            {imagesLoading || uploading ? (
+              <p className="text-sm text-slate-500">Loading media...</p>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {filteredImages.slice(0, 24).map((img) => (
+                  <button
+                    key={img.id}
+                    type="button"
+                    className="text-left rounded-lg border border-slate-200 p-2 hover:border-slate-400"
+                    onClick={() => {
+                      if (activeTab === 'pages') {
+                        setPageForm((f) => ({ ...f, ogImage: img.url }));
+                      } else {
+                        setBlogForm((f) => ({ ...f, featuredImage: img.url, ogImage: img.url }));
+                      }
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.url} alt={img.altText ?? img.fileName ?? 'image'} className="w-full h-24 object-cover rounded-md mb-2" />
+                    <p className="text-xs font-medium text-slate-800 truncate">{img.fileName ?? img.key}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{img.key}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Campaigns */}
+      {activeTab === 'campaigns' && (
       <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
@@ -415,8 +894,10 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
           )}
         </div>
       </section>
+      )}
 
       {/* Marketing tools / links */}
+      {activeTab === 'links' && (
       <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
@@ -548,6 +1029,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
           )}
         </div>
       </section>
+      )}
 
       <MyActivityPanel />
     </div>

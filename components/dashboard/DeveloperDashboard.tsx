@@ -6,6 +6,8 @@ import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Building2, Pencil
 import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
+import { BLOG_POST_META } from '@/lib/blog-post-meta';
+import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
 
 type SitePage = {
   href: string;
@@ -27,7 +29,7 @@ export default function DeveloperDashboard({
   const [translateResult, setTranslateResult] = useState<{ results: { locale: string; translated: number; skipped: number }[] } | null>(null);
   const [translateError, setTranslateError] = useState<string | null>(null);
   const base = `/${locale}`;
-  const sitePages: SitePage[] = [
+  const staticPages: SitePage[] = [
     { href: `${base}`, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
     { href: `${base}/about`, label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
     { href: `${base}/services`, label: 'Services', pageKey: 'services', editFile: 'app/[locale]/services/page.tsx', icon: <FileText size={20} /> },
@@ -35,8 +37,17 @@ export default function DeveloperDashboard({
     { href: `${base}/companies/dealsmedi`, label: 'Companies — Dealsmedi', pageKey: 'companies-dealsmedi', editFile: 'app/[locale]/companies/dealsmedi/page.tsx', icon: <Building2 size={20} /> },
     { href: `${base}/companies/dlsin`, label: 'Companies — Dlsin', pageKey: 'companies-dlsin', editFile: 'app/[locale]/companies/dlsin/page.tsx', icon: <Building2 size={20} /> },
     { href: `${base}/companies/janatha-mirror`, label: 'Companies — Janatha Mirror', pageKey: 'companies-janatha-mirror', editFile: 'app/[locale]/companies/janatha-mirror/page.tsx', icon: <Building2 size={20} /> },
+    { href: `${base}/blog`, label: 'Blog — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
+    ...Object.keys(BLOG_POST_META).map((slug) => ({
+      href: `${base}/blog/${slug}`,
+      label: `Blog — ${slug}`,
+      pageKey: 'messages-en',
+      editFile: 'messages/en.json',
+      icon: <FileText size={20} />,
+    })),
     { href: base, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
+  const sitePages = staticPages;
 
   const isDeveloperView = viewerRole === 'DEVELOPER';
 
@@ -86,7 +97,7 @@ export default function DeveloperDashboard({
         <div className="p-5 grid gap-3 sm:grid-cols-2">
           {sitePages.map((page) => (
             <div
-              key={page.pageKey}
+              key={page.href}
               className="flex flex-col rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all overflow-hidden"
             >
               <div className="flex items-center justify-between p-4 gap-2">
@@ -188,6 +199,8 @@ export default function DeveloperDashboard({
           )}
         </div>
       </section>
+
+      <DeveloperObservabilityPanel />
 
       <MyActivityPanel />
 
