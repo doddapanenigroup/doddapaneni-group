@@ -133,6 +133,7 @@ model PageContent {
   locale    String   @default("en")
   title     String
   body      String   @db.Text
+  status    PageStatus @default(published)
   metaTitle       String? @map("meta_title")
   metaDescription String? @map("meta_description")
   keywords        String?
@@ -143,6 +144,11 @@ model PageContent {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([pageKey, locale])
+}
+
+enum PageStatus {
+  draft
+  published
 }
 
 enum BlogStatus {

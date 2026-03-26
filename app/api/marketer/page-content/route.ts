@@ -39,6 +39,7 @@ export async function GET(request: Request) {
         locale: r.locale,
         title: r.title,
         body: r.body,
+        status: r.status,
         metaTitle: r.metaTitle,
         metaDescription: r.metaDescription,
         keywords: r.keywords,
@@ -75,6 +76,10 @@ export async function POST(request: Request) {
     const title = strOrNull(body.title);
     const content = typeof body.body === 'string' ? body.body : '';
     const seoNote = strOrNull(body.seoNote);
+    const status =
+      body.status === 'draft' || body.status === 'published'
+        ? (body.status as 'draft' | 'published')
+        : 'published';
 
     if (!pageKey || !slug || !title) {
       return NextResponse.json({ message: 'pageKey, slug and title are required' }, { status: 400 });
@@ -88,6 +93,7 @@ export async function POST(request: Request) {
         locale,
         title,
         body: content,
+        status,
         metaTitle: strOrNull(body.metaTitle),
         metaDescription: strOrNull(body.metaDescription),
         keywords: strOrNull(body.keywords),
@@ -130,6 +136,7 @@ export async function POST(request: Request) {
         locale: doc.locale,
         title: doc.title,
         body: doc.body,
+        status: doc.status,
         metaTitle: doc.metaTitle,
         metaDescription: doc.metaDescription,
         keywords: doc.keywords,

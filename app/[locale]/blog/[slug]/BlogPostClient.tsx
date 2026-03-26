@@ -45,14 +45,16 @@ export default function BlogPostClient({
             {title}
           </h1>
           <div className="flex items-center gap-4 text-blue-200 text-sm">
-            <div className="flex items-center">
-              <Calendar size={16} className="mr-2" />
-              {new Date(publishedAt ?? Date.now()).toLocaleDateString(locale, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </div>
+            {publishedAt ? (
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2" />
+                {new Date(publishedAt).toLocaleDateString(locale, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </div>
+            ) : null}
             <div className="flex items-center">
               <Clock size={16} className="mr-2" />
               {readTime}

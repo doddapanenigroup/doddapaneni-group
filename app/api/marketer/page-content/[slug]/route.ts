@@ -42,6 +42,7 @@ export async function GET(
         locale: doc.locale,
         title: doc.title,
         body: doc.body,
+        status: doc.status,
         metaTitle: doc.metaTitle,
         metaDescription: doc.metaDescription,
         keywords: doc.keywords,
@@ -89,6 +90,7 @@ export async function PATCH(
     if (typeof body.locale === 'string' && body.locale.trim()) data.locale = body.locale.trim().toLowerCase();
     if (typeof body.title === 'string') data.title = body.title;
     if (typeof body.body === 'string') data.body = body.body;
+    if (body.status === 'draft' || body.status === 'published') data.status = body.status;
     if ('metaTitle' in body) data.metaTitle = strOrNull(body.metaTitle);
     if ('metaDescription' in body) data.metaDescription = strOrNull(body.metaDescription);
     if ('keywords' in body) data.keywords = strOrNull(body.keywords);

@@ -37,7 +37,23 @@ export default async function BlogPostPage({ params }: Props) {
       status: true,
     },
   });
-  if (!dbPost || dbPost.status !== 'published') notFound();
+  if (!dbPost || dbPost.status !== 'published') {
+    const messagePost = blog.posts[slug];
+    if (!messagePost) notFound();
+
+    return (
+      <BlogPostClient
+        locale={locale}
+        blogContent={messagePost.content ?? ''}
+        backToBlog={blog.backToBlog}
+        title={messagePost.title}
+        category="Blog"
+        readTime={messagePost.readTime}
+        image={null}
+        publishedAt={null}
+      />
+    );
+  }
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));

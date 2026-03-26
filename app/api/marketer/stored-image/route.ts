@@ -5,7 +5,7 @@ import path from 'node:path';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
-import { logMarketingActivity } from '@/lib/audit-log';
+import { logMarketingActivity, logContentEdit } from '@/lib/audit-log';
 
 export const runtime = 'nodejs';
 
@@ -105,6 +105,15 @@ export async function POST(req: Request) {
         size: saved.size,
         mimeType: saved.mimeType,
       },
+    });
+
+    await logContentEdit({
+      userId: session.user.id,
+      userEmail: session.user.email ?? '',
+      userRole: session.user.role ?? '',
+      kind: 'stored_image',
+      targetPath: saved.key,
+      summary: `upload ${saved.fileName ?? saved.key}`,
     });
 
     return NextResponse.json({

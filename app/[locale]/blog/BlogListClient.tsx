@@ -64,14 +64,16 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                         <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
                           {post.category}
                         </span>
-                        <div className="flex items-center text-slate-500 text-xs">
-                          <Calendar size={14} className="mr-1" />
-                          {new Date(post.publishedAt ?? Date.now()).toLocaleDateString(locale, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </div>
+                        {post.publishedAt ? (
+                          <div className="flex items-center text-slate-500 text-xs">
+                            <Calendar size={14} className="mr-1" />
+                            {new Date(post.publishedAt).toLocaleDateString(locale, {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </div>
+                        ) : null}
                       </div>
                       <h2 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
                         {post.title}

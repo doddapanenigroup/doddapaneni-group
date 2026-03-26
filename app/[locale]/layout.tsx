@@ -35,7 +35,10 @@ export async function generateMetadata({
   const hasLocalePrefix = !!maybeLocale && routing.locales.includes(maybeLocale as (typeof routing.locales)[number]);
   const routeSegments = hasLocalePrefix ? segments.slice(1) : segments;
   const routePath = routeSegments.join('/');
-  const slug = routePath ? routePath : 'home';
+  const baseSlug = routePath ? routePath : 'home';
+  // PageContent `slug` values for non-default locales are stored with locale prefix (e.g. `te/about`)
+  // so include it here to keep metadata and OG tags consistent.
+  const slug = locale === routing.defaultLocale ? baseSlug : `${locale}/${baseSlug}`;
 
   let seo:
     | {
@@ -51,7 +54,7 @@ export async function generateMetadata({
     | null = null;
   try {
     seo = await prisma.pageContent.findFirst({
-      where: { slug, locale },
+      where: { slug, locale, status: 'published' },
       select: {
         title: true,
         metaTitle: true,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import {
   Megaphone,
   Globe,
@@ -61,6 +62,7 @@ type PageContentRow = {
   locale: string;
   title: string;
   body: string;
+  status: 'draft' | 'published';
   metaTitle: string | null;
   metaDescription: string | null;
   keywords: string | null;
@@ -100,10 +102,12 @@ function GoogleSnippetPreview({
   title,
   description,
   url,
+  ogImage,
 }: {
   title: string;
   description: string;
   url: string;
+  ogImage?: string | null;
 }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -115,12 +119,20 @@ function GoogleSnippetPreview({
       <p className="text-sm text-slate-600 line-clamp-2">
         {description || 'Your meta description appears here for search users.'}
       </p>
+      {ogImage ? (
+        <div className="mt-3 rounded-lg border border-slate-200 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ogImage} alt="OG preview" className="w-full h-28 object-cover bg-slate-100" />
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default function MarketerDashboard({ locale }: { locale: string }) {
   const base = `/${locale}`;
+  const { data: sessionData } = useSession();
+  const authorLabel = sessionData?.user?.email ?? sessionData?.user?.name ?? '—';
   const [activeTab, setActiveTab] = useState<'campaigns' | 'links' | 'pages' | 'blogs'>('pages');
 
   // ——— Campaigns ———
@@ -312,9 +324,22 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   const [pages, setPages] = useState<PageContentRow[]>([]);
   const [pagesLoading, setPagesLoading] = useState(true);
   const [selectedPageSlug, setSelectedPageSlug] = useState('');
+  const [creatingPage, setCreatingPage] = useState(false);
+  const PAGE_KEY_OPTIONS: { value: string; label: string }[] = [
+    { value: 'home', label: 'Home' },
+    { value: 'about', label: 'About' },
+    { value: 'services', label: 'Services' },
+    { value: 'contact', label: 'Contact' },
+    { value: 'companies-dealsmedi', label: 'Companies (Dealsmedi)' },
+    { value: 'companies-dlsin', label: 'Companies (Dlsin)' },
+    { value: 'companies-janatha-mirror', label: 'Companies (Janatha Mirror)' },
+  ];
   const [pageForm, setPageForm] = useState({
+    pageKey: '',
     title: '',
+    slug: '',
     body: '',
+    status: 'published' as 'draft' | 'published',
     seoNote: '',
     metaTitle: '',
     metaDescription: '',
@@ -335,6 +360,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     content: '',
     featuredImage: '',
     status: 'draft' as 'draft' | 'published',
+    publishedAt: '',
     seoNote: '',
     metaTitle: '',
     metaDescription: '',
@@ -352,7 +378,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/marketer/page-content?locale=en')
+    fetch(`/api/marketer/page-content?locale=${encodeURIComponent(locale)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         const items = (d?.items ?? []) as PageContentRow[];
@@ -361,7 +387,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       })
       .catch(() => setPages([]))
       .finally(() => setPagesLoading(false));
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetch('/api/marketer/blog')
@@ -385,9 +411,13 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
   function selectPage(page: PageContentRow) {
     setSelectedPageSlug(page.slug);
+    setCreatingPage(false);
     setPageForm({
+      pageKey: page.pageKey ?? '',
       title: page.title ?? '',
+      slug: page.slug ?? '',
       body: page.body ?? '',
+      status: page.status ?? 'published',
       seoNote: '',
       metaTitle: page.metaTitle ?? '',
       metaDescription: page.metaDescription ?? '',
@@ -407,6 +437,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       content: blog.content ?? '',
       featuredImage: blog.featuredImage ?? '',
       status: blog.status ?? 'draft',
+      publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().slice(0, 10) : '',
       seoNote: '',
       metaTitle: blog.metaTitle ?? '',
       metaDescription: blog.metaDescription ?? '',
@@ -429,7 +460,103 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     if (!res.ok) return;
     const item = data.item as PageContentRow;
     setPages((prev) => prev.map((p) => (p.id === item.id ? ({ ...p, ...item }) : p)));
-    setPageForm((f) => ({ ...f, seoNote: '' }));
+    setSelectedPageSlug(item.slug);
+    setPageForm((f) => ({
+      ...f,
+      pageKey: item.pageKey,
+      slug: item.slug,
+      title: item.title,
+      body: item.body,
+      status: item.status,
+      metaTitle: item.metaTitle ?? '',
+      metaDescription: item.metaDescription ?? '',
+      keywords: item.keywords ?? '',
+      canonicalUrl: item.canonicalUrl ?? '',
+      ogTitle: item.ogTitle ?? '',
+      ogDescription: item.ogDescription ?? '',
+      ogImage: item.ogImage ?? '',
+      seoNote: '',
+    }));
+  }
+
+  async function createPage() {
+    // Marketer can create new PageContent rows; only PageKeys below are wired to the public site.
+    const payload = {
+      pageKey: pageForm.pageKey.trim(),
+      slug: pageForm.slug.trim(),
+      locale,
+      title: pageForm.title.trim(),
+      body: pageForm.body,
+      status: pageForm.status,
+      metaTitle: pageForm.metaTitle.trim() || null,
+      metaDescription: pageForm.metaDescription.trim() || null,
+      keywords: pageForm.keywords.trim() || null,
+      canonicalUrl: pageForm.canonicalUrl.trim() || null,
+      ogTitle: pageForm.ogTitle.trim() || null,
+      ogDescription: pageForm.ogDescription.trim() || null,
+      ogImage: pageForm.ogImage.trim() || null,
+      seoNote: pageForm.seoNote.trim() || undefined,
+    };
+
+    if (!payload.pageKey || !payload.slug || !payload.title) return;
+
+    const res = await fetch('/api/marketer/page-content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) return;
+
+    const item = data.item as PageContentRow;
+    setPages((prev) => [item, ...prev]);
+    setSelectedPageSlug(item.slug);
+    setCreatingPage(false);
+    setPageForm({
+      pageKey: item.pageKey,
+      title: item.title,
+      slug: item.slug,
+      body: item.body,
+      status: item.status,
+      seoNote: '',
+      metaTitle: item.metaTitle ?? '',
+      metaDescription: item.metaDescription ?? '',
+      keywords: item.keywords ?? '',
+      canonicalUrl: item.canonicalUrl ?? '',
+      ogTitle: item.ogTitle ?? '',
+      ogDescription: item.ogDescription ?? '',
+      ogImage: item.ogImage ?? '',
+    });
+  }
+
+  async function deleteSelectedPage() {
+    if (!selectedPageSlug) return;
+    if (!confirm('Delete this page content?')) return;
+
+    const res = await fetch(`/api/marketer/page-content/${encodeURIComponent(selectedPageSlug)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) return;
+
+    const remaining = pages.filter((p) => p.slug !== selectedPageSlug);
+    setPages(remaining);
+    setSelectedPageSlug('');
+    setCreatingPage(false);
+    setPageForm({
+      pageKey: PAGE_KEY_OPTIONS[0]?.value ?? 'home',
+      title: '',
+      slug: '',
+      body: '',
+      status: 'published',
+      seoNote: '',
+      metaTitle: '',
+      metaDescription: '',
+      keywords: '',
+      canonicalUrl: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+    });
   }
 
   async function saveBlogSeo() {
@@ -447,7 +574,58 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     if (!res.ok) return;
     const item = data.item as BlogRow;
     setBlogs((prev) => prev.map((b) => (b.id === item.id ? ({ ...b, ...item }) : b)));
-    setBlogForm((f) => ({ ...f, seoNote: '' }));
+    setSelectedBlogSlug(item.slug);
+    setBlogForm((f) => ({
+      ...f,
+      title: item.title,
+      slug: item.slug,
+      content: item.content,
+      featuredImage: item.featuredImage ?? '',
+      status: item.status ?? 'draft',
+      publishedAt: item.publishedAt ? new Date(item.publishedAt).toISOString().slice(0, 10) : '',
+      seoNote: '',
+      metaTitle: item.metaTitle ?? '',
+      metaDescription: item.metaDescription ?? '',
+      keywords: item.keywords ?? '',
+      canonicalUrl: '',
+      ogTitle: item.ogTitle ?? '',
+      ogDescription: item.ogDescription ?? '',
+      ogImage: item.ogImage ?? '',
+    }));
+  }
+
+  async function deleteSelectedBlog() {
+    if (!selectedBlogSlug) return;
+    if (!confirm('Delete this blog?')) return;
+
+    const res = await fetch(`/api/marketer/blog/${encodeURIComponent(selectedBlogSlug)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) return;
+
+    const remaining = blogs.filter((b) => b.slug !== selectedBlogSlug);
+    setBlogs(remaining);
+
+    if (remaining[0]) selectBlog(remaining[0]);
+    else {
+      setSelectedBlogSlug('');
+      setBlogForm({
+        title: '',
+        slug: '',
+        content: '',
+        featuredImage: '',
+        status: 'draft',
+        publishedAt: '',
+        seoNote: '',
+        metaTitle: '',
+        metaDescription: '',
+        keywords: '',
+        canonicalUrl: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
+      });
+    }
   }
 
   async function createBlog() {
@@ -488,6 +666,22 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     } finally {
       setUploading(false);
     }
+  }
+
+  async function copyImageUrl(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Clipboard may be blocked; users can still manually copy from the preview.
+      alert('Copy failed. Please copy the URL manually.');
+    }
+  }
+
+  async function deleteImage(key: string) {
+    if (!confirm('Delete this image?')) return;
+    const res = await fetch(`/api/marketer/stored-image/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    if (!res.ok) return;
+    setImages((prev) => prev.filter((i) => i.key !== key));
   }
 
   const filteredImages = images.filter((i) => {
@@ -567,9 +761,37 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
       {activeTab === 'pages' && (
         <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50">
-            <h2 className="text-lg font-semibold text-slate-800">Pages management + SEO</h2>
-            <p className="text-sm text-slate-600 mt-1">Select a page, update content, then save.</p>
+          <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">Pages management + SEO</h2>
+              <p className="text-sm text-slate-600 mt-1">Select a page, update content, then save.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCreatingPage(true);
+                setSelectedPageSlug('');
+                setPageForm({
+                  pageKey: PAGE_KEY_OPTIONS[0]?.value ?? 'home',
+                  title: '',
+                  slug: '',
+                  body: '',
+                  status: 'draft',
+                  seoNote: '',
+                  metaTitle: '',
+                  metaDescription: '',
+                  keywords: '',
+                  canonicalUrl: '',
+                  ogTitle: '',
+                  ogDescription: '',
+                  ogImage: '',
+                });
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800"
+            >
+              <Plus size={18} />
+              Create page
+            </button>
           </div>
           <div className="p-5 grid lg:grid-cols-3 gap-5">
             <div className="space-y-2">
@@ -591,12 +813,43 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                     >
                       <p className="text-sm font-medium text-slate-900">{p.title}</p>
                       <p className="text-xs text-slate-500">/{p.slug}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-xs bg-slate-200 text-slate-700">
+                        {p.status}
+                      </span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
             <div className="lg:col-span-2 space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <select
+                  value={pageForm.pageKey}
+                  onChange={(e) => setPageForm((f) => ({ ...f, pageKey: e.target.value }))}
+                  disabled={!creatingPage}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                >
+                  {PAGE_KEY_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  value={pageForm.slug}
+                  onChange={(e) => setPageForm((f) => ({ ...f, slug: e.target.value }))}
+                  placeholder="Slug (URL)"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+                <select
+                  value={pageForm.status}
+                  onChange={(e) => setPageForm((f) => ({ ...f, status: e.target.value as 'draft' | 'published' }))}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
               <input
                 value={pageForm.title}
                 onChange={(e) => setPageForm((f) => ({ ...f, title: e.target.value }))}
@@ -606,7 +859,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
               <textarea
                 value={pageForm.body}
                 onChange={(e) => setPageForm((f) => ({ ...f, body: e.target.value }))}
-                placeholder="Page content"
+                placeholder="Page content (rich text / HTML)"
                 rows={6}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
               />
@@ -629,10 +882,26 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 title={pageForm.metaTitle || pageForm.title}
                 description={pageForm.metaDescription}
                 url={pageForm.canonicalUrl || `https://doddapanenigroup.net/${locale}/${selectedPageSlug || ''}`}
+                ogImage={pageForm.ogImage}
               />
-              <button type="button" onClick={savePageSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">
-                Save page changes
-              </button>
+              <div className="flex flex-wrap gap-2 items-center">
+                <button
+                  type="button"
+                  onClick={creatingPage ? createPage : savePageSeo}
+                  className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm"
+                >
+                  {creatingPage ? 'Create page' : 'Save page changes'}
+                </button>
+                {!creatingPage && selectedPageSlug ? (
+                  <button
+                    type="button"
+                    onClick={deleteSelectedPage}
+                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                  >
+                    Delete page
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
@@ -654,6 +923,9 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                     <button key={b.id} type="button" onClick={() => selectBlog(b)} className={`w-full text-left p-3 rounded-lg border ${selectedBlogSlug === b.slug ? 'border-slate-700 bg-slate-100' : 'border-slate-200 bg-white'}`}>
                       <p className="text-sm font-medium text-slate-900">{b.title}</p>
                       <p className="text-xs text-slate-500">/{b.slug}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-xs bg-slate-200 text-slate-700">
+                        {b.status}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -663,13 +935,30 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
               <div className="grid sm:grid-cols-2 gap-3">
                 <input value={blogForm.title} onChange={(e) => setBlogForm((f) => ({ ...f, title: e.target.value }))} placeholder="Blog title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <input value={blogForm.slug} onChange={(e) => setBlogForm((f) => ({ ...f, slug: e.target.value }))} placeholder="Slug (example: best-packers-movers)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input value={authorLabel} disabled placeholder="Author" className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
               </div>
               <textarea value={blogForm.content} onChange={(e) => setBlogForm((f) => ({ ...f, content: e.target.value }))} placeholder="Blog content" rows={8} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
               <div className="grid sm:grid-cols-2 gap-3">
-                <select value={blogForm.status} onChange={(e) => setBlogForm((f) => ({ ...f, status: e.target.value as 'draft' | 'published' }))} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                <select
+                  value={blogForm.status}
+                  onChange={(e) =>
+                    setBlogForm((f) => {
+                      const nextStatus = e.target.value as 'draft' | 'published';
+                      return { ...f, status: nextStatus, publishedAt: nextStatus === 'published' ? f.publishedAt : '' };
+                    })
+                  }
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
                 </select>
+                <input
+                  type="date"
+                  value={blogForm.publishedAt}
+                  onChange={(e) => setBlogForm((f) => ({ ...f, publishedAt: e.target.value }))}
+                  disabled={blogForm.status !== 'published'}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
                 <input value={blogForm.featuredImage} onChange={(e) => setBlogForm((f) => ({ ...f, featuredImage: e.target.value }))} placeholder="Featured image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <input value={blogForm.metaTitle} onChange={(e) => setBlogForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <input value={blogForm.keywords} onChange={(e) => setBlogForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
@@ -679,10 +968,24 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 <textarea value={blogForm.ogDescription} onChange={(e) => setBlogForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
               </div>
               <input value={blogForm.seoNote} onChange={(e) => setBlogForm((f) => ({ ...f, seoNote: e.target.value }))} placeholder="Note for team (saved in logs)" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-              <GoogleSnippetPreview title={blogForm.metaTitle || blogForm.title} description={blogForm.metaDescription} url={`https://doddapanenigroup.net/${locale}/blog/${blogForm.slug || ''}`} />
+              <GoogleSnippetPreview
+                title={blogForm.metaTitle || blogForm.title}
+                description={blogForm.metaDescription}
+                url={`https://doddapanenigroup.net/${locale}/blog/${blogForm.slug || ''}`}
+                ogImage={blogForm.ogImage || blogForm.featuredImage}
+              />
               <div className="flex gap-2 flex-wrap">
                 <button type="button" onClick={saveBlogSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">Save blog</button>
                 <button type="button" onClick={createBlog} className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700">Create new blog</button>
+                {selectedBlogSlug ? (
+                  <button
+                    type="button"
+                    onClick={deleteSelectedBlog}
+                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                  >
+                    Delete blog
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>
@@ -725,9 +1028,10 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {filteredImages.slice(0, 24).map((img) => (
-                  <button
+                  <div
                     key={img.id}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     className="text-left rounded-lg border border-slate-200 p-2 hover:border-slate-400"
                     onClick={() => {
                       if (activeTab === 'pages') {
@@ -737,11 +1041,35 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                       }
                     }}
                   >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyImageUrl(img.url);
+                        }}
+                        className="px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-700 text-[11px] hover:bg-slate-50"
+                      >
+                        Copy URL
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteImage(img.key);
+                        }}
+                        className="p-2 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                        aria-label="Delete image"
+                        title="Delete image"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={img.url} alt={img.altText ?? img.fileName ?? 'image'} className="w-full h-24 object-cover rounded-md mb-2" />
                     <p className="text-xs font-medium text-slate-800 truncate">{img.fileName ?? img.key}</p>
                     <p className="text-[11px] text-slate-500 truncate">{img.key}</p>
-                  </button>
+                  </div>
                 ))}
               </div>
             )}

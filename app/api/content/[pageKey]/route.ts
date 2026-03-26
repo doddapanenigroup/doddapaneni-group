@@ -51,8 +51,8 @@ export async function GET(
 
   try {
     await connectDb();
-    const doc = await prisma.pageContent.findUnique({
-      where: { pageKey_locale: { pageKey, locale } },
+    const doc = await prisma.pageContent.findFirst({
+      where: { pageKey, locale, status: 'published' },
     });
     if (!doc) {
       return NextResponse.json(null, {
@@ -119,8 +119,9 @@ export async function PUT(
         locale,
         title,
         body: bodyContent,
+        status: 'published',
       },
-      update: { slug: contentSlug(pageKey, locale), title, body: bodyContent },
+      update: { slug: contentSlug(pageKey, locale), title, body: bodyContent, status: 'published' },
     });
 
     await logContentEdit({

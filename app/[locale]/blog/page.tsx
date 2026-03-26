@@ -31,20 +31,31 @@ export default async function BlogPage({ params }: Props) {
     where: { status: 'published' },
     orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
   });
-  const posts = rows.map((r) => {
-    const plain = r.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    const first = plain.slice(0, 180);
-    const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
-    return {
-      slug: r.slug,
-      title: r.title,
-      excerpt: first.length < plain.length ? `${first}...` : first,
-      image: r.featuredImage,
-      publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
-      readTime: `${readMinutes} min read`,
-      category: 'Blog',
-    };
-  });
+  const posts =
+    rows.length > 0
+      ? rows.map((r) => {
+          const plain = r.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          const first = plain.slice(0, 180);
+          const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
+          return {
+            slug: r.slug,
+            title: r.title,
+            excerpt: first.length < plain.length ? `${first}...` : first,
+            image: r.featuredImage,
+            publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+            readTime: `${readMinutes} min read`,
+            category: 'Blog',
+          };
+        })
+      : Object.entries(blog.posts).map(([slug, p]) => ({
+          slug,
+          title: p.title,
+          excerpt: p.excerpt,
+          image: null,
+          publishedAt: null,
+          readTime: p.readTime,
+          category: p.category,
+        }));
 
   return <BlogListClient locale={locale} blog={blog} posts={posts} />;
 }

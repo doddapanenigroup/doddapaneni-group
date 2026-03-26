@@ -4,7 +4,7 @@ export async function logContentEdit(params: {
   userId: string;
   userEmail: string;
   userRole: string;
-  kind: "file" | "page_content" | "blog";
+  kind: "file" | "page_content" | "blog" | "stored_image";
   targetPath: string;
   summary?: string | null;
 }) {
