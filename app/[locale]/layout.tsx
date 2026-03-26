@@ -23,6 +23,9 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
+    notFound();
+  }
   const t = await getTranslations({locale, namespace: 'Metadata'});
 
   const headersList = await headers();
@@ -102,20 +105,13 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: paramLocale } = await params;
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? '';
-  // Prefer route param (from URL segment); fallback to pathname so /hi/blog and /es/blog get correct locale
-  const fromPath = pathname.split('/').filter(Boolean)[0];
-  type AppLocale = (typeof routing.locales)[number];
-  const isLocale = (l: string | undefined): l is AppLocale => !!l && routing.locales.includes(l as AppLocale);
-  const locale =
-    isLocale(paramLocale) ? paramLocale
-    : isLocale(fromPath) ? fromPath
-    : routing.defaultLocale;
-
-  if (!isLocale(locale)) {
+  if (!routing.locales.includes(paramLocale as (typeof routing.locales)[number])) {
     notFound();
   }
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') ?? '';
+  type AppLocale = (typeof routing.locales)[number];
+  const locale = paramLocale as AppLocale;
 
   setRequestLocale(locale);
   const messages = messagesByLocale[locale] ?? messagesByLocale.en;

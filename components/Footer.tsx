@@ -3,8 +3,22 @@
 import {Link} from '@/i18n/routing';
 import {useTranslations} from 'next-intl';
 import Image from 'next/image';
-import { Facebook, Instagram, Youtube, X, MessageCircle, Pin } from 'lucide-react';
+import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
 import { mediaUrl } from '@/lib/media';
+
+function PinterestIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M12 2a10 10 0 0 0-3.64 19.31 9.3 9.3 0 0 1 .08-2.68l1.01-4.3s-.25-.5-.25-1.25c0-1.17.68-2.05 1.53-2.05.72 0 1.06.54 1.06 1.18 0 .72-.46 1.8-.7 2.8-.2.83.42 1.5 1.24 1.5 1.49 0 2.64-1.57 2.64-3.84 0-2.01-1.45-3.42-3.51-3.42-2.39 0-3.79 1.79-3.79 3.64 0 .72.28 1.5.63 1.92a.26.26 0 0 1 .06.25l-.25 1.02c-.04.17-.14.21-.33.13-1.22-.57-1.98-2.34-1.98-3.76 0-3.06 2.22-5.87 6.41-5.87 3.36 0 5.98 2.4 5.98 5.61 0 3.35-2.11 6.05-5.04 6.05-.98 0-1.9-.51-2.22-1.11l-.61 2.3a10.1 10.1 0 0 1-.91 2.14A10 10 0 1 0 12 2z" />
+    </svg>
+  );
+}
 
 export default function Footer() {
   const t = useTranslations('Footer');
@@ -32,7 +46,6 @@ export default function Footer() {
     instagram: "https://www.instagram.com/doddapanrnigroup/",
     whatsapp: "https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33",
     pinterest: "https://www.pinterest.com/doddapanenigroup/",
-    youtube: "https://www.youtube.com/@doddapanenigroup"
   };
 
   return (
@@ -175,16 +188,7 @@ export default function Footer() {
               className="text-blue-300 hover:text-white transition-colors"
               aria-label="Pinterest"
             >
-              <Pin size={16} className="md:w-6 md:h-6" />
-            </a>
-            <a
-              href={socialLinks.youtube}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="YouTube"
-            >
-              <Youtube size={16} className="md:w-6 md:h-6" />
+              <PinterestIcon className="w-4 h-4 md:w-6 md:h-6" />
             </a>
           </div>
         </div>
