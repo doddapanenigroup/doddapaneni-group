@@ -4,6 +4,7 @@ import { routing } from '@/i18n/routing';
 import { getBlogMessages } from '@/lib/messages';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
+import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogListClient from './BlogListClient';
 
 export const dynamic = 'force-dynamic';
@@ -70,7 +71,7 @@ export default async function BlogPage({ params }: Props) {
           slug,
           title: p.title,
           excerpt: p.excerpt,
-          image: null,
+          image: BLOG_POST_META[slug]?.image ?? null,
           publishedAt: null,
           readTime: p.readTime,
           category: p.category,

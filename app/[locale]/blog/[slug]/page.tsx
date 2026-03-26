@@ -4,6 +4,7 @@ import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
+import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogPostClient from './BlogPostClient';
 
 export const dynamic = 'force-dynamic';
@@ -68,7 +69,7 @@ export default async function BlogPostPage({ params }: Props) {
         title={messagePost.title}
         category="Blog"
         readTime={messagePost.readTime}
-        image={null}
+        image={BLOG_POST_META[slug]?.image ?? null}
         publishedAt={null}
       />
     );
