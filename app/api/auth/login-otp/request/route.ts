@@ -8,7 +8,11 @@ import {
   hashLoginEmailOtpCode,
   loginEmailOtpExpiresAt,
 } from '@/lib/login-email-otp';
-import { isLoginEmailDeliveryConfigured, sendLoginVerificationCodeEmail } from '@/lib/email';
+import {
+  isLoginEmailDeliveryConfigured,
+  sendLoginVerificationCodeEmail,
+  smtpFailureUserMessage,
+} from '@/lib/email';
 import * as z from 'zod';
 
 export const runtime = 'nodejs';
@@ -91,9 +95,10 @@ export async function POST(request: Request) {
       const detail = err instanceof Error ? err.message : String(err);
       console.error('[login-otp/request] send mail failed:', detail, err);
       await prisma.loginEmailOtp.deleteMany({ where: { userId: user.id } });
+      const userMsg = smtpFailureUserMessage(err);
       const devHint =
-        process.env.NODE_ENV === 'development' ? ` Mail error: ${detail.slice(0, 200)}` : '';
-      return NextResponse.json({ message: `Could not send verification email.${devHint}` }, { status: 502 });
+        process.env.NODE_ENV === 'development' ? ` (${detail.slice(0, 240)})` : '';
+      return NextResponse.json({ message: `${userMsg}${devHint}` }, { status: 502 });
     }
 
     return NextResponse.json({ ok: true, codeSentTo: user.email });

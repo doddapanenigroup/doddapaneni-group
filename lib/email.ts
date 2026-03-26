@@ -1,5 +1,16 @@
+import dns from 'dns';
 import nodemailer from 'nodemailer';
 import { formatDateISTAndET } from '@/lib/date-timezones';
+
+/** Some hosts truncate env values at `#`; base64 avoids that. Set `SMTP_DNS_IPV4_FIRST=1` if SMTP hangs (IPv6 issues). */
+function maybePreferIpv4ForSmtp(): void {
+  if (process.env.SMTP_DNS_IPV4_FIRST !== '1' && process.env.SMTP_DNS_IPV4_FIRST !== 'true') return;
+  try {
+    dns.setDefaultResultOrder('ipv4first');
+  } catch {
+    /* Node < 17 */
+  }
+}
 
 const ROLES_FOR_LOGIN_EMAIL = ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'] as const;
 
@@ -23,11 +34,28 @@ export function getSmtpUser(): string | undefined {
 }
 
 function getSmtpPassword(): string | undefined {
+  const b64 = process.env.EMAIL_PASS_B64?.trim() || process.env.SMTP_PASS_B64?.trim();
+  if (b64) {
+    try {
+      const decoded = Buffer.from(b64, 'base64').toString('utf8');
+      return decoded || undefined;
+    } catch {
+      return undefined;
+    }
+  }
   const p =
     process.env.EMAIL_PASS?.trim() ||
     process.env.SMTP_PASS?.trim() ||
     process.env.GMAIL_APP_PASSWORD?.trim();
-  return p || undefined;
+  if (!p) return undefined;
+  // Strip wrapping quotes some deployment UIs store literally in the value.
+  if (
+    (p.startsWith('"') && p.endsWith('"') && p.length >= 2) ||
+    (p.startsWith("'") && p.endsWith("'") && p.length >= 2)
+  ) {
+    return p.slice(1, -1) || undefined;
+  }
+  return p;
 }
 
 function mailFromHeader(): string {
@@ -43,16 +71,22 @@ export function createMailTransporter(): nodemailer.Transporter | null {
 
   const host = process.env.SMTP_HOST?.trim();
   if (host) {
+    maybePreferIpv4ForSmtp();
     const port = Number(process.env.SMTP_PORT || '587');
+    const secureFlag = process.env.SMTP_SECURE;
     const secure =
-      process.env.SMTP_SECURE === 'true' ||
-      process.env.SMTP_SECURE === '1' ||
-      port === 465;
+      secureFlag === 'true' ||
+      secureFlag === '1' ||
+      (port === 465 && secureFlag !== 'false' && secureFlag !== '0');
     return nodemailer.createTransport({
       host,
       port,
       secure,
       auth: { user, pass },
+      connectionTimeout: 25_000,
+      greetingTimeout: 25_000,
+      requireTLS: !secure && port === 587,
+      tls: { minVersion: 'TLSv1.2' },
     });
   }
 
@@ -73,6 +107,43 @@ function getTransporter(): nodemailer.Transporter | null {
 /** True when outbound SMTP credentials are present (Gmail or custom SMTP_HOST). */
 export function isLoginEmailDeliveryConfigured(): boolean {
   return !!(getSmtpUser() && getSmtpPassword());
+}
+
+/** Maps Nodemailer/SMTP errors to a short message (no secrets). Use in API routes when send fails. */
+export function smtpFailureUserMessage(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  const response =
+    err && typeof err === 'object' && 'response' in err
+      ? String((err as { response?: string }).response ?? '')
+      : '';
+  const combined = `${msg} ${response}`.toLowerCase();
+
+  if (
+    combined.includes('invalid login') ||
+    combined.includes('535') ||
+    combined.includes('authentication unsuccessful') ||
+    combined.includes('auth failed') ||
+    combined.includes('535 5.7.8')
+  ) {
+    return 'Email could not be sent: SMTP login failed. Check EMAIL_USER and password. If the password contains # or special characters, set EMAIL_PASS_B64 (base64 of the password) in Hostinger or change the mailbox password.';
+  }
+  if (
+    combined.includes('etimedout') ||
+    combined.includes('econnrefused') ||
+    combined.includes('enotfound') ||
+    combined.includes('greeting timeout') ||
+    combined.includes('timeout')
+  ) {
+    return 'Email could not be sent: the app could not reach the mail server. Try SMTP_PORT=587 and SMTP_SECURE=false, or set SMTP_DNS_IPV4_FIRST=1.';
+  }
+  if (
+    combined.includes('certificate') ||
+    combined.includes('self signed') ||
+    combined.includes('unable to verify the first certificate')
+  ) {
+    return 'Email could not be sent: TLS error connecting to SMTP. Try SMTP_PORT=587 and SMTP_SECURE=false.';
+  }
+  return 'Could not send verification email.';
 }
 
 /**
