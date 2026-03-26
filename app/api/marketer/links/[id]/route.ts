@@ -7,6 +7,8 @@ import {
   prisma,
 } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { writeAuditLog } from '@/lib/audit';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
@@ -47,6 +49,13 @@ export async function GET(
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/links/[id]/GET',
+      user: null,
+    });
     console.error('Marketer link GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -135,13 +144,20 @@ export async function PATCH(
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/links/[id]/PATCH',
+      user: null,
+    });
     console.error('Marketer link PATCH error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -170,8 +186,25 @@ export async function DELETE(
         type: existing.type,
       },
     });
+
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'content.marketing_link.delete',
+      targetType: 'MarketingLink',
+      targetId: id,
+      targetLabel: existing.name,
+      payload: { name: existing.name, url: existing.url, type: existing.type },
+    });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/links/[id]/DELETE',
+      user: null,
+    });
     console.error('Marketer link DELETE error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

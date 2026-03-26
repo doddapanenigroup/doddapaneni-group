@@ -1,9 +1,8 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import RecordDeveloperPage from '@/components/dashboard/RecordDeveloperPage';
-import RecordDashboardVisit from '@/components/dashboard/RecordDashboardVisit';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import { connectDb, prisma } from '@/lib/db';
 
 export default async function DashboardLayout({
   children,
@@ -17,14 +16,27 @@ export default async function DashboardLayout({
     redirect(`/${locale}/login?callbackUrl=/${locale}/dashboard`);
   }
 
+  // Enforce admin "force logout" by comparing JWT issue time against DB revocation time.
+  // This keeps security strong even with JWT sessions (no session table).
+  try {
+    await connectDb();
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { sessionRevokedAt: true },
+    });
+    const issuedAtMs =
+      typeof session.user.sessionIssuedAt === 'number' ? session.user.sessionIssuedAt * 1000 : null;
+    const revokedAtMs = dbUser?.sessionRevokedAt ? dbUser.sessionRevokedAt.getTime() : null;
+    if (issuedAtMs != null && revokedAtMs != null && revokedAtMs > issuedAtMs) {
+      redirect(`/${locale}/login?reason=revoked&callbackUrl=/${locale}/dashboard`);
+    }
+  } catch {
+    // Best-effort: if DB is temporarily unavailable, do not block dashboard rendering here.
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <RecordDeveloperPage />
-      <RecordDashboardVisit />
-      <DashboardHeader user={session.user} locale={locale} />
-      <main className="flex-1 overflow-auto w-full max-w-[1400px] mx-auto pt-4 pb-8 px-6 sm:px-8 lg:px-12 xl:px-16">
-        {children}
-      </main>
-    </div>
+    <DashboardShell user={session.user} locale={locale}>
+      {children}
+    </DashboardShell>
   );
 }

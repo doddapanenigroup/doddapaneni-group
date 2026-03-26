@@ -41,8 +41,8 @@ export default function DeveloperObservabilityPanel() {
   const users = useMemo(() => data?.users ?? [], [data]);
 
   return (
-    <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+    <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
         <Activity size={20} className="text-slate-600" />
         Developer observability
       </h2>
@@ -108,7 +108,7 @@ function TableBlock({ title, rows }: { title: string; rows: string[] }) {
   return (
     <div className="rounded-xl border border-slate-200 overflow-hidden">
       <div className="bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">{title}</div>
-      <ul className="max-h-52 overflow-y-auto text-sm divide-y divide-slate-100">
+      <ul className="max-h-52 overflow-y-auto text-sm divide-y divide-slate-100 dark:divide-slate-800">
         {rows.length === 0 ? (
           <li className="px-4 py-2 text-slate-500">No data</li>
         ) : (

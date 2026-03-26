@@ -3,16 +3,24 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
 import { logContentEdit } from '@/lib/audit-log';
-
-function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
-}
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { allowMarketerModule } from '@/app/api/marketer/_permissions';
+import { writeAuditLog } from '@/lib/audit';
+import { notifyContentPublished } from '@/lib/notify';
+import { routing } from '@/i18n/routing';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
   const t = v.trim();
   return t.length ? t : null;
+}
+
+function dateOrNull(v: unknown): Date | null {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  if (!t) return null;
+  const d = new Date(t);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 export async function GET(
@@ -21,7 +29,7 @@ export async function GET(
 ) {
   try {
     const session = await auth();
-    if (!session?.user || !allowMarketer(session)) {
+    if (!session?.user || !(await allowMarketerModule(session.user.role as any, 'blogs'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -31,6 +39,13 @@ export async function GET(
     if (!doc) return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     return NextResponse.json({ item: doc });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/blog/[slug]/GET',
+      user: null,
+    });
     console.error('Marketer blog(slug) GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -42,7 +57,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session?.user?.id || !allowMarketer(session)) {
+    if (!session?.user?.id || !(await allowMarketerModule(session.user.role as any, 'blogs'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -73,6 +88,7 @@ export async function PATCH(
     if ('ogDescription' in body) data.ogDescription = strOrNull(body.ogDescription);
     if ('ogImage' in body) data.ogImage = strOrNull(body.ogImage);
     if (body.status === 'draft' || body.status === 'published') data.status = body.status;
+    if ('scheduledPublishAt' in body) data.scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
     if ('publishedAt' in body) {
       data.publishedAt =
         typeof body.publishedAt === 'string' && body.publishedAt.trim()
@@ -107,20 +123,37 @@ export async function PATCH(
       summary: `update title length ${doc.title.length}, content length ${doc.content.length}`,
     });
 
+    if (existing.status !== 'published' && doc.status === 'published') {
+      void notifyContentPublished({
+        kind: 'blog',
+        locale: routing.defaultLocale,
+        title: doc.title,
+        slug: doc.slug,
+        actorUserId: session.user.id,
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ item: doc });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/blog/[slug]/PATCH',
+      user: null,
+    });
     console.error('Marketer blog(slug) PATCH error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await auth();
-    if (!session?.user?.id || !allowMarketer(session)) {
+    if (!session?.user?.id || !(await allowMarketerModule(session.user.role as any, 'blogs'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -150,8 +183,25 @@ export async function DELETE(
       targetPath: existing.slug,
       summary: 'delete',
     });
+
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'content.blog.delete',
+      targetType: 'Blog',
+      targetId: existing.id,
+      targetLabel: existing.slug,
+      payload: { slug: existing.slug, title: existing.title },
+    });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/blog/[slug]/DELETE',
+      user: null,
+    });
     console.error('Marketer blog(slug) DELETE error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -17,6 +17,7 @@ declare module 'next-auth' {
     email: string;
     name: string | null;
     role: Role;
+    sessionIssuedAt?: number;
   }
   interface Session {
     user: User;
@@ -116,6 +117,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.email = token.email ?? '';
         session.user.name = token.name ?? null;
         session.user.role = (token.role ?? 'DEVELOPER') as Role;
+        session.user.sessionIssuedAt = typeof token.iat === 'number' ? token.iat : undefined;
       }
       return session;
     },

@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { recordApiRequest } from '@/lib/request-monitor';
 
 export const runtime = 'nodejs';
 
@@ -61,6 +62,7 @@ export async function GET(
   context: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    recordApiRequest({ request: _req, userId: null });
     const { path: segments } = await context.params;
     if (!segments?.length) {
       return new NextResponse('Not found', { status: 404 });

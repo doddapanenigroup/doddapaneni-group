@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import {
@@ -17,9 +17,11 @@ import {
   ExternalLink,
   Image as ImageIcon,
   Search,
+  BarChart3,
 } from 'lucide-react';
 import VisitStats from './VisitStats';
 import MyActivityPanel from './MyActivityPanel';
+import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -63,6 +65,7 @@ type PageContentRow = {
   title: string;
   body: string;
   status: 'draft' | 'published';
+  scheduledPublishAt: string | null;
   metaTitle: string | null;
   metaDescription: string | null;
   keywords: string | null;
@@ -80,6 +83,7 @@ type BlogRow = {
   featuredImage: string | null;
   status: 'draft' | 'published';
   publishedAt: string | null;
+  scheduledPublishAt: string | null;
   metaTitle: string | null;
   metaDescription: string | null;
   keywords: string | null;
@@ -129,11 +133,371 @@ function GoogleSnippetPreview({
   );
 }
 
+function toDateTimeLocalValue(v: string | null | undefined) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
+    d.getMinutes(),
+  )}`;
+}
+
+function stripHtmlToText(value: string | null | undefined) {
+  const s = (value ?? '').toString();
+  // Very lightweight HTML->text conversion for length scoring.
+  return s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+type SeoScoreResult = {
+  score: number;
+  warnings: { id: string; label: string }[];
+};
+
+type SeoSuggestionsResult = {
+  suggestedKeywordsCsv: string;
+  suggestedMetaDescription: string;
+  hasH1: boolean;
+  hasH2: boolean;
+  keywordTokens: string[];
+};
+
+function computeSeoScore(args: {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  content: string;
+}): SeoScoreResult {
+  const metaTitle = (args.metaTitle ?? '').trim();
+  const metaDescription = (args.metaDescription ?? '').trim();
+  const keywordsRaw = (args.keywords ?? '').trim();
+  const contentText = stripHtmlToText(args.content);
+
+  const titleLen = metaTitle.length;
+  const descLen = metaDescription.length;
+  const keywordTokens = keywordsRaw
+    ? keywordsRaw
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+  const keywordCount = keywordTokens.length;
+  const contentLen = contentText.length;
+
+  // Simple, fast scoring heuristic:
+  // - Title: ideal 40-60 chars (0-30 points)
+  // - Description: ideal 120-160 chars (0-40 points)
+  // - Keywords presence: 1+ token (0-10 points)
+  // - Content length: best at >=1200 chars (0-20 points)
+  const titleIdealMin = 40;
+  const titleIdealMax = 60;
+  const descIdealMin = 120;
+  const descIdealMax = 160;
+  const contentIdeal = 1200;
+
+  const titleScore = (() => {
+    if (!titleLen) return 0;
+    if (titleLen >= titleIdealMin && titleLen <= titleIdealMax) return 30;
+    if (titleLen < titleIdealMin) return Math.round((titleLen / titleIdealMin) * 30);
+    const over = titleLen - titleIdealMax;
+    const penalty = (over / titleIdealMax) * 30;
+    return Math.round(clamp(30 - penalty, 0, 30));
+  })();
+
+  const descScore = (() => {
+    if (!descLen) return 0;
+    if (descLen >= descIdealMin && descLen <= descIdealMax) return 40;
+    if (descLen < descIdealMin) return Math.round((descLen / descIdealMin) * 40);
+    const over = descLen - descIdealMax;
+    const penalty = (over / descIdealMax) * 40;
+    return Math.round(clamp(40 - penalty, 0, 40));
+  })();
+
+  const keywordsScore = keywordCount > 0 ? 10 : 0;
+  const contentScore = contentLen > 0 ? Math.round(clamp((contentLen / contentIdeal) * 20, 0, 20)) : 0;
+
+  const score = clamp(titleScore + descScore + keywordsScore + contentScore, 0, 100);
+
+  const warnings: { id: string; label: string }[] = [];
+  if (keywordCount === 0) warnings.push({ id: 'missing_keywords', label: 'Missing keywords' });
+  if (descLen === 0) warnings.push({ id: 'missing_description', label: 'Missing meta description' });
+  if (titleLen > 0 && titleLen < 30) warnings.push({ id: 'title_too_short', label: 'Title is too short (aim 40-60 chars)' });
+  if (titleLen > 60) warnings.push({ id: 'title_too_long', label: 'Title is too long (aim 40-60 chars)' });
+
+  return { score, warnings };
+}
+
+function SeoScorePanel(props: {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  content: string;
+}) {
+  const result = useMemo(
+    () => computeSeoScore({ metaTitle: props.metaTitle, metaDescription: props.metaDescription, keywords: props.keywords, content: props.content }),
+    [props.metaTitle, props.metaDescription, props.keywords, props.content]
+  );
+
+  const tone = result.score >= 80 ? 'emerald' : result.score >= 55 ? 'amber' : 'rose';
+  const toneTitleClass =
+    tone === 'emerald' ? 'text-emerald-700' : tone === 'amber' ? 'text-amber-700' : 'text-rose-700';
+  const toneBarClass =
+    tone === 'emerald' ? 'bg-emerald-600' : tone === 'amber' ? 'bg-amber-600' : 'bg-rose-600';
+
+  return (
+    <div className={`rounded-xl border bg-white p-4 mt-1 border-slate-200`}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs text-slate-500">SEO score</p>
+          <p className={`text-sm font-semibold ${toneTitleClass}`}>Meta + content readiness</p>
+        </div>
+        <div className="text-right">
+          <p className={`text-3xl font-bold leading-none ${toneTitleClass}`}>{result.score}</p>
+          <p className="text-xs text-slate-500">/ 100</p>
+        </div>
+      </div>
+      <div className="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${toneBarClass}`}
+          style={{ width: `${result.score}%` }}
+        />
+      </div>
+
+      {result.warnings.length > 0 ? (
+        <div className="mt-3 space-y-1">
+          <p className="text-xs font-medium text-slate-700">Suggestions</p>
+          {result.warnings.map((w) => (
+            <p key={w.id} className="text-xs text-rose-700 bg-rose-50 border border-rose-100 rounded-md px-2 py-1">
+              - {w.label}
+            </p>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md px-2 py-1">
+          Looks good. No blocking issues detected.
+        </p>
+      )}
+    </div>
+  );
+}
+
+const STOP_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'by',
+  'for',
+  'from',
+  'has',
+  'he',
+  'in',
+  'is',
+  'it',
+  'its',
+  'of',
+  'on',
+  'or',
+  'that',
+  'the',
+  'their',
+  'this',
+  'to',
+  'was',
+  'were',
+  'will',
+  'with',
+  'you',
+  'your',
+]);
+
+function tokeniseForKeywords(text: string): string[] {
+  const lower = text.toLowerCase();
+  const tokens = lower.match(/[a-z0-9]+/g) ?? [];
+  return tokens.filter((t) => t.length >= 3 && !STOP_WORDS.has(t));
+}
+
+function suggestKeywordsFromContent(contentHtml: string): SeoSuggestionsResult['keywordTokens'] {
+  const plain = stripHtmlToText(contentHtml);
+  const tokens = tokeniseForKeywords(plain);
+  const freq = new Map<string, number>();
+  for (const t of tokens) freq.set(t, (freq.get(t) ?? 0) + 1);
+
+  // Lightweight: top tokens only (no heavy NLP).
+  const sorted = Array.from(freq.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([t]) => t);
+
+  // De-dup & limit.
+  return sorted.slice(0, 8);
+}
+
+function suggestMetaDescriptionFromContent(contentHtml: string): string {
+  const plain = stripHtmlToText(contentHtml);
+  if (!plain) return '';
+
+  // Prefer first sentence-like chunk if possible.
+  const sentenceEnd = plain.search(/[.!?]/);
+  const base =
+    sentenceEnd > 20 ? plain.slice(0, sentenceEnd + 1).trim() : plain.slice(0, 200).trim();
+
+  // Normalize whitespace.
+  const cleaned = base.replace(/\s+/g, ' ');
+  if (cleaned.length <= 160) return cleaned;
+  return cleaned.slice(0, 157).trimEnd().replace(/[,:;]\s*$/, '') + '…';
+}
+
+function computeSeoSuggestions(args: {
+  contentHtml: string;
+  currentKeywordsCsv: string;
+  currentMetaDescription: string;
+}): SeoSuggestionsResult {
+  const keywordTokens = suggestKeywordsFromContent(args.contentHtml);
+  const suggestedKeywordsCsv = keywordTokens.join(', ');
+  const suggestedMetaDescription = suggestMetaDescriptionFromContent(args.contentHtml);
+  const hasH1 = /<h1\b/i.test(args.contentHtml);
+  const hasH2 = /<h2\b/i.test(args.contentHtml);
+  return {
+    suggestedKeywordsCsv,
+    suggestedMetaDescription,
+    hasH1,
+    hasH2,
+    keywordTokens,
+  };
+}
+
+function SeoImprovementsPanel(props: {
+  content: string;
+  keywordsCsv: string;
+  metaDescription: string;
+  onCopyKeywords: () => void;
+  onCopyMetaDescription: () => void;
+}) {
+  const result = useMemo(
+    () =>
+      computeSeoSuggestions({
+        contentHtml: props.content,
+        currentKeywordsCsv: props.keywordsCsv,
+        currentMetaDescription: props.metaDescription,
+      }),
+    [props.content, props.keywordsCsv, props.metaDescription]
+  );
+
+  const hasKeywords = props.keywordsCsv.trim().length > 0;
+  const descLen = (props.metaDescription ?? '').trim().length;
+
+  return (
+    <details className="mt-3">
+      <summary className="cursor-pointer list-none flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
+        <span className="text-sm font-semibold text-slate-800">SEO improvement suggestions</span>
+        <span className="text-xs text-slate-500">Non-destructive</span>
+      </summary>
+
+      <div className="mt-2 rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+        <div>
+          <p className="text-xs font-medium text-slate-700 mb-1">Keywords</p>
+          {!hasKeywords ? (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-2 py-1 w-fit">
+              Missing keywords
+            </p>
+          ) : null}
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(result.keywordTokens.length ? result.keywordTokens : ['keyword']).map((kw) => (
+              <span
+                key={kw}
+                className="text-[11px] px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700"
+              >
+                {kw}
+              </span>
+            ))}
+          </div>
+          <div className="mt-2 flex gap-2 flex-wrap items-center">
+            <button
+              type="button"
+              onClick={props.onCopyKeywords}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              disabled={!result.suggestedKeywordsCsv}
+            >
+              Copy suggested keywords
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-slate-700 mb-1">Meta description</p>
+          {descLen === 0 ? (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-2 py-1 w-fit">
+              Missing description
+            </p>
+          ) : null}
+          {result.suggestedMetaDescription ? (
+            <p className="text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2">
+              Suggested: {result.suggestedMetaDescription}
+            </p>
+          ) : (
+            <p className="text-xs text-slate-500 mt-2">Add content to generate a suggestion.</p>
+          )}
+          <div className="mt-2 flex gap-2 flex-wrap items-center">
+            <button
+              type="button"
+              onClick={props.onCopyMetaDescription}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              disabled={!result.suggestedMetaDescription}
+            >
+              Copy suggested description
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-slate-700 mb-1">Headings (H1 / H2)</p>
+          <div className="flex gap-2 flex-wrap">
+            <span
+              className={`text-[11px] px-2 py-1 rounded-md border ${
+                result.hasH1 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'
+              }`}
+            >
+              {result.hasH1 ? 'H1 found' : 'Missing H1'}
+            </span>
+            <span
+              className={`text-[11px] px-2 py-1 rounded-md border ${
+                result.hasH2 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'
+              }`}
+            >
+              {result.hasH2 ? 'H2 found' : 'Missing H2'}
+            </span>
+          </div>
+          {(!result.hasH1 || !result.hasH2) && (
+            <p className="text-xs text-slate-600 mt-2">
+              Suggestion: add an <code>{"<h1>"}</code> near the top (usually the page/blog title) and use <code>{"<h2>"}</code> for major sections.
+            </p>
+          )}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export default function MarketerDashboard({ locale }: { locale: string }) {
   const base = `/${locale}`;
   const { data: sessionData } = useSession();
+  const { pushSaveLayer } = useDashboardShortcuts();
   const authorLabel = sessionData?.user?.email ?? sessionData?.user?.name ?? '—';
   const [activeTab, setActiveTab] = useState<'campaigns' | 'links' | 'pages' | 'blogs'>('pages');
+
+  const [previewLink, setPreviewLink] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const viewerRole = sessionData?.user?.role ?? null;
+  const canPages = viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
+  const canBlogs = viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
 
   // ——— Campaigns ———
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -340,6 +704,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     slug: '',
     body: '',
     status: 'published' as 'draft' | 'published',
+    scheduledPublishAt: '',
     seoNote: '',
     metaTitle: '',
     metaDescription: '',
@@ -361,6 +726,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     featuredImage: '',
     status: 'draft' as 'draft' | 'published',
     publishedAt: '',
+    scheduledPublishAt: '',
     seoNote: '',
     metaTitle: '',
     metaDescription: '',
@@ -376,6 +742,11 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   const [imagesLoading, setImagesLoading] = useState(true);
   const [imageSearch, setImageSearch] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    // Clear preview link when switching contexts.
+    setPreviewLink(null);
+  }, [activeTab, selectedPageSlug, selectedBlogSlug]);
 
   useEffect(() => {
     fetch(`/api/marketer/page-content?locale=${encodeURIComponent(locale)}`)
@@ -418,6 +789,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       slug: page.slug ?? '',
       body: page.body ?? '',
       status: page.status ?? 'published',
+      scheduledPublishAt: toDateTimeLocalValue(page.scheduledPublishAt),
       seoNote: '',
       metaTitle: page.metaTitle ?? '',
       metaDescription: page.metaDescription ?? '',
@@ -438,6 +810,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       featuredImage: blog.featuredImage ?? '',
       status: blog.status ?? 'draft',
       publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().slice(0, 10) : '',
+      scheduledPublishAt: toDateTimeLocalValue(blog.scheduledPublishAt),
       seoNote: '',
       metaTitle: blog.metaTitle ?? '',
       metaDescription: blog.metaDescription ?? '',
@@ -468,6 +841,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       title: item.title,
       body: item.body,
       status: item.status,
+      scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
       metaTitle: item.metaTitle ?? '',
       metaDescription: item.metaDescription ?? '',
       keywords: item.keywords ?? '',
@@ -488,6 +862,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       title: pageForm.title.trim(),
       body: pageForm.body,
       status: pageForm.status,
+      scheduledPublishAt: pageForm.scheduledPublishAt || null,
       metaTitle: pageForm.metaTitle.trim() || null,
       metaDescription: pageForm.metaDescription.trim() || null,
       keywords: pageForm.keywords.trim() || null,
@@ -518,6 +893,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       slug: item.slug,
       body: item.body,
       status: item.status,
+      scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
       seoNote: '',
       metaTitle: item.metaTitle ?? '',
       metaDescription: item.metaDescription ?? '',
@@ -548,6 +924,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       slug: '',
       body: '',
       status: 'published',
+      scheduledPublishAt: '',
       seoNote: '',
       metaTitle: '',
       metaDescription: '',
@@ -583,6 +960,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       featuredImage: item.featuredImage ?? '',
       status: item.status ?? 'draft',
       publishedAt: item.publishedAt ? new Date(item.publishedAt).toISOString().slice(0, 10) : '',
+      scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
       seoNote: '',
       metaTitle: item.metaTitle ?? '',
       metaDescription: item.metaDescription ?? '',
@@ -616,6 +994,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         featuredImage: '',
         status: 'draft',
         publishedAt: '',
+        scheduledPublishAt: '',
         seoNote: '',
         metaTitle: '',
         metaDescription: '',
@@ -677,6 +1056,50 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     }
   }
 
+  async function copyTextToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      alert('Copy failed. Please copy manually.');
+    }
+  }
+
+  async function createPreviewLink(kind: "page" | "blog") {
+    setPreviewLoading(true);
+    setPreviewLink(null);
+    try {
+      const payload =
+        kind === "page"
+          ? { kind, slug: selectedPageSlug, locale }
+          : { kind, slug: selectedBlogSlug, locale };
+
+      if (!payload.slug) {
+        alert("Please select a draft item first.");
+        return;
+      }
+
+      const res = await fetch("/api/preview/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data?.message ?? "Failed to create preview link");
+        return;
+      }
+
+      if (data?.url) {
+        setPreviewLink(data.url);
+      }
+    } catch {
+      alert("Failed to create preview link");
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
   async function deleteImage(key: string) {
     if (!confirm('Delete this image?')) return;
     const res = await fetch(`/api/marketer/stored-image/${encodeURIComponent(key)}`, { method: 'DELETE' });
@@ -694,6 +1117,26 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
     );
   });
 
+  const marketerSaveRef = useRef<() => void>(() => {});
+  marketerSaveRef.current = () => {
+    if (activeTab === 'pages') {
+      if (creatingPage) void createPage();
+      else if (selectedPageSlug) void savePageSeo();
+    } else if (activeTab === 'blogs') {
+      if (selectedBlogSlug) void saveBlogSeo();
+    } else if (activeTab === 'campaigns' && showCampaignForm) {
+      void handleSaveCampaign();
+    } else if (activeTab === 'links' && showLinkForm) {
+      void handleSaveLink();
+    }
+  };
+
+  useEffect(() => {
+    return pushSaveLayer(() => {
+      marketerSaveRef.current();
+    });
+  }, [pushSaveLayer]);
+
   return (
     <div className="space-y-8">
       <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
@@ -706,12 +1149,12 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         </p>
       </header>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <Globe size={20} className="text-slate-600" />
           Quick links
         </h2>
-        <div className="p-5 grid gap-3 sm:grid-cols-2">
+        <div className="p-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Link
             href={base}
             target="_blank"
@@ -730,16 +1173,23 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
             <Mail size={22} className="text-slate-600" />
             <span className="font-medium text-slate-800">Contact page</span>
           </Link>
+          <Link
+            href={`${base}/dashboard/analytics`}
+            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all"
+          >
+            <BarChart3 size={22} className="text-violet-600" />
+            <span className="font-medium text-slate-800">Analytics</span>
+          </Link>
         </div>
       </section>
 
       <VisitStats />
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg p-4">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-4">
         <div className="flex flex-wrap gap-2">
           {[
-            { id: 'pages', label: 'Pages' },
-            { id: 'blogs', label: 'Blogs' },
+            ...(canPages ? [{ id: 'pages', label: 'Pages' }] : []),
+            ...(canBlogs ? [{ id: 'blogs', label: 'Blogs' }] : []),
             { id: 'campaigns', label: 'Campaigns' },
             { id: 'links', label: 'Tools' },
           ].map((tab) => (
@@ -760,8 +1210,8 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       </section>
 
       {activeTab === 'pages' && (
-        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-slate-800">Pages management + SEO</h2>
               <p className="text-sm text-slate-600 mt-1">Select a page, update content, then save.</p>
@@ -777,6 +1227,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   slug: '',
                   body: '',
                   status: 'draft',
+                  scheduledPublishAt: '',
                   seoNote: '',
                   metaTitle: '',
                   metaDescription: '',
@@ -850,6 +1301,15 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   <option value="published">Published</option>
                 </select>
               </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <input
+                  type="datetime-local"
+                  value={pageForm.scheduledPublishAt}
+                  onChange={(e) => setPageForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                />
+                <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">Optional: pick a publish date/time. If set to a future time, it will be hidden publicly until due.</p>
+              </div>
               <input
                 value={pageForm.title}
                 onChange={(e) => setPageForm((f) => ({ ...f, title: e.target.value }))}
@@ -884,6 +1344,33 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 url={pageForm.canonicalUrl || `https://doddapanenigroup.net/${locale}/${selectedPageSlug || ''}`}
                 ogImage={pageForm.ogImage}
               />
+              <SeoScorePanel
+                metaTitle={pageForm.metaTitle}
+                metaDescription={pageForm.metaDescription}
+                keywords={pageForm.keywords}
+                content={pageForm.body}
+              />
+              <SeoImprovementsPanel
+                content={pageForm.body}
+                keywordsCsv={pageForm.keywords}
+                metaDescription={pageForm.metaDescription}
+                onCopyKeywords={() => {
+                  const res = computeSeoSuggestions({
+                    contentHtml: pageForm.body,
+                    currentKeywordsCsv: pageForm.keywords,
+                    currentMetaDescription: pageForm.metaDescription,
+                  });
+                  void copyTextToClipboard(res.suggestedKeywordsCsv);
+                }}
+                onCopyMetaDescription={() => {
+                  const res = computeSeoSuggestions({
+                    contentHtml: pageForm.body,
+                    currentKeywordsCsv: pageForm.keywords,
+                    currentMetaDescription: pageForm.metaDescription,
+                  });
+                  void copyTextToClipboard(res.suggestedMetaDescription);
+                }}
+              />
               <div className="flex flex-wrap gap-2 items-center">
                 <button
                   type="button"
@@ -891,6 +1378,14 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm"
                 >
                   {creatingPage ? 'Create page' : 'Save page changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => createPreviewLink("page")}
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                  disabled={previewLoading || creatingPage || !selectedPageSlug}
+                >
+                  {previewLoading ? "Generating…" : "Preview draft"}
                 </button>
                 {!creatingPage && selectedPageSlug ? (
                   <button
@@ -902,14 +1397,42 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   </button>
                 ) : null}
               </div>
+              {previewLink ? (
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
+                  <a
+                    href={previewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-700 hover:underline truncate"
+                  >
+                    {previewLink}
+                  </a>
+                  <div className="flex gap-2 flex-wrap items-center">
+                    <button
+                      type="button"
+                      onClick={() => void copyTextToClipboard(previewLink)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                    >
+                      Copy link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewLink(null)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
       )}
 
       {activeTab === 'blogs' && (
-        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50">
+        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
             <h2 className="text-lg font-semibold text-slate-800">Blog management + SEO</h2>
           </div>
           <div className="p-5 grid lg:grid-cols-3 gap-5">
@@ -959,7 +1482,64 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   disabled={blogForm.status !== 'published'}
                   className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                 />
-                <input value={blogForm.featuredImage} onChange={(e) => setBlogForm((f) => ({ ...f, featuredImage: e.target.value }))} placeholder="Featured image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <input
+                  type="datetime-local"
+                  value={blogForm.scheduledPublishAt}
+                  onChange={(e) => setBlogForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                  placeholder="Scheduled publish date/time"
+                />
+                <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
+                  Optional: if set to a future time, the blog post won’t show publicly until scheduledPublishAt is due.
+                </p>
+                <div className="sm:col-span-2 grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <input
+                      value={blogForm.featuredImage}
+                      onChange={(e) => setBlogForm((f) => ({ ...f, featuredImage: e.target.value }))}
+                      placeholder="Featured image URL"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm w-full"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Or upload a file below</p>
+                  </div>
+                  <label className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 cursor-pointer bg-white flex items-center justify-center">
+                    {uploading ? 'Uploading…' : 'Upload featured image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploading(true);
+                        try {
+                          const form = new FormData();
+                          form.append('file', file);
+                          // Use blog title as alt text when available
+                          if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
+                          const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
+                          const data = await res.json();
+                          if (!res.ok) return;
+                          // stored-image endpoint always converts uploads to .webp
+                          setBlogForm((f) => ({
+                            ...f,
+                            featuredImage: data.url ?? '',
+                            ogImage: f.ogImage || (data.url ?? ''),
+                          }));
+                        } finally {
+                          setUploading(false);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                {blogForm.featuredImage ? (
+                  <div className="sm:col-span-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={blogForm.featuredImage} alt="Featured preview" className="w-full h-32 object-cover rounded-lg border border-slate-200 mt-1" />
+                  </div>
+                ) : null}
                 <input value={blogForm.metaTitle} onChange={(e) => setBlogForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <input value={blogForm.keywords} onChange={(e) => setBlogForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <textarea value={blogForm.metaDescription} onChange={(e) => setBlogForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
@@ -974,8 +1554,43 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 url={`https://doddapanenigroup.net/${locale}/blog/${blogForm.slug || ''}`}
                 ogImage={blogForm.ogImage || blogForm.featuredImage}
               />
+              <SeoScorePanel
+                metaTitle={blogForm.metaTitle}
+                metaDescription={blogForm.metaDescription}
+                keywords={blogForm.keywords}
+                content={blogForm.content}
+              />
+              <SeoImprovementsPanel
+                content={blogForm.content}
+                keywordsCsv={blogForm.keywords}
+                metaDescription={blogForm.metaDescription}
+                onCopyKeywords={() => {
+                  const res = computeSeoSuggestions({
+                    contentHtml: blogForm.content,
+                    currentKeywordsCsv: blogForm.keywords,
+                    currentMetaDescription: blogForm.metaDescription,
+                  });
+                  void copyTextToClipboard(res.suggestedKeywordsCsv);
+                }}
+                onCopyMetaDescription={() => {
+                  const res = computeSeoSuggestions({
+                    contentHtml: blogForm.content,
+                    currentKeywordsCsv: blogForm.keywords,
+                    currentMetaDescription: blogForm.metaDescription,
+                  });
+                  void copyTextToClipboard(res.suggestedMetaDescription);
+                }}
+              />
               <div className="flex gap-2 flex-wrap">
                 <button type="button" onClick={saveBlogSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">Save blog</button>
+                <button
+                  type="button"
+                  onClick={() => createPreviewLink("blog")}
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                  disabled={previewLoading || !selectedBlogSlug}
+                >
+                  {previewLoading ? "Generating…" : "Preview draft"}
+                </button>
                 <button type="button" onClick={createBlog} className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700">Create new blog</button>
                 {selectedBlogSlug ? (
                   <button
@@ -987,14 +1602,42 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                   </button>
                 ) : null}
               </div>
+              {previewLink ? (
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
+                  <a
+                    href={previewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-700 hover:underline truncate"
+                  >
+                    {previewLink}
+                  </a>
+                  <div className="flex gap-2 flex-wrap items-center">
+                    <button
+                      type="button"
+                      onClick={() => void copyTextToClipboard(previewLink)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                    >
+                      Copy link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewLink(null)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
       )}
 
       {(activeTab === 'pages' || activeTab === 'blogs') && (
-        <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
             <ImageIcon size={18} className="text-slate-600" />
             <h2 className="text-lg font-semibold text-slate-800">Media library (StoredImage)</h2>
           </div>
@@ -1079,8 +1722,8 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
       {/* Campaigns */}
       {activeTab === 'campaigns' && (
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <Target size={20} className="text-slate-600" />
             Campaign management
@@ -1226,8 +1869,8 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
       {/* Marketing tools / links */}
       {activeTab === 'links' && (
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <Link2 size={20} className="text-slate-600" />
             Marketing tools &amp; integrations

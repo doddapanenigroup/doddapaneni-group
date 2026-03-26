@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
+import { captureErrorToDb } from '@/lib/error-monitor';
 import type {
   ContentEditLog,
   MarketingActivityLog,
@@ -112,6 +113,15 @@ export async function GET() {
       })),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'dashboard/admin-insights/GET',
+      user: session?.user
+        ? { id: session.user.id, email: session.user.email ?? null, role: session.user.role }
+        : null,
+    });
     console.error('Admin insights error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 type VitalPayload = {
   name?: string;
@@ -54,6 +55,13 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'web-vitals/POST',
+      user: null,
+    });
     console.error('Web vitals ingest error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { logMarketingActivity, logContentEdit } from '@/lib/audit-log';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 export const runtime = 'nodejs';
 
@@ -125,6 +126,13 @@ export async function POST(req: Request) {
       url: mediaUrl(saved.key),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: req,
+      statusCode: 500,
+      context: 'marketer/stored-image/POST',
+      user: null,
+    });
     console.error('Marketer stored-image POST error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -158,6 +166,13 @@ export async function GET() {
       })),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/stored-image/GET',
+      user: null,
+    });
     console.error('Marketer stored-image GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -3,11 +3,9 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
 import { logContentEdit } from '@/lib/audit-log';
-
-function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
-}
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { allowMarketerModule } from '@/app/api/marketer/_permissions';
+import { notifyContentPublished } from '@/lib/notify';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -15,10 +13,18 @@ function strOrNull(v: unknown): string | null {
   return t.length ? t : null;
 }
 
+function dateOrNull(v: unknown): Date | null {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  if (!t) return null;
+  const d = new Date(t);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 export async function GET(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user || !allowMarketer(session)) {
+    if (!session?.user || !(await allowMarketerModule(session.user.role as any, 'pages'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -40,6 +46,7 @@ export async function GET(request: Request) {
         title: r.title,
         body: r.body,
         status: r.status,
+        scheduledPublishAt: r.scheduledPublishAt ? r.scheduledPublishAt.toISOString() : null,
         metaTitle: r.metaTitle,
         metaDescription: r.metaDescription,
         keywords: r.keywords,
@@ -51,6 +58,13 @@ export async function GET(request: Request) {
       })),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/page-content/GET',
+      user: null,
+    });
     console.error('Marketer page-content GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -59,7 +73,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.id || !allowMarketer(session)) {
+    if (!session?.user?.id || !(await allowMarketerModule(session.user.role as any, 'pages'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -76,6 +90,7 @@ export async function POST(request: Request) {
     const title = strOrNull(body.title);
     const content = typeof body.body === 'string' ? body.body : '';
     const seoNote = strOrNull(body.seoNote);
+    const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
     const status =
       body.status === 'draft' || body.status === 'published'
         ? (body.status as 'draft' | 'published')
@@ -94,6 +109,7 @@ export async function POST(request: Request) {
         title,
         body: content,
         status,
+        scheduledPublishAt,
         metaTitle: strOrNull(body.metaTitle),
         metaDescription: strOrNull(body.metaDescription),
         keywords: strOrNull(body.keywords),
@@ -128,6 +144,17 @@ export async function POST(request: Request) {
       summary: `create title length ${doc.title.length}, body length ${doc.body.length}`,
     });
 
+    if (doc.status === 'published') {
+      void notifyContentPublished({
+        kind: 'page',
+        locale: doc.locale,
+        title: doc.title,
+        slug: doc.slug,
+        pageKey: doc.pageKey,
+        actorUserId: session.user.id,
+      }).catch(() => {});
+    }
+
     return NextResponse.json({
       item: {
         id: doc.id,
@@ -137,6 +164,7 @@ export async function POST(request: Request) {
         title: doc.title,
         body: doc.body,
         status: doc.status,
+        scheduledPublishAt: doc.scheduledPublishAt ? doc.scheduledPublishAt.toISOString() : null,
         metaTitle: doc.metaTitle,
         metaDescription: doc.metaDescription,
         keywords: doc.keywords,
@@ -148,6 +176,13 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/page-content/POST',
+      user: null,
+    });
     console.error('Marketer page-content POST error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

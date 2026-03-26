@@ -6,6 +6,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogListClient from './BlogListClient';
+import { publishScheduledContent } from '@/lib/publish-scheduled';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,8 +48,15 @@ export default async function BlogPage({ params }: Props) {
   if (!blog) notFound();
 
   await connectDb();
+  const now = new Date();
+  // Server-side fallback: if cron hasn't run yet, still publish due items.
+  await publishScheduledContent(now);
+  const nowIso = now.toISOString();
   const rows = await prisma.blog.findMany({
-    where: { status: 'published' },
+    where: {
+      status: 'published',
+      OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: nowIso } }],
+    },
     orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
   });
   const posts =

@@ -8,6 +8,7 @@ import {
 } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
 import type { Campaign } from '@/lib/prisma-generated';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
@@ -43,6 +44,13 @@ export async function GET() {
     }));
     return NextResponse.json({ campaigns });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/campaigns/GET',
+      user: null,
+    });
     console.error('Marketer campaigns GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -125,6 +133,13 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/campaigns/POST',
+      user: null,
+    });
     console.error('Marketer campaigns POST error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -8,6 +8,7 @@ import {
 } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
 import type { MarketingLink } from '@/lib/prisma-generated';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
@@ -41,6 +42,13 @@ export async function GET() {
     }));
     return NextResponse.json({ links });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/links/GET',
+      user: null,
+    });
     console.error('Marketer links GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -110,6 +118,13 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/links/POST',
+      user: null,
+    });
     console.error('Marketer links POST error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

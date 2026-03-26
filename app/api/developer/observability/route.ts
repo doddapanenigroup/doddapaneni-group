@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 function allowedRole(role: string | undefined): boolean {
   return role === 'DEVELOPER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
@@ -136,6 +137,13 @@ export async function GET(request: Request) {
       })),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'developer/observability/GET',
+      user: null,
+    });
     console.error('Developer observability GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -2,14 +2,16 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
+import { recordApiRequest } from '@/lib/request-monitor';
 
-export async function POST() {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    recordApiRequest({ request, userId: session.user.id });
     await connectDb();
     const latest = await prisma.loginLog.findFirst({
       where: { userId: session.user.id, loggedOutAt: null },

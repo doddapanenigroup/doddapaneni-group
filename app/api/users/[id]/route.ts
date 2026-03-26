@@ -4,6 +4,8 @@ import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import { sendRoleDeletedEmailToDeleter, sendRoleDeletedEmailToDeletedUser } from '@/lib/email';
 import bcrypt from 'bcryptjs';
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { writeAuditLog } from '@/lib/audit';
 
 const ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES = ['DEVELOPER', 'DIGITAL_MARKETER'] as const;
 type AdminAllowedPasswordChangeRole = (typeof ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES)[number];
@@ -90,13 +92,20 @@ export async function PATCH(
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'users/[id]/PATCH',
+      user: null,
+    });
     console.error('Change password error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -156,6 +165,16 @@ export async function DELETE(
       await tx.user.delete({ where: { id } });
     });
 
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'user.delete',
+      targetType: 'User',
+      targetId: id,
+      targetLabel: deletedUserEmail,
+      payload: { deletedUserEmail, deletedUserRole },
+    });
+
     const deletedAt = new Date();
     const deleterEmail = session.user.email ?? '';
     const deleterName = session.user.name ?? null;
@@ -181,6 +200,13 @@ export async function DELETE(
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'users/[id]/DELETE',
+      user: null,
+    });
     console.error('Delete user error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import * as z from 'zod';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 const bodySchema = z.object({
   currentPassword: z.string().min(1),
@@ -58,6 +59,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (e) {
+    await captureErrorToDb({
+      error: e,
+      request,
+      statusCode: 500,
+      context: 'account/password/POST',
+      user: undefined,
+    });
     console.error('[account/password]', e);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

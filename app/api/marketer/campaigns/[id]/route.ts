@@ -7,6 +7,8 @@ import {
   prisma,
 } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { writeAuditLog } from '@/lib/audit';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
@@ -49,6 +51,13 @@ export async function GET(
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/campaigns/[id]/GET',
+      user: null,
+    });
     console.error('Marketer campaign GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -149,13 +158,20 @@ export async function PATCH(
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/campaigns/[id]/PATCH',
+      user: null,
+    });
     console.error('Marketer campaign PATCH error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -184,8 +200,25 @@ export async function DELETE(
         status: existing.status,
       },
     });
+
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'content.campaign.delete',
+      targetType: 'Campaign',
+      targetId: id,
+      targetLabel: existing.name,
+      payload: { name: existing.name, url: existing.url, status: existing.status },
+    });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/campaigns/[id]/DELETE',
+      user: null,
+    });
     console.error('Marketer campaign DELETE error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

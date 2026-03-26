@@ -5,6 +5,7 @@ import {
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
 } from '@/lib/email';
+import { recordApiRequest } from '@/lib/request-monitor';
 
 const contactSchema = z.object({
   name: z.string().min(1),
@@ -14,6 +15,7 @@ const contactSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    recordApiRequest({ request, userId: null });
     const body = await request.json();
     
     // Validate request body

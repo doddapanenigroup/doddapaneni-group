@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { X, Plus, Trash2, Users, KeyRound } from 'lucide-react';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
+import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 
 type UserRow = {
   id: string;
@@ -52,6 +53,11 @@ export default function ManageEmployeesModal({
   onChangePassword?: (id: string, newPassword: string) => Promise<void>;
   onClose: () => void;
 }) {
+  const { pushEscLayer } = useDashboardShortcuts();
+  useEffect(() => {
+    return pushEscLayer(() => onClose());
+  }, [pushEscLayer, onClose]);
+
   const sortedAllowedRoles = useMemo(
     () => [...allowedRoles].sort((a, b) => getRoleOrder(a) - getRoleOrder(b)),
     [allowedRoles]

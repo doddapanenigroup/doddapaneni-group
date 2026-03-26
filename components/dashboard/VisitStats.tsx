@@ -43,7 +43,7 @@ export default function VisitStats() {
 
   if (loading) {
     return (
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg p-6">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-6">
         <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-4">
           <Globe size={22} />
           Website visits
@@ -55,7 +55,7 @@ export default function VisitStats() {
 
   if (!stats) {
     return (
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg p-6">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-6">
         <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-4">
           <Globe size={22} />
           Website visits
@@ -77,8 +77,8 @@ export default function VisitStats() {
   const pieData = stats.visitsByYear.map(({ year, count }) => ({ name: year, value: count }));
 
   return (
-    <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-      <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2 p-5 border-b border-slate-100 bg-slate-50">
+    <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+      <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
         <Globe size={22} className="text-slate-600" />
         Website visit statistics
       </h2>

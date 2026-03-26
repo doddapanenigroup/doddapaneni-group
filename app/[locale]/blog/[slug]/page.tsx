@@ -6,6 +6,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogPostClient from './BlogPostClient';
+import { publishScheduledContent } from '@/lib/publish-scheduled';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,9 @@ export default async function BlogPostPage({ params }: Props) {
   if (!blog) notFound();
 
   await connectDb();
+  const now = new Date();
+  // Server-side fallback: if cron hasn't run yet, still publish due items.
+  await publishScheduledContent(now);
   const dbPost = await prisma.blog.findUnique({
     where: { slug },
     select: {
@@ -55,9 +59,10 @@ export default async function BlogPostPage({ params }: Props) {
       featuredImage: true,
       publishedAt: true,
       status: true,
+      scheduledPublishAt: true,
     },
   });
-  if (!dbPost || dbPost.status !== 'published') {
+  if (!dbPost || dbPost.status !== 'published' || (dbPost.scheduledPublishAt && dbPost.scheduledPublishAt > now)) {
     const messagePost = blog.posts[slug];
     if (!messagePost) notFound();
 

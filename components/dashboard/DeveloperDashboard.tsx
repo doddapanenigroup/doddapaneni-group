@@ -8,6 +8,14 @@ import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
+import DeveloperErrorsPanel from './DeveloperErrorsPanel';
+import DeveloperRequestMonitorPanel from './DeveloperRequestMonitorPanel';
+import DeveloperTasksPanel from './DeveloperTasksPanel';
+import DeveloperEnvPanel from './DeveloperEnvPanel';
+import DeveloperCachePanel from './DeveloperCachePanel';
+import DeveloperTimelinePanel from './DeveloperTimelinePanel';
+import DeveloperAuditPanel from './DeveloperAuditPanel';
+import FeatureGate from '@/components/FeatureGate';
 
 type SitePage = {
   href: string;
@@ -66,8 +74,8 @@ export default function DeveloperDashboard({
         </p>
       </header>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
           <h2 className="font-semibold text-slate-800 flex items-center gap-2">
             <BookOpen size={18} className="text-slate-600" />
             How to change the code
@@ -86,8 +94,8 @@ export default function DeveloperDashboard({
         </div>
       </section>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <Globe size={20} className="text-slate-600" />
           Site pages — every page on the website
         </h2>
@@ -138,8 +146,8 @@ export default function DeveloperDashboard({
         </div>
       </section>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <Languages size={20} className="text-slate-600" />
           Multi-lingual — automatic translation
         </h2>
@@ -200,7 +208,23 @@ export default function DeveloperDashboard({
         </div>
       </section>
 
-      <DeveloperObservabilityPanel />
+      <FeatureGate feature="analyticsDashboard">
+        <DeveloperObservabilityPanel />
+      </FeatureGate>
+
+      <DeveloperErrorsPanel />
+
+      <DeveloperRequestMonitorPanel />
+
+      <DeveloperTasksPanel />
+
+      <DeveloperEnvPanel />
+
+      <DeveloperCachePanel />
+
+      <DeveloperTimelinePanel />
+
+      <DeveloperAuditPanel />
 
       <MyActivityPanel />
 

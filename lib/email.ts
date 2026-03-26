@@ -251,6 +251,47 @@ export async function sendAdminEmployeeCreateOtpEmail(
   });
 }
 
+export async function sendUserInviteEmail(args: {
+  to: string;
+  invitedByEmail: string;
+  invitedByName: string | null;
+  roleLabel: string;
+  inviteUrl: string;
+  expiresInHours: number;
+}): Promise<void> {
+  const transporter = getTransporter();
+  if (!transporter) {
+    throw new Error(
+      'Email is not configured (set EMAIL_USER + EMAIL_PASS, or SMTP_USER + SMTP_PASS, or SMTP_HOST + SMTP_USER + SMTP_PASS)'
+    );
+  }
+
+  const displayName = args.invitedByName?.trim() || args.invitedByEmail;
+
+  await transporter.sendMail({
+    from: mailFromHeader(),
+    to: args.to,
+    subject: 'You are invited – Doddapaneni Group',
+    text: `Hello,\n\n${displayName} invited you to join the Doddapaneni Group dashboard as: ${args.roleLabel}\n\nSet your password using this link (expires in ${args.expiresInHours} hours):\n${args.inviteUrl}\n\nIf you were not expecting this invite, you can ignore this email.\n\nDoddapaneni Group`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+        <h2 style="color: #1e3a8a;">You’re invited</h2>
+        <p>Hello,</p>
+        <p><strong>${displayName}</strong> invited you to join the Doddapaneni Group dashboard.</p>
+        <p><strong>Role:</strong> ${args.roleLabel}</p>
+        <p>
+          <a href="${args.inviteUrl}" style="display:inline-block; background:#1e3a8a; color:#fff; text-decoration:none; padding:12px 16px; border-radius:10px; font-weight:600;">
+            Set your password
+          </a>
+        </p>
+        <p style="font-size: 14px; color: #666;">This invite link expires in ${args.expiresInHours} hours.</p>
+        <p style="font-size: 14px; color: #666;">If you were not expecting this invite, you can ignore this email.</p>
+        <p style="margin-top: 24px; font-size: 14px; color: #1e3a8a; font-weight: bold;">Doddapaneni Group</p>
+      </div>
+    `,
+  });
+}
+
 /**
  * Send email to the creator (e.g. Super Admin or Admin) when they create a new role.
  * Content: "[Role] was created by [creator role] at [date and time IST/ET]."

@@ -6,6 +6,7 @@ import type {
   DeveloperPageView,
   MarketingActivityLog,
 } from '@/lib/prisma-generated';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 export async function GET() {
   const session = await auth();
@@ -69,6 +70,13 @@ export async function GET() {
       })),
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'dashboard/my-activity/GET',
+      user: null,
+    });
     console.error('My activity error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

@@ -13,6 +13,7 @@ import {
   sendLoginVerificationCodeEmail,
   smtpFailureUserMessage,
 } from '@/lib/email';
+import { recordApiRequest } from '@/lib/request-monitor';
 import * as z from 'zod';
 
 export const runtime = 'nodejs';
@@ -38,6 +39,7 @@ const bodySchema = z.object({
  */
 export async function POST(request: Request) {
   try {
+    recordApiRequest({ request, userId: null });
     if (!process.env.AUTH_SECRET?.trim()) {
       return NextResponse.json(
         {

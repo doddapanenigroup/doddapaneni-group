@@ -34,9 +34,34 @@ type Insights = {
   webVitals7d: { name: string; avgValue: number | null; samples: number }[];
 };
 
+type ActiveSessionsResponse = {
+  activeByUser: {
+    userId: string;
+    userEmail: string;
+    userName: string | null;
+    userRole: string;
+    deviceUserAgent: string | null;
+    activeSessions: { id: string; loggedAt: string }[];
+  }[];
+};
+
+function toDeviceLabel(ua: string | null) {
+  if (!ua) return 'Unknown device';
+  const s = ua.toLowerCase();
+  if (s.includes('iphone') || s.includes('ipad')) return 'iOS (Safari/Browser)';
+  if (s.includes('android')) return 'Android (Browser)';
+  if (s.includes('mac os') || s.includes('macintosh')) return 'macOS (Browser)';
+  if (s.includes('windows')) return 'Windows (Browser)';
+  if (s.includes('linux')) return 'Linux (Browser)';
+  return 'Browser';
+}
+
 export default function AdminOpsInsights() {
   const [data, setData] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<ActiveSessionsResponse | null>(null);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const [logoutBusyUserId, setLogoutBusyUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/dashboard/admin-insights')
@@ -47,6 +72,35 @@ export default function AdminOpsInsights() {
       .then(setData)
       .catch(() => setError('Could not load admin insights'));
   }, []);
+
+  useEffect(() => {
+    fetch('/api/admin/sessions?activeOnly=1&take=200')
+      .then(async (r) => {
+        if (!r.ok) throw new Error('Failed to load');
+        return (await r.json()) as ActiveSessionsResponse;
+      })
+      .then(setSessions)
+      .catch(() => setSessionsError('Could not load active sessions'));
+  }, []);
+
+  async function forceLogoutUser(userId: string) {
+    setLogoutBusyUserId(userId);
+    try {
+      const r = await fetch('/api/admin/sessions/force-logout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (!r.ok) throw new Error('Failed');
+      const refreshed = await fetch('/api/admin/sessions?activeOnly=1&take=200');
+      if (!refreshed.ok) throw new Error('Failed');
+      setSessions((await refreshed.json()) as ActiveSessionsResponse);
+    } catch {
+      setSessionsError('Force logout failed');
+    } finally {
+      setLogoutBusyUserId(null);
+    }
+  }
 
   if (error) {
     return (
@@ -63,8 +117,52 @@ export default function AdminOpsInsights() {
 
   return (
     <div className="space-y-6">
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
+          <Activity size={20} className="text-slate-600" />
+          Active sessions
+        </h2>
+        {sessionsError ? (
+          <p className="p-4 text-sm text-red-600">{sessionsError}</p>
+        ) : !sessions ? (
+          <p className="p-4 text-sm text-slate-500">Loading active sessions…</p>
+        ) : sessions.activeByUser.length === 0 ? (
+          <p className="p-4 text-sm text-slate-500">No active sessions right now.</p>
+        ) : (
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+            {sessions.activeByUser.map((u) => (
+              <li key={u.userId} className="p-4 text-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {u.userEmail}
+                      {u.userName ? <span className="text-slate-500"> · {u.userName}</span> : null}
+                    </p>
+                    <p className="text-slate-600">
+                      {u.userRole} · {toDeviceLabel(u.deviceUserAgent)}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Latest login:{' '}
+                      {new Date(u.activeSessions[0]?.loggedAt ?? Date.now()).toLocaleString()}
+                      {' · '}Active sessions: {u.activeSessions.length}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => forceLogoutUser(u.userId)}
+                    disabled={logoutBusyUserId === u.userId}
+                    className="text-xs px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-60"
+                  >
+                    {logoutBusyUserId === u.userId ? 'Logging out…' : 'Force logout'}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <BarChart3 size={20} className="text-slate-600" />
           Traffic &amp; performance (7 days)
         </h2>
@@ -104,12 +202,12 @@ export default function AdminOpsInsights() {
         )}
       </section>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <Activity size={20} className="text-slate-600" />
           Recent logins
         </h2>
-        <ul className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+        <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto">
           {data.recentLogins.length === 0 ? (
             <li className="p-4 text-sm text-slate-500">No login records yet.</li>
           ) : (
@@ -128,11 +226,11 @@ export default function AdminOpsInsights() {
         </ul>
       </section>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
           Developer edits (files &amp; CMS)
         </h2>
-        <ul className="divide-y divide-slate-100 max-h-64 overflow-y-auto text-sm">
+        <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-64 overflow-y-auto text-sm">
           {data.contentEdits.length === 0 ? (
             <li className="p-4 text-slate-500">No edits recorded yet.</li>
           ) : (
@@ -150,12 +248,12 @@ export default function AdminOpsInsights() {
         </ul>
       </section>
 
-      <section className="bg-white/90 backdrop-blur rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
           <Megaphone size={20} className="text-slate-600" />
           Digital marketer / SEO-related changes
         </h2>
-        <ul className="divide-y divide-slate-100 max-h-64 overflow-y-auto text-sm">
+        <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-64 overflow-y-auto text-sm">
           {data.marketingActivity.length === 0 ? (
             <li className="p-4 text-slate-500">No marketing activity logged yet.</li>
           ) : (

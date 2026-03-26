@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import * as z from 'zod';
 import type { Role } from '@/lib/constants';
 import type { Role as DbRole } from '@/lib/prisma-generated';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 const usernameSchema = z
   .string()
@@ -163,6 +164,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ user });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'users/POST',
+      user: null,
+    });
     console.error('Create user error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

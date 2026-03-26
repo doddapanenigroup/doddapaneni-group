@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logContentEdit } from '@/lib/audit-log';
+import { publishScheduledContent } from '@/lib/publish-scheduled';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 const PAGE_KEYS = [
   'home',
@@ -50,9 +52,17 @@ export async function GET(
   const locale = url.searchParams.get('locale') || 'en';
 
   try {
+    const now = new Date();
     await connectDb();
+    // Server-side fallback: if cron hasn't run yet, still publish due items.
+    await publishScheduledContent(now);
     const doc = await prisma.pageContent.findFirst({
-      where: { pageKey, locale, status: 'published' },
+      where: {
+        pageKey,
+        locale,
+        status: 'published',
+        OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: now.toISOString() } }],
+      },
     });
     if (!doc) {
       return NextResponse.json(null, {
@@ -74,6 +84,13 @@ export async function GET(
       }
     );
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: _request,
+      statusCode: 500,
+      context: 'content/[pageKey]/GET',
+      user: null,
+    });
     console.error('Content GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -139,6 +156,15 @@ export async function PUT(
       updatedAt: doc.updatedAt,
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'content/[pageKey]/PUT',
+      user: session?.user
+        ? { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null }
+        : null,
+    });
     console.error('Content PUT error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

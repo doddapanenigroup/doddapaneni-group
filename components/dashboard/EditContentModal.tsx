@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Save } from 'lucide-react';
+import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 
 type EditContentModalProps = {
   pageKey: string;
@@ -11,10 +12,23 @@ type EditContentModalProps = {
 };
 
 export default function EditContentModal({ pageKey, label, editFile, onClose }: EditContentModalProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const { pushEscLayer, pushSaveLayer } = useDashboardShortcuts();
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<'idle' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    return pushEscLayer(() => onClose());
+  }, [pushEscLayer, onClose]);
+
+  useEffect(() => {
+    if (loading) return;
+    return pushSaveLayer(() => {
+      formRef.current?.requestSubmit();
+    });
+  }, [loading, pushSaveLayer]);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +95,7 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
         {loading ? (
           <p className="text-slate-500">Loading file…</p>
         ) : (
-          <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+          <form ref={formRef} onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0 flex flex-col mb-4">
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Full source code — edit and save to update the file

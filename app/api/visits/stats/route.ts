@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 export async function GET() {
   try {
@@ -71,6 +72,13 @@ export async function GET() {
       visitsByYear,
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'visits/stats/GET',
+      user: null,
+    });
     console.error('Visits stats error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

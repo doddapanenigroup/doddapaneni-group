@@ -28,6 +28,7 @@ model User {
   createdAtIST      String?   @map("created_at_ist")
   createdAtET       String?   @map("created_at_et")
   passwordChangedAt DateTime? @map("password_changed_at")
+  sessionRevokedAt  DateTime? @map("session_revoked_at")
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
@@ -36,6 +37,79 @@ model User {
   loginEmailOtps             LoginEmailOtp[]
   adminEmployeeCreateOtps    AdminEmployeeCreateOtp[]
   blogs                      Blog[]
+  invitesCreated             UserInvite[]             @relation("InviteCreator")
+  notifications              Notification[]
+}
+
+model UserInvite {
+  id            String   @id @default(cuid())
+  email         String
+  role          Role
+  tokenHash     String   @map("token_hash")
+  invitedById   String?  @map("invited_by_id")
+  invitedBy     User?    @relation("InviteCreator", fields: [invitedById], references: [id], onDelete: SetNull)
+  expiresAt     DateTime @map("expires_at")
+  usedAt        DateTime? @map("used_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([email, expiresAt])
+  @@index([invitedById, createdAt])
+  @@map("user_invite")
+}
+
+/// In-app notifications (per user). Types: page_published | error | user_action
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?   @db.Text
+  linkHref  String?   @map("link_href")
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, readAt])
+  @@map("notification")
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorUserId   String?  @map("actor_user_id")
+  actorEmail    String?  @map("actor_email")
+  actorRole     String?  @map("actor_role")
+  action        String
+  targetType    String?  @map("target_type")
+  targetId      String?  @map("target_id")
+  targetLabel   String?  @map("target_label")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  payloadJson   String?  @map("payload_json") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_log")
+}
+
+model DbBackup {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now()) @map("created_at")
+  createdById   String?  @map("created_by_id")
+  createdByEmail String? @map("created_by_email")
+  createdByRole String?  @map("created_by_role")
+  label         String?  // optional note (e.g. "pre-restore", "manual")
+  format        String   @default("json") // future-proof
+  includeMedia  Boolean  @default(false) @map("include_media")
+  sha256        String
+  sizeBytes     Int      @map("size_bytes")
+  dataJson      String   @db.Text @map("data_json")
+
+  @@index([createdAt])
+  @@index([createdById, createdAt])
+  @@map("db_backup")
 }
 
 /// Pending employee row + OTP emailed to admin before POST /api/users finalizes create.
@@ -101,6 +175,9 @@ model Visit {
   ipAddress    String?  @map("ip_address")
   pagePath     String?  @map("page_path")
   userAgent    String?  @map("user_agent")
+
+  @@index([visitedAt(sort: Desc)])
+  @@index([pagePath, visitedAt])
 }
 
 model DashboardVisit {
@@ -134,6 +211,7 @@ model PageContent {
   title     String
   body      String   @db.Text
   status    PageStatus @default(published)
+  scheduledPublishAt DateTime? @map("scheduled_publish_at")
   metaTitle       String? @map("meta_title")
   metaDescription String? @map("meta_description")
   keywords        String?
@@ -166,6 +244,7 @@ model Blog {
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   status          BlogStatus @default(draft)
   publishedAt     DateTime?  @map("published_at")
+  scheduledPublishAt DateTime? @map("scheduled_publish_at")
   metaTitle       String?    @map("meta_title")
   metaDescription String?    @map("meta_description")
   keywords        String?
@@ -252,6 +331,44 @@ model WebVitalReport {
   userId         String?  @map("user_id")
   userAgent      String?  @map("user_agent")
   createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@index([name, createdAt])
+}
+
+model ErrorLog {
+  id String @id @default(cuid())
+
+  userId    String? @map("user_id")
+  userEmail String? @map("user_email")
+  userRole  String? @map("user_role")
+
+  path       String? @map("path")
+  method     String? @map("method")
+  statusCode Int?    @map("status_code")
+  errorType  String? @map("error_type")
+
+  message    String  @db.Text
+  stackTrace String? @db.Text @map("stack_trace")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+}
+
+model TaskExecutionLog {
+  id        String   @id @default(cuid())
+  taskName  String   @map("task_name")
+  status    String   @map("status") // started | success | error | skipped
+  startedAt DateTime @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+  durationMs Int?     @map("duration_ms")
+  message   String?   @db.Text
+  detailsJson String? @map("details_json") @db.Text
+
+  @@index([taskName, startedAt])
+  @@index([startedAt])
+  @@map("task_execution_log")
 }
 
 /// Binary image assets served via GET /api/media/{key} (key = path relative to /public, POSIX slashes).
@@ -266,4 +383,28 @@ model StoredImage {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("stored_image")
+}
+
+model FeatureToggle {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  enabled     Boolean  @default(false)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_toggle")
+}
+
+model RoleModulePermission {
+  id        String   @id @default(cuid())
+  role      Role
+  module    String
+  allowed   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([role, module])
+  @@index([role])
+  @@map("role_module_permission")
 }

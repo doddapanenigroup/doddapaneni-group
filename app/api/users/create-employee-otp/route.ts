@@ -10,6 +10,7 @@ import {
   hashAdminEmployeeCreateOtp,
 } from '@/lib/admin-employee-create-otp';
 import { isLoginEmailDeliveryConfigured, sendAdminEmployeeCreateOtpEmail } from '@/lib/email';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 const usernameSchema = z
   .string()
@@ -155,6 +156,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, codeSentTo: adminEmail });
   } catch (e) {
+    await captureErrorToDb({
+      error: e,
+      request,
+      statusCode: 500,
+      context: 'users/create-employee-otp/POST',
+      user: null,
+    });
     console.error('[create-employee-otp]', e);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

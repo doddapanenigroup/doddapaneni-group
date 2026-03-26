@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
+import { captureErrorToDb } from '@/lib/error-monitor';
 
 /** Only record website visits when the app is live (production). Local/dev visits are not counted. */
 export async function POST(request: Request) {
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'visit/POST',
+    });
     console.error('Record visit error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

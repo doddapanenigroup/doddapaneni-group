@@ -3,16 +3,23 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
 import { logContentEdit } from '@/lib/audit-log';
-
-function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
-}
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { allowMarketerModule } from '@/app/api/marketer/_permissions';
+import { writeAuditLog } from '@/lib/audit';
+import { notifyContentPublished } from '@/lib/notify';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
   const t = v.trim();
   return t.length ? t : null;
+}
+
+function dateOrNull(v: unknown): Date | null {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  if (!t) return null;
+  const d = new Date(t);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 export async function GET(
@@ -21,7 +28,7 @@ export async function GET(
 ) {
   try {
     const session = await auth();
-    if (!session?.user || !allowMarketer(session)) {
+    if (!session?.user || !(await allowMarketerModule(session.user.role as any, 'pages'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -43,6 +50,7 @@ export async function GET(
         title: doc.title,
         body: doc.body,
         status: doc.status,
+        scheduledPublishAt: doc.scheduledPublishAt ? doc.scheduledPublishAt.toISOString() : null,
         metaTitle: doc.metaTitle,
         metaDescription: doc.metaDescription,
         keywords: doc.keywords,
@@ -54,6 +62,13 @@ export async function GET(
       },
     });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/page-content/[slug]/GET',
+      user: null,
+    });
     console.error('Marketer page-content(slug) GET error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
@@ -65,7 +80,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session?.user?.id || !allowMarketer(session)) {
+    if (!session?.user?.id || !(await allowMarketerModule(session.user.role as any, 'pages'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -91,6 +106,7 @@ export async function PATCH(
     if (typeof body.title === 'string') data.title = body.title;
     if (typeof body.body === 'string') data.body = body.body;
     if (body.status === 'draft' || body.status === 'published') data.status = body.status;
+    if ('scheduledPublishAt' in body) data.scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
     if ('metaTitle' in body) data.metaTitle = strOrNull(body.metaTitle);
     if ('metaDescription' in body) data.metaDescription = strOrNull(body.metaDescription);
     if ('keywords' in body) data.keywords = strOrNull(body.keywords);
@@ -136,20 +152,38 @@ export async function PATCH(
       summary: `update title length ${doc.title.length}, body length ${doc.body.length}`,
     });
 
+    if (existing.status !== 'published' && doc.status === 'published') {
+      void notifyContentPublished({
+        kind: 'page',
+        locale: doc.locale,
+        title: doc.title,
+        slug: doc.slug,
+        pageKey: doc.pageKey,
+        actorUserId: session.user.id,
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ ok: true, item: doc });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'marketer/page-content/[slug]/PATCH',
+      user: null,
+    });
     console.error('Marketer page-content(slug) PATCH error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await auth();
-    if (!session?.user?.id || !allowMarketer(session)) {
+    if (!session?.user?.id || !(await allowMarketerModule(session.user.role as any, 'pages'))) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -180,8 +214,25 @@ export async function DELETE(
       summary: 'delete',
     });
 
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'content.page_content.delete',
+      targetType: 'PageContent',
+      targetId: existing.id,
+      targetLabel: `${existing.slug} (${existing.locale})`,
+      payload: { slug: existing.slug, pageKey: existing.pageKey, locale: existing.locale },
+    });
+
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/page-content/[slug]/DELETE',
+      user: null,
+    });
     console.error('Marketer page-content(slug) DELETE error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }

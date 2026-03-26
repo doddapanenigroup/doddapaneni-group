@@ -53,8 +53,14 @@ export async function generateMetadata({
       }
     | null = null;
   try {
+    const nowIso = new Date().toISOString();
     seo = await prisma.pageContent.findFirst({
-      where: { slug, locale, status: 'published' },
+      where: {
+        slug,
+        locale,
+        status: 'published',
+        OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: nowIso } }],
+      },
       select: {
         title: true,
         metaTitle: true,

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logContentEdit, logMarketingActivity } from '@/lib/audit-log';
+import { captureErrorToDb } from '@/lib/error-monitor';
+import { writeAuditLog } from '@/lib/audit';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   const role = session?.user?.role;
@@ -11,7 +13,7 @@ function allowMarketer(session: { user?: { role?: string } } | null) {
 export const runtime = 'nodejs';
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ key: string }> }
 ) {
   try {
@@ -52,8 +54,25 @@ export async function DELETE(
       summary: `delete ${existing.fileName ?? existing.key}`,
     });
 
+    await writeAuditLog({
+      request,
+      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+      action: 'content.stored_image.delete',
+      targetType: 'StoredImage',
+      targetId: existing.id,
+      targetLabel: existing.key,
+      payload: { key: existing.key, fileName: existing.fileName ?? null },
+    });
+
     return NextResponse.json({ ok: true });
   } catch (error) {
+    await captureErrorToDb({
+      error,
+      request: undefined,
+      statusCode: 500,
+      context: 'marketer/stored-image/[key]/DELETE',
+      user: null,
+    });
     console.error('Marketer stored-image DELETE error:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
