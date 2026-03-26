@@ -11,7 +11,8 @@ export default async function DashboardPage() {
     redirect(`/${locale}/login`);
   }
 
-  const role = session.user.role as Role;
+  // Be defensive: session can exist but custom fields may be missing on some hosts/cookie races.
+  const role = (session.user.role ?? 'DEVELOPER') as Role;
 
   if (role === 'SUPER_ADMIN') redirect(`/${locale}/dashboard/super-admin`);
   if (role === 'ADMIN') redirect(`/${locale}/dashboard/admin`);
