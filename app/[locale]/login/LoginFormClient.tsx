@@ -4,11 +4,20 @@
  * Login: email or username + password, then email OTP code to finish sign-in.
  */
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import { mediaUrl } from '@/lib/media';
+
+const AUTH_DEBUG =
+  process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' || process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true';
+
+function authDebug(...args: unknown[]) {
+  if (!AUTH_DEBUG) return;
+  // Keep logs consistent and easy to remove/grep.
+  console.debug('[auth-debug]', ...args);
+}
 
 function safeCallbackUrl(locale: string, raw: string | undefined): string {
   const fallback = `/${locale}/dashboard`;
@@ -21,6 +30,32 @@ function safeCallbackUrl(locale: string, raw: string | undefined): string {
 
 type Step = 'credentials' | 'code';
 
+type SessionResponse =
+  | { user: unknown; expires: string }
+  | null;
+
+async function waitForSessionReady(timeoutMs = 4000): Promise<boolean> {
+  const started = Date.now();
+  let delay = 150;
+  while (Date.now() - started < timeoutMs) {
+    try {
+      const res = await fetch('/api/auth/session', { cache: 'no-store' });
+      if (res.ok) {
+        const json = (await res.json().catch(() => null)) as SessionResponse;
+        if (json && typeof json === 'object' && 'user' in json && (json as { user?: unknown }).user) {
+          authDebug('session-ready', { waitedMs: Date.now() - started });
+          return true;
+        }
+      }
+    } catch {
+      // ignore and retry
+    }
+    await new Promise((r) => setTimeout(r, delay));
+    delay = Math.min(600, Math.floor(delay * 1.6));
+  }
+  return false;
+}
+
 export default function LoginFormClient({
   locale,
   callbackUrlFromServer,
@@ -28,7 +63,20 @@ export default function LoginFormClient({
   locale: string;
   callbackUrlFromServer: string;
 }) {
+  const { status } = useSession();
   const callbackUrl = safeCallbackUrl(locale, callbackUrlFromServer);
+
+  useEffect(() => {
+    authDebug('login-page-session-status', status);
+  }, [status]);
+
+  // If already signed in, do not show the login UI; redirect to dashboard.
+  // Using `replace` avoids back button returning to login.
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    authDebug('auto-redirect-authenticated', { to: `/${locale}/dashboard` });
+    window.location.href = `/${locale}/dashboard`;
+  }, [status, locale]);
 
   const [step, setStep] = useState<Step>('credentials');
   const [login, setLogin] = useState('');
@@ -39,6 +87,11 @@ export default function LoginFormClient({
   const [loading, setLoading] = useState(false);
 
   const passwordForAuth = password.trim();
+
+  // Prevent flicker: don't render the login form until we know the user is unauthenticated.
+  if (status === 'loading' || status === 'authenticated') {
+    return null;
+  }
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
@@ -130,6 +183,7 @@ export default function LoginFormClient({
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setInfo('');
     setLoading(true);
     try {
       const res = await signIn('credentials', {
@@ -137,17 +191,25 @@ export default function LoginFormClient({
         password: passwordForAuth,
         emailOtp: emailOtp.replace(/\s/g, ''),
         redirect: false,
-        callbackUrl,
       });
-      if (res?.error) {
-        setError('Invalid or expired code. Try again or request a new code.');
+      authDebug('signIn(credentials) response', { ok: res?.ok, error: res?.error, url: res?.url });
+      if (!res?.ok) {
+        setError(
+          typeof res?.error === 'string' && res.error.trim()
+            ? res.error
+            : 'Login failed. Please check the code and try again.'
+        );
         return;
       }
-      // On some hosts/Auth.js versions, `res.url` may point back to the sign-in page even when auth succeeded.
-      // Since `redirect:false` is used, always navigate to our validated callbackUrl on success.
-      window.location.href = callbackUrl.startsWith('http')
-        ? callbackUrl
-        : `${window.location.origin}${callbackUrl}`;
+      // Production hosts can have a short delay before the session cookie is readable by server components.
+      // Wait briefly to avoid a login->dashboard->login bounce.
+      setInfo('Signing you in…');
+      const ready = await waitForSessionReady(5000);
+      authDebug('post-login session check', { ready });
+
+      // Do not rely on `useSession` for redirect. Navigate explicitly after success.
+      authDebug('redirect-after-login', { to: `/${locale}/dashboard` });
+      window.location.href = `${window.location.origin}/${locale}/dashboard`;
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {

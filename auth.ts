@@ -32,6 +32,8 @@ if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required');
 }
 
+const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 'true';
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // Hostinger runs behind a reverse proxy; Auth.js often needs this to avoid
   // "There was a problem with the server configuration" / ClientFetchError.
@@ -72,6 +74,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
           if (!row || !verifyLoginEmailOtpCode(row.codeHash, user.id, emailOtpRaw)) {
             return null;
+          }
+
+          if (AUTH_DEBUG) {
+            console.info('[auth-debug] otp-verified', { userId: user.id, at: now.toISOString() });
           }
 
           await prisma.loginEmailOtp.deleteMany({ where: { userId: user.id } });
