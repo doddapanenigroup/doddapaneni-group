@@ -123,8 +123,11 @@ export default function LoginFormClient({
         setError('Invalid or expired code. Try again or request a new code.');
         return;
       }
-      const url = res?.url ?? callbackUrl;
-      window.location.href = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+      // On some hosts/Auth.js versions, `res.url` may point back to the sign-in page even when auth succeeded.
+      // Since `redirect:false` is used, always navigate to our validated callbackUrl on success.
+      window.location.href = callbackUrl.startsWith('http')
+        ? callbackUrl
+        : `${window.location.origin}${callbackUrl}`;
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {
