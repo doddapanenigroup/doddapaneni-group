@@ -29,8 +29,13 @@ export async function generateMetadata({
     title: t('title'),
     description: t('description'),
     icons: {
-      icon: [{ url: mediaUrl('logo.webp'), type: 'image/webp' }],
-      apple: [{ url: mediaUrl('logo.webp'), type: 'image/webp' }],
+      icon: [
+        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '32x32' },
+        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '192x192' },
+        { url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '512x512' },
+      ],
+      shortcut: [{ url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '32x32' }],
+      apple: [{ url: mediaUrl('logo.webp'), type: 'image/webp', sizes: '180x180' }],
     },
     other: { google: 'notranslate' },
   };
