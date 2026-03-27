@@ -6,6 +6,7 @@ import { sendRoleDeletedEmailToDeleter, sendRoleDeletedEmailToDeletedUser } from
 import bcrypt from 'bcryptjs';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { writeAuditLog } from '@/lib/audit';
+import { hasAdminAccess, isAdmin, isSuperAdmin } from '@/lib/role-utils';
 
 const ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES = ['DEVELOPER', 'DIGITAL_MARKETER'] as const;
 type AdminAllowedPasswordChangeRole = (typeof ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES)[number];
@@ -23,10 +24,9 @@ export async function PATCH(
     const session = await auth();
     const role = session?.user?.role;
     const currentUserId = session?.user?.id;
-    const isSuperAdmin = role === 'SUPER_ADMIN';
-    const isAdmin = role === 'ADMIN';
+    const isAdminUser = isAdmin(role as any);
 
-    if (!session?.user || (!isSuperAdmin && !isAdmin)) {
+    if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -63,7 +63,7 @@ export async function PATCH(
     }
 
     const targetRole = user.role as string;
-    if (isAdmin && !isAdminAllowedPasswordChangeRole(targetRole)) {
+    if (isAdminUser && !isAdminAllowedPasswordChangeRole(targetRole)) {
       return NextResponse.json(
         { message: 'Admin can only change password for Developer or Digital Marketer' },
         { status: 403 }
@@ -112,10 +112,9 @@ export async function DELETE(
     const session = await auth();
     const role = session?.user?.role;
     const currentUserId = session?.user?.id;
-    const isSuperAdmin = role === 'SUPER_ADMIN';
-    const isAdmin = role === 'ADMIN';
+    const isAdminUser = isAdmin(role as any);
 
-    if (!session?.user || (!isSuperAdmin && !isAdmin)) {
+    if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -135,12 +134,12 @@ export async function DELETE(
     }
 
     const targetRole = user.role as string;
-    if (targetRole === 'SUPER_ADMIN') {
+    if (isSuperAdmin(targetRole as any)) {
       return NextResponse.json({ message: 'Cannot delete Super Admin' }, { status: 403 });
     }
     if (
-      isAdmin &&
-      (targetRole === 'ADMIN' || targetRole === 'SUPER_ADMIN')
+      isAdminUser &&
+      (isAdmin(targetRole as any) || isSuperAdmin(targetRole as any))
     ) {
       return NextResponse.json(
         { message: 'Admin can only delete Developer or Digital Marketer' },

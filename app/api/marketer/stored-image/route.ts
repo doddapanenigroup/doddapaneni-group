@@ -7,14 +7,14 @@ import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { logMarketingActivity, logContentEdit } from '@/lib/audit-log';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 export const runtime = 'nodejs';
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasMarketerAccess(session?.user?.role as any);
 }
 
 function strOrNull(v: unknown): string | null {

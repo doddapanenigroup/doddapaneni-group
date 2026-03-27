@@ -11,6 +11,7 @@ import {
 } from '@/lib/admin-employee-create-otp';
 import { isLoginEmailDeliveryConfigured, sendAdminEmployeeCreateOtpEmail } from '@/lib/email';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
 
 const usernameSchema = z
   .string()
@@ -60,9 +61,8 @@ export async function POST(request: Request) {
 
     const session = await auth();
     const role = session?.user?.role;
-    const isSuperAdmin = role === 'SUPER_ADMIN';
-    const isAdmin = role === 'ADMIN';
-    if (!session?.user?.id || (!isSuperAdmin && !isAdmin)) {
+    const isSuperAdminUser = isSuperAdmin(role as any);
+    if (!session?.user?.id || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid JSON' }, { status: 400 });
     }
 
-    const parsed = isSuperAdmin
+    const parsed = isSuperAdminUser
       ? bodySchemaSuperAdmin.safeParse(body)
       : bodySchemaAdmin.safeParse(body);
     if (!parsed.success) {

@@ -5,6 +5,7 @@ import { X, Plus, Trash2, Users, KeyRound } from 'lucide-react';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
+import { getRoleLabel } from '@/lib/dashboard-title';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 
 type UserRow = {
@@ -16,13 +17,6 @@ type UserRow = {
   createdAt: Date;
   createdAtIST: string | null;
   createdAtET: string | null;
-};
-
-const roleLabel: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ADMIN: 'Admin',
-  DEVELOPER: 'Developer',
-  DIGITAL_MARKETER: 'Digital Marketer',
 };
 
 const roleBadgeClass: Record<string, string> = {
@@ -318,7 +312,7 @@ export default function ManageEmployeesModal({
                         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
                       >
                         {sortedAllowedRoles.map((r) => (
-                          <option key={r} value={r}>{roleLabel[r] ?? r}</option>
+                          <option key={r} value={r}>{getRoleLabel(r)}</option>
                         ))}
                       </select>
                     </div>
@@ -364,7 +358,7 @@ export default function ManageEmployeesModal({
                   </div>
                   <p className="text-xs text-slate-500">
                     New account: {email.trim().toLowerCase()} · @{username.trim().toLowerCase()} ·{' '}
-                    {roleLabel[role] ?? role}
+                    {getRoleLabel(role)}
                   </p>
                   {message && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{message}</p>}
                   <div className="flex gap-2 flex-wrap">
@@ -465,7 +459,7 @@ export default function ManageEmployeesModal({
                       <td className="p-3 text-slate-600">{u.name ?? '—'}</td>
                       <td className="p-3">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${roleBadgeClass[String(u.role)] ?? 'bg-slate-100 text-slate-700'}`}>
-                          {roleLabel[String(u.role)] ?? String(u.role)}
+                          {getRoleLabel(u.role)}
                         </span>
                       </td>
                       <td className="p-3 text-slate-600 text-xs">

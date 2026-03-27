@@ -4,6 +4,7 @@ import { logContentEdit } from '@/lib/audit-log';
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { runTranslateAll } from '@/lib/run-translate-all';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 const PAGE_KEY_TO_PATH: Record<string, string> = {
   home: 'app/[locale]/page.tsx',
@@ -28,7 +29,7 @@ function getFilePath(pageKey: string): string | null {
 export async function GET(request: Request) {
   const session = await auth();
   const role = session?.user?.role;
-  if (!session?.user || (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
+  if (!session?.user || !hasDeveloperAccess(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
@@ -58,7 +59,7 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   const session = await auth();
   const role = session?.user?.role;
-  if (!session?.user || (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
+  if (!session?.user || !hasDeveloperAccess(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

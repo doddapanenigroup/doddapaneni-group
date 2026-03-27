@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getServerSession } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { recordApiRequest } from '@/lib/request-monitor';
-
-const DASHBOARD_ROLES = new Set([
-  'SUPER_ADMIN',
-  'ADMIN',
-  'DEVELOPER',
-  'DIGITAL_MARKETER',
-]);
+import { isDashboardRole } from '@/lib/role-utils';
 
 function clampTake(n: number) {
   return Math.min(Math.max(n, 1), 15);
@@ -19,11 +13,20 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const session = await auth();
+  const session = await getServerSession();
   recordApiRequest({ request, userId: session?.user?.id ?? null });
   const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
 
-  if (!session?.user?.id || !role || !DASHBOARD_ROLES.has(role)) {
+  console.info('[dashboard/search] auth check', {
+    hasSession: Boolean(session?.user?.id),
+    userId: session?.user?.id ?? null,
+    role: role ?? null,
+  });
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+  if (!isDashboardRole(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

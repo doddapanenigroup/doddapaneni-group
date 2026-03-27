@@ -18,10 +18,15 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   BarChart,
   Bar,
 } from 'recharts';
+import {
+  SafeResponsiveChart,
+  DASHBOARD_CHART_HEIGHT,
+} from '@/components/dashboard/SafeResponsiveChart';
+import type { Role } from '@/lib/constants';
+import { getDashboardTitle } from '@/lib/dashboard-title';
 
 export type AnalyticsPayload = {
   rangeDays: number;
@@ -47,7 +52,13 @@ function truncatePath(p: string, max = 36) {
 
 const DAY_OPTIONS = [7, 30, 90] as const;
 
-export default function AnalyticsDashboard({ locale }: { locale: string }) {
+export default function AnalyticsDashboard({
+  locale,
+  viewerRole,
+}: {
+  locale: string;
+  viewerRole: Role;
+}) {
   const [days, setDays] = useState<number>(30);
   const [data, setData] = useState<AnalyticsPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +118,7 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
             className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 mb-2"
           >
             <ArrowLeft size={16} />
-            Dashboard
+            {getDashboardTitle(viewerRole)}
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <BarChart3 size={28} className="text-violet-600 dark:text-violet-400" />
@@ -142,9 +153,28 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
       ) : null}
 
       {loading && !data ? (
-        <div className="flex items-center justify-center py-24 text-slate-500 gap-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          Loading analytics…
+        <div className="space-y-6">
+          <div className="flex items-center justify-center gap-2 py-8 text-slate-500 dark:text-slate-400">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            Loading analytics…
+          </div>
+          <div
+            className="w-full rounded-2xl bg-slate-100/90 dark:bg-slate-800/60 animate-pulse"
+            style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+            aria-hidden
+          />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="rounded-2xl bg-slate-100/90 dark:bg-slate-800/60 animate-pulse"
+              style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+              aria-hidden
+            />
+            <div
+              className="rounded-2xl bg-slate-100/90 dark:bg-slate-800/60 animate-pulse"
+              style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+              aria-hidden
+            />
+          </div>
         </div>
       ) : null}
 
@@ -211,9 +241,9 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
               <LineChartIcon size={18} className="text-slate-600 dark:text-slate-400" />
               Page views by day
             </h2>
-            <div className="h-72 w-full min-w-0">
+            <div className="w-full min-w-0" style={{ minHeight: DASHBOARD_CHART_HEIGHT }}>
               {lineData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
                   <LineChart data={lineData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#33415522" />
                     <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="#64748b" />
@@ -232,9 +262,14 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
                       activeDot={{ r: 4 }}
                     />
                   </LineChart>
-                </ResponsiveContainer>
+                </SafeResponsiveChart>
               ) : (
-                <p className="text-sm text-slate-500 py-12 text-center">No views in this range.</p>
+                <div
+                    className="flex items-center justify-center text-sm text-slate-500 dark:text-slate-400"
+                    style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+                >
+                  No views in this range.
+                </div>
               )}
             </div>
           </section>
@@ -245,9 +280,9 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
                 <BarChart3 size={18} className="text-slate-600 dark:text-slate-400" />
                 Top pages
               </h2>
-              <div className="h-[min(28rem,50vh)] w-full min-w-0">
+              <div className="w-full min-w-0" style={{ minHeight: DASHBOARD_CHART_HEIGHT }}>
                 {topBars.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
                     <BarChart
                       layout="vertical"
                       data={topBars}
@@ -271,9 +306,14 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
                       />
                       <Bar dataKey="views" fill="#475569" radius={[0, 4, 4, 0]} name="Views" />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </SafeResponsiveChart>
                 ) : (
-                  <p className="text-sm text-slate-500 py-12 text-center">No page paths recorded.</p>
+                  <div
+                    className="flex items-center justify-center text-sm text-slate-500 dark:text-slate-400"
+                    style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+                  >
+                    No page paths recorded.
+                  </div>
                 )}
               </div>
             </section>
@@ -287,9 +327,9 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
                 Views by blog URL (from public site tracking). Web Vitals LCP average for blog URLs
                 shown in summary cards.
               </p>
-              <div className="h-[min(28rem,50vh)] w-full min-w-0">
+              <div className="w-full min-w-0" style={{ minHeight: DASHBOARD_CHART_HEIGHT }}>
                 {blogBars.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
                     <BarChart
                       layout="vertical"
                       data={blogBars}
@@ -313,9 +353,14 @@ export default function AnalyticsDashboard({ locale }: { locale: string }) {
                       />
                       <Bar dataKey="views" fill="#7c3aed" radius={[0, 4, 4, 0]} name="Views" />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </SafeResponsiveChart>
                 ) : (
-                  <p className="text-sm text-slate-500 py-12 text-center">No blog traffic in this range.</p>
+                  <div
+                    className="flex items-center justify-center text-sm text-slate-500 dark:text-slate-400"
+                    style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+                  >
+                    No blog traffic in this range.
+                  </div>
                 )}
               </div>
             </section>

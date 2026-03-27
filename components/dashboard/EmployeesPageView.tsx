@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, UserCircle, Clock, FileCode } from 'lucide-react';
 import type { Role } from '@/lib/constants';
+import { getRoleLabel } from '@/lib/dashboard-title';
 
 type EmployeeSession = {
   logId: string;
@@ -21,13 +22,6 @@ type EmployeeWithStats = {
   role: Role;
   sessions: EmployeeSession[];
   isActive: boolean;
-};
-
-const roleLabel: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ADMIN: 'Admin',
-  DEVELOPER: 'Developer',
-  DIGITAL_MARKETER: 'Digital Marketer',
 };
 
 const roleBadgeClass: Record<string, string> = {
@@ -100,7 +94,7 @@ export default function EmployeesPageView({
                       {emp.email}
                     </p>
                     <span className={`inline-block mt-1.5 px-2 py-0.5 rounded text-xs font-medium ${roleBadgeClass[String(emp.role)] ?? 'bg-slate-100 text-slate-700'}`}>
-                      {roleLabel[String(emp.role)] ?? String(emp.role)}
+                      {getRoleLabel(emp.role)}
                     </span>
                   </span>
                 </button>
@@ -129,7 +123,7 @@ export default function EmployeesPageView({
                   {selected.email}
                 </p>
                 <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-lg text-xs font-medium ${roleBadgeClass[String(selected.role)] ?? 'bg-slate-100 text-slate-700'}`}>
-                  {roleLabel[String(selected.role)] ?? String(selected.role)}
+                  {getRoleLabel(selected.role)}
                 </span>
               </div>
 

@@ -22,6 +22,38 @@ function dateOrNull(v: unknown): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+async function resolveSectorIdOrError(raw: unknown): Promise<
+  { ok: true; sectorId: string } | { ok: false; status: number; message: string }
+> {
+  const sectorId = strOrNull(raw);
+  if (!sectorId) {
+    console.warn('[marketer/blog] missing sectorId on create', { raw });
+    return { ok: false, status: 400, message: 'sectorId is required' };
+  }
+  const sector = await prisma.sector.findUnique({
+    where: { id: sectorId },
+    select: { id: true },
+  });
+  if (!sector) {
+    console.warn('[marketer/blog] invalid sectorId on create', { sectorId });
+    return { ok: false, status: 400, message: 'Invalid sectorId' };
+  }
+  return { ok: true, sectorId };
+}
+
+async function resolveSectorIdFilter(raw: unknown): Promise<
+  { ok: true; sectorId: string | null } | { ok: false; status: number; message: string }
+> {
+  const sectorId = strOrNull(raw);
+  if (!sectorId) return { ok: true, sectorId: null };
+  const sector = await prisma.sector.findUnique({
+    where: { id: sectorId },
+    select: { id: true },
+  });
+  if (!sector) return { ok: false, status: 400, message: 'Invalid sectorId filter' };
+  return { ok: true, sectorId };
+}
+
 export async function GET(request: Request) {
   try {
     const session = await auth();
@@ -31,12 +63,22 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const status = strOrNull(url.searchParams.get('status'));
+    const sectorIdFilter = await resolveSectorIdFilter(url.searchParams.get('sectorId'));
+    if (!sectorIdFilter.ok) {
+      return NextResponse.json({ message: sectorIdFilter.message }, { status: sectorIdFilter.status });
+    }
 
     await connectDb();
     const blogs = await prisma.blog.findMany({
-      where: status === 'draft' || status === 'published' ? { status } : undefined,
+      where: {
+        ...(status === 'draft' || status === 'published' ? { status } : {}),
+        ...(sectorIdFilter.sectorId ? { sectorId: sectorIdFilter.sectorId } : {}),
+      },
       orderBy: [{ updatedAt: 'desc' }],
-      include: { author: { select: { id: true, email: true, name: true } } },
+      include: {
+        author: { select: { id: true, email: true, name: true } },
+        sector: { select: { id: true, name: true, slug: true } },
+      },
     });
     return NextResponse.json({ items: blogs });
   } catch (error) {
@@ -79,11 +121,16 @@ export async function POST(request: Request) {
     const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
 
     await connectDb();
+    const sectorResult = await resolveSectorIdOrError(body.sectorId);
+    if (!sectorResult.ok) {
+      return NextResponse.json({ message: sectorResult.message }, { status: sectorResult.status });
+    }
     const doc = await prisma.blog.create({
       data: {
         title,
         slug,
         content,
+        sectorId: sectorResult.sectorId,
         featuredImage: strOrNull(body.featuredImage),
         authorId: session.user.id,
         status: status === 'published' ? 'published' : 'draft',
@@ -106,7 +153,7 @@ export async function POST(request: Request) {
       entityId: doc.id,
       action: 'create',
       seoNote: strOrNull(body.seoNote),
-      payload: { title: doc.title, slug: doc.slug, status: doc.status },
+      payload: { title: doc.title, slug: doc.slug, status: doc.status, sectorId: doc.sectorId },
     });
     await logContentEdit({
       userId: session.user.id,

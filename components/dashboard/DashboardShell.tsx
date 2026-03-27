@@ -3,6 +3,7 @@
 import type { Role } from '@/lib/constants';
 import { DashboardThemeProvider } from '@/components/dashboard/DashboardThemeProvider';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import RecordDeveloperPage from '@/components/dashboard/RecordDeveloperPage';
 import RecordDashboardVisit from '@/components/dashboard/RecordDashboardVisit';
 import AutoLogoutOnUnauthenticated from '@/components/dashboard/AutoLogoutOnUnauthenticated';
@@ -20,13 +21,14 @@ export default function DashboardShell({
   return (
     <DashboardThemeProvider>
       <DashboardShortcutsProvider>
-        <RecordDeveloperPage />
+        <RecordDeveloperPage locale={locale} />
         <RecordDashboardVisit />
-        <AutoLogoutOnUnauthenticated />
+        <AutoLogoutOnUnauthenticated locale={locale} />
         <DashboardHeader user={user} locale={locale} />
-        <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 pt-6 sm:pt-8 pb-10 sm:pb-12 md:pb-14 min-w-0">
-          {children}
-        </main>
+        <div className="mx-auto flex w-full max-w-[1400px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-10 xl:px-14">
+          <DashboardSidebar locale={locale} role={user.role} />
+          <main className="min-w-0 flex-1 pb-10 sm:pb-12 md:pb-14">{children}</main>
+        </div>
       </DashboardShortcutsProvider>
     </DashboardThemeProvider>
   );

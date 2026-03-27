@@ -4,6 +4,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { parseBackupJson, backupDigest, saveBackupToDb } from '@/lib/db-backup';
 import { writeAuditLog } from '@/lib/audit';
+import { isSuperAdmin } from '@/lib/role-utils';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const role = session?.user?.role as string | undefined;
-  if (!session?.user?.id || role !== 'SUPER_ADMIN') {
+  if (!session?.user?.id || !isSuperAdmin(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

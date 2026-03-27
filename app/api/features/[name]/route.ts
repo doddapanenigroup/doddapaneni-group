@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { writeAuditLog } from '@/lib/audit';
 import { invalidateFeatureFlagCache } from '@/lib/features';
+import { isSuperAdmin } from '@/lib/role-utils';
 
 function isAllowedToEdit(session: unknown): boolean {
   const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
-  return role === 'SUPER_ADMIN';
+  return isSuperAdmin(role as any);
 }
 
 export async function GET(

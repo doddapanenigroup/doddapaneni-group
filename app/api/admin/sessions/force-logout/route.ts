@@ -2,9 +2,10 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { NextResponse } from 'next/server';
+import { hasAdminAccess } from '@/lib/role-utils';
 
 function isAdminRole(role: unknown) {
-  return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasAdminAccess(role as any);
 }
 
 export async function POST(request: Request) {

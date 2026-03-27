@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
+import { hasAdminAccess } from '@/lib/role-utils';
 
 function isAdminRole(role: unknown) {
-  return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasAdminAccess(role as any);
 }
 
 export const runtime = 'nodejs';

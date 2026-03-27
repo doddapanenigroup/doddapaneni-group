@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 function allowedRole(role: string | undefined): boolean {
-  return role === 'DEVELOPER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasDeveloperAccess(role as any);
 }
 
 function parseDate(value: string | null, endOfDay = false): Date | null {

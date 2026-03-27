@@ -1,0 +1,92 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Shield, Users, Code2, Megaphone } from 'lucide-react';
+import type { Role } from '@/lib/constants';
+import { getDashboardTitle } from '@/lib/dashboard-title';
+
+type DashboardMenuItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  roles: Role[];
+};
+
+function dashboardItems(locale: string): DashboardMenuItem[] {
+  return [
+    {
+      href: `/${locale}/dashboard/super-admin`,
+      label: getDashboardTitle('SUPER_ADMIN'),
+      icon: Shield,
+      roles: ['SUPER_ADMIN'],
+    },
+    {
+      href: `/${locale}/dashboard/admin`,
+      label: getDashboardTitle('ADMIN'),
+      icon: Users,
+      roles: ['SUPER_ADMIN'],
+    },
+    {
+      href: `/${locale}/dashboard/developer`,
+      label: getDashboardTitle('DEVELOPER'),
+      icon: Code2,
+      roles: ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER'],
+    },
+    {
+      href: `/${locale}/dashboard/marketer`,
+      label: getDashboardTitle('DIGITAL_MARKETER'),
+      icon: Megaphone,
+      roles: ['SUPER_ADMIN', 'ADMIN', 'DIGITAL_MARKETER'],
+    },
+  ];
+}
+
+export default function DashboardSidebar({
+  locale,
+  role,
+}: {
+  locale: string;
+  role: Role;
+}) {
+  const pathname = usePathname();
+  const items = dashboardItems(locale).filter((item) => item.roles.includes(role));
+
+  return (
+    <aside className="hidden w-72 shrink-0 xl:block">
+      <div className="sticky top-[78px] rounded-2xl border border-slate-200/80 bg-white/85 p-3 shadow-sm backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/85">
+        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          Dashboard Menu
+        </p>
+        <nav className="space-y-1">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={[
+                  'flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                  active
+                    ? 'bg-slate-900 text-white dark:bg-violet-600'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800',
+                ].join(' ')}
+              >
+                <Icon size={17} className="shrink-0 opacity-90" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+          <Link
+            href={`/${locale}/dashboard`}
+            className="mt-2 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+          >
+            <LayoutDashboard size={16} className="shrink-0" />
+            Dashboard Home
+          </Link>
+        </nav>
+      </div>
+    </aside>
+  );
+}

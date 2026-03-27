@@ -55,6 +55,31 @@ const SEED_USERS = [
   },
 ];
 
+const SEED_SECTORS = [
+  'IT',
+  'Digital Marketing',
+  'E-Commerce',
+  'Media',
+  'Employee Consultancy',
+  'Healthcare',
+  'Construction',
+  'Education',
+  'Food Processing',
+  'Manufacturing',
+  'Logistics',
+  'Import Export',
+];
+
+function slugify(name) {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 async function main() {
   for (const u of SEED_USERS) {
     const existing = await prisma.user.findUnique({ where: { email: u.email } });
@@ -72,6 +97,16 @@ async function main() {
     } else {
       console.log(u.role, 'user already exists:', u.email);
     }
+  }
+
+  for (const name of SEED_SECTORS) {
+    const slug = slugify(name);
+    await prisma.sector.upsert({
+      where: { slug },
+      create: { name, slug, description: null },
+      update: { name },
+    });
+    console.log('Upserted sector:', name, `(${slug})`);
   }
 
   console.log(

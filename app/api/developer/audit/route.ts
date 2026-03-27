@@ -3,9 +3,10 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 function isAllowed(role: unknown) {
-  return role === 'DEVELOPER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasDeveloperAccess(role as any);
 }
 
 export const runtime = 'nodejs';

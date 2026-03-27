@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import type { Role } from "@/lib/constants";
 import { getEnvStatus } from "@/lib/env-status";
+import { hasDeveloperAccess } from "@/lib/role-utils";
 
 function allowedRole(role: Role | undefined): boolean {
-  return role === "DEVELOPER" || role === "ADMIN" || role === "SUPER_ADMIN";
+  return hasDeveloperAccess(role);
 }
 
 export async function GET() {

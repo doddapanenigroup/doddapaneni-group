@@ -9,6 +9,7 @@ import * as z from 'zod';
 import type { Role } from '@/lib/constants';
 import type { Role as DbRole } from '@/lib/prisma-generated';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
 
 const usernameSchema = z
   .string()
@@ -44,14 +45,13 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     const role = session?.user?.role;
-    const isSuperAdmin = role === 'SUPER_ADMIN';
-    const isAdmin = role === 'ADMIN';
-    if (!session?.user || (!isSuperAdmin && !isAdmin)) {
+    const isSuperAdminUser = isSuperAdmin(role as any);
+    if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
-    const parsed = isSuperAdmin
+    const parsed = isSuperAdminUser
       ? createUserSchemaSuperAdmin.safeParse(body)
       : createUserSchemaAdmin.safeParse(body);
     if (!parsed.success) {

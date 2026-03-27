@@ -2,15 +2,13 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 export async function GET() {
   try {
     const session = await auth();
     const role = session?.user?.role;
-    const allowed =
-      role === 'ADMIN' ||
-      role === 'SUPER_ADMIN' ||
-      role === 'DIGITAL_MARKETER';
+    const allowed = hasMarketerAccess(role as any);
     if (!session?.user || !allowed) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }

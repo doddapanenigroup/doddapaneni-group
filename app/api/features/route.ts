@@ -3,12 +3,13 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { FEATURE_FLAG_DEFINITIONS } from '@/lib/features';
+import { isSuperAdmin } from '@/lib/role-utils';
 
 export async function GET() {
   try {
     const session = await auth();
     const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
-    if (!session?.user?.id || role !== 'SUPER_ADMIN') {
+    if (!session?.user?.id || !isSuperAdmin(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 

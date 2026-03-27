@@ -9,14 +9,10 @@ import {
 import { logMarketingActivity } from '@/lib/audit-log';
 import type { MarketingLink } from '@/lib/prisma-generated';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return (
-    role === 'DIGITAL_MARKETER' ||
-    role === 'ADMIN' ||
-    role === 'SUPER_ADMIN'
-  );
+  return hasMarketerAccess(session?.user?.role as any);
 }
 
 const TYPES = MARKETING_LINK_TYPES;

@@ -8,29 +8,6 @@ import { verifyLoginEmailOtpCode } from '@/lib/login-email-otp';
 import { shouldSendLoginSuccessEmail, sendLoginSuccessEmail } from '@/lib/email';
 import type { Role } from '@/lib/constants';
 
-// Ensure this file is treated as a module for TS module augmentation.
-export {};
-
-declare module 'next-auth' {
-  interface User {
-    id: string;
-    email: string;
-    name: string | null;
-    role: Role;
-    sessionIssuedAt?: number;
-  }
-  interface Session {
-    user: User;
-  }
-}
-
-declare module '@auth/core/jwt' {
-  interface JWT {
-    id?: string;
-    role?: Role;
-  }
-}
-
 // Validate required env vars at startup
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required');
@@ -38,7 +15,7 @@ if (!process.env.AUTH_SECRET) {
 
 const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 'true';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const nextAuth = NextAuth({
   // Hostinger runs behind a reverse proxy; Auth.js often needs this to avoid
   // "There was a problem with the server configuration" / ClientFetchError.
   trustHost: true,
@@ -152,3 +129,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
   secret: process.env.AUTH_SECRET,
 });
+
+export const { handlers, signIn, signOut, auth } = nextAuth;
+
+/**
+ * Server-side session for Route Handlers and Server Components.
+ * Auth.js v5 uses `auth()` under the hood (replaces NextAuth v4 `getServerSession`).
+ */
+export async function getServerSession() {
+  return auth();
+}

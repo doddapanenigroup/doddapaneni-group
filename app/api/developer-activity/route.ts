@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
+import { isDeveloper } from '@/lib/role-utils';
 
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
-  if (session.user.role !== 'DEVELOPER') {
+  if (!isDeveloper(session.user.role as any)) {
     return NextResponse.json({ message: 'For developers only' }, { status: 403 });
   }
 

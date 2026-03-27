@@ -3,9 +3,10 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { recordApiRequest } from '@/lib/request-monitor';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 function allowedRole(role: Role | undefined): boolean {
-  return role === 'DEVELOPER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasDeveloperAccess(role);
 }
 
 function parseDate(value: string | null, endOfDay = false): Date | null {

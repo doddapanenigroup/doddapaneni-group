@@ -1,4 +1,10 @@
 import { prisma } from "./prisma";
+import {
+  hasAdminAccess,
+  isDeveloper,
+  isMarketer,
+  isSuperAdmin,
+} from "@/lib/role-utils";
 
 export { prisma };
 
@@ -7,24 +13,19 @@ export async function connectDb(): Promise<void> {
 }
 
 export function isDeveloperRole(role: string): boolean {
-  return role === "DEVELOPER";
+  return isDeveloper(role as any);
 }
 
 export function isMarketerRole(role: string): boolean {
-  return role === "DIGITAL_MARKETER";
+  return isMarketer(role as any);
 }
 
 export function isSuperAdminRole(role: string): boolean {
-  return role === "SUPER_ADMIN";
+  return isSuperAdmin(role as any);
 }
 
 export function isAdminRole(role: string): boolean {
-  return (
-    role === "SUPER_ADMIN" ||
-    role === "ADMIN" ||
-    role === "DEVELOPER" ||
-    role === "DIGITAL_MARKETER"
-  );
+  return hasAdminAccess(role as any);
 }
 
 /** Matches Prisma `CampaignStatus` (use if IDE/@prisma/client enums are stale). */

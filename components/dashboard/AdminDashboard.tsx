@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Users, UserCog, UserCircle, Pencil, BarChart3 } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
+import { getDashboardTitle } from '@/lib/dashboard-title';
 import VisitStats from './VisitStats';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
@@ -28,10 +29,12 @@ export default function AdminDashboard({
   users: initialUsers,
   locale,
   currentUserId,
+  viewerRole,
 }: {
   users: UserRow[];
   locale: string;
   currentUserId: string;
+  viewerRole: Role;
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [showManageModal, setShowManageModal] = useState(false);
@@ -65,7 +68,7 @@ export default function AdminDashboard({
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Users size={28} className="opacity-90" />
-              Admin Dashboard
+              {getDashboardTitle(viewerRole)}
             </h1>
             <p className="mt-1 opacity-90 text-sm">Manage users, view visit statistics, and monitor developer & marketer activity.</p>
           </div>

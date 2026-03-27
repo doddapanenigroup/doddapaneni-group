@@ -1,5 +1,6 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import type { Metadata } from 'next';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { connectDb, prisma } from '@/lib/db';
@@ -9,6 +10,7 @@ import BlogPostClient from './BlogPostClient';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 
 export const dynamic = 'force-dynamic';
+const SITE_NAME = 'Doddapaneni Group';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -28,6 +30,62 @@ function normalizeStoredImage(value: string | null): string | null {
     return s;
   }
   return mediaUrl(s.startsWith('/') ? s.slice(1) : s);
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: paramLocale, slug } = await params;
+  const locale = routing.locales.includes(paramLocale as (typeof routing.locales)[number])
+    ? paramLocale
+    : routing.defaultLocale;
+
+  await connectDb();
+  const now = new Date();
+  await publishScheduledContent(now);
+  const dbPost = await prisma.blog.findFirst({
+    where: {
+      slug: slug.trim(),
+      status: 'published',
+      OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: now } }],
+    },
+    select: {
+      title: true,
+      content: true,
+      featuredImage: true,
+      metaTitle: true,
+      metaDescription: true,
+      keywords: true,
+      ogTitle: true,
+      ogDescription: true,
+      ogImage: true,
+      sector: { select: { slug: true, name: true } },
+    },
+  });
+  if (!dbPost) return {};
+
+  const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const dynamicDescription = plain.length > 160 ? `${plain.slice(0, 160)}...` : plain;
+  const description = dbPost.metaDescription ?? dynamicDescription;
+  const title = `${dbPost.metaTitle ?? dbPost.title} | ${SITE_NAME}`;
+  const image = normalizeStoredImage(dbPost.ogImage ?? dbPost.featuredImage);
+  const canonical = dbPost.sector?.slug
+    ? `/${locale}/${dbPost.sector.slug}/${slug}`
+    : `/${locale}/blog/${slug}`;
+
+  return {
+    title,
+    description,
+    keywords: dbPost.keywords ?? undefined,
+    alternates: { canonical },
+    openGraph: {
+      title: dbPost.ogTitle ?? title,
+      description: dbPost.ogDescription ?? description,
+      images: image ? [image] : undefined,
+      url: canonical,
+      siteName: SITE_NAME,
+      locale,
+      type: 'article',
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -60,8 +118,19 @@ export default async function BlogPostPage({ params }: Props) {
       publishedAt: true,
       status: true,
       scheduledPublishAt: true,
+      sector: { select: { slug: true } },
     },
   });
+  const isPublishedNow =
+    !!dbPost &&
+    dbPost.status === 'published' &&
+    (!dbPost.scheduledPublishAt || dbPost.scheduledPublishAt <= now);
+
+  // Prefer canonical sector route for sector-tagged published blogs.
+  if (isPublishedNow && dbPost?.sector?.slug) {
+    permanentRedirect(`/${locale}/${dbPost.sector.slug}/${slug}`);
+  }
+
   if (!dbPost || dbPost.status !== 'published' || (dbPost.scheduledPublishAt && dbPost.scheduledPublishAt > now)) {
     const messagePost = blog.posts[slug];
     if (!messagePost) notFound();

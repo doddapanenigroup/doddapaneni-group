@@ -1,41 +1,34 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import type { Role } from '@/lib/constants';
 
-/**
- * Extracts dashboard path segment from pathname, e.g.:
- * /en/dashboard/super-admin -> super-admin
- * /en/dashboard/employees -> employees
- * /en/dashboard -> dashboard
- */
-function getDashboardPath(pathname: string | null): string | null {
-  if (!pathname) return null;
-  const match = pathname.match(/\/dashboard(?:\/([^/]+))?/);
-  if (!match) return null;
-  return match[1] ?? 'dashboard';
-}
+const DASHBOARD_PATH_BY_ROLE: Record<Role, string> = {
+  SUPER_ADMIN: 'super-admin',
+  ADMIN: 'admin',
+  DEVELOPER: 'developer',
+  DIGITAL_MARKETER: 'marketer',
+};
 
 export default function RecordDashboardVisit() {
-  const pathname = usePathname();
   const { data: session, status } = useSession();
-  const lastPathRef = useRef<string | null>(null);
+  const lastRoleRef = useRef<Role | null>(null);
 
   useEffect(() => {
-    if (status !== 'authenticated' || !session?.user?.role || !pathname) return;
+    const role = session?.user?.role as Role | undefined;
+    if (status !== 'authenticated' || !role) return;
+    if (lastRoleRef.current === role) return;
+    lastRoleRef.current = role;
 
-    const path = getDashboardPath(pathname);
-    if (!path) return;
-    if (lastPathRef.current === path) return;
-    lastPathRef.current = path;
+    const path = DASHBOARD_PATH_BY_ROLE[role];
 
     fetch('/api/dashboard-visit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path }),
     }).catch(() => {});
-  }, [pathname, session?.user?.role, status]);
+  }, [session?.user?.role, status]);
 
   return null;
 }

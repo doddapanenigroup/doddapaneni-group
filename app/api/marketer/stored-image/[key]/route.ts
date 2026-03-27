@@ -4,10 +4,10 @@ import { connectDb, prisma } from '@/lib/db';
 import { logContentEdit, logMarketingActivity } from '@/lib/audit-log';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { writeAuditLog } from '@/lib/audit';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === 'DIGITAL_MARKETER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasMarketerAccess(session?.user?.role as any);
 }
 
 export const runtime = 'nodejs';

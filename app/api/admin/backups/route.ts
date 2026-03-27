@@ -3,9 +3,10 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { buildBackupJson, backupDigest, saveBackupToDb } from '@/lib/db-backup';
+import { hasAdminAccess } from '@/lib/role-utils';
 
 function isAdminRole(role: unknown) {
-  return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasAdminAccess(role as any);
 }
 
 export const runtime = 'nodejs';

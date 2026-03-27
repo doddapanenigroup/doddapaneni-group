@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
+import { canAccessEmployeesDashboard } from '@/lib/dashboard-access';
+import { isSuperAdmin } from '@/lib/role-utils';
 import type {
   DeveloperPageView,
   LoginLog,
@@ -35,12 +37,12 @@ export default async function EmployeesPage() {
   const locale = await getLocale();
 
   const role = session?.user?.role;
-  if (!session?.user || (role !== 'SUPER_ADMIN' && role !== 'ADMIN')) {
+  if (!session?.user || !canAccessEmployeesDashboard(role as Role | null | undefined)) {
     redirect(`/${locale}/dashboard`);
   }
 
   const employeeRoles: Role[] =
-    role === 'SUPER_ADMIN'
+    isSuperAdmin(role as any)
       ? ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
       : ['DEVELOPER', 'DIGITAL_MARKETER'];
 
@@ -124,7 +126,7 @@ export default async function EmployeesPage() {
     );
 
   const dashboardHref =
-    role === 'SUPER_ADMIN' ? `/${locale}/dashboard/super-admin` : `/${locale}/dashboard/admin`;
+    isSuperAdmin(role as any) ? `/${locale}/dashboard/super-admin` : `/${locale}/dashboard/admin`;
 
   return (
     <EmployeesPageView

@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { auth } from '@/auth';
 import type { Role } from '@/lib/constants';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 function allowedRole(role: Role | undefined): boolean {
-  return role === 'DEVELOPER' || role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasDeveloperAccess(role);
 }
 
 function strArray(value: unknown): string[] {

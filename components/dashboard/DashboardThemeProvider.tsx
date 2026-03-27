@@ -22,9 +22,18 @@ const DashboardThemeContext = createContext<Ctx | null>(null);
 
 function readStoredMode(): DashboardColorMode {
   if (typeof window === 'undefined') return 'light';
-  const s = localStorage.getItem(STORAGE_KEY);
-  if (s === 'dark' || s === 'light') return s;
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s === 'dark' || s === 'light') return s;
+  } catch {
+    // private mode / blocked storage
+  }
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyDashboardDarkClass(mode: DashboardColorMode) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('dark', mode === 'dark');
 }
 
 export function useDashboardTheme(): Ctx {
@@ -36,35 +45,42 @@ export function useDashboardTheme(): Ctx {
 }
 
 export function DashboardThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<DashboardColorMode>('light');
+  const [mode, setModeState] = useState<DashboardColorMode>(() => readStoredMode());
 
   useLayoutEffect(() => {
-    setModeState(readStoredMode());
-  }, []);
+    // Ensure the <html> class is in sync on mount (including after refresh).
+    applyDashboardDarkClass(mode);
+  }, [mode]);
 
   const setMode = useCallback((m: DashboardColorMode) => {
-    localStorage.setItem(STORAGE_KEY, m);
+    try {
+      localStorage.setItem(STORAGE_KEY, m);
+    } catch {
+      // ignore
+    }
     setModeState(m);
+    applyDashboardDarkClass(m);
   }, []);
 
   const toggleMode = useCallback(() => {
     setModeState((prev) => {
       const next: DashboardColorMode = prev === 'dark' ? 'light' : 'dark';
-      localStorage.setItem(STORAGE_KEY, next);
+      try {
+        localStorage.setItem(STORAGE_KEY, next);
+      } catch {
+        // ignore
+      }
+      applyDashboardDarkClass(next);
       return next;
     });
   }, []);
 
   const value = useMemo(() => ({ mode, setMode, toggleMode }), [mode, setMode, toggleMode]);
 
-  const isDark = mode === 'dark';
-
   return (
     <DashboardThemeContext.Provider value={value}>
-      <div className={isDark ? 'dark' : ''}>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
-          {children}
-        </div>
+      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
+        {children}
       </div>
     </DashboardThemeContext.Provider>
   );

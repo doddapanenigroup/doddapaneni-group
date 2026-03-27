@@ -22,6 +22,8 @@ import {
 import VisitStats from './VisitStats';
 import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
+import type { Role } from '@/lib/constants';
+import { getDashboardTitle } from '@/lib/dashboard-title';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -80,6 +82,8 @@ type BlogRow = {
   title: string;
   slug: string;
   content: string;
+  sectorId: string | null;
+  sector?: { id: string; name: string; slug: string } | null;
   featuredImage: string | null;
   status: 'draft' | 'published';
   publishedAt: string | null;
@@ -90,6 +94,13 @@ type BlogRow = {
   ogTitle: string | null;
   ogDescription: string | null;
   ogImage: string | null;
+};
+
+type SectorRow = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
 };
 
 type StoredImageRow = {
@@ -485,7 +496,13 @@ function SeoImprovementsPanel(props: {
   );
 }
 
-export default function MarketerDashboard({ locale }: { locale: string }) {
+export default function MarketerDashboard({
+  locale,
+  viewerRole,
+}: {
+  locale: string;
+  viewerRole: Role;
+}) {
   const base = `/${locale}`;
   const { data: sessionData } = useSession();
   const { pushSaveLayer } = useDashboardShortcuts();
@@ -495,9 +512,10 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   const [previewLink, setPreviewLink] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
-  const viewerRole = sessionData?.user?.role ?? null;
-  const canPages = viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
-  const canBlogs = viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
+  const canPages =
+    viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
+  const canBlogs =
+    viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
 
   // ——— Campaigns ———
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -718,11 +736,15 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   // ——— Blog + SEO ———
   const [blogs, setBlogs] = useState<BlogRow[]>([]);
   const [blogsLoading, setBlogsLoading] = useState(true);
+  const [sectors, setSectors] = useState<SectorRow[]>([]);
+  const [sectorsLoading, setSectorsLoading] = useState(true);
+  const [blogSectorFilter, setBlogSectorFilter] = useState('');
   const [selectedBlogSlug, setSelectedBlogSlug] = useState('');
   const [blogForm, setBlogForm] = useState({
     title: '',
     slug: '',
     content: '',
+    sectorId: '',
     featuredImage: '',
     status: 'draft' as 'draft' | 'published',
     publishedAt: '',
@@ -761,15 +783,49 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
   }, [locale]);
 
   useEffect(() => {
-    fetch('/api/marketer/blog')
+    const qs = blogSectorFilter
+      ? `?sectorId=${encodeURIComponent(blogSectorFilter)}`
+      : '';
+    fetch(`/api/marketer/blog${qs}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         const items = (d?.items ?? []) as BlogRow[];
         setBlogs(items);
-        if (items[0]) selectBlog(items[0]);
+        if (items[0]) {
+          selectBlog(items[0]);
+        } else {
+          setSelectedBlogSlug('');
+          setBlogForm((f) => ({
+            ...f,
+            title: '',
+            slug: '',
+            content: '',
+            sectorId: blogSectorFilter,
+            featuredImage: '',
+            status: 'draft',
+            publishedAt: '',
+            scheduledPublishAt: '',
+            seoNote: '',
+            metaTitle: '',
+            metaDescription: '',
+            keywords: '',
+            canonicalUrl: '',
+            ogTitle: '',
+            ogDescription: '',
+            ogImage: '',
+          }));
+        }
       })
       .catch(() => setBlogs([]))
       .finally(() => setBlogsLoading(false));
+  }, [blogSectorFilter]);
+
+  useEffect(() => {
+    fetch('/api/marketer/sectors')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setSectors((d?.items ?? []) as SectorRow[]))
+      .catch(() => setSectors([]))
+      .finally(() => setSectorsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -807,6 +863,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       title: blog.title ?? '',
       slug: blog.slug ?? '',
       content: blog.content ?? '',
+      sectorId: blog.sectorId ?? '',
       featuredImage: blog.featuredImage ?? '',
       status: blog.status ?? 'draft',
       publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().slice(0, 10) : '',
@@ -957,6 +1014,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       title: item.title,
       slug: item.slug,
       content: item.content,
+      sectorId: item.sectorId ?? '',
       featuredImage: item.featuredImage ?? '',
       status: item.status ?? 'draft',
       publishedAt: item.publishedAt ? new Date(item.publishedAt).toISOString().slice(0, 10) : '',
@@ -991,6 +1049,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
         title: '',
         slug: '',
         content: '',
+        sectorId: '',
         featuredImage: '',
         status: 'draft',
         publishedAt: '',
@@ -1009,6 +1068,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
 
   async function createBlog() {
     if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) return;
+    if (!blogForm.sectorId.trim()) return;
     const res = await fetch('/api/marketer/blog', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1142,7 +1202,7 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
       <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Megaphone size={28} className="opacity-90" />
-          Digital Marketer Dashboard
+          {getDashboardTitle(viewerRole)}
         </h1>
         <p className="mt-1 opacity-90 text-sm">
           Analytics, campaigns, and marketing tools. All data is stored in the database.
@@ -1438,6 +1498,18 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
           <div className="p-5 grid lg:grid-cols-3 gap-5">
             <div className="space-y-2">
               <p className="text-sm font-medium text-slate-700">Blog posts</p>
+              <select
+                value={blogSectorFilter}
+                onChange={(e) => setBlogSectorFilter(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">All sectors</option>
+                {sectors.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
               {blogsLoading ? (
                 <p className="text-sm text-slate-500">Loading blogs...</p>
               ) : (
@@ -1446,6 +1518,9 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                     <button key={b.id} type="button" onClick={() => selectBlog(b)} className={`w-full text-left p-3 rounded-lg border ${selectedBlogSlug === b.slug ? 'border-slate-700 bg-slate-100' : 'border-slate-200 bg-white'}`}>
                       <p className="text-sm font-medium text-slate-900">{b.title}</p>
                       <p className="text-xs text-slate-500">/{b.slug}</p>
+                      {b.sector?.name ? (
+                        <p className="text-[11px] text-slate-500">{b.sector.name}</p>
+                      ) : null}
                       <span className="inline-block mt-1 px-2 py-0.5 rounded text-xs bg-slate-200 text-slate-700">
                         {b.status}
                       </span>
@@ -1458,6 +1533,18 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
               <div className="grid sm:grid-cols-2 gap-3">
                 <input value={blogForm.title} onChange={(e) => setBlogForm((f) => ({ ...f, title: e.target.value }))} placeholder="Blog title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 <input value={blogForm.slug} onChange={(e) => setBlogForm((f) => ({ ...f, slug: e.target.value }))} placeholder="Slug (example: best-packers-movers)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                <select
+                  value={blogForm.sectorId}
+                  onChange={(e) => setBlogForm((f) => ({ ...f, sectorId: e.target.value }))}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                >
+                  <option value="">{sectorsLoading ? 'Loading sectors...' : 'Select sector *'}</option>
+                  {sectors.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
                 <input value={authorLabel} disabled placeholder="Author" className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
               </div>
               <textarea value={blogForm.content} onChange={(e) => setBlogForm((f) => ({ ...f, content: e.target.value }))} placeholder="Blog content" rows={8} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
@@ -1591,7 +1678,14 @@ export default function MarketerDashboard({ locale }: { locale: string }) {
                 >
                   {previewLoading ? "Generating…" : "Preview draft"}
                 </button>
-                <button type="button" onClick={createBlog} className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700">Create new blog</button>
+                <button
+                  type="button"
+                  onClick={createBlog}
+                  disabled={!blogForm.sectorId}
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Create new blog
+                </button>
                 {selectedBlogSlug ? (
                   <button
                     type="button"

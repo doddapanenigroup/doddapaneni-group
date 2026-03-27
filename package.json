@@ -48,6 +48,9 @@
       "nodemailer": "^7.0.13"
     }
   },
+  "prisma": {
+    "seed": "node scripts/seed.mjs"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",

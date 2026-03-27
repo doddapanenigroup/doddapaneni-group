@@ -1,35 +1,109 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getServerSession } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import type { Role } from '@/lib/constants';
+import { ROLES } from '@/lib/constants';
 import type { Role as DbRole } from '@/lib/prisma-generated';
+import { isDashboardRole } from '@/lib/role-utils';
 
-const DASHBOARD_PATHS = ['dashboard', 'super-admin', 'admin', 'developer', 'marketer', 'employees'] as const;
+/** First-class segments we document; others may still be valid URL slugs. */
+const KNOWN_DASHBOARD_SEGMENTS = new Set([
+  'dashboard',
+  'super-admin',
+  'admin',
+  'developer',
+  'marketer',
+  'employees',
+  'analytics',
+  'security',
+]);
+
+const DEFAULT_PATH = 'dashboard';
 
 function toDbRole(role: Role): DbRole {
   return role as DbRole;
 }
 
+function isRole(value: unknown): value is Role {
+  return typeof value === 'string' && (ROLES as readonly string[]).includes(value);
+}
+
+/**
+ * Safe dashboard path: lowercase slug, or default. Allows [a-z0-9-] for new routes without API churn.
+ */
+function normalizePath(raw: unknown): string {
+  if (typeof raw !== 'string') return DEFAULT_PATH;
+  const s = raw.trim().toLowerCase().replace(/^\/+|\/+$/g, '');
+  if (!s) return DEFAULT_PATH;
+  if (KNOWN_DASHBOARD_SEGMENTS.has(s)) return s;
+  if (/^[a-z0-9-]{1,64}$/.test(s)) return s;
+  return DEFAULT_PATH;
+}
+
+function asString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id || !session.user.role) {
+  const session = await getServerSession();
+  const role = session?.user?.role as Role | undefined;
+  console.info('[dashboard-visit] auth check', {
+    hasSession: Boolean(session?.user?.id),
+    userId: session?.user?.id ?? null,
+    role: role ?? null,
+  });
+
+  if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
+  if (!isDashboardRole(role)) {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
 
-  let path: string;
+  let rawBody: Record<string, unknown> = {};
   try {
-    const body = await request.json();
-    path = typeof body?.path === 'string' ? body.path.trim().toLowerCase() : '';
+    const text = await request.text();
+    if (text?.trim()) {
+      rawBody = JSON.parse(text) as Record<string, unknown>;
+    }
   } catch {
-    path = '';
+    rawBody = {};
   }
-  if (!path || !DASHBOARD_PATHS.includes(path as (typeof DASHBOARD_PATHS)[number])) {
-    return NextResponse.json(
-      { message: 'path must be one of: ' + DASHBOARD_PATHS.join(', ') },
-      { status: 400 }
-    );
-  }
+
+  const bodyPath = asString(rawBody.path);
+  const bodyRole = asString(rawBody.role);
+  const bodyUserId = asString(rawBody.userId);
+
+  const missing: string[] = [];
+  if (!bodyPath) missing.push('path');
+  if (!bodyRole) missing.push('role');
+  if (!bodyUserId) missing.push('userId');
+
+  const path = normalizePath(bodyPath ?? DEFAULT_PATH);
+  const userId = session.user.id;
+  const safeRole: Role = isRole(session.user.role) ? session.user.role : role!;
+  const mismatchedBodyIdentity =
+    (bodyUserId != null && bodyUserId !== session.user.id) ||
+    (bodyRole != null && bodyRole !== safeRole);
+
+  const uaHeader = request.headers.get('user-agent');
+  const userAgent =
+    typeof uaHeader === 'string' && uaHeader.length > 0 ? uaHeader.slice(0, 512) : null;
+
+  console.info('[dashboard-visit] incoming request', {
+    received: {
+      path: rawBody.path,
+      role: rawBody.role,
+      userId: rawBody.userId,
+      userAgent: rawBody.userAgent,
+    },
+    missingRequiredFields: missing,
+    bodyIdentityMismatch: mismatchedBodyIdentity,
+    resolved: { path, role: safeRole, userId, userAgentLen: userAgent?.length ?? 0 },
+  });
 
   try {
     await connectDb();
@@ -37,16 +111,17 @@ export async function POST(request: Request) {
     const visitedAt = new Date();
     await prisma.dashboardVisit.create({
       data: {
-        userId: session.user.id,
+        userId,
         path,
-        role: toDbRole(session.user.role as Role),
+        role: toDbRole(safeRole),
         visitedAt,
         visitedAtIST: formatInIST(visitedAt),
         visitedAtET: formatInET(visitedAt),
+        userAgent,
       },
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, path, role: safeRole, userId });
   } catch (error) {
     console.error('Dashboard visit error:', error);
     return NextResponse.json({ message: 'Failed to record dashboard visit' }, { status: 500 });

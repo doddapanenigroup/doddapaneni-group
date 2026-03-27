@@ -23,6 +23,26 @@ function dateOrNull(v: unknown): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+async function resolveSectorIdIfProvided(raw: unknown): Promise<
+  { ok: true; sectorId: string | null } | { ok: false; status: number; message: string }
+> {
+  if (raw == null) return { ok: true, sectorId: null };
+  const sectorId = strOrNull(raw);
+  if (!sectorId) {
+    console.warn('[marketer/blog/[slug]] empty sectorId on update, clearing relation');
+    return { ok: true, sectorId: null };
+  }
+  const sector = await prisma.sector.findUnique({
+    where: { id: sectorId },
+    select: { id: true },
+  });
+  if (!sector) {
+    console.warn('[marketer/blog/[slug]] invalid sectorId on update', { sectorId });
+    return { ok: false, status: 400, message: 'Invalid sectorId' };
+  }
+  return { ok: true, sectorId };
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -88,6 +108,13 @@ export async function PATCH(
     if ('ogDescription' in body) data.ogDescription = strOrNull(body.ogDescription);
     if ('ogImage' in body) data.ogImage = strOrNull(body.ogImage);
     if (body.status === 'draft' || body.status === 'published') data.status = body.status;
+    if ('sectorId' in body) {
+      const sectorResult = await resolveSectorIdIfProvided(body.sectorId);
+      if (!sectorResult.ok) {
+        return NextResponse.json({ message: sectorResult.message }, { status: sectorResult.status });
+      }
+      data.sectorId = sectorResult.sectorId;
+    }
     if ('scheduledPublishAt' in body) data.scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
     if ('publishedAt' in body) {
       data.publishedAt =
@@ -110,8 +137,18 @@ export async function PATCH(
       action: 'update',
       seoNote: strOrNull(body.seoNote),
       payload: {
-        before: { slug: existing.slug, title: existing.title, status: existing.status },
-        after: { slug: doc.slug, title: doc.title, status: doc.status },
+        before: {
+          slug: existing.slug,
+          title: existing.title,
+          status: existing.status,
+          sectorId: existing.sectorId ?? null,
+        },
+        after: {
+          slug: doc.slug,
+          title: doc.title,
+          status: doc.status,
+          sectorId: doc.sectorId ?? null,
+        },
       },
     });
     await logContentEdit({

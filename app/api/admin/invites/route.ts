@@ -5,6 +5,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { isLoginEmailDeliveryConfigured, sendUserInviteEmail } from '@/lib/email';
 import { generateInviteToken, hashInviteToken, inviteExpiresAt } from '@/lib/user-invite-token';
 import * as z from 'zod';
+import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -14,7 +15,7 @@ const bodySchema = z.object({
 });
 
 function isAdminRole(role: unknown) {
-  return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  return hasAdminAccess(role as any);
 }
 
 const ROLE_LABEL: Record<string, string> = {
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     // Only SUPER_ADMIN can invite ADMIN.
-    if (parsed.data.role === 'ADMIN' && requesterRole !== 'SUPER_ADMIN') {
+    if (parsed.data.role === 'ADMIN' && !isSuperAdmin(requesterRole as any)) {
       return NextResponse.json({ message: 'Only SUPER_ADMIN can invite ADMIN users.' }, { status: 403 });
     }
 

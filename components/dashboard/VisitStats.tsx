@@ -9,12 +9,12 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   Legend,
 } from 'recharts';
+import { SafeResponsiveChart, DASHBOARD_CHART_HEIGHT } from '@/components/dashboard/SafeResponsiveChart';
 
 type VisitStatsData = {
   total: number;
@@ -44,11 +44,23 @@ export default function VisitStats() {
   if (loading) {
     return (
       <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-6">
-        <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-4">
+        <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
           <Globe size={22} />
           Website visits
         </h2>
-        <p className="text-slate-500 text-sm">Loading…</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">Loading visit statistics…</p>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div
+            className="rounded-xl bg-slate-100/90 dark:bg-slate-800/60 animate-pulse"
+            style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+            aria-hidden
+          />
+          <div
+            className="rounded-xl bg-slate-100/90 dark:bg-slate-800/60 animate-pulse"
+            style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
+            aria-hidden
+          />
+        </div>
       </section>
     );
   }
@@ -110,21 +122,19 @@ export default function VisitStats() {
                 <TrendingUp size={16} className="text-slate-600" />
                 Visits by month (last 12)
               </h3>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#64748b" />
-                    <YAxis tick={{ fontSize: 11 }} stroke="#64748b" />
-                    <Tooltip
-                      contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                      formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
-                      labelFormatter={(label) => `Month: ${label}`}
-                    />
-                    <Bar dataKey="visits" fill="#64748b" radius={[4, 4, 0, 0]} name="Visits" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
+                <BarChart data={barData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="#64748b" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="#64748b" />
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                    formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
+                    labelFormatter={(label) => `Month: ${label}`}
+                  />
+                  <Bar dataKey="visits" fill="#64748b" radius={[4, 4, 0, 0]} name="Visits" />
+                </BarChart>
+              </SafeResponsiveChart>
             </div>
           )}
           {pieData.length > 0 && (
@@ -133,32 +143,30 @@ export default function VisitStats() {
                 <Calendar size={16} className="text-slate-600" />
                 Visits by year
               </h3>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                    >
-                      {pieData.map((_, index) => (
-                        <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                      formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
-                    />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    dataKey="value"
+                    nameKey="name"
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  >
+                    {pieData.map((_, index) => (
+                      <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                    formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
+                  />
+                  <Legend />
+                </PieChart>
+              </SafeResponsiveChart>
             </div>
           )}
         </div>

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getServerSession } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { isDashboardRole } from '@/lib/role-utils';
 export const dynamic = 'force-dynamic';
 
 const MAX_DAYS = 90;
@@ -19,14 +20,20 @@ function clampDays(raw: string | null): number {
 }
 
 export async function GET(request: Request) {
-  const session = await auth();
+  const session = await getServerSession();
   const role = session?.user?.role;
-  const allowed =
-    role === 'ADMIN' ||
-    role === 'SUPER_ADMIN' ||
-    role === 'DIGITAL_MARKETER';
+  const allowed = isDashboardRole(role as any);
 
-  if (!session?.user || !allowed) {
+  console.info('[dashboard/analytics] auth check', {
+    hasSession: Boolean(session?.user?.id),
+    userId: session?.user?.id ?? null,
+    role: role ?? null,
+  });
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+  if (!allowed) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

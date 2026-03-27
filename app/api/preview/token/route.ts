@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { connectDb, prisma } from "@/lib/db";
 import { createPreviewToken, PreviewTokenKind } from "@/lib/preview-token";
+import { hasMarketerAccess } from "@/lib/role-utils";
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
-  const role = session?.user?.role;
-  return role === "DIGITAL_MARKETER" || role === "ADMIN" || role === "SUPER_ADMIN";
+  return hasMarketerAccess(session?.user?.role as any);
 }
 
 function strOrNull(v: unknown): string | null {

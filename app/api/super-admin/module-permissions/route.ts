@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { MODULES, type ModuleName } from "@/lib/module-permissions";
 import type { Role } from "@/lib/constants";
 import { writeAuditLog } from "@/lib/audit";
+import { isSuperAdmin as isSuperAdminRole } from "@/lib/role-utils";
 
 function isSuperAdmin(role: Role | undefined) {
-  return role === "SUPER_ADMIN";
+  return isSuperAdminRole(role);
 }
 
 function isRole(value: unknown): value is Role {

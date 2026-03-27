@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getServerSession } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { isDashboardRole } from '@/lib/role-utils';
 import type {
   ContentEditLog,
   MarketingActivityLog,
@@ -25,9 +26,19 @@ type WebVitalGroupRow = {
 };
 
 export async function GET() {
-  const session = await auth();
+  const session = await getServerSession();
   const role = session?.user?.role;
-  if (!session?.user || (role !== 'SUPER_ADMIN' && role !== 'ADMIN')) {
+
+  console.info('[dashboard/admin-insights] auth check', {
+    hasSession: Boolean(session?.user?.id),
+    userId: session?.user?.id ?? null,
+    role: role ?? null,
+  });
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+  if (!isDashboardRole(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
+import { canAccessSuperAdminDashboard } from '@/lib/dashboard-access';
 import type { User as DbUser } from '@/lib/prisma-generated';
 import SuperAdminDashboard from '@/components/dashboard/SuperAdminDashboard';
 
@@ -10,7 +11,10 @@ export default async function SuperAdminDashboardPage() {
   const session = await auth();
   const locale = await getLocale();
 
-  if (!session?.user || session.user.role !== 'SUPER_ADMIN') {
+  if (
+    !session?.user ||
+    !canAccessSuperAdminDashboard(session.user.role as Role | null | undefined)
+  ) {
     redirect(`/${locale}/dashboard`);
   }
 
@@ -35,6 +39,7 @@ export default async function SuperAdminDashboardPage() {
       users={users}
       locale={locale}
       currentUserId={session.user.id}
+      viewerRole={session.user.role as Role}
     />
   );
 }

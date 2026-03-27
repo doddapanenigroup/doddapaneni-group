@@ -4,6 +4,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { logContentEdit } from '@/lib/audit-log';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 const PAGE_KEYS = [
   'home',
@@ -38,6 +39,60 @@ function contentSlug(pageKey: string, locale: string): string {
   return locale === 'en' ? base : `${locale}/${base}`;
 }
 
+const CONTENT_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+} as const;
+
+function publishedWhere(now: Date) {
+  return {
+    status: 'published' as const,
+    OR: [
+      { scheduledPublishAt: null },
+      { scheduledPublishAt: { lte: now } },
+    ],
+  };
+}
+
+/** Row is publicly readable at `now` (published and not waiting on a future schedule). */
+function isPubliclyReadable(
+  doc: { status: string; scheduledPublishAt: Date | null },
+  now: Date
+): boolean {
+  if (doc.status !== 'published') return false;
+  if (!doc.scheduledPublishAt) return true;
+  return doc.scheduledPublishAt.getTime() <= now.getTime();
+}
+
+function jsonHeaders() {
+  return { headers: CONTENT_CACHE_HEADERS };
+}
+
+/** Same shape as a miss (`null`) plus flag so clients can tell DB path failed; still 200 so fetch() succeeds. */
+function fallbackPayload(pageKey: string, locale: string, reason: string) {
+  console.warn('[content/[pageKey]/GET] fallback', { pageKey, locale, reason });
+  return NextResponse.json(
+    {
+      title: '',
+      body: '',
+      updatedAt: null,
+      fallback: true,
+      reason,
+    },
+    jsonHeaders()
+  );
+}
+
+function slugCandidates(pageKey: string, locale: string, rawPageKey: string): string[] {
+  const candidates = new Set<string>();
+  const normalizedRaw = rawPageKey.trim().toLowerCase().replace(/^\/+|\/+$/g, '');
+  const baseSlug = pageKeyToSlugBase(pageKey);
+  candidates.add(contentSlug(pageKey, locale));
+  candidates.add(baseSlug);
+  candidates.add(pageKey);
+  if (normalizedRaw) candidates.add(normalizedRaw);
+  return [...candidates].filter(Boolean);
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ pageKey: string }> }
@@ -49,39 +104,55 @@ export async function GET(
   }
 
   const url = new URL(_request.url);
-  const locale = url.searchParams.get('locale') || 'en';
+  const locale = (url.searchParams.get('locale') || 'en').trim().toLowerCase() || 'en';
+  const now = new Date();
 
   try {
-    const now = new Date();
-    await connectDb();
-    // Server-side fallback: if cron hasn't run yet, still publish due items.
-    await publishScheduledContent(now);
-    const doc = await prisma.pageContent.findFirst({
-      where: {
-        pageKey,
-        locale,
-        status: 'published',
-        OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: now.toISOString() } }],
-      },
-    });
-    if (!doc) {
-      return NextResponse.json(null, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    try {
+      await connectDb();
+    } catch (dbConnErr) {
+      console.error('[content/[pageKey]/GET] connectDb failed', dbConnErr);
+      return fallbackPayload(pageKey, locale, 'db_connect');
+    }
+
+    try {
+      await publishScheduledContent(now);
+    } catch (publishErr) {
+      console.error('[content/[pageKey]/GET] publishScheduledContent failed', publishErr);
+    }
+
+    let doc = null;
+    const slugs = slugCandidates(pageKey, locale, raw);
+    try {
+      doc = await prisma.pageContent.findFirst({
+        where: {
+          locale,
+          AND: [
+            { OR: [{ pageKey }, { slug: { in: slugs } }] },
+            publishedWhere(now),
+          ],
         },
       });
+    } catch (qErr) {
+      console.error('[content/[pageKey]/GET] findFirst lookup failed', {
+        pageKey,
+        locale,
+        slugCandidates: slugs,
+        error: qErr,
+      });
     }
+
+    if (!doc) {
+      return fallbackPayload(pageKey, locale, 'not_found');
+    }
+
     return NextResponse.json(
       {
         title: doc.title,
         body: doc.body,
         updatedAt: doc.updatedAt,
       },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-        },
-      }
+      jsonHeaders()
     );
   } catch (error) {
     await captureErrorToDb({
@@ -91,8 +162,8 @@ export async function GET(
       context: 'content/[pageKey]/GET',
       user: null,
     });
-    console.error('Content GET error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    console.error('[content/[pageKey]/GET] unexpected error:', error);
+    return fallbackPayload(pageKey, locale, 'unexpected');
   }
 }
 
@@ -102,10 +173,7 @@ export async function PUT(
 ) {
   const session = await auth();
   const role = session?.user?.role;
-  if (
-    !session?.user ||
-    (role !== 'DEVELOPER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN')
-  ) {
+  if (!session?.user || !hasDeveloperAccess(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

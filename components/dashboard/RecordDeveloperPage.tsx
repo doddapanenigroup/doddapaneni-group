@@ -1,25 +1,24 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { isDeveloper } from '@/lib/role-utils';
 
-export default function RecordDeveloperPage() {
-  const pathname = usePathname();
+export default function RecordDeveloperPage({ locale }: { locale: string }) {
   const { data: session, status } = useSession();
-  const lastPathRef = useRef<string | null>(null);
+  const hasPostedRef = useRef(false);
 
   useEffect(() => {
-    if (status !== 'authenticated' || session?.user?.role !== 'DEVELOPER' || !pathname) return;
-    if (lastPathRef.current === pathname) return;
-    lastPathRef.current = pathname;
+    if (status !== 'authenticated' || !isDeveloper(session?.user?.role as any)) return;
+    if (hasPostedRef.current) return;
+    hasPostedRef.current = true;
 
     fetch('/api/developer-activity', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: pathname }),
+      body: JSON.stringify({ path: `/${locale}/dashboard/developer` }),
     }).catch(() => {});
-  }, [pathname, session?.user?.role, status]);
+  }, [locale, session?.user?.role, status]);
 
   return null;
 }

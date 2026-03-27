@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Class-based dark mode (.dark on html) — required for Tailwind v4 `dark:` utilities and portals under body */
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  color-scheme: dark;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

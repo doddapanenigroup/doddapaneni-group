@@ -242,6 +242,8 @@ model Blog {
   featuredImage   String?    @map("featured_image")
   authorId        String     @map("author_id")
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  sectorId        String?    @map("sector_id")
+  sector          Sector?    @relation(fields: [sectorId], references: [id], onDelete: SetNull)
   status          BlogStatus @default(draft)
   publishedAt     DateTime?  @map("published_at")
   scheduledPublishAt DateTime? @map("scheduled_publish_at")
@@ -255,6 +257,17 @@ model Blog {
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
   @@index([authorId])
+  @@index([sectorId])
+}
+
+model Sector {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  blogs Blog[]
 }
 
 enum CampaignStatus {

@@ -6,6 +6,7 @@ import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Building2, Pencil
 import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
+import { getDashboardTitle } from '@/lib/dashboard-title';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
 import DeveloperErrorsPanel from './DeveloperErrorsPanel';
@@ -64,7 +65,7 @@ export default function DeveloperDashboard({
       <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Code2 size={28} className="opacity-90" />
-          {isDeveloperView ? 'Developer Dashboard' : 'Content & SEO Dashboard'}
+          {getDashboardTitle(viewerRole)}
         </h1>
         <p className="mt-1 opacity-90 text-sm">
           {isDeveloperView

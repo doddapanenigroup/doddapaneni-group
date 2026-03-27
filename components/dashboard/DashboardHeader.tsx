@@ -4,16 +4,10 @@ import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { LayoutDashboard, LogOut, Shield } from 'lucide-react';
 import type { Role } from '@/lib/constants';
+import { getDashboardTitle, getRoleLabel } from '@/lib/dashboard-title';
 import DashboardNotificationsMenu from '@/components/dashboard/DashboardNotificationsMenu';
 import DashboardThemeToggle from '@/components/dashboard/DashboardThemeToggle';
 import GlobalSearchPalette from '@/components/dashboard/GlobalSearchPalette';
-
-const roleLabels: Record<Role, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ADMIN: 'Admin',
-  DEVELOPER: 'Developer',
-  DIGITAL_MARKETER: 'Digital Marketer',
-};
 
 const headerLinkClass =
   'inline-flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800';
@@ -30,10 +24,10 @@ export default function DashboardHeader({
       <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-4 lg:px-10 xl:px-14">
         <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
           <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 dark:text-white sm:text-xl">
-            Dashboard
+            {getDashboardTitle(user.role)}
           </h1>
           <span className="inline-flex shrink-0 items-center rounded-lg bg-slate-800 px-2.5 py-1 text-xs font-semibold text-white dark:bg-violet-600 dark:text-white">
-            {roleLabels[user.role]}
+            {getRoleLabel(user.role)}
           </span>
         </div>
 
