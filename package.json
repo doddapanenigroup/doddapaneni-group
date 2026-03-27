@@ -16,6 +16,7 @@
     "i18n:translate": "node scripts/translate-all-locales.mjs",
     "i18n:translate-blog": "node scripts/translate-blog-content.mjs",
     "db:seed": "node scripts/seed.mjs",
+    "db:seed:blogs": "node scripts/seed-division-blogs.mjs",
     "db:reset": "node scripts/reset-and-seed.mjs",
     "db:push": "prisma db push",
     "media:seed": "node scripts/seed-stored-images.mjs",

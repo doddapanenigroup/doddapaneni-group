@@ -15,21 +15,40 @@ export default function LayoutWithNav({
 }) {
   const pathnameFromHook = usePathname();
   const pathname = pathnameFromHook ?? initialPathname;
-  const hideNav = pathname.includes('/dashboard') || pathname.includes('/login');
+  const hidePublicNav = pathname.includes('/dashboard') || pathname.includes('/login');
 
-  if (hideNav) {
-    return <>{children}</>;
+  if (hidePublicNav) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-400"
+        >
+          Skip to main content
+        </a>
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 outline-none">
+          {children}
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"
+      >
+        Skip to main content
+      </a>
       <RecordVisit />
       <WebVitalsReporter />
       <Navbar />
-      <main className="flex-grow w-full min-w-0">
+      <main id="main-content" tabIndex={-1} className="flex min-h-0 w-full min-w-0 flex-1 flex-col outline-none">
         {children}
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

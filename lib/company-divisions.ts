@@ -1,0 +1,83 @@
+import { routing } from '@/i18n/routing';
+
+/**
+ * Static company division routes under app/[locale]/<slug>/.
+ * Each slug must exist in the Sector model (Sector.slug) for layouts and data to resolve.
+ */
+export const COMPANY_DIVISION_SLUGS = [
+  'software-it-ai',
+  'digital-marketing',
+  'healthcare-medical',
+  'construction-realestate',
+  'ecommerce-marketplace',
+  'media-news-entertainment',
+  'staffing-consultancy',
+  'food-beverages',
+  'manufacturing-trading',
+  'logistics-warehousing',
+  'education-skill',
+  'import-export',
+] as const;
+
+export type CompanyDivisionSlug = (typeof COMPANY_DIVISION_SLUGS)[number];
+
+/** Divisions with full public hubs on the homepage (remaining show “Coming soon”). */
+export const HOME_DIVISION_ACTIVE_SLUGS = [
+  'software-it-ai',
+  'digital-marketing',
+  'healthcare-medical',
+  'construction-realestate',
+] as const satisfies readonly CompanyDivisionSlug[];
+
+export function isActiveHomeDivisionSlug(slug: string): boolean {
+  return (HOME_DIVISION_ACTIVE_SLUGS as readonly string[]).includes(slug);
+}
+
+export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
+  return (COMPANY_DIVISION_SLUGS as readonly string[]).includes(s);
+}
+
+/**
+ * Display names for header/footer (aligned with `scripts/sector-seeds.mjs` Sector.name).
+ */
+export const COMPANY_DIVISION_NAV_LABELS: Record<CompanyDivisionSlug, string> = {
+  'software-it-ai': 'Software, IT & AI',
+  'digital-marketing': 'Digital Marketing',
+  'healthcare-medical': 'Healthcare & Medical',
+  'construction-realestate': 'Construction & Real Estate',
+  'ecommerce-marketplace': 'E-commerce & Marketplace',
+  'media-news-entertainment': 'Media, News & Entertainment',
+  'staffing-consultancy': 'Staffing & Consultancy',
+  'food-beverages': 'Food & Beverages',
+  'manufacturing-trading': 'Manufacturing & Trading',
+  'logistics-warehousing': 'Logistics & Warehousing',
+  'education-skill': 'Education & Skill Development',
+  'import-export': 'Import & Export',
+};
+
+export type CompanyDivisionNavItem = {
+  slug: CompanyDivisionSlug;
+  label: string;
+  active: boolean;
+};
+
+export function getCompanyDivisionNavItems(): CompanyDivisionNavItem[] {
+  return COMPANY_DIVISION_SLUGS.map((slug) => ({
+    slug,
+    label: COMPANY_DIVISION_NAV_LABELS[slug],
+    active: isActiveHomeDivisionSlug(slug),
+  }));
+}
+
+/** First path segment when it is a company division (e.g. /software-it-ai/services). */
+export function activeCompanyDivisionSlugFromPathname(pathname: string): CompanyDivisionSlug | null {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts.length === 0) return null;
+  let i = 0;
+  if (routing.locales.includes(parts[0] as (typeof routing.locales)[number])) {
+    i = 1;
+  }
+  const seg = parts[i];
+  if (!seg || !isCompanyDivisionSlug(seg)) return null;
+  return seg;
+}

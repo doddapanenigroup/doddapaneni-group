@@ -5,7 +5,8 @@ import ContentPage from '@/components/ContentPage';
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from '@/i18n/routing';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
+import MotionLazy from '@/components/motion/MotionLazy';
 
 export default function FAQ() {
   const locale = useLocale();
@@ -27,80 +28,85 @@ export default function FAQ() {
 
   return (
     <ContentPage pageKey="faq" locale={locale}>
-      <div className="min-h-screen bg-white">
-        {/* Page heading */}
-        <section className="bg-blue-900 py-8 md:py-10 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                <HelpCircle className="text-white" size={32} />
+      <MotionLazy>
+        <div className="min-h-screen bg-white">
+          {/* Page heading */}
+          <section className="bg-blue-900 py-8 md:py-10 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                  <HelpCircle className="text-white" size={32} />
+                </div>
               </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
+              <p className="mt-2 text-blue-200 text-sm md:text-base">{t('subtitle')}</p>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
-            <p className="mt-2 text-blue-200 text-sm md:text-base">{t('subtitle')}</p>
-          </div>
-        </section>
+          </section>
 
-        {/* FAQ Content */}
-        <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-slate-50">
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-4">
-              {questions.map((item, index) => (
-                <motion.div
-                  key={item.key}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden"
-                >
-                  <button
-                    onClick={() => toggleQuestion(index)}
-                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-blue-50 transition-colors"
+          {/* FAQ Content */}
+          <section
+            className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-slate-50"
+            aria-labelledby="faq-section-heading"
+          >
+            <div className="max-w-4xl mx-auto">
+              <h2 id="faq-section-heading" className="mb-6 text-xl font-bold text-slate-900 md:text-2xl">
+                {t('sectionHeading')}
+              </h2>
+              <div className="space-y-4">
+                {questions.map((item, index) => (
+                  <m.div
+                    key={item.key}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden"
                   >
-                    <span className="text-lg font-semibold text-slate-900 pr-4">
-                      {t(`questions.${item.q}.question`)}
-                    </span>
-                    {openIndex === index ? (
-                      <ChevronUp className="text-blue-600 flex-shrink-0" size={20} />
-                    ) : (
-                      <ChevronDown className="text-blue-600 flex-shrink-0" size={20} />
-                    )}
-                  </button>
-                  <AnimatePresence>
-                    {openIndex === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-4">
-                          <p className="text-slate-700 leading-relaxed">
+                    <button
+                      type="button"
+                      onClick={() => toggleQuestion(index)}
+                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-blue-50 transition-colors"
+                    >
+                      <span className="text-lg font-semibold text-slate-900 pr-4">
+                        {t(`questions.${item.q}.question`)}
+                      </span>
+                      {openIndex === index ? (
+                        <ChevronUp className="text-blue-600 flex-shrink-0" size={20} />
+                      ) : (
+                        <ChevronDown className="text-blue-600 flex-shrink-0" size={20} />
+                      )}
+                    </button>
+                    <div
+                      className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
+                        openIndex === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                      }`}
+                    >
+                      <div className="min-h-0 overflow-hidden">
+                        <div className="px-6 pb-4 border-t border-transparent">
+                          <p className="text-slate-700 leading-relaxed pt-3 text-[15px] sm:text-base">
                             {t(`questions.${item.q}.answer`)}
                           </p>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              ))}
-            </div>
+                      </div>
+                    </div>
+                  </m.div>
+                ))}
+              </div>
 
-            {/* Contact Support Section */}
-            <div className="mt-12 bg-blue-900 rounded-xl p-6 md:p-8 text-center text-white">
-              <h2 className="text-xl font-bold mb-2">{t('contactSupport')}</h2>
-              <p className="text-blue-200 mb-6">{t('contactSupportDesc')}</p>
-              <Link
-                href="/contact"
-                className="inline-block px-6 py-3 bg-white text-blue-900 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
-              >
-                {t('contactButton')}
-              </Link>
+              {/* Contact Support Section */}
+              <div className="mt-12 bg-blue-900 rounded-xl p-6 md:p-8 text-center text-white">
+                <h2 className="text-xl font-bold mb-2">{t('contactSupport')}</h2>
+                <p className="text-blue-200 mb-6">{t('contactSupportDesc')}</p>
+                <Link
+                  href="/contact"
+                  className="inline-block px-6 py-3 bg-white text-blue-900 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  {t('contactButton')}
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      </MotionLazy>
     </ContentPage>
   );
 }

@@ -3,11 +3,13 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import MotionLazy from '@/components/motion/MotionLazy';
 import type { BlogMessages } from '@/lib/messages';
 
 type BlogListItem = {
   slug: string;
+  href?: string;
   title: string;
   excerpt: string;
   image: string | null;
@@ -20,6 +22,7 @@ type Props = { locale: string; blog: BlogMessages; posts: BlogListItem[] };
 
 export default function BlogListClient({ locale, blog, posts }: Props) {
   return (
+    <MotionLazy>
     <div className="min-h-screen bg-white">
       <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
@@ -29,6 +32,11 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
           <p className="text-blue-200 text-lg md:text-xl max-w-3xl mx-auto">
             {blog.subtitle}
           </p>
+          {blog.intro ? (
+            <p className="mt-6 max-w-3xl mx-auto text-left text-sm leading-relaxed text-blue-100/95 sm:text-base md:text-center">
+              {blog.intro}
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -37,7 +45,7 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post, index) => {
               return (
-                <motion.article
+                <m.article
                   key={post.slug}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -45,7 +53,7 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
                 >
-                  <Link href={`/blog/${post.slug}`}>
+                  <Link href={post.href ?? `/blog/${post.slug}`} locale={locale}>
                     <div className="relative h-48 w-full">
                       {post.image ? (
                         <Image
@@ -54,6 +62,8 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-cover"
+                          loading={index < 3 ? 'eager' : 'lazy'}
+                          fetchPriority={index === 0 ? 'high' : undefined}
                         />
                       ) : (
                         <div className="h-full w-full bg-slate-200" />
@@ -87,12 +97,13 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                       </div>
                     </div>
                   </Link>
-                </motion.article>
+                </m.article>
               );
             })}
           </div>
         </div>
       </section>
     </div>
+    </MotionLazy>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import {Link} from '@/i18n/routing';
-import {useTranslations} from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
 import { mediaUrl } from '@/lib/media';
@@ -20,197 +20,263 @@ function PinterestIcon({ className }: { className?: string }) {
   );
 }
 
+const COMPANY_NAME = 'Doddapaneni Group';
+
 export default function Footer() {
   const t = useTranslations('Footer');
   const navT = useTranslations('Navbar');
   const currentYear = new Date().getFullYear();
-  const companyName = "Doddapaneni Group";
-  
+
   const contact = {
-    email: "info@doddapanenigroup.net",
+    email: 'info@doddapanenigroup.net',
     locations: [
       {
-        phone: "+91 814 224 6666",
-        address: "Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, 500085"
+        phone: '+91 814 224 6666',
+        address:
+          'Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, 500085',
       },
       {
-        phone: "+1 (352)230-8586",
-        address: "5052 SW 40th PL, Ocala, Florida, 34474"
-      }
-    ]
+        phone: '+1 (352)230-8586',
+        address: '5052 SW 40th PL, Ocala, Florida, 34474',
+      },
+    ],
   };
 
   const socialLinks = {
-    facebook: "https://www.facebook.com/profile.php?id=61588007971937",
-    twitter: "https://x.com/DoddapanenGroup",
-    instagram: "https://www.instagram.com/doddapanrnigroup/",
-    whatsapp: "https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33",
-    pinterest: "https://www.pinterest.com/doddapanenigroup/",
+    facebook: 'https://www.facebook.com/profile.php?id=61588007971937',
+    twitter: 'https://x.com/DoddapanenGroup',
+    instagram: 'https://www.instagram.com/doddapanrnigroup/',
+    whatsapp: 'https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33',
+    pinterest: 'https://www.pinterest.com/doddapanenigroup/',
   };
 
+  const legalLinkClass =
+    'text-blue-200 hover:text-white text-xs sm:text-sm transition-colors underline-offset-2 hover:underline';
+
   return (
-    <footer className="bg-blue-900 text-white pt-3 pb-3 md:pt-8 md:pb-6 w-full">
-      <div className="w-full px-5 sm:px-8 lg:px-12 xl:px-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-3 md:mb-6">
-        {/* Company Info */}
-        <div>
-          <div className="mb-2 md:mb-4">
-            <Image 
-              src={mediaUrl('logo.webp')} 
-              alt={companyName} 
-              width={280} 
-              height={112} 
-              className="h-8 md:h-16 w-auto object-contain"
-            />
-          </div>
-          <p className="text-blue-400 text-xs md:text-sm leading-relaxed mb-2 md:mb-4">
-            {t('tagline')}
+    <footer className="mt-auto w-full bg-blue-900 text-white">
+      <div className="w-full px-5 pt-6 pb-4 sm:px-8 md:pt-10 md:pb-6 lg:px-12 xl:px-16">
+        <nav
+          aria-label={t('companyLegalNavAria')}
+          className="border-b border-blue-700/80 pb-5 md:pb-6"
+        >
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-blue-300 sm:text-xs">
+            {t('companyLegalNav')}
           </p>
-        </div>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-8">
+            <li>
+              <Link href="/about" className={legalLinkClass}>
+                {navT('about')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className={legalLinkClass}>
+                {navT('contact')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy-policy" className={legalLinkClass}>
+                {t('privacyPolicy')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/terms" className={legalLinkClass}>
+                {t('termsShort')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/disclaimer" className={legalLinkClass}>
+                {t('disclaimer')}
+              </Link>
+            </li>
+          </ul>
+        </nav>
 
-        {/* Quick Links & Legal */}
-        <div className="pr-0 md:pr-4 lg:pr-8">
-          <div className="grid grid-cols-2 gap-2 md:gap-4">
-            <div>
-              <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('quickLinks')}</h3>
-              <ul className="space-y-0.5 md:space-y-1.5">
-                <li><Link href="/" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{navT('home')}</Link></li>
-                <li><Link href="/about" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{navT('about')}</Link></li>
-                <li><Link href="/services" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{navT('services')}</Link></li>
-                <li><Link href="/blog" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{navT('blog')}</Link></li>
-                <li><Link href="/contact" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{navT('contact')}</Link></li>
-                <li><Link href="/faq" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('faq')}</Link></li>
-              </ul>
+        <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-10">
+          <div className="lg:max-w-md">
+            <div className="mb-3 md:mb-4">
+              <Image
+                src={mediaUrl('logo.webp')}
+                alt={COMPANY_NAME}
+                width={280}
+                height={112}
+                className="h-9 w-auto object-contain md:h-16"
+                sizes="(max-width: 768px) 120px, 200px"
+                loading="lazy"
+              />
             </div>
-            
-            <div>
-              <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('legal')}</h3>
-              <ul className="space-y-0.5 md:space-y-1.5">
-                <li><Link href="/privacy-policy" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('privacyPolicy')}</Link></li>
-                <li><Link href="/terms-conditions" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('termsConditions')}</Link></li>
-                <li><Link href="/disclaimer" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('disclaimer')}</Link></li>
-                <li><a href="/sitemap.xml" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">{t('sitemap')}</a></li>
-              </ul>
-            </div>
+            <p className="text-base font-semibold text-white">{COMPANY_NAME}</p>
+            <p className="mt-2 text-xs leading-relaxed text-blue-300 md:text-sm">{t('tagline')}</p>
           </div>
-        </div>
 
-        {/* Contact Info */}
-        <div className="pr-0 md:pr-4 lg:pr-8">
-          <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('contact')}</h3>
-          <div className="text-blue-400 text-xs md:text-sm space-y-1.5 md:space-y-4">
-            {contact.locations.map((location, index) => {
-              // Shorten address on mobile - show only city/state or key part
-              const addressParts = location.address.split(',');
-              const shortAddress = addressParts.length > 2 
-                ? `${addressParts[addressParts.length - 2]}, ${addressParts[addressParts.length - 1]}`
-                : location.address;
-              
-              return (
-                <div key={index} className="space-y-0.5 md:space-y-2">
-                  <p className="break-words">
-                    <span className="text-white font-medium mr-1 md:mr-2 text-xs">{t('phone')}:</span>
-                    <a href={`tel:${location.phone.replace(/[^\d+]/g, '')}`} className="hover:text-white transition-colors break-all text-xs">
-                      {location.phone}
-                    </a>
-                  </p>
-                  <div className="flex items-start">
-                    <span className="text-white font-medium mr-1 md:mr-2 shrink-0 text-xs">{t('address')}:</span>
-                    <a 
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="hover:text-white transition-colors break-words text-xs leading-tight"
-                      title={location.address}
-                    >
-                      <span className="md:hidden">{shortAddress}</span>
-                      <span className="hidden md:inline">{location.address}</span>
-                    </a>
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('quickLinks')}</h3>
+            <ul className="space-y-1.5 md:space-y-2">
+              <li>
+                <Link href="/" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
+                  {navT('home')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
+                  {navT('services')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
+                  {navT('blog')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
+                  {t('faq')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('contact')}</h3>
+            <div className="text-xs text-blue-300 md:text-sm space-y-3 md:space-y-4">
+              {contact.locations.map((location, index) => {
+                const addressParts = location.address.split(',');
+                const shortAddress =
+                  addressParts.length > 2
+                    ? `${addressParts[addressParts.length - 2]}, ${addressParts[addressParts.length - 1]}`
+                    : location.address;
+
+                return (
+                  <div key={index} className="space-y-1 md:space-y-2">
+                    <p className="break-words">
+                      <span className="mr-1 font-medium text-white md:mr-2">{t('phone')}:</span>
+                      <a
+                        href={`tel:${location.phone.replace(/[^\d+]/g, '')}`}
+                        className="break-all text-blue-200 transition-colors hover:text-white"
+                      >
+                        {location.phone}
+                      </a>
+                    </p>
+                    <div className="flex items-start">
+                      <span className="mr-1 shrink-0 font-medium text-white md:mr-2">{t('address')}:</span>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-200 transition-colors hover:text-white break-words leading-snug"
+                        title={location.address}
+                      >
+                        <span className="md:hidden">{shortAddress}</span>
+                        <span className="hidden md:inline">{location.address}</span>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-            {contact.email && (
-              <p className="break-words mt-1 md:mt-0">
-                <span className="text-white font-medium mr-1 md:mr-2 text-xs">{t('email')}:</span>
-                <a href={`mailto:${contact.email}`} className="hover:text-white transition-colors break-all text-xs">
-                  {contact.email}
-                </a>
-              </p>
-            )}
+                );
+              })}
+              {contact.email ? (
+                <p className="break-words">
+                  <span className="mr-1 font-medium text-white md:mr-2">{t('email')}:</span>
+                  <a href={`mailto:${contact.email}`} className="break-all text-blue-200 transition-colors hover:text-white">
+                    {contact.email}
+                  </a>
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('followUs')}</h3>
+            <div className="flex flex-wrap gap-3 md:gap-4">
+              <a
+                href={socialLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="Twitter"
+              >
+                <X size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.pinterest}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="Pinterest"
+              >
+                <PinterestIcon className="h-[18px] w-[18px] md:h-6 md:w-6" />
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Social Media */}
-        <div className="pr-0 md:pr-4 lg:pr-8">
-          <h3 className="text-xs md:text-lg font-semibold mb-1 md:mb-3">{t('followUs')}</h3>
-          <div className="flex flex-wrap gap-2 md:gap-4">
-            <a
-              href={socialLinks.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook size={16} className="md:w-6 md:h-6" />
-            </a>
-            <a
-              href={socialLinks.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="Twitter"
-            >
-              <X size={16} className="md:w-6 md:h-6" />
-            </a>
-            <a
-              href={socialLinks.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram size={16} className="md:w-6 md:h-6" />
-            </a>
-            <a
-              href={socialLinks.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="WhatsApp"
-            >
-              <MessageCircle size={16} className="md:w-6 md:h-6" />
-            </a>
-            <a
-              href={socialLinks.pinterest}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-white transition-colors"
-              aria-label="Pinterest"
-            >
-              <PinterestIcon className="w-4 h-4 md:w-6 md:h-6" />
-            </a>
+        <div className="border-t border-blue-800 pt-4 md:pt-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-center text-xs text-blue-300 md:text-left md:text-sm">
+              © {currentYear} <span className="font-semibold text-white">{COMPANY_NAME}</span>. {t('rights')}
+            </p>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-blue-300 sm:text-sm md:justify-end">
+              <Link href="/about" className="hover:text-white transition-colors">
+                {navT('about')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <Link href="/contact" className="hover:text-white transition-colors">
+                {navT('contact')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <Link href="/privacy-policy" className="hover:text-white transition-colors">
+                {t('privacyPolicy')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <Link href="/terms" className="hover:text-white transition-colors">
+                {t('termsShort')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <Link href="/disclaimer" className="hover:text-white transition-colors">
+                {t('disclaimer')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <a href="/sitemap.xml" className="hover:text-white transition-colors">
+                {t('sitemap')}
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Bottom bar - inset from wrapper above */}
-      <div className="border-t border-blue-800 pt-2 md:pt-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-1.5 md:gap-3">
-          <p className="text-blue-400 text-xs md:text-sm text-center md:text-left">
-            © {currentYear} {companyName}. {t('rights')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-1 md:gap-4 text-blue-400 text-xs md:text-sm">
-            <Link href="/privacy-policy" className="hover:text-white transition-colors">{t('privacyPolicy')}</Link>
-            <span className="hidden md:inline">|</span>
-            <Link href="/terms-conditions" className="hover:text-white transition-colors">{t('termsConditions')}</Link>
-            <span className="hidden md:inline">|</span>
-            <Link href="/disclaimer" className="hover:text-white transition-colors">{t('disclaimer')}</Link>
-            <span className="hidden md:inline">|</span>
-            <a href="/sitemap.xml" className="hover:text-white transition-colors">{t('sitemap')}</a>
-          </div>
-        </div>
-      </div>
       </div>
     </footer>
   );

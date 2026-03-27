@@ -4,7 +4,7 @@
  *
  * Behavior:
  * - Never overwrites existing blog.sectorId values
- * - Prefers sector slug "it"
+ * - Prefers sector slug "software-it-ai" (company division default)
  * - Falls back to sector slug "general" (creates it if missing)
  *
  * Run:
@@ -24,11 +24,11 @@ import { PrismaClient } from '../lib/prisma-generated/index.js';
 const prisma = new PrismaClient();
 
 async function getOrCreateDefaultSector() {
-  const it = await prisma.sector.findUnique({
-    where: { slug: 'it' },
+  const primary = await prisma.sector.findUnique({
+    where: { slug: 'software-it-ai' },
     select: { id: true, name: true, slug: true },
   });
-  if (it) return it;
+  if (primary) return primary;
 
   const general = await prisma.sector.upsert({
     where: { slug: 'general' },

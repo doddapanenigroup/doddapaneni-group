@@ -1,24 +1,19 @@
-import type { Metadata } from "next";
-import { headers } from "next/headers";
-import { Inter } from "next/font/google";
-import "../globals.css";
-import LayoutWithNav from "../../components/LayoutWithNav";
-import Providers from "@/components/Providers";
-import {NextIntlClientProvider} from 'next-intl';
-import {getTranslations, setRequestLocale} from 'next-intl/server';
-import {notFound} from 'next/navigation';
-import {routing} from '@/i18n/routing';
-import {messagesByLocale} from '@/lib/messages';
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 import { prisma } from '@/lib/prisma';
+import { alternateLanguagesForPathname, absoluteUrlForLocale } from '@/lib/sitemap-build';
+import { getSiteOrigin } from '@/lib/site-origin';
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  display: 'swap',
-  preload: true,
-});
+/** Pre-render all locale variants for static routes that compose with child `generateStaticParams`. */
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 export async function generateMetadata({
-  params
+  params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
@@ -26,18 +21,17 @@ export async function generateMetadata({
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
-  const t = await getTranslations({locale, namespace: 'Metadata'});
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
 
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') ?? '';
   const segments = pathname.split('/').filter(Boolean);
   const maybeLocale = segments[0];
-  const hasLocalePrefix = !!maybeLocale && routing.locales.includes(maybeLocale as (typeof routing.locales)[number]);
+  const hasLocalePrefix =
+    !!maybeLocale && routing.locales.includes(maybeLocale as (typeof routing.locales)[number]);
   const routeSegments = hasLocalePrefix ? segments.slice(1) : segments;
   const routePath = routeSegments.join('/');
   const baseSlug = routePath ? routePath : 'home';
-  // PageContent `slug` values for non-default locales are stored with locale prefix (e.g. `te/about`)
-  // so include it here to keep metadata and OG tags consistent.
   const slug = locale === routing.defaultLocale ? baseSlug : `${locale}/${baseSlug}`;
 
   let seo:
@@ -73,13 +67,17 @@ export async function generateMetadata({
       },
     });
   } catch {
-    // Keep metadata resilient even if DB is unavailable.
     seo = null;
   }
 
   const title = seo?.metaTitle?.trim() || seo?.title?.trim() || t('title');
   const description = seo?.metaDescription?.trim() || t('description');
- 
+
+  const origin = getSiteOrigin();
+  const pathnameForSeo = routePath ? `/${routePath.replace(/^\/+/, '')}` : '/';
+  const computedCanonical = absoluteUrlForLocale(origin, locale, pathnameForSeo);
+  const canonical = seo?.canonicalUrl?.trim() || computedCanonical;
+
   return {
     title,
     description,
@@ -100,15 +98,18 @@ export async function generateMetadata({
       description: seo?.ogDescription?.trim() || seo?.metaDescription?.trim() || description,
       images: seo?.ogImage ? [{ url: seo.ogImage }] : undefined,
     },
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
+    alternates: {
+      canonical,
+      languages: alternateLanguagesForPathname(origin, pathnameForSeo),
+    },
     keywords: seo?.keywords ?? undefined,
     other: { google: 'notranslate' },
   };
 }
 
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
@@ -117,23 +118,7 @@ export default async function RootLayout({
   if (!routing.locales.includes(paramLocale as (typeof routing.locales)[number])) {
     notFound();
   }
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? '';
-  type AppLocale = (typeof routing.locales)[number];
-  const locale = paramLocale as AppLocale;
+  setRequestLocale(paramLocale as (typeof routing.locales)[number]);
 
-  setRequestLocale(locale);
-  const messages = messagesByLocale[locale] ?? messagesByLocale.en;
-
-  return (
-    <html lang={locale}>
-      <body className={`${inter.className} antialiased min-h-screen flex flex-col`}>
-        <Providers>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <LayoutWithNav initialPathname={pathname}>{children}</LayoutWithNav>
-          </NextIntlClientProvider>
-        </Providers>
-      </body>
-    </html>
-  );
+  return <>{children}</>;
 }

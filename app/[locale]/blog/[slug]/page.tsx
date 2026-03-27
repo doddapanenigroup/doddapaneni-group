@@ -8,6 +8,9 @@ import { mediaUrl } from '@/lib/media';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogPostClient from './BlogPostClient';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
+import { publicPathWithLocale } from '@/lib/sector-landing';
+import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
+import { getSiteOrigin } from '@/lib/site-origin';
 
 export const dynamic = 'force-dynamic';
 const SITE_NAME = 'Doddapaneni Group';
@@ -67,15 +70,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = dbPost.metaDescription ?? dynamicDescription;
   const title = `${dbPost.metaTitle ?? dbPost.title} | ${SITE_NAME}`;
   const image = normalizeStoredImage(dbPost.ogImage ?? dbPost.featuredImage);
-  const canonical = dbPost.sector?.slug
-    ? `/${locale}/${dbPost.sector.slug}/${slug}`
-    : `/${locale}/blog/${slug}`;
+  const origin = getSiteOrigin();
+  const pathRel = dbPost.sector?.slug
+    ? publicPathWithLocale(locale, dbPost.sector.slug, slug.trim())
+    : publicPathWithLocale(locale, 'blog', slug.trim());
+  const canonical = `${origin}${pathRel}`;
+  const pathnameForHreflang = dbPost.sector?.slug
+    ? `/${dbPost.sector.slug}/${slug.trim()}`
+    : `/blog/${slug.trim()}`;
 
   return {
     title,
     description,
     keywords: dbPost.keywords ?? undefined,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      languages: alternateLanguagesForPathname(origin, pathnameForHreflang),
+    },
     openGraph: {
       title: dbPost.ogTitle ?? title,
       description: dbPost.ogDescription ?? description,
@@ -128,7 +139,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   // Prefer canonical sector route for sector-tagged published blogs.
   if (isPublishedNow && dbPost?.sector?.slug) {
-    permanentRedirect(`/${locale}/${dbPost.sector.slug}/${slug}`);
+    permanentRedirect(publicPathWithLocale(locale, dbPost.sector.slug, slug.trim()));
   }
 
   if (!dbPost || dbPost.status !== 'published' || (dbPost.scheduledPublishAt && dbPost.scheduledPublishAt > now)) {

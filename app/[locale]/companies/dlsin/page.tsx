@@ -1,7 +1,8 @@
 "use client";
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import MotionLazy from '@/components/motion/MotionLazy';
 import { Globe, Truck, CreditCard, Users } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
@@ -20,6 +21,7 @@ export default function Dlsin() {
 
   return (
     <ContentPage pageKey="companies-dlsin" locale={locale}>
+    <MotionLazy>
     <div className="min-h-screen bg-white">
       {/* Page heading – small blue strip; extra top padding so fixed navbar doesn't overlap logo */}
       <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
@@ -39,7 +41,7 @@ export default function Dlsin() {
       <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -51,8 +53,8 @@ export default function Dlsin() {
               </h2>
               <p className="text-slate-700 text-base leading-relaxed mb-4">{t('p1')}</p>
               <p className="text-slate-700 text-base leading-relaxed">{t('p2')}</p>
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -65,14 +67,15 @@ export default function Dlsin() {
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
+                loading="lazy"
               />
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Features */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((feature, index) => (
-              <motion.div
+              <m.div
                 key={index}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -85,12 +88,13 @@ export default function Dlsin() {
                 </div>
                 <h3 className="text-base font-bold text-slate-900 mb-2">{t(`features.${feature.key}.title`)}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{t(`features.${feature.key}.description`)}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
       </section>
     </div>
+    </MotionLazy>
     </ContentPage>
   );
 }

@@ -44,6 +44,7 @@ const nextConfig: NextConfig = {
   // Optimize images
   images: {
     remotePatterns: [
+      ...apiMediaRemotePatterns(),
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
@@ -57,6 +58,7 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: true,
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   async headers() {
     return [

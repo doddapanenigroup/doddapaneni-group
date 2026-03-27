@@ -14,6 +14,7 @@ config({ path: path.join(projectRoot, '.env') });
 
 import { PrismaClient } from '../lib/prisma-generated/index.js';
 import bcrypt from 'bcryptjs';
+import { SECTOR_SEEDS } from './sector-seeds.mjs';
 
 const prisma = new PrismaClient();
 
@@ -55,31 +56,6 @@ const SEED_USERS = [
   },
 ];
 
-const SEED_SECTORS = [
-  'IT',
-  'Digital Marketing',
-  'E-Commerce',
-  'Media',
-  'Employee Consultancy',
-  'Healthcare',
-  'Construction',
-  'Education',
-  'Food Processing',
-  'Manufacturing',
-  'Logistics',
-  'Import Export',
-];
-
-function slugify(name) {
-  return String(name)
-    .trim()
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
 async function main() {
   for (const u of SEED_USERS) {
     const existing = await prisma.user.findUnique({ where: { email: u.email } });
@@ -99,18 +75,27 @@ async function main() {
     }
   }
 
-  for (const name of SEED_SECTORS) {
-    const slug = slugify(name);
+  for (const row of SECTOR_SEEDS) {
     await prisma.sector.upsert({
-      where: { slug },
-      create: { name, slug, description: null },
-      update: { name },
+      where: { slug: row.slug },
+      create: {
+        name: row.name,
+        slug: row.slug,
+        description: row.description ?? null,
+      },
+      update: {
+        name: row.name,
+        description: row.description ?? null,
+      },
     });
-    console.log('Upserted sector:', name, `(${slug})`);
+    console.log('Upserted sector:', row.name, `(${row.slug})`);
   }
 
   console.log(
-    'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.'
+   (
+      'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.\n' +
+      'Optional: run `npm run media:seed` then `npm run db:seed:blogs` to load division blog content (52 published posts).'
+    ).trim(),
   );
 }
 

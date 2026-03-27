@@ -47,6 +47,8 @@ export function getMessagesForLocale(locale: string): Record<string, unknown> {
 export type BlogMessages = {
   title: string;
   subtitle: string;
+  /** Optional editorial note on listing pages (AdSense / trust signals). */
+  intro?: string;
   readMore: string;
   backToBlog: string;
   relatedPosts?: string;

@@ -31,6 +31,7 @@ export default function BlogPostClient({
         <div className="max-w-4xl mx-auto">
           <Link
             href="/blog"
+            locale={locale}
             className="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft size={20} className="mr-2" />
@@ -89,6 +90,7 @@ export default function BlogPostClient({
         <div className="max-w-4xl mx-auto">
           <Link
             href="/blog"
+            locale={locale}
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
           >
             <ArrowLeft size={20} className="mr-2" />

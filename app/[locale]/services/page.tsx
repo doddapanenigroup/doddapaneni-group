@@ -16,7 +16,8 @@ import {
   CheckCircle,
   LucideIcon
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import MotionLazy from '@/components/motion/MotionLazy';
 import { useTranslations, useLocale } from 'next-intl';
 import ContentPage from '@/components/ContentPage';
 
@@ -74,6 +75,7 @@ export default function Services() {
 
   return (
     <ContentPage pageKey="services" locale={locale}>
+    <MotionLazy>
     <div className="min-h-screen bg-white">
       {/* Page heading – small blue strip */}
       <section className="bg-blue-900 py-6 md:py-10 px-4 sm:px-6 lg:px-8">
@@ -84,9 +86,15 @@ export default function Services() {
       </section>
 
       {/* Services List */}
-      <section className="py-8 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
+      <section className="py-8 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50" aria-labelledby="services-capabilities-heading">
         <div className="max-w-6xl mx-auto">
-          <motion.div
+          <h2
+            id="services-capabilities-heading"
+            className="mb-6 text-lg font-bold tracking-tight text-slate-900 sm:mb-8 sm:text-xl md:text-2xl"
+          >
+            {t('listHeading')}
+          </h2>
+          <m.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -95,7 +103,7 @@ export default function Services() {
             {serviceKeys.map((key) => {
               const IconComponent = iconMap[key] || CheckCircle;
               return (
-                <motion.div
+                <m.div
                   key={key}
                   variants={itemVariants}
                   className="bg-white p-4 sm:p-5 rounded-xl border border-blue-200 flex flex-col sm:flex-row gap-3 sm:gap-4 hover:border-blue-600 hover:shadow-md transition-all duration-300"
@@ -111,13 +119,14 @@ export default function Services() {
                       {tServices(`${key}.description`)}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>
+    </MotionLazy>
     </ContentPage>
   );
 }
