@@ -32,6 +32,7 @@ function apiMediaRemotePatterns(): NonNullable<
 }
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   // Docker / VPS: produces .next/standalone for `node server.js` (see Dockerfile)
   output: 'standalone',
   // Prisma engine must stay external (local client lives under lib/prisma-generated)
@@ -58,7 +59,7 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'next-intl'],
   },
   async headers() {
     return [
@@ -85,7 +86,7 @@ const nextConfig: NextConfig = {
       },
       // Do not match .webp/.avif here — would also match /api/media/*.webp and break API caching.
       {
-        source: '/:path*\\.(jpg|jpeg|png|gif|svg|ico)',
+        source: '/:path*\\.(jpg|jpeg|png|gif|svg|ico|webp|avif)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],

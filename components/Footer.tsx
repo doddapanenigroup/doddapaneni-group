@@ -94,14 +94,13 @@ export default function Footer() {
 
         <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-10">
           <div className="lg:max-w-md">
-            <div className="mb-3 md:mb-4">
+            <div className="relative mb-3 h-9 w-[90px] md:mb-4 md:h-16 md:w-[160px]">
               <Image
                 src={mediaUrl('logo.webp')}
                 alt={COMPANY_NAME}
-                width={280}
-                height={112}
-                className="h-9 w-auto object-contain md:h-16"
-                sizes="(max-width: 768px) 120px, 200px"
+                fill
+                className="object-contain object-left"
+                sizes="(max-width: 768px) 90px, 160px"
                 loading="lazy"
               />
             </div>

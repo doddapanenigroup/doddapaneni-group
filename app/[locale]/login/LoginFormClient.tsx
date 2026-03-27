@@ -264,8 +264,15 @@ export default function LoginFormClient({
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <div className="flex justify-center mb-6">
-          <Image src={mediaUrl('logo.webp')} alt="Logo" width={80} height={80} />
+        <div className="relative mx-auto mb-6 h-20 w-20 shrink-0">
+          <Image
+            src={mediaUrl('logo.webp')}
+            alt="Logo"
+            fill
+            className="object-contain"
+            sizes="80px"
+            loading="lazy"
+          />
         </div>
 
         {step === 'credentials' ? (

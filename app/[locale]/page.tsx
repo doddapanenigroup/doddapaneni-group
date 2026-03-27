@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import HomepageOrganizationJsonLd from '@/components/seo/HomepageOrganizationJsonLd';
 import { getBusinessDivisionsForHome } from '@/lib/business-divisions-home';
+import ContentPageBoundary from '@/components/ContentPageBoundary';
 import HomePage from '@/components/home/HomePage';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
@@ -42,7 +43,9 @@ export default async function Page({ params }: Props) {
   return (
     <>
       <HomepageOrganizationJsonLd locale={locale} />
-      <HomePage locale={locale} divisions={divisions} />
+      <ContentPageBoundary pageKey="home" locale={locale}>
+        <HomePage divisions={divisions} />
+      </ContentPageBoundary>
     </>
   );
 }

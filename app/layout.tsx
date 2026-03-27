@@ -3,20 +3,11 @@ import type { AbstractIntlMessages } from 'next-intl';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { fontBodyClassNames } from '@/app/fonts';
 import CorporateHubShell from '@/components/corporate/CorporateHubShell';
 import { resolveAppLocaleFromPathname } from '@/lib/locale-from-path';
 import { getMessagesForLocale } from '@/lib/messages';
 import { getSiteOrigin } from '@/lib/site-origin';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true,
-  variable: '--font-inter',
-  adjustFontFallback: true,
-  weight: ['400', '500', '600', '700'],
-});
 
 const siteOrigin = getSiteOrigin();
 
@@ -55,7 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang={initialLocale} suppressHydrationWarning>
-      <body className={`${inter.className} ${inter.variable} flex min-h-screen flex-col antialiased`}>
+      <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
         <CorporateHubShell
           initialPathname={pathname}
           initialLocale={initialLocale}

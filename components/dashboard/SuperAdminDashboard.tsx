@@ -6,7 +6,7 @@ import { Shield, UserCog, UserCircle, Pencil, BarChart3 } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
-import VisitStats from './VisitStats';
+import VisitStatsLazy from './VisitStatsLazy';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
 import PermissionMatrixPanel from './PermissionMatrixPanel';
@@ -128,7 +128,7 @@ export default function SuperAdminDashboard({
 
       <FeatureFlagsPanel />
 
-      <VisitStats />
+      <VisitStatsLazy />
     </div>
   );
 }

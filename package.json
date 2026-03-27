@@ -20,6 +20,8 @@
     "db:reset": "node scripts/reset-and-seed.mjs",
     "db:push": "prisma db push",
     "media:seed": "node scripts/seed-stored-images.mjs",
+    "images:optimize": "node scripts/convert-images-to-webp.mjs",
+    "images:recompress-webp": "OPTIMIZE_EXISTING_WEBP=1 node scripts/convert-images-to-webp.mjs",
     "postinstall": "prisma generate",
     "prepare": "prisma generate"
   },

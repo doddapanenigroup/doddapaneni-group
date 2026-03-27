@@ -1,10 +1,12 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import RecordVisit from '@/components/RecordVisit';
-import WebVitalsReporter from '@/components/WebVitalsReporter';
+
+const RecordVisit = dynamic(() => import('@/components/RecordVisit'), { ssr: false });
+const WebVitalsReporter = dynamic(() => import('@/components/WebVitalsReporter'), { ssr: false });
 
 export default function LayoutWithNav({
   children,

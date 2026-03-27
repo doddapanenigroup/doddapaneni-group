@@ -4,7 +4,21 @@ import { useEffect } from 'react';
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
 
+/** Local console checks against production targets (LCP, CLS, INP / FID-style budgets). */
+function logThresholdViolation(metric: Metric) {
+  if (process.env.NODE_ENV === 'production') return;
+  const lcp = metric.name === 'LCP' && metric.value > 2500;
+  const cls = metric.name === 'CLS' && metric.value > 0.1;
+  const inp = metric.name === 'INP' && metric.value > 200;
+  if (lcp || cls || inp) {
+    const display =
+      metric.name === 'CLS' ? metric.value.toFixed(3) : `${Math.round(metric.value)}ms`;
+    console.warn(`[Web Vitals] ${metric.name} ${display} (${metric.rating}) — target LCP≤2.5s, CLS≤0.1`);
+  }
+}
+
 function flush(metric: Metric) {
+  logThresholdViolation(metric);
   if (process.env.NODE_ENV !== 'production') return;
   const body = JSON.stringify({
     name: metric.name,
@@ -28,7 +42,6 @@ function flush(metric: Metric) {
 
 export default function WebVitalsReporter() {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') return;
     onLCP(flush);
     onINP(flush);
     onCLS(flush);

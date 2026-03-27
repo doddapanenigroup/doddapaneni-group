@@ -127,7 +127,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                       className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
                     >
                       <Link href={`/${sector.slug}/${post.slug}`} locale={locale} prefetch>
-                        <div className="relative h-48 w-full">
+                        <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                           {imageSrc ? (
                             <Image
                               src={imageSrc}
@@ -135,8 +135,8 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                               fill
                               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                               className="object-cover"
-                              loading={postIndex < 2 ? 'eager' : 'lazy'}
-                              fetchPriority={postIndex === 0 ? 'high' : undefined}
+                              loading="lazy"
+                              fetchPriority="low"
                             />
                           ) : (
                             <div className="h-full w-full bg-slate-200" />

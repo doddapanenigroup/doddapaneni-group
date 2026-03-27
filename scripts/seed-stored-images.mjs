@@ -51,13 +51,30 @@ function toKey(absPath) {
   return rel;
 }
 
+/** Skip heavy .jpg/.png/.jpeg/.avif when a sibling .webp exists (app uses WebP via mediaUrl). */
+function filterPreferWebp(files) {
+  const normalized = new Set(files.map((f) => path.normalize(f)));
+  return files.filter((file) => {
+    const ext = path.extname(file).toLowerCase();
+    if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.avif') return true;
+    const webpSibling =
+      file.slice(0, -ext.length) + '.webp';
+    return !normalized.has(path.normalize(webpSibling));
+  });
+}
+
 async function main() {
   if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL is required');
     process.exit(1);
   }
 
-  const files = await walk(publicDir);
+  const filesAll = await walk(publicDir);
+  const files = filterPreferWebp(filesAll);
+  const skipped = filesAll.length - files.length;
+  if (skipped > 0) {
+    console.log(`Skipping ${skipped} raster file(s) that have a .webp twin (smaller DB / uploads).`);
+  }
   if (files.length === 0) {
     console.log('No image files found under public/');
     return;

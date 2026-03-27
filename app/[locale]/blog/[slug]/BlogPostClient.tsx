@@ -1,5 +1,3 @@
-"use client";
-
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
@@ -65,14 +63,15 @@ export default function BlogPostClient({
       </section>
 
       {image ? (
-        <section className="relative h-64 md:h-96 w-full">
+        <section className="relative h-64 min-h-64 w-full overflow-hidden bg-slate-100 md:h-96 md:min-h-96">
           <Image
             src={image}
             alt={title}
             fill
             sizes="100vw"
             className="object-cover"
-            priority
+            loading="lazy"
+            fetchPriority="low"
           />
         </section>
       ) : null}

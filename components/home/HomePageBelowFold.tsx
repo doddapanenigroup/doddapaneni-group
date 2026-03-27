@@ -107,7 +107,7 @@ export default function HomePageBelowFold() {
                         <Link
                           key={`${i}-${index}`}
                           href={logo.link}
-                          className="relative h-16 w-28 shrink-0 opacity-90 transition-all duration-300 hover:scale-105 hover:opacity-100 sm:h-20 sm:w-36 md:h-24 md:w-40"
+                          className="relative block h-16 w-28 shrink-0 overflow-hidden opacity-90 transition-all duration-300 hover:scale-105 hover:opacity-100 sm:h-20 sm:w-36 md:h-24 md:w-40"
                         >
                           <Image
                             src={logo.src}

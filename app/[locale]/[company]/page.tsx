@@ -2,11 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import SectorLandingView from '@/components/sector/SectorLandingView';
-import {
-  resolveAppLocale,
-  sectorLandingMetadata,
-  toPositiveSectorPage,
-} from '@/lib/sector-landing';
+import { localeFromRouteParam } from '@/lib/locale-from-path';
+import { sectorLandingMetadata, toPositiveSectorPage } from '@/lib/sector-landing';
 
 type Props = {
   params: Promise<{ locale: string; company: string }>;
@@ -21,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompanySectorLandingPage({ params, searchParams }: Props) {
   const { locale: paramLocale, company } = await params;
 
-  const locale = await resolveAppLocale(paramLocale);
+  const locale = localeFromRouteParam(paramLocale);
   if (!routing.locales.includes(locale)) notFound();
 
   const sectorSlug = company.trim().toLowerCase();

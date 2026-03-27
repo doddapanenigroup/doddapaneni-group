@@ -19,7 +19,7 @@ import {
   Search,
   BarChart3,
 } from 'lucide-react';
-import VisitStats from './VisitStats';
+import VisitStatsLazy from './VisitStatsLazy';
 import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 import type { Role } from '@/lib/constants';
@@ -1243,7 +1243,7 @@ export default function MarketerDashboard({
         </div>
       </section>
 
-      <VisitStats />
+      <VisitStatsLazy />
 
       <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-4">
         <div className="flex flex-wrap gap-2">

@@ -192,16 +192,15 @@ export default function Navbar() {
           <Link
             href="/"
             locale={locale}
-            className="group flex flex-shrink-0 items-center gap-2"
+            className="group relative flex h-16 w-[160px] shrink-0 items-center"
             onClick={handleLogoClick}
           >
             <Image
               src={mediaUrl('logo.webp')}
               alt={companyName}
-              width={200}
-              height={80}
-              className="h-16 w-auto object-contain"
-              sizes="(max-width: 768px) 140px, 200px"
+              fill
+              className="object-contain object-left"
+              sizes="160px"
               priority
             />
           </Link>

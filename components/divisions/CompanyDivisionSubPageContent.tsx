@@ -2,7 +2,6 @@
 
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import ContentPage from '@/components/ContentPage';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
 import {
   divisionContentPageKey,
@@ -24,7 +23,6 @@ export default function CompanyDivisionSubPageContent({
   const { heading, paragraphs } = getDivisionSubpagePlaceholder(sectorName, subpage);
 
   return (
-    <ContentPage pageKey={pageKey} locale={locale}>
       <MotionLazy>
       <section className="bg-blue-900 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
@@ -57,6 +55,5 @@ export default function CompanyDivisionSubPageContent({
         </div>
       </section>
       </MotionLazy>
-    </ContentPage>
   );
 }

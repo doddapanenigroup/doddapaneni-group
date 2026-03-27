@@ -54,7 +54,7 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                   className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
                 >
                   <Link href={post.href ?? `/blog/${post.slug}`} locale={locale}>
-                    <div className="relative h-48 w-full">
+                    <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                       {post.image ? (
                         <Image
                           src={post.image}
@@ -62,8 +62,8 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-cover"
-                          loading={index < 3 ? 'eager' : 'lazy'}
-                          fetchPriority={index === 0 ? 'high' : undefined}
+                          loading="lazy"
+                          fetchPriority="low"
                         />
                       ) : (
                         <div className="h-full w-full bg-slate-200" />

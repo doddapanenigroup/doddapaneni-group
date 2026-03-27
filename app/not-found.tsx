@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { fontBodyClassNames } from '@/app/fonts';
 import { publicPathWithLocale } from '@/lib/sector-landing';
 import { routing } from '@/i18n/routing';
+import './globals.css';
 
 /**
  * Global fallback when `notFound()` is invoked outside the `[locale]` segment tree,
@@ -11,7 +13,9 @@ export default function GlobalNotFound() {
 
   return (
     <html lang={routing.defaultLocale}>
-      <body className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center font-sans text-slate-800 antialiased">
+      <body
+        className={`${fontBodyClassNames} flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center font-sans text-slate-800 antialiased`}
+      >
         <p className="text-sm font-semibold uppercase tracking-widest text-blue-600">404</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Page not found</h1>
         <p className="mt-3 max-w-md text-slate-600">

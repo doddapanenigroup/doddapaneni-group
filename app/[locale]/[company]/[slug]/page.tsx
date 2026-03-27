@@ -3,12 +3,14 @@ import type { Metadata } from 'next';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { fetchPublishedSectorBlogPost } from '@/lib/sector-blog-post';
-import { normalizeStoredImage, publicPathWithLocale, resolveAppLocale } from '@/lib/sector-landing';
+import { localeFromRouteParam } from '@/lib/locale-from-path';
+import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 import BlogPostClient from '@/app/[locale]/blog/[slug]/BlogPostClient';
 
-export const dynamic = 'force-dynamic';
+/** ISR: sector posts refresh on an interval without forcing every request dynamic. */
+export const revalidate = 120;
 
 const SITE_NAME = 'Doddapaneni Group';
 
@@ -56,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SectorBlogPostPage({ params }: Props) {
   const { locale: paramLocale, company, slug } = await params;
-  const locale = await resolveAppLocale(paramLocale);
+  const locale = localeFromRouteParam(paramLocale);
   const sectorSlug = company.trim().toLowerCase();
 
   if (!routing.locales.includes(locale)) {
