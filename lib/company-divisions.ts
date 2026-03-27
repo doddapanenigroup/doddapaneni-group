@@ -37,6 +37,17 @@ export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
   return (COMPANY_DIVISION_SLUGS as readonly string[]).includes(s);
 }
 
+/** Sector hubs that show marketing focus areas only (no news listing), matching the digital-marketing content pattern. */
+export const SECTOR_LANDING_CONTENT_ONLY_SLUGS = [
+  'software-it-ai',
+  'healthcare-medical',
+  'media-news-entertainment',
+] as const satisfies readonly CompanyDivisionSlug[];
+
+export function isSectorLandingContentOnlySlug(slug: string): boolean {
+  return (SECTOR_LANDING_CONTENT_ONLY_SLUGS as readonly string[]).includes(slug);
+}
+
 /**
  * Display names for header/footer (aligned with `scripts/sector-seeds.mjs` Sector.name).
  */

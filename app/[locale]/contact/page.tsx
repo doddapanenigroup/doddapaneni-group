@@ -1,7 +1,7 @@
 'use client';
 
 import { Mail, Phone, MapPin, Send, CheckCircle2, ExternalLink } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { useTranslations, useLocale } from 'next-intl';
@@ -13,21 +13,10 @@ import * as z from 'zod';
 /** E.164 for tel: — keep in sync with displayed numbers in locale messages */
 const PHONE_HREF = { india: 'tel:+918142246666', usa: 'tel:+13522308586' } as const;
 
-function contactMapEmbedSrc(): string | null {
-  if (process.env.NEXT_PUBLIC_CONTACT_MAP_DISABLED === '1') return null;
-  const custom = process.env.NEXT_PUBLIC_CONTACT_MAP_EMBED_URL?.trim();
-  if (custom && custom !== '0') return custom;
-  const q = encodeURIComponent(
-    'Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, Telangana 500085, India',
-  );
-  return `https://maps.google.com/maps?q=${q}&output=embed`;
-}
-
 export default function Contact() {
   const locale = useLocale();
   const t = useTranslations('ContactPage');
   const [showSuccess, setShowSuccess] = useState(false);
-  const mapSrc = useMemo(() => contactMapEmbedSrc(), []);
 
   const contactSchema = z.object({
     name: z.string().min(1, t('nameRequired')),
@@ -256,31 +245,6 @@ export default function Contact() {
                 )}
               </m.div>
             </div>
-
-            {mapSrc ? (
-              <m.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-                className="mt-12 md:mt-16"
-              >
-                <h2 className="text-lg font-bold text-slate-900 md:text-xl">{t('mapTitle')}</h2>
-                <p className="mt-1 max-w-3xl text-sm text-slate-600">{t('mapCaption')}</p>
-                <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 shadow-inner">
-                  <div className="relative aspect-[10/5] min-h-[220px] w-full sm:min-h-[280px] md:aspect-[21/9]">
-                    <iframe
-                      src={mapSrc}
-                      title={t('mapTitle')}
-                      className="absolute inset-0 h-full w-full border-0"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      allowFullScreen
-                    />
-                  </div>
-                </div>
-              </m.div>
-            ) : null}
           </div>
         </section>
       </div>

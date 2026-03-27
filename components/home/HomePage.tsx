@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { useTranslations } from 'next-intl';
@@ -56,12 +56,6 @@ export default function HomePage({ locale, divisions }: Props) {
 
           <div className="relative z-10 mx-auto max-w-7xl">
             <div className="home-hero-enter max-w-4xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md sm:mb-5 sm:px-4">
-                <Sparkles className="h-3.5 w-3.5 text-amber-300" aria-hidden />
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100 sm:text-sm">
-                  {t('hubHeroEyebrow')}
-                </span>
-              </div>
               <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-white sm:mb-5 sm:text-5xl md:text-6xl lg:text-7xl">
                 {t('hubHeroTitle')}
               </h1>

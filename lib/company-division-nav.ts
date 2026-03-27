@@ -12,19 +12,22 @@ export type DivisionTopicNavItem = {
 const TOPIC_NAV_BY_SLUG = {
   'software-it-ai': [
     {
-      label: 'Services',
-      href: '/software-it-ai/services',
-      description: 'Delivery models and capabilities for software, IT, and AI engagements.',
+      label: 'Dlsin marketplace',
+      href: '/software-it-ai#topic-dlsin',
+      description:
+        'Dlsin is the group’s multivendor commerce platform—catalogue management, checkout, seller dashboards, and secure settlements for independent merchants.',
     },
     {
-      label: 'AI',
-      href: '/software-it-ai#topic-ai',
-      description: 'Automation, models, and intelligent products tailored to your roadmap.',
+      label: 'Seller tooling',
+      href: '/software-it-ai#topic-sellers',
+      description:
+        'Fulfilment status, dispute workflows, and analytics so sellers can restock and price with evidence—not guesswork.',
     },
     {
-      label: 'Cloud',
-      href: '/software-it-ai#topic-cloud',
-      description: 'Secure, scalable cloud foundations and modernization paths.',
+      label: 'Platform engineering',
+      href: '/software-it-ai#topic-platform',
+      description:
+        'Software, IT & AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure.',
     },
   ],
   'digital-marketing': [
@@ -97,19 +100,22 @@ const TOPIC_NAV_BY_SLUG = {
   ],
   'media-news-entertainment': [
     {
-      label: 'Content',
+      label: 'Janatha Mirror',
+      href: '/media-news-entertainment#topic-janatha',
+      description:
+        'Digital-first newsroom with sourced reporting, verification, and corrections when facts change—public policy, business, culture, and civic coverage optimised for web and social.',
+    },
+    {
+      label: 'Editorial & multimedia',
       href: '/media-news-entertainment#topic-content',
-      description: 'Production, formats, and distribution at scale.',
+      description:
+        'Formats, production, and distribution at scale—video, interviews, and storytelling built for how audiences read and share today.',
     },
     {
-      label: 'News',
-      href: '/media-news-entertainment#topic-news',
-      description: 'Editorial systems, audience products, and monetization.',
-    },
-    {
-      label: 'Brand',
+      label: 'Audience & partnerships',
       href: '/media-news-entertainment#topic-brand',
-      description: 'Brand studios, partnerships, and sponsorships.',
+      description:
+        'Audience products, brand studios, and partnerships that extend reach while protecting editorial standards.',
     },
   ],
   'staffing-consultancy': [

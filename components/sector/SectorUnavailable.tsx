@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, Building2 } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import { COMPANY_DIVISION_NAV_LABELS, type CompanyDivisionSlug } from '@/lib/company-divisions';
 import { publicPathWithLocale } from '@/lib/sector-landing';
 
@@ -12,10 +13,11 @@ type Props = {
  * Shown when a URL matches a known division slug but the sector is not yet in the database,
  * so the public hub cannot load. Avoids a bare 404 for bookmarked or marketed URLs.
  */
-export default function SectorUnavailable({ locale, slug }: Props) {
+export default async function SectorUnavailable({ locale, slug }: Props) {
   const label = COMPANY_DIVISION_NAV_LABELS[slug];
   const homeHref = publicPathWithLocale(locale);
   const blogHref = publicPathWithLocale(locale, 'blog');
+  const t = await getTranslations({ locale, namespace: 'Blog' });
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -28,7 +30,7 @@ export default function SectorUnavailable({ locale, slug }: Props) {
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">{label}</h1>
           <p className="mt-4 text-base leading-relaxed text-blue-100 sm:text-lg">
             This division hub is being prepared. The page will go live once the sector is published in our systems.
-            Meanwhile, you can browse the blog or return to the homepage.
+            Meanwhile, you can browse {t('title').toLowerCase()} or return to the homepage.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link
@@ -42,7 +44,7 @@ export default function SectorUnavailable({ locale, slug }: Props) {
               href={blogHref}
               className="inline-flex items-center rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
             >
-              Browse all blogs
+              {t('browseAllNews')}
             </Link>
           </div>
         </div>

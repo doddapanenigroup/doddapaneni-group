@@ -21,6 +21,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
+  const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations('Navbar');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
@@ -31,6 +32,28 @@ export default function Navbar() {
     [pathname],
   );
   const isOnGroupCompany = activeDivisionSlug !== null;
+
+  const openCompaniesMenu = () => {
+    if (closeMenuTimerRef.current) {
+      clearTimeout(closeMenuTimerRef.current);
+      closeMenuTimerRef.current = null;
+    }
+    setCompaniesOpen(true);
+  };
+
+  const scheduleCloseCompaniesMenu = () => {
+    if (closeMenuTimerRef.current) clearTimeout(closeMenuTimerRef.current);
+    closeMenuTimerRef.current = setTimeout(() => {
+      setCompaniesOpen(false);
+      closeMenuTimerRef.current = null;
+    }, 220);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeMenuTimerRef.current) clearTimeout(closeMenuTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const updateThreshold = () => {
@@ -58,26 +81,11 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!companiesOpen) return;
-
-    const close = () => setCompaniesOpen(false);
-
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
-      const el = companiesRef.current;
-      if (el && !el.contains(e.target as Node)) close();
-    };
-
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') setCompaniesOpen(false);
     };
-
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('touchstart', onPointerDown, { passive: true });
     document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('touchstart', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [companiesOpen]);
 
   const isTransparent = !scrolled;
@@ -96,12 +104,11 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: t('home') },
     { href: '/about', label: t('about') },
-    { href: '/services', label: t('services') },
     { href: '/blog', label: t('blog') },
     { href: '/contact', label: t('contact') },
   ];
-  const navBeforeCompanies = navLinks.slice(0, 3);
-  const navAfterCompanies = navLinks.slice(3);
+  const navBeforeMega = navLinks.slice(0, 2);
+  const navAfterMega = navLinks.slice(2);
 
   const linkBaseClass = `px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300 hover:backdrop-blur-md hover:scale-105 border border-transparent ${
     isTransparent
@@ -120,7 +127,13 @@ export default function Navbar() {
   const inset = 'px-5 sm:px-8 lg:px-12 xl:px-16';
 
   const renderCompanyRows = (onNavigate?: () => void, mobile = false) => (
-    <ul className={mobile ? 'space-y-0.5 py-1' : 'max-h-[min(28rem,calc(100vh-8rem))] overflow-y-auto overscroll-contain py-2'}>
+    <ul
+      className={
+        mobile
+          ? 'space-y-0.5 py-1'
+          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-1 sm:gap-y-0 max-h-[min(32rem,calc(100vh-8rem))] overflow-y-auto overscroll-contain py-3 px-2'
+      }
+    >
       {COMPANIES_NAV.map((item) => {
         const isActiveHere = activeDivisionSlug === item.slug;
 
@@ -134,8 +147,8 @@ export default function Navbar() {
                   setCompaniesOpen(false);
                   onNavigate?.();
                 }}
-                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm transition-colors ${
-                  mobile ? 'rounded-lg' : ''
+                className={`flex items-center justify-between gap-3 px-3 py-2.5 text-sm transition-colors ${
+                  mobile ? 'rounded-lg' : 'rounded-lg'
                 } ${
                   isActiveHere
                     ? 'bg-blue-600 text-white font-semibold'
@@ -151,11 +164,11 @@ export default function Navbar() {
         return (
           <li key={item.slug}>
             <div
-              className={`flex items-center justify-between gap-2 px-4 py-2.5 text-sm ${
+              className={`flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded-lg ${
                 isActiveHere
                   ? 'border-l-2 border-blue-600 bg-blue-50/90 text-slate-800'
                   : 'text-slate-400'
-              } ${mobile ? 'rounded-r-lg' : ''}`}
+              } ${mobile ? '' : ''}`}
             >
               <span
                 className={`min-w-0 leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
@@ -194,19 +207,25 @@ export default function Navbar() {
           </Link>
         </div>
         <div className="hidden shrink-0 items-center space-x-6 md:flex md:space-x-8">
-          {navBeforeCompanies
+          {navBeforeMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
               <Link key={link.href} href={link.href} locale={locale} className={linkBaseClass}>
                 {link.label}
               </Link>
             ))}
-          <div className="relative" ref={companiesRef}>
+          <div
+            className="relative"
+            ref={companiesRef}
+            onMouseEnter={openCompaniesMenu}
+            onMouseLeave={scheduleCloseCompaniesMenu}
+          >
             <button
               type="button"
               className={companiesTriggerClass}
               aria-expanded={companiesOpen}
-              aria-haspopup="menu"
+              aria-haspopup="true"
+              onFocus={openCompaniesMenu}
               onClick={() => setCompaniesOpen((o) => !o)}
             >
               {t('ourCompanies')}
@@ -217,14 +236,17 @@ export default function Navbar() {
             </button>
             {companiesOpen ? (
               <div
-                className="absolute left-0 top-full z-[60] mt-2 w-80 max-w-[min(20rem,calc(100vw-2.5rem))] rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
-                role="menu"
+                className="absolute left-0 top-full z-[60] mt-1 w-[min(42rem,calc(100vw-2rem))] min-w-[22rem] rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
+                role="region"
+                aria-label={t('ourCompanies')}
+                onMouseEnter={openCompaniesMenu}
+                onMouseLeave={scheduleCloseCompaniesMenu}
               >
                 {renderCompanyRows()}
               </div>
             ) : null}
           </div>
-          {navAfterCompanies
+          {navAfterMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
               <Link key={link.href} href={link.href} locale={locale} className={linkBaseClass}>
@@ -250,7 +272,7 @@ export default function Navbar() {
       {isOpen ? (
         <div className="border-t border-gray-100 md:hidden">
           <div className={`${inset} space-y-1 bg-white/95 py-2 pb-4 pt-2 backdrop-blur-lg`}>
-            {navBeforeCompanies
+            {navBeforeMega
               .filter((link) => link.href !== pathname)
               .map((link) => (
                 <Link
@@ -284,7 +306,7 @@ export default function Navbar() {
                 </div>
               ) : null}
             </div>
-            {navAfterCompanies
+            {navAfterMega
               .filter((link) => link.href !== pathname)
               .map((link) => (
                 <Link

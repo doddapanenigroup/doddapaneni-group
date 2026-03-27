@@ -7,9 +7,9 @@
     "home": "Home",
     "about": "About Us",
     "services": "Services",
-    "ourCompanies": "Our Companies",
+    "ourCompanies": "Our Services",
     "comingSoonNav": "Coming soon",
-    "blog": "Blog",
+    "blog": "News",
     "contact": "Contact Us",
     "language": "Language"
   },
@@ -58,9 +58,9 @@
     "description": "Doddapaneni Group is the parent company for a portfolio of operating divisions and brands. Technology and marketing teams build web and automation solutions; other divisions support healthcare-related supply and billing workflows, construction and property work, import–export desks, manufacturing and wholesale, warehousing and freight, consumer platforms, media, staffing, education, and food-sector programs. We publish sector articles on this site so visitors can see how each unit approaches its market. If you need a formal introduction, regulatory filing reference, or vendor onboarding pack, use the Contact page and we will route you to the right division.",
     "readStory": "Read our full story",
     "ourGroupCompanies": "Featured group brands on this site",
-    "drivingExcellence": "DealsMedi (USA health products), Dlsin (multivendor commerce), and Janatha Mirror (digital news) are three public-facing companies you can explore in depth via the links below.",
+    "drivingExcellence": "DealsMedi (USA health products), Dlsin (multivendor commerce), and Janatha Mirror (digital news) are three public-facing brands you can explore in depth via the links below.",
     "ourServices": "Our Services",
-    "diverseSolutions": "For a sector-by-sector list of capabilities, see the Services page.",
+    "diverseSolutions": "For a sector-by-sector list of capabilities, explore Our Services in the header or the Services page.",
     "viewAllServices": "View all services",
     "learnMore": "Learn more",
     "readyToTransform": "Ready to Transform Your Business?",
@@ -120,8 +120,8 @@
     "businessDivisionsSubtitle": "Twelve industry verticals across the group—each with dedicated capabilities, sector insights, and published articles.",
     "hubHeroEyebrow": "Corporate hub",
     "hubHeroTitle": "Doddapaneni Group",
-    "hubHeroSubtitle": "12 Business Divisions",
-    "hubHeroLead": "Twelve specialised verticals—technology, healthcare, commerce, infrastructure, and more—unified under one disciplined operating model.",
+    "hubHeroSubtitle": "India & USA • diversified operations",
+    "hubHeroLead": "Specialised verticals—technology, healthcare, commerce, infrastructure, and more—unified under one disciplined operating model.",
     "divisionsSectionTitle": "Business divisions",
     "divisionsSectionSubtitle": "Four hubs are live today with full sector pages and published insights. Eight additional divisions are preparing to launch—listed here for transparency.",
     "viewCompany": "View Company",
@@ -373,7 +373,6 @@
     "tocSecurity": "Security & retention",
     "tocRights": "Your rights & contact",
     "tocChanges": "Changes",
-
     "informationWeCollect": "1. Data collection",
     "informationWeCollectLead": "We collect information in the following ways:",
     "informationWeCollectYouProvideTitle": "Information you provide",
@@ -382,7 +381,6 @@
     "informationWeCollectAutoDesc": "When you visit our website, our servers and partners may automatically receive technical data such as IP address, approximate location derived from IP, browser type and version, device type, operating system, referring URLs, pages viewed, and timestamps. This helps us secure the site, measure performance, debug issues, and understand aggregate usage.",
     "informationWeCollectSensitiveTitle": "Sensitive categories",
     "informationWeCollectSensitiveDesc": "We do not intentionally solicit special categories of personal data (such as health data) through general website forms. Please do not submit sensitive information unless a specific form clearly requires it for a stated purpose.",
-
     "cookies": "2. Cookies & similar technologies",
     "cookiesLead": "Cookies are small text files stored on your device. We and our partners may also use pixels, local storage, and similar technologies for the purposes described below.",
     "cookiesEssentialTitle": "Essential & functional",
@@ -393,7 +391,6 @@
     "cookiesAdvertisingDesc": "We may use third-party advertising services (such as Google AdSense) that set cookies or use advertising identifiers to show ads on our site, measure ad delivery, and—depending on your settings and applicable law—personalise ads based on your visits to this and other websites. These partners may combine data from our site with data from other sites and apps.",
     "cookiesChoicesTitle": "Your choices",
     "cookiesChoicesDesc": "You can control cookies through your browser settings (including blocking or deleting cookies). You can also visit Google’s Ads Settings and the NAI / DAA opt-out resources to learn more about personalised ads and limit certain uses. Note that disabling cookies may affect site features.",
-
     "thirdParty": "3. Third-party services",
     "thirdPartyLead": "We may integrate services provided by third parties. These providers process data under their own policies and may act as independent controllers or processors.",
     "thirdPartyGoogleTitle": "Google services",
@@ -402,28 +399,20 @@
     "thirdPartyOtherDesc": "We may use additional providers for hosting, email delivery, content delivery, security, or embedded media. Each processes only the data needed to perform its role.",
     "thirdPartyLiabilityTitle": "External sites",
     "thirdPartyLiabilityDesc": "Our website may link to external sites. We are not responsible for their privacy practices. Please read the policies of any site you visit.",
-
     "adsenseNoticeTitle": "Advertising disclosure (AdSense & similar programmes)",
     "adsenseNoticeDesc": "Where we display third-party ads, those ads may be personalised using cookies or mobile identifiers, subject to your choices and applicable regulations. Third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to our website or other websites. Users may opt out of personalised advertising by adjusting ad settings in their Google Account or using industry opt-out tools where available. EU / UK / similar users may see consent mechanisms as required by law.",
-
     "howWeUse": "4. How we use information",
     "howWeUseDesc": "We use personal and technical information to: operate and improve our website; respond to enquiries and provide customer support; send administrative or service-related messages; analyse traffic and performance; deliver and measure advertising where enabled; detect fraud, abuse, and security incidents; comply with law, regulation, or legal process; and enforce our terms.",
-
     "dataProtection": "5. Security & retention",
     "dataProtectionDesc": "We implement appropriate technical and organisational measures designed to protect personal information. No method of transmission over the Internet is completely secure. We retain information only as long as necessary for the purposes above, unless a longer period is required by law or legitimate business needs (such as resolving disputes).",
-
     "yourRights": "6. Your rights & contact",
     "yourRightsDesc": "Depending on your location, you may have rights to access, rectify, delete, restrict, or object to certain processing, or to data portability. You may also withdraw consent where processing is consent-based. To exercise rights or ask questions about this Policy, contact us via the details on our Contact page (for example info [at] doddapanenigroup.net). We may need to verify your identity before fulfilling certain requests.",
-
     "childrenTitle": "Children",
     "childrenDesc": "Our website is not directed at children under 16 (or the age required in your jurisdiction). We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us so we can delete it.",
-
     "internationalTitle": "International transfers",
     "internationalDesc": "We may process data in India, the United States, the European Economic Area, or other regions where we or our providers operate. We use appropriate safeguards as required by applicable law when data crosses borders.",
-
     "changes": "7. Changes to this policy",
     "changesDesc": "We may update this Privacy Policy to reflect legal, technical, or business changes. The “Last updated” date at the top will be revised when we post a new version. Continued use of the site after changes constitutes acceptance unless applicable law requires additional consent.",
-
     "partnerSitesLinkLabel": "How Google uses data from sites that use its services",
     "googlePrivacyLinkLabel": "Google Privacy Policy",
     "googleAdsSettingsLabel": "Google Ads Settings",
@@ -450,42 +439,30 @@
     "tocLaw": "Governing law & disputes",
     "tocChanges": "Changes & contact",
     "contactPageLink": "Go to Contact",
-
     "acceptance": "1. Agreement to these terms",
     "acceptanceDesc": "By accessing or using any website, application, or online service operated by Doddapaneni Group or its affiliates (collectively, “we”, “us”, “our”), you agree to these Terms of Service and our Privacy Policy. If you do not agree, you must not use the site. Additional terms may apply to specific services, products, or portals; in case of conflict, the more specific terms control for that offering.",
     "eligibilityTitle": "2. Eligibility",
     "eligibilityDesc": "You represent that you have the legal capacity to enter into these terms in your jurisdiction and, where you act on behalf of an organisation, that you are authorised to bind that organisation. You must not use the site in any country or manner prohibited by applicable sanctions, export controls, or law.",
-
     "useLicense": "3. Licence to use the website",
     "useLicenseDesc": "Subject to these Terms, we grant you a limited, non-exclusive, non-transferable, revocable licence to access and use the site for lawful business or personal, non-commercial browsing. You may not copy, scrape, mirror, or frame substantial portions of the site; circumvent security or access controls; probe or test vulnerabilities without authorisation; or use the site in any way that could damage, disable, or overburden our systems.",
-
     "restrictions": "4. Acceptable use",
     "restrictionsDesc": "You will not: (a) violate any applicable law or regulation; (b) infringe intellectual property or privacy rights of others; (c) upload malware, spam, or harmful code; (d) impersonate any person or entity; (e) harvest data or accounts without consent; (f) use automated means in breach of these Terms or robots.txt (if any); (g) attempt unauthorised access to our networks, data, or integrations. We may suspend or terminate access for conduct we reasonably believe breaches these Terms or harms us or third parties.",
-
     "ipTitle": "5. Intellectual property",
     "ipDesc": "The site and its content (including text, graphics, logos, layouts, software, and trademarks) are owned by Doddapaneni Group or its licensors and are protected by intellectual property laws. Except for the limited licence above, no rights are granted. You must not remove proprietary notices or use our marks without prior written consent.",
-
     "userContentTitle": "6. Information you provide",
     "userContentDesc": "If you submit enquiries, feedback, or other materials through the site, you grant us a non-exclusive licence to use, reproduce, and process such information to operate the site, respond to you, and improve our services, subject to our Privacy Policy. You represent that your submissions do not violate third-party rights or law.",
-
     "links": "7. Third-party links & integrations",
     "linksDesc": "The site may link to third-party websites, tools, or embedded content. We do not control and are not responsible for third-party sites, their content, or their practices. Your use of third-party services is subject to their terms and policies.",
-
     "disclaimer": "8. Disclaimers",
     "disclaimerDesc": "The site and all content are provided “as is” and “as available”, without warranties of any kind, whether express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement, to the fullest extent permitted by applicable law. We do not warrant uninterrupted or error-free operation, that defects will be corrected, or that the site or servers are free of harmful components. Educational or sector-related information on the site is general in nature and not a substitute for professional, legal, medical, real-estate, financial, or other specialised advice.",
-
     "limitations": "9. Limitation of liability",
     "limitationsDesc": "To the fullest extent permitted by applicable law, Doddapaneni Group and its affiliates, directors, officers, employees, and agents shall not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for loss of profits, data, goodwill, or business opportunities, arising from or related to your use of or inability to use the site. Our aggregate liability for claims arising from the site shall not exceed the greater of (a) the amount you paid to us for the specific service giving rise to the claim in the twelve (12) months before the claim or (b) one hundred U.S. dollars (USD 100), if no fees were paid. Some jurisdictions do not allow certain limitations; in such cases, our liability is limited to the maximum permitted by law.",
-
     "indemnityTitle": "10. Indemnity",
     "indemnityDesc": "You agree to indemnify, defend, and hold harmless Doddapaneni Group and its affiliates from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys’ fees) arising out of your use of the site, your violation of these Terms, or your violation of any third-party rights or applicable law, except to the extent caused by our gross negligence or wilful misconduct.",
-
     "governingLawTitle": "11. Governing law & disputes",
     "governingLawDesc": "These Terms are governed by applicable laws, without regard to conflict-of-law rules that would require the application of another jurisdiction’s laws. Subject to mandatory consumer protections in your country, you agree that exclusive jurisdiction and venue for disputes arising from these Terms or the site shall lie with the courts of competent jurisdiction as determined by us, unless otherwise required by binding law. Nothing in this section limits either party’s right to seek injunctive or equitable relief.",
-
     "revisions": "12. Changes",
     "revisionsDesc": "We may modify these Terms by posting an updated version on the site and updating the “Last updated” date. Material changes may be highlighted where appropriate. Continued use after changes become effective constitutes acceptance unless applicable law requires additional consent.",
-
     "contactClosingTitle": "13. Contact",
     "contactClosingDesc": "For questions about these Terms, please contact us through the Contact page or the contact details published there."
   },
@@ -510,28 +487,20 @@
     "tocBusiness": "Business information",
     "tocJurisdiction": "Jurisdiction",
     "contactPageLink": "Go to Contact",
-
     "general": "1. General",
     "generalDesc": "Information on this website is provided on an “as is” and “as available” basis. To the fullest extent permitted by applicable law, Doddapaneni Group (“we”, “us”, “our”) disclaims all representations and warranties, whether express, implied, or statutory, regarding the site, its content, and its operation. You use the site at your sole risk. We may change, suspend, or discontinue any part of the site without notice.",
-
     "healthcareTitle": "2. Healthcare & medical content limitation",
     "healthcareDesc": "Content that references healthcare, medical devices, wellness, billing, clinical, or related topics is provided for general informational purposes only. It does not constitute medical advice, diagnosis, treatment, or a recommendation to use any particular product or service. It is not a substitute for professional judgment by a qualified clinician, pharmacist, or other licensed healthcare provider. Never disregard professional medical advice or delay seeking it because of something you read on this site. If you think you may have a medical emergency, contact appropriate emergency services immediately. Any case studies, descriptions, or examples are illustrative only and do not guarantee outcomes for your situation.",
-
     "realEstateTitle": "3. Real estate & construction information",
     "realEstateDesc": "Content related to real estate, construction, architecture, development, leasing, investment, or property markets is for general information only. It does not constitute an offer, solicitation, or commitment to sell, lease, or finance property where such would require registration, licensing, or disclosure under applicable law. Maps, imagery, availability, pricing, specifications, timelines, and forward-looking statements may be approximate, subject to change, and not binding until confirmed in a written agreement signed by authorised parties. You must independently verify zoning, title, permits, taxes, environmental conditions, and all material facts with qualified professionals (including legal counsel, surveyors, and regulatory authorities) before relying on any information or making decisions. Past performance or descriptions of projects are not a guarantee of future results.",
-
     "noWarranty": "4. No warranty",
     "noWarrantyDesc": "We do not warrant that the website will be uninterrupted, secure, or error-free; that defects will be corrected; or that content is complete, accurate, timely, or suitable for any purpose. Technical and typographical errors may occur.",
-
     "limitation": "5. Limitation of liability",
     "limitationDesc": "To the fullest extent permitted by applicable law, Doddapaneni Group and its affiliates, directors, officers, employees, and agents shall not be liable for any direct, indirect, incidental, consequential, special, exemplary, or punitive damages, or any loss of profit, data, goodwill, or business opportunities, arising from your access to or use of (or inability to use) the site or reliance on its content—even if advised of the possibility of such damages.",
-
     "externalLinks": "6. External links",
     "externalLinksDesc": "Links to third-party websites or resources are provided for convenience. We do not endorse and are not responsible for the content, products, services, privacy practices, or availability of third-party sites. Accessing linked sites is at your own risk.",
-
     "businessDisclaimer": "7. Business & forward-looking information",
     "businessDisclaimerDesc": "Descriptions of businesses, divisions, services, capabilities, strategies, or growth plans may include forward-looking statements that involve risks and uncertainties. Actual results may differ materially. We undertake no obligation to update such information except as required by law.",
-
     "jurisdiction": "8. Jurisdiction",
     "jurisdictionDesc": "This Disclaimer is governed by applicable laws. Nothing herein limits non-waivable consumer rights under the law of your place of residence. For questions, contact us via our Contact page."
   },
@@ -545,7 +514,7 @@
     "questions": {
       "q1": {
         "question": "What does Doddapaneni Group actually do?",
-        "answer": "We are a parent organisation for twelve operating divisions. In practice that means software and IT work, digital marketing, healthcare-related products and back-office support, construction and real-estate activity, e-commerce platforms, media, staffing, food and manufacturing, logistics, education programmes, and import–export. The Services page summarises each area; division hubs and the blog publish more detail."
+        "answer": "We are a parent organisation for twelve operating divisions. In practice that means software and IT work, digital marketing, healthcare-related products and back-office support, construction and real-estate activity, e-commerce platforms, media, staffing, food and manufacturing, logistics, education programmes, and import–export. The Services page summarises each area; division hubs and News publish more detail."
       },
       "q2": {
         "question": "Where is Doddapaneni Group located?",
@@ -570,14 +539,17 @@
     }
   },
   "Blog": {
-    "title": "Blog",
-    "subtitle": "Articles from our divisions on commerce, healthcare operations, construction, logistics, and related topics—written for operators and decision-makers, not keyword stuffing.",
+    "title": "News",
+    "subtitle": "Articles from our divisions on commerce, healthcare operations, construction, logistics, and related topics—written for operators and decision-makers.",
     "intro": "Posts are edited for clarity and factual accuracy before publication. Dates refer to publication unless stated otherwise; for regulatory, medical, or investment decisions, confirm details with a qualified professional in your jurisdiction.",
-    "readMore": "Read More",
-    "backToBlog": "Back to Blog",
-    "relatedPosts": "Related Posts",
+    "readMore": "Read more",
+    "backToBlog": "Back to News",
+    "relatedPosts": "Related news",
     "categories": "Categories",
-    "recentPosts": "Recent Posts",
+    "recentPosts": "Recent news",
+    "emptySectorTitle": "No published news in this sector yet",
+    "emptySectorBody": "When posts are published under this division, they will appear here with links to each article.",
+    "browseAllNews": "Browse all news",
     "posts": {
       "future-of-ecommerce-2026": {
         "title": "The Future of E-Commerce in 2026: Trends and Opportunities",
