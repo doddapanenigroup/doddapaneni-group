@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
-import { routing } from './i18n/routing';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+const DEFAULT_LOCALE = 'en';
+const LOCALES = [
+  'en', 'te', 'hi', 'es',
+  'bn', 'mr', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks',
+] as const;
 
 /** Allow next/image to optimize `/api/media/**` (absolute URLs need a matching pattern). */
 function apiMediaRemotePatterns(): NonNullable<
@@ -37,8 +41,8 @@ const nextConfig: NextConfig = {
     return [
       { source: '/blog', destination: '/news', permanent: true },
       { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
-      ...routing.locales
-        .filter((loc) => loc !== routing.defaultLocale)
+      ...LOCALES
+        .filter((loc) => loc !== DEFAULT_LOCALE)
         .flatMap((loc) => [
           { source: `/${loc}/blog`, destination: `/${loc}/news`, permanent: true as const },
           {

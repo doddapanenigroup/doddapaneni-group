@@ -16,9 +16,6 @@ if (!process.env.AUTH_SECRET) {
 const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 'true';
 
 const nextAuth = NextAuth({
-  // Hostinger runs behind a reverse proxy; Auth.js often needs this to avoid
-  // "There was a problem with the server configuration" / ClientFetchError.
-  trustHost: true,
   providers: [
     Credentials({
       name: 'credentials',
@@ -90,10 +87,10 @@ const nextAuth = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id ?? '';
-        session.user.email = token.email ?? '';
-        session.user.name = token.name ?? null;
-        session.user.role = (token.role ?? 'DEVELOPER') as Role;
+        session.user.id = typeof token.id === 'string' ? token.id : '';
+        session.user.email = typeof token.email === 'string' ? token.email : '';
+        session.user.name = typeof token.name === 'string' ? token.name : null;
+        session.user.role = (typeof token.role === 'string' ? token.role : 'DEVELOPER') as Role;
         session.user.sessionIssuedAt = typeof token.iat === 'number' ? token.iat : undefined;
       }
       return session;

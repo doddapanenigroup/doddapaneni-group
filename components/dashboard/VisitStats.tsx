@@ -129,7 +129,7 @@ export default function VisitStats() {
                   <YAxis tick={{ fontSize: 11 }} stroke="#64748b" />
                   <Tooltip
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                    formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
+                    formatter={(value) => [Number(value ?? 0), 'Visits']}
                     labelFormatter={(label) => `Month: ${label}`}
                   />
                   <Bar dataKey="visits" fill="#64748b" radius={[4, 4, 0, 0]} name="Visits" />
@@ -162,7 +162,7 @@ export default function VisitStats() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                    formatter={(value: number | undefined) => [value ?? 0, 'Visits']}
+                    formatter={(value) => [Number(value ?? 0), 'Visits']}
                   />
                   <Legend />
                 </PieChart>

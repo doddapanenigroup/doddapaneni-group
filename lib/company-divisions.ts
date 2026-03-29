@@ -5,28 +5,28 @@ import { routing } from '@/i18n/routing';
  * Each slug must exist in the Sector model (Sector.slug) for layouts and data to resolve.
  */
 export const COMPANY_DIVISION_SLUGS = [
-  'Information Technology & AI Development',
-  'Digital Marketing',
-  'Healthcare & Medical',
-  'Construction & Real Estate',
-  'E-commerce & Marketplace',
-  'Media, News & Entertainment',
-  'Staffing & Consultancy',
-  'Food & Beverages',
-  'Manufacturing & Trading',
-  'Logistics & Warehousing',
-  'Education & Skill Development',
-  'Import & Export',
+  'software-it-ai',
+  'digital-marketing',
+  'healthcare-medical',
+  'construction-realestate',
+  'ecommerce-marketplace',
+  'media-news-entertainment',
+  'staffing-consultancy',
+  'food-beverages',
+  'manufacturing-trading',
+  'logistics-warehousing',
+  'education-skill',
+  'import-export',
 ] as const;
 
 export type CompanyDivisionSlug = (typeof COMPANY_DIVISION_SLUGS)[number];
 
 /** Divisions with full public hubs on the homepage (remaining show “Coming soon”). */
 export const HOME_DIVISION_ACTIVE_SLUGS = [
-  'Information Technology & AI Development',
-  'Digital Marketing',
-  'Healthcare & Medical',
-  'Construction & Real Estate',
+  'software-it-ai',
+  'digital-marketing',
+  'healthcare-medical',
+  'construction-realestate',
 ] as const satisfies readonly CompanyDivisionSlug[];
 
 export function isActiveHomeDivisionSlug(slug: string): boolean {
@@ -39,26 +39,30 @@ export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
 
 /** Sector hubs that show marketing focus areas only (no news listing), matching the digital-marketing content pattern. */
 export const SECTOR_LANDING_CONTENT_ONLY_SLUGS = [
-  'Information Technology & AI Development',
-  'Healthcare & Medical',
-  'Media, News & Entertainment',
-] as const satisfies readonly CompanyDivisionSlug[]
+  'software-it-ai',
+  'healthcare-medical',
+  'media-news-entertainment',
+] as const satisfies readonly CompanyDivisionSlug[];
+
+export function isSectorLandingContentOnlySlug(slug: string): boolean {
+  return (SECTOR_LANDING_CONTENT_ONLY_SLUGS as readonly string[]).includes(slug);
+}
 /**
  * Display names for header/footer (aligned with `scripts/sector-seeds.mjs` Sector.name).
  */
 export const COMPANY_DIVISION_NAV_LABELS: Record<CompanyDivisionSlug, string> = {
-  'Information Technology & AI Development': 'Information Technology & AI Development ',
-  'Digital Marketing': 'Digital Marketing',
-  'Healthcare & Medical': 'Healthcare & Medical',
-  'Construction & Real Estate': 'Construction & Real Estate',
-  'E-commerce & Marketplace': 'E-commerce & Marketplace',
-  'Media, News & Entertainment': 'Media, News & Entertainment',
-  'Staffing & Consultancy': 'Staffing & Consultancy',
-  'Food & Beverages': 'Food & Beverages',
-  'Manufacturing & Trading': 'Manufacturing & Trading',
-  'Logistics & Warehousing': 'Logistics & Warehousing',
-  'Education & Skill Development': 'Education & Skill Development',
-  'Import & Export': 'Import & Export',
+  'software-it-ai': 'Software, IT & AI',
+  'digital-marketing': 'Digital Marketing',
+  'healthcare-medical': 'Healthcare & Medical',
+  'construction-realestate': 'Construction & Real Estate',
+  'ecommerce-marketplace': 'E-commerce & Marketplace',
+  'media-news-entertainment': 'Media, News & Entertainment',
+  'staffing-consultancy': 'Staffing & Consultancy',
+  'food-beverages': 'Food & Beverages',
+  'manufacturing-trading': 'Manufacturing & Trading',
+  'logistics-warehousing': 'Logistics & Warehousing',
+  'education-skill': 'Education & Skill Development',
+  'import-export': 'Import & Export',
 };
 
 export type CompanyDivisionNavItem = {

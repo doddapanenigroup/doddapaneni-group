@@ -46,7 +46,7 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
                 <YAxis tick={{ fontSize: 11 }} stroke="#64748b" allowDecimals={false} />
                 <Tooltip
                   contentStyle={{ borderRadius: 8 }}
-                  formatter={(v: number | undefined) => [(v ?? 0).toLocaleString(), 'Views']}
+                  formatter={(v) => [Number(v ?? 0).toLocaleString(), 'Views']}
                   labelFormatter={(l) => `Day ${l}`}
                 />
                 <Line
@@ -95,7 +95,7 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
                   />
                   <Tooltip
                     contentStyle={{ borderRadius: 8 }}
-                    formatter={(v: number | undefined) => [(v ?? 0).toLocaleString(), 'Views']}
+                    formatter={(v) => [Number(v ?? 0).toLocaleString(), 'Views']}
                     labelFormatter={(_, payload) =>
                       (payload?.[0]?.payload as { fullPath?: string })?.fullPath ?? ''
                     }
@@ -142,7 +142,7 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
                   />
                   <Tooltip
                     contentStyle={{ borderRadius: 8 }}
-                    formatter={(v: number | undefined) => [(v ?? 0).toLocaleString(), 'Views']}
+                    formatter={(v) => [Number(v ?? 0).toLocaleString(), 'Views']}
                     labelFormatter={(_, payload) =>
                       (payload?.[0]?.payload as { fullPath?: string })?.fullPath ?? ''
                     }
