@@ -131,7 +131,7 @@ export default function Navbar() {
       className={
         mobile
           ? 'space-y-0.5 py-1'
-          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 py-3 px-3 sm:px-4'
+          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 sm:items-start py-3 px-3 sm:px-4'
       }
     >
       {COMPANIES_NAV.map((item) => {
@@ -139,7 +139,7 @@ export default function Navbar() {
 
         if (item.active) {
           return (
-            <li key={item.slug}>
+            <li key={item.slug} className={mobile ? undefined : 'min-w-0'}>
               <Link
                 href={`/${item.slug}`}
                 locale={locale}
@@ -147,7 +147,7 @@ export default function Navbar() {
                   setCompaniesOpen(false);
                   onNavigate?.();
                 }}
-                className={`flex items-center justify-between gap-3 px-3 py-2.5 text-sm transition-colors ${
+                className={`flex items-start gap-3 px-3 py-2.5 text-sm transition-colors ${
                   mobile ? 'rounded-lg' : 'rounded-lg'
                 } ${
                   isActiveHere
@@ -155,7 +155,7 @@ export default function Navbar() {
                     : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <span className="min-w-0 leading-snug">{item.label}</span>
+                <span className="min-w-0 flex-1 break-words leading-snug">{item.label}</span>
               </Link>
             </li>
           );
@@ -171,7 +171,7 @@ export default function Navbar() {
               } ${mobile ? '' : ''}`}
             >
               <span
-                className={`min-w-0 flex-1 leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
+                className={`min-w-0 flex-1 break-words leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
               >
                 {item.label}
               </span>
@@ -235,7 +235,7 @@ export default function Navbar() {
             </button>
             {companiesOpen ? (
               <div
-                className="absolute left-0 top-full z-[60] mt-1 max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] min-w-[min(100%,28rem)] overflow-y-auto overscroll-contain rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
+                className="absolute right-0 left-auto top-full z-[60] mt-1 max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
                 role="region"
                 aria-label={t('ourCompanies')}
                 onMouseEnter={openCompaniesMenu}
