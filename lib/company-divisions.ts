@@ -51,14 +51,14 @@ export function isSectorLandingContentOnlySlug(slug: string): boolean {
  * Display names for header/footer (aligned with `scripts/sector-seeds.mjs` Sector.name).
  */
 export const COMPANY_DIVISION_NAV_LABELS: Record<CompanyDivisionSlug, string> = {
-  'software-it-ai': 'Software, IT & AI',
+  'software-it-ai': 'Information Technology & AI Development',
   'digital-marketing': 'Digital Marketing',
   'healthcare-medical': 'Healthcare & Medical',
   'construction-realestate': 'Construction & Real Estate',
-  'ecommerce-marketplace': 'E-commerce & Marketplace',
-  'media-news-entertainment': 'Media, News & Entertainment',
-  'staffing-consultancy': 'Staffing & Consultancy',
-  'food-beverages': 'Food & Beverages',
+  'ecommerce-marketplace': 'E-commerce Marketplace',
+  'media-news-entertainment': 'Media News & Entertainment',
+  'staffing-consultancy': 'Staff & Consultancy',
+  'food-beverages': 'Food & Baverages',
   'manufacturing-trading': 'Manufacturing & Trading',
   'logistics-warehousing': 'Logistics & Warehousing',
   'education-skill': 'Education & Skill Development',

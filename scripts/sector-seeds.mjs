@@ -4,7 +4,7 @@
  */
 export const SECTOR_SEEDS = [
   {
-    name: 'Software, IT & AI',
+    name: 'Information Technology & AI Development',
     slug: 'software-it-ai',
     description:
       'Enterprise software, cloud, and AI capabilities that modernize operations, strengthen security, and unlock data-driven growth.',
@@ -28,25 +28,25 @@ export const SECTOR_SEEDS = [
       'Project delivery, property platforms, and infrastructure partnerships from planning through handover.',
   },
   {
-    name: 'E-commerce & Marketplace',
+    name: 'E-commerce Marketplace',
     slug: 'ecommerce-marketplace',
     description:
       'Commerce platforms, catalog and fulfillment integration, and marketplace experiences scaled for multi-region growth.',
   },
   {
-    name: 'Media, News & Entertainment',
+    name: 'Media News & Entertainment',
     slug: 'media-news-entertainment',
     description:
       'Content distribution, audience products, and digital experiences for publishers and entertainment brands.',
   },
   {
-    name: 'Staffing & Consultancy',
+    name: 'Staff & Consultancy',
     slug: 'staffing-consultancy',
     description:
       'Talent programs, workforce solutions, and advisory services aligned to your industry and growth stage.',
   },
   {
-    name: 'Food & Beverages',
+    name: 'Food & Baverages',
     slug: 'food-beverages',
     description:
       'Supply chain, quality, and digital capabilities for food and beverage brands serving regional and global markets.',

@@ -27,7 +27,7 @@ const TOPIC_NAV_BY_SLUG = {
       label: 'Platform engineering',
       href: '/software-it-ai#topic-platform',
       description:
-        'Software, IT & AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure.',
+        'Information technology and AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure.',
     },
   ],
   'digital-marketing': [

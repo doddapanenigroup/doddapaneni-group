@@ -65,31 +65,31 @@
     "getInTouch": "Get in Touch",
     "servicesList": {
       "ecommerce": {
-        "title": "E-Commerce & Marketplaces",
+        "title": "E-commerce Marketplace",
         "description": "We design, develop, and manage scalable e-commerce ecosystems that support modern business models. Our solutions include online retail platforms, multi-vendor marketplaces, global trading portals, and dropshipping and wholesale systems optimized for performance and growth."
       },
       "software": {
-        "title": "Software, IT & AI Technologies",
+        "title": "Information Technology & AI Development",
         "description": "We provide end-to-end digital solutions including web and mobile application development, AI-powered automation, chatbots, cloud services, SaaS platforms, and IT consulting. Our technology solutions are designed to enhance efficiency, security, and scalability."
       },
       "digitalMarketing": {
-        "title": "Digital Marketing Services",
+        "title": "Digital Marketing",
         "description": "Our digital marketing services focus on building brand visibility and driving measurable growth. We offer SEO and keyword optimization, social media management, branding and advertising campaigns, and lead generation through performance-driven strategies."
       },
       "healthcare": {
-        "title": "Healthcare, Medical Supplies & Medical Billing",
+        "title": "Healthcare & Medical",
         "description": "We support healthcare providers with medical equipment trading and comprehensive backend services. Our offerings include CPAP and BiPAP devices, medical consumables, wholesale distribution, medical billing and coding, insurance claims processing, EHR/EMR integration, telehealth billing, and complete Revenue Cycle Management solutions."
       },
       "construction": {
-        "title": "Construction, Architecture & Real Estate",
+        "title": "Construction & Real Estate",
         "description": "We deliver construction and real estate solutions covering building construction, architectural design, real estate development, and property consulting, ensuring quality, compliance, and timely execution."
       },
       "importExport": {
-        "title": "Import & Export (All Commodities)",
+        "title": "Import & Export",
         "description": "We facilitate international trade through global sourcing, wholesale exports, international trading, and cross-border logistics, enabling smooth and compliant global operations."
       },
       "food": {
-        "title": "Food Processing & Beverages",
+        "title": "Food & Baverages",
         "description": "Our food processing and beverage division focuses on packaged food production, beverage manufacturing, and efficient food supply chain distribution."
       },
       "education": {
@@ -101,15 +101,15 @@
         "description": "We offer end-to-end logistics solutions including freight and cargo handling, storage and warehousing, supply chain management, and last-mile delivery services."
       },
       "media": {
-        "title": "Media, News & Entertainment",
+        "title": "Media News & Entertainment",
         "description": "Our media division manages digital news portals, media production, video and content creation, and advertising network management."
       },
       "manufacturing": {
-        "title": "Manufacturing & Wholesale Trading",
+        "title": "Manufacturing & Trading",
         "description": "We operate industrial manufacturing units, custom production facilities, and bulk wholesale trading operations to support diverse industry needs."
       },
       "staffing": {
-        "title": "Employee Consultancy & Staffing Services",
+        "title": "Staff & Consultancy",
         "description": "We assist organizations with recruitment and staffing, HR consulting, and workforce management, helping businesses build efficient and high-performing teams."
       }
     },

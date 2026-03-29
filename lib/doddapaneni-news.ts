@@ -57,8 +57,8 @@ function article(
 export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
   {
     name: 'Information Technology & AI Development',
-    slug: 'information-technology-ai-development',
-    aliases: ['information-technology'],
+    slug: 'software-it-ai',
+    aliases: ['information-technology-ai-development', 'information-technology'],
     shortDescription: 'Software delivery, cloud modernization, AI-led automation, and digital transformation.',
     serviceTypeOptions: ['AI consulting', 'Custom software', 'Cloud migration', 'Data engineering', 'Automation'],
     dynamicFields: [
@@ -175,7 +175,8 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
   },
   {
     name: 'Construction & Real Estate',
-    slug: 'construction-real-estate',
+    slug: 'construction-realestate',
+    aliases: ['construction-real-estate'],
     shortDescription: 'Project execution, real estate advisory, and end-to-end transaction support.',
     serviceTypeOptions: ['Project planning', 'Property advisory', 'Commercial development', 'Residential sales', 'Vendor sourcing'],
     dynamicFields: [
@@ -220,7 +221,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'E-commerce & Marketplace',
+    name: 'E-commerce Marketplace',
     slug: 'ecommerce-marketplace',
     shortDescription: 'Marketplace growth, conversion optimization, and omnichannel commerce operations.',
     serviceTypeOptions: ['Store launch', 'Marketplace expansion', 'Conversion optimization', 'Retention strategy'],
@@ -241,7 +242,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'Media, News & Entertainment',
+    name: 'Media News & Entertainment',
     slug: 'media-news-entertainment',
     shortDescription: 'Audience growth, content distribution, and monetization strategy for modern media brands.',
     serviceTypeOptions: ['Editorial strategy', 'Audience growth', 'Video monetization', 'Publishing platform'],
@@ -262,7 +263,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'Staffing & Consultancy',
+    name: 'Staff & Consultancy',
     slug: 'staffing-consultancy',
     shortDescription: 'Talent acquisition and advisory services for high-skill and growth-critical roles.',
     serviceTypeOptions: ['Permanent hiring', 'Contract staffing', 'Executive search', 'Consulting'],
@@ -283,7 +284,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'Food & Beverages',
+    name: 'Food & Baverages',
     slug: 'food-beverages',
     shortDescription: 'Operational efficiency, supply quality, and brand-led growth for food businesses.',
     serviceTypeOptions: ['Food processing', 'Quality compliance', 'Distribution', 'Brand growth'],
@@ -347,7 +348,8 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
   },
   {
     name: 'Education & Skill Development',
-    slug: 'education-skill-development',
+    slug: 'education-skill',
+    aliases: ['education-skill-development'],
     shortDescription: 'Learning design, skilling programs, and digital education platforms.',
     serviceTypeOptions: ['Curriculum design', 'LMS setup', 'Corporate skilling', 'Career programs'],
     dynamicFields: [
