@@ -131,7 +131,7 @@ export default function Navbar() {
       className={
         mobile
           ? 'space-y-0.5 py-1'
-          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-1 sm:gap-y-0 max-h-[min(32rem,calc(100vh-8rem))] overflow-y-auto overscroll-contain py-3 px-2'
+          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 py-3 px-3 sm:px-4'
       }
     >
       {COMPANIES_NAV.map((item) => {
@@ -164,18 +164,18 @@ export default function Navbar() {
         return (
           <li key={item.slug}>
             <div
-              className={`flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded-lg ${
+              className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-lg ${
                 isActiveHere
                   ? 'border-l-2 border-blue-600 bg-blue-50/90 text-slate-800'
                   : 'text-slate-400'
               } ${mobile ? '' : ''}`}
             >
               <span
-                className={`min-w-0 leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
+                className={`min-w-0 flex-1 leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
               >
                 {item.label}
               </span>
-              <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              <span className="shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                 {t('comingSoonNav')}
               </span>
             </div>
@@ -235,7 +235,7 @@ export default function Navbar() {
             </button>
             {companiesOpen ? (
               <div
-                className="absolute left-0 top-full z-[60] mt-1 w-[min(42rem,calc(100vw-2rem))] min-w-[22rem] rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
+                className="absolute left-0 top-full z-[60] mt-1 max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] min-w-[min(100%,28rem)] overflow-y-auto overscroll-contain rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
                 role="region"
                 aria-label={t('ourCompanies')}
                 onMouseEnter={openCompaniesMenu}

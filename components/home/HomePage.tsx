@@ -52,11 +52,11 @@ export default function HomePage({ divisions }: Props) {
             src={BANNER_IMAGE}
             alt={t('heroImageAlt')}
             fill
-            sizes="100vw"
+            sizes="(max-width: 1920px) 100vw, 1920px"
+            quality={72}
             className="object-cover opacity-45"
             priority
             fetchPriority="high"
-            decoding="sync"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/95 to-blue-950/90" />
           <div

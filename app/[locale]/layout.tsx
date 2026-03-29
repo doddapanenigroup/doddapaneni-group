@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { prisma } from '@/lib/prisma';
+import { getCachedLayoutPageSeo } from '@/lib/cached-layout-seo';
 import { alternateLanguagesForPathname, absoluteUrlForLocale } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 
@@ -34,41 +34,7 @@ export async function generateMetadata({
   const baseSlug = routePath ? routePath : 'home';
   const slug = locale === routing.defaultLocale ? baseSlug : `${locale}/${baseSlug}`;
 
-  let seo:
-    | {
-        title: string;
-        metaTitle: string | null;
-        metaDescription: string | null;
-        keywords: string | null;
-        canonicalUrl: string | null;
-        ogTitle: string | null;
-        ogDescription: string | null;
-        ogImage: string | null;
-      }
-    | null = null;
-  try {
-    const nowIso = new Date().toISOString();
-    seo = await prisma.pageContent.findFirst({
-      where: {
-        slug,
-        locale,
-        status: 'published',
-        OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: nowIso } }],
-      },
-      select: {
-        title: true,
-        metaTitle: true,
-        metaDescription: true,
-        keywords: true,
-        canonicalUrl: true,
-        ogTitle: true,
-        ogDescription: true,
-        ogImage: true,
-      },
-    });
-  } catch {
-    seo = null;
-  }
+  const seo = await getCachedLayoutPageSeo(slug, locale);
 
   const title = seo?.metaTitle?.trim() || seo?.title?.trim() || t('title');
   const description = seo?.metaDescription?.trim() || t('description');
