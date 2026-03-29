@@ -33,7 +33,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
 
   const tBlog = await getTranslations({ locale, namespace: 'Blog' });
   const newsLabel = tBlog('title');
-  const allNewsHref = '/blog';
+  const allNewsHref = '/news';
   const topicAnchors = getDivisionTopicNavItems(sectorSlug).filter((i) => topicAnchorIdFromHref(i.href));
   const contentOnly = isSectorLandingContentOnlySlug(sectorSlug);
 

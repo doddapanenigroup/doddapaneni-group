@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
+import { routing } from './i18n/routing';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
@@ -32,6 +33,22 @@ function apiMediaRemotePatterns(): NonNullable<
 }
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/blog', destination: '/news', permanent: true },
+      { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
+      ...routing.locales
+        .filter((loc) => loc !== routing.defaultLocale)
+        .flatMap((loc) => [
+          { source: `/${loc}/blog`, destination: `/${loc}/news`, permanent: true as const },
+          {
+            source: `/${loc}/blog/:slug`,
+            destination: `/${loc}/news/:slug`,
+            permanent: true as const,
+          },
+        ]),
+    ];
+  },
   poweredByHeader: false,
   // Docker / VPS: produces .next/standalone for `node server.js` (see Dockerfile)
   output: 'standalone',

@@ -124,7 +124,7 @@ export type BlogListRowWithSector = {
   sector: { slug: string; name: string } | null;
 };
 
-/** All published posts with sector link — main `/blog` index (DB is source of truth when rows exist). */
+/** All published posts with sector link — main `/news` index (DB is source of truth when rows exist). */
 export async function listAllPublishedBlogsWithSector(now: Date): Promise<BlogListRowWithSector[]> {
   await connectDb();
   return prisma.blog.findMany({

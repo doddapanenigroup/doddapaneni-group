@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { connectDb, prisma } from "@/lib/db";
 import { verifyPreviewToken } from "@/lib/preview-token";
 import { mediaUrl } from "@/lib/media";
-import BlogPostClient from "../../blog/[slug]/BlogPostClient";
+import BlogPostClient from "../../news/[slug]/BlogPostClient";
 import { BLOG_POST_META } from "@/lib/blog-post-meta";
 
 export const dynamic = "force-dynamic";
@@ -95,12 +95,15 @@ export default async function PreviewPage({ params }: Props) {
     <BlogPostClient
       locale={locale}
       blogContent={dbPost.content ?? ""}
-      backToBlog={"Back to Blog"}
-      title={dbPost.title ?? "Blog preview"}
-      category="Blog"
+      backToBlog={"Back to News"}
+      title={dbPost.title ?? "News preview"}
+      category="News"
       readTime={`${readMinutes} min read`}
       image={normalizeStoredImage(dbPost.featuredImage) ?? (fallbackMeta?.image ?? null)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
+      articlePathname={`/news/${payload.slug}`}
+      articleSlug={payload.slug}
+      showEngagement={false}
     />
   );
 }

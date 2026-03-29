@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
+import NewsPostEngagement from '@/components/news/NewsPostEngagement';
 
 type Props = {
   locale: string;
@@ -11,6 +12,11 @@ type Props = {
   readTime: string;
   image: string | null;
   publishedAt: string | null;
+  /** Path from site root for analytics/email, e.g. `/news/slug` or `/software-it-ai/slug`. */
+  articlePathname: string;
+  articleSlug: string;
+  /** Set false for draft preview routes. */
+  showEngagement?: boolean;
 };
 
 export default function BlogPostClient({
@@ -22,13 +28,16 @@ export default function BlogPostClient({
   readTime,
   image,
   publishedAt,
+  articlePathname,
+  articleSlug,
+  showEngagement = true,
 }: Props) {
   return (
     <div className="min-h-screen bg-white">
       <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/blog"
+            href="/news"
             locale={locale}
             className="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors"
           >
@@ -40,9 +49,7 @@ export default function BlogPostClient({
               {category}
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            {title}
-          </h1>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">{title}</h1>
           <div className="flex items-center gap-4 text-blue-200 text-sm">
             {publishedAt ? (
               <div className="flex items-center">
@@ -85,10 +92,14 @@ export default function BlogPostClient({
         </article>
       </section>
 
+      {showEngagement ? (
+        <NewsPostEngagement articleSlug={articleSlug} articleTitle={title} articlePathname={articlePathname} />
+      ) : null}
+
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-slate-50 border-t border-slate-200">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/blog"
+            href="/news"
             locale={locale}
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
           >

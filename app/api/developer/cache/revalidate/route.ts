@@ -21,7 +21,7 @@ function strArray(value: unknown): string[] {
  * Developer-only cache revalidation endpoint.
  *
  * Supports:
- * - `paths`: array of route paths (e.g. "/en", "/en/blog", "/en/about")
+ * - `paths`: array of route paths (e.g. "/en", "/en/news", "/en/about")
  * - `tags`: array of cache tags (only affects fetch() requests that used those tags)
  *
  * Note: This does not purge external/CDN caches. It triggers Next.js on-demand revalidation.
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           '/en/about',
           '/en/services',
           '/en/contact',
-          '/en/blog',
+          '/en/news',
         ];
 
     const results: { paths: { path: string; ok: boolean }[]; tags: { tag: string; ok: boolean }[] } = {

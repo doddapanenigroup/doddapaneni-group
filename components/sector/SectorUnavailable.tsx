@@ -16,7 +16,7 @@ type Props = {
 export default async function SectorUnavailable({ locale, slug }: Props) {
   const label = COMPANY_DIVISION_NAV_LABELS[slug];
   const homeHref = publicPathWithLocale(locale);
-  const blogHref = publicPathWithLocale(locale, 'blog');
+  const blogHref = publicPathWithLocale(locale, 'news');
   const t = await getTranslations({ locale, namespace: 'Blog' });
 
   return (

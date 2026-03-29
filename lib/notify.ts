@@ -1,6 +1,7 @@
 import { connectDb, prisma } from '@/lib/db';
 import { ROLES, type Role } from '@/lib/constants';
 import { routing } from '@/i18n/routing';
+import { publicPathWithLocale } from '@/lib/sector-landing';
 
 type AuditActorLite = {
   id: string;
@@ -71,7 +72,7 @@ export async function notifyContentPublished(args: {
 }) {
   const linkHref =
     args.kind === 'blog'
-      ? `/${args.locale}/blog/${encodeURIComponent(args.slug)}`
+      ? publicPathWithLocale(args.locale, 'news', args.slug)
       : `${dashBase()}/marketer`;
   const titleText =
     args.kind === 'blog'

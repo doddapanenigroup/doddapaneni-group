@@ -7,7 +7,7 @@ import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
-import BlogPostClient from '@/app/[locale]/blog/[slug]/BlogPostClient';
+import BlogPostClient from '@/app/[locale]/news/[slug]/BlogPostClient';
 
 /** ISR: sector posts refresh on an interval without forcing every request dynamic. */
 export const revalidate = 120;
@@ -73,6 +73,7 @@ export default async function SectorBlogPostPage({ params }: Props) {
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
+  const sectorArticlePath = `/${dbPost.sector.slug}/${slug.trim()}`;
 
   return (
     <BlogPostClient
@@ -84,6 +85,8 @@ export default async function SectorBlogPostPage({ params }: Props) {
       readTime={`${readMinutes} min read`}
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
+      articlePathname={sectorArticlePath}
+      articleSlug={slug.trim()}
     />
   );
 }

@@ -30,8 +30,8 @@ function pagePublicPath(locale: string, slug: string): string {
 }
 
 function blogPublicPath(locale: string, slug: string): string {
-  if (locale === routing.defaultLocale) return `/blog/${slug}`;
-  return `/${locale}/blog/${slug}`;
+  if (locale === routing.defaultLocale) return `/news/${slug}`;
+  return `/${locale}/news/${slug}`;
 }
 
 function buildFlatItems(

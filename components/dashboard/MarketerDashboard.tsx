@@ -24,6 +24,8 @@ import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
+import { publicPathWithLocale } from '@/lib/sector-landing';
+import { getSiteOrigin } from '@/lib/site-origin';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -1638,7 +1640,7 @@ export default function MarketerDashboard({
               <GoogleSnippetPreview
                 title={blogForm.metaTitle || blogForm.title}
                 description={blogForm.metaDescription}
-                url={`https://doddapanenigroup.net/${locale}/blog/${blogForm.slug || ''}`}
+                url={`${getSiteOrigin()}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
                 ogImage={blogForm.ogImage || blogForm.featuredImage}
               />
               <SeoScorePanel

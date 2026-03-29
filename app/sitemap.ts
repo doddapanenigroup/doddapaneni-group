@@ -22,7 +22,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'monthly' },
-  { path: '/blog', priority: 0.9, changeFrequency: 'daily' },
+  { path: '/news', priority: 0.9, changeFrequency: 'daily' },
   { path: '/contact', priority: 0.85, changeFrequency: 'monthly' },
   { path: '/companies/dealsmedi', priority: 0.75, changeFrequency: 'monthly' },
   { path: '/companies/dlsin', priority: 0.75, changeFrequency: 'monthly' },
@@ -61,7 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ) => {
     for (const r of STATIC_ROUTES) {
       let lastModified = contentLastModByPath.get(r.path) ?? now;
-      if (r.path === '/blog' && blogListingLastMod) {
+      if (r.path === '/news' && blogListingLastMod) {
         lastModified = new Date(Math.max(lastModified.getTime(), blogListingLastMod.getTime()));
       }
       entries.push(
@@ -181,7 +181,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   for (const post of blogRows) {
-    const path = post.sector?.slug ? `/${post.sector.slug}/${post.slug}` : `/blog/${post.slug}`;
+    const path = post.sector?.slug ? `/${post.sector.slug}/${post.slug}` : `/news/${post.slug}`;
     if (seenPaths.has(path)) continue;
     seenPaths.add(path);
     entries.push(

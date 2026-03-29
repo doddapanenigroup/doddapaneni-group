@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Trash2, RefreshCw } from 'lucide-react';
 
 export default function DeveloperCachePanel() {
-  const [pathsText, setPathsText] = useState('/en\n/en/blog\n/en/about');
+  const [pathsText, setPathsText] = useState('/en\n/en/news\n/en/about');
   const [tagsText, setTagsText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; results?: unknown; message?: string } | null>(null);
@@ -58,7 +58,7 @@ export default function DeveloperCachePanel() {
               onChange={(e) => setPathsText(e.target.value)}
               rows={6}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono"
-              placeholder="/en&#10;/en/blog"
+              placeholder="/en&#10;/en/news"
             />
           </div>
           <div>

@@ -10,7 +10,8 @@ const DEFAULT_DAYS = 30;
 
 function isBlogPath(path: string | null): boolean {
   if (!path) return false;
-  return path.toLowerCase().includes('/blog/');
+  const p = path.toLowerCase();
+  return p.includes('/news/') || p.includes('/blog/');
 }
 
 function clampDays(raw: string | null): number {
@@ -91,7 +92,10 @@ export async function GET(request: Request) {
         where: {
           createdAt: { gte: since, lte: untilDay },
           name: 'LCP',
-          pagePath: { contains: '/blog/', mode: 'insensitive' },
+          OR: [
+            { pagePath: { contains: '/news/', mode: 'insensitive' } },
+            { pagePath: { contains: '/blog/', mode: 'insensitive' } },
+          ],
         },
         _avg: { value: true },
         _count: { id: true },

@@ -120,7 +120,7 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
             Blog performance
           </h2>
           <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-            Views by blog URL (from public site tracking). Web Vitals LCP average for blog URLs shown
+            Views by news URL (from public site tracking). Web Vitals LCP average for news URLs shown
             in summary cards.
           </p>
           <div className="w-full min-w-0" style={{ minHeight: DASHBOARD_CHART_HEIGHT }}>
@@ -155,7 +155,7 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
                 className="flex items-center justify-center text-sm text-slate-500 dark:text-slate-400"
                 style={{ height: DASHBOARD_CHART_HEIGHT, minHeight: DASHBOARD_CHART_HEIGHT }}
               >
-                No blog traffic in this range.
+                No news traffic in this range.
               </div>
             )}
           </div>

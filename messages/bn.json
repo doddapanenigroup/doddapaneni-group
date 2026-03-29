@@ -690,6 +690,26 @@
     },
     "emptySectorTitle": "No published news in this sector yet",
     "emptySectorBody": "When posts are published under this division, they will appear here with links to each article.",
-    "browseAllNews": "Browse all news"
+    "browseAllNews": "Browse all news",
+    "engagementSectionEyebrow": "Connect",
+    "engagementSectionTitle": "Get in touch about this article",
+    "engagementLeadTitle": "Business inquiry",
+    "engagementLeadSubtitle": "Share your needs and we will route you to the right team.",
+    "engagementCommentTitle": "Leave a comment",
+    "engagementCommentSubtitle": "Comments are reviewed before publication.",
+    "engagementName": "Name",
+    "engagementEmail": "Email",
+    "engagementPhone": "Phone (optional)",
+    "engagementCompany": "Company (optional)",
+    "engagementInterest": "How can we help?",
+    "engagementCommentLabel": "Your comment",
+    "engagementSubmitLead": "Send inquiry",
+    "engagementSubmitComment": "Post comment",
+    "engagementSending": "Sending…",
+    "engagementSuccessLead": "Thank you — we have received your inquiry.",
+    "engagementSuccessComment": "Thank you — your comment was submitted for review.",
+    "engagementError": "Something went wrong. Please try again later.",
+    "engagementRequired": "Please check this field.",
+    "engagementPrivacyNote": "By submitting, you agree we may contact you about this request. See our Privacy Policy for how we handle your data."
   }
 }

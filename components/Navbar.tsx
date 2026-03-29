@@ -104,7 +104,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: t('home') },
     { href: '/about', label: t('about') },
-    { href: '/blog', label: t('blog') },
+    { href: '/news', label: t('blog') },
     { href: '/contact', label: t('contact') },
   ];
   const navBeforeMega = navLinks.slice(0, 2);

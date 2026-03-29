@@ -218,18 +218,18 @@ export default function AnalyticsDashboard({
             </div>
             <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <BookOpen size={14} /> Blog views
+                <BookOpen size={14} /> News views
               </p>
               <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
                 {data.blog.totalViews.toLocaleString()}
               </p>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Paths matching /blog/
+                Paths matching /news/ (and legacy /blog/)
               </p>
             </div>
             <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Blog LCP (avg)
+                News LCP (avg)
               </p>
               <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
                 {data.blog.lcpAvgMs != null
@@ -238,8 +238,8 @@ export default function AnalyticsDashboard({
               </p>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {data.blog.lcpSamples > 0
-                  ? `${data.blog.lcpSamples} samples on blog URLs`
-                  : 'No LCP samples for blog paths'}
+                  ? `${data.blog.lcpSamples} samples on news URLs`
+                  : 'No LCP samples for news paths'}
               </p>
             </div>
           </div>

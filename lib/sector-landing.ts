@@ -97,7 +97,7 @@ export function toPositiveSectorPage(raw: string | undefined): number {
   return n;
 }
 
-/** Path prefix for Link hrefs (matches next-intl / blog list pattern). */
+/** Path prefix for Link hrefs (matches next-intl /news listing pattern). */
 export function publicPathWithLocale(locale: string, ...segments: string[]): string {
   const path = `/${segments.filter(Boolean).join('/')}`;
   if (locale === routing.defaultLocale) return path;
