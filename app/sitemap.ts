@@ -8,6 +8,7 @@ import { getSiteOrigin } from '@/lib/site-origin';
 import { sitemapEntry } from '@/lib/sitemap-build';
 import { sitemapPathFromPageKey } from '@/lib/sitemap-paths';
 import { listAllPublishedBlogsWithSector } from '@/lib/data/sector-blog-repository';
+import { DODDAPANENI_NEWS_SECTORS } from '@/lib/doddapaneni-news';
 
 /**
  * ISR: sitemap reflects DB changes on a short interval without querying on every hit.
@@ -31,6 +32,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/terms', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/disclaimer', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/faq', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/doddapaneni/news', priority: 0.8, changeFrequency: 'weekly' },
 ];
 
 function blogLastModified(post: { publishedAt: Date | null; updatedAt: Date }): Date {
@@ -146,6 +148,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const seenPaths = new Set<string>();
   for (const s of STATIC_ROUTES) {
     seenPaths.add(s.path === '/' ? '/' : s.path);
+  }
+
+  for (const sector of DODDAPANENI_NEWS_SECTORS) {
+    const sectorPath = `/doddapaneni/${sector.slug}/news`;
+    if (!seenPaths.has(sectorPath)) {
+      seenPaths.add(sectorPath);
+      entries.push(
+        sitemapEntry(origin, sectorPath, {
+          priority: 0.72,
+          changeFrequency: 'weekly',
+          lastModified: now,
+        }),
+      );
+    }
+    for (const article of sector.news) {
+      const articlePath = `${sectorPath}/${article.slug}`;
+      if (seenPaths.has(articlePath)) continue;
+      seenPaths.add(articlePath);
+      entries.push(
+        sitemapEntry(origin, articlePath, {
+          priority: 0.66,
+          changeFrequency: 'monthly',
+          lastModified: now,
+        }),
+      );
+    }
   }
 
   /** All 12 division hubs and subpages — DB refines `lastmod`; routes exist even if seed is incomplete. */
