@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
+import { canonicalDivisionDisplayName } from '@/lib/company-divisions';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publishedBlogWhere, publishedBlogWhereForSector } from '@/lib/data/published-blog';
 import { getPublicSectorBySlug, type PublicSector } from '@/lib/data/sector-repository';
@@ -69,7 +70,11 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
   if (!rel) return null;
 
   const { sector: _ignore, ...rest } = post;
-  return { ...rest, sector: rel };
+  const sectorPayload = {
+    ...rel,
+    name: canonicalDivisionDisplayName(rel.slug, rel.name),
+  };
+  return { ...rest, sector: sectorPayload };
 });
 
 export async function listPublishedBlogsForSectorPage(args: {
@@ -127,9 +132,18 @@ export type BlogListRowWithSector = {
 /** All published posts with sector link — main `/news` index (DB is source of truth when rows exist). */
 export async function listAllPublishedBlogsWithSector(now: Date): Promise<BlogListRowWithSector[]> {
   await connectDb();
-  return prisma.blog.findMany({
+  const rows = await prisma.blog.findMany({
     where: publishedBlogWhere(now),
     orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
     select: blogListWithSectorSelect,
   });
+  return rows.map((r) => ({
+    ...r,
+    sector: r.sector
+      ? {
+          slug: r.sector.slug,
+          name: canonicalDivisionDisplayName(r.sector.slug, r.sector.name),
+        }
+      : null,
+  }));
 }

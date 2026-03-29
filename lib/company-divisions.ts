@@ -37,6 +37,23 @@ export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
   return (COMPANY_DIVISION_SLUGS as readonly string[]).includes(s);
 }
 
+/**
+ * Public UI label for a sector row: use the canonical twelve-division name when `slug` matches,
+ * otherwise the database name (e.g. custom sectors) or `fallback`.
+ */
+export function canonicalDivisionDisplayName(
+  slug: string | null | undefined,
+  dbName: string | null | undefined,
+  fallback = 'News',
+): string {
+  const key = slug?.trim().toLowerCase();
+  if (key && isCompanyDivisionSlug(key)) {
+    return COMPANY_DIVISION_NAV_LABELS[key];
+  }
+  const trimmed = dbName?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : fallback;
+}
+
 /** Sector hubs that show marketing focus areas only (no news listing), matching the digital-marketing content pattern. */
 export const SECTOR_LANDING_CONTENT_ONLY_SLUGS = [
   'software-it-ai',
