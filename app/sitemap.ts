@@ -208,8 +208,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  for (const slug of COMPANY_DIVISION_SLUGS) {
+    const sectorNewsPath = `/news/${slug}`;
+    if (!seenPaths.has(sectorNewsPath)) {
+      seenPaths.add(sectorNewsPath);
+      const lm = hubLastMod.get(slug) ?? now;
+      entries.push(
+        sitemapEntry(origin, sectorNewsPath, {
+          lastModified: lm,
+          priority: 0.82,
+          changeFrequency: 'weekly',
+        }),
+      );
+    }
+  }
+
   for (const post of blogRows) {
-    const path = post.sector?.slug ? `/${post.sector.slug}/${post.slug}` : `/news/${post.slug}`;
+    const path = post.sector?.slug
+      ? `/news/${post.sector.slug}/${post.slug}`
+      : `/news/${post.slug}`;
     if (seenPaths.has(path)) continue;
     seenPaths.add(path);
     entries.push(

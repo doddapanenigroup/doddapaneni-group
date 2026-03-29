@@ -1,8 +1,8 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
-import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { BLOG_POST_META } from '@/lib/blog-post-meta';
@@ -11,6 +11,15 @@ import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
+import { localeFromRouteParam } from '@/lib/locale-from-path';
+import {
+  canonicalDivisionDisplayName,
+  isCompanyDivisionSlug,
+} from '@/lib/company-divisions';
+import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
+import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
+import NewsSectorBlogList from '@/components/news/NewsSectorBlogList';
+import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
 export const revalidate = 120;
 const SITE_NAME = 'Doddapaneni Group';
@@ -40,13 +49,43 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = routing.locales.includes(paramLocale as (typeof routing.locales)[number])
     ? paramLocale
     : routing.defaultLocale;
+  const trimmed = slug.trim();
+
+  if (isCompanyDivisionSlug(trimmed)) {
+    const sector = await getPublicSectorBySlug(trimmed);
+    if (!sector) return {};
+    const label = canonicalDivisionDisplayName(sector.slug, sector.name);
+    const t = await getTranslations({ locale, namespace: 'Blog' });
+    const title = `${label} — ${t('title')} | ${SITE_NAME}`;
+    const description = t('sectorNewsSubtitle');
+    const origin = getSiteOrigin();
+    const pathRel = publicPathWithLocale(locale, 'news', trimmed);
+    const canonical = `${origin}${pathRel}`;
+    const pathnameForHreflang = `/news/${trimmed}`;
+    return {
+      title,
+      description,
+      robots: { index: true, follow: true },
+      alternates: {
+        canonical,
+        languages: alternateLanguagesForPathname(origin, pathnameForHreflang),
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonical,
+        siteName: SITE_NAME,
+        type: 'website',
+      },
+    };
+  }
 
   await connectDb();
   const now = new Date();
   await publishScheduledContent(now);
   const dbPost = await prisma.blog.findFirst({
     where: {
-      slug: slug.trim(),
+      slug: trimmed,
       status: 'published',
       OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: now } }],
     },
@@ -72,12 +111,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const image = normalizeStoredImage(dbPost.ogImage ?? dbPost.featuredImage);
   const origin = getSiteOrigin();
   const pathRel = dbPost.sector?.slug
-    ? publicPathWithLocale(locale, dbPost.sector.slug, slug.trim())
-    : publicPathWithLocale(locale, 'news', slug.trim());
+    ? publicPathWithLocale(locale, 'news', dbPost.sector.slug, trimmed)
+    : publicPathWithLocale(locale, 'news', trimmed);
   const canonical = `${origin}${pathRel}`;
   const pathnameForHreflang = dbPost.sector?.slug
-    ? `/${dbPost.sector.slug}/${slug.trim()}`
-    : `/news/${slug.trim()}`;
+    ? `/news/${dbPost.sector.slug}/${trimmed}`
+    : `/news/${trimmed}`;
 
   return {
     title,
@@ -99,9 +138,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function NewsSectorListOrArticlePage({ params }: Props) {
   const { locale: paramLocale, slug } = await params;
   const locale = localeFromRouteParam(paramLocale);
+  const trimmed = slug.trim();
 
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
@@ -110,12 +150,63 @@ export default async function BlogPostPage({ params }: Props) {
   const blog = getBlogMessages(locale);
   if (!blog) notFound();
 
+  if (isCompanyDivisionSlug(trimmed)) {
+    const sector = await getPublicSectorBySlug(trimmed);
+    if (!sector) notFound();
+
+    const now = new Date();
+    await publishScheduledContent(now);
+    const { rows } = await listPublishedBlogsForSectorPage({
+      sector,
+      page: 1,
+      pageSize: 500,
+      now,
+    });
+
+    const t = await getTranslations({ locale, namespace: 'Blog' });
+    const label = canonicalDivisionDisplayName(sector.slug, sector.name);
+
+    const posts: NewsSectorPostItem[] = rows.map((r) => {
+      const raw = (r.metaDescription?.trim() || r.ogDescription?.trim()) ?? '';
+      const excerpt = raw.length > 200 ? `${raw.slice(0, 200)}…` : raw || r.title;
+      const readMinutes = Math.max(1, Math.ceil(excerpt.split(/\s+/).filter(Boolean).length / 220));
+      return {
+        slug: r.slug,
+        title: r.title,
+        excerpt,
+        image: normalizeStoredImage(r.featuredImage),
+        publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+        readTime: `${readMinutes} min read`,
+      };
+    });
+
+    return (
+      <div className="min-h-screen bg-white">
+        <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">{t('title')}</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+              {label}
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-blue-100 sm:text-lg">{t('sectorNewsSubtitle')}</p>
+          </div>
+        </section>
+        <NewsSectorBlogList
+          locale={locale}
+          sectorSlug={trimmed}
+          sectorLabel={label}
+          readMoreLabel={t('readMore')}
+          posts={posts}
+        />
+      </div>
+    );
+  }
+
   await connectDb();
   const now = new Date();
-  // Server-side fallback: if cron hasn't run yet, still publish due items.
   await publishScheduledContent(now);
   const dbPost = await prisma.blog.findUnique({
-    where: { slug: slug.trim() },
+    where: { slug: trimmed },
     select: {
       title: true,
       content: true,
@@ -131,15 +222,14 @@ export default async function BlogPostPage({ params }: Props) {
     dbPost.status === 'published' &&
     (!dbPost.scheduledPublishAt || dbPost.scheduledPublishAt <= now);
 
-  // Prefer canonical sector route for sector-tagged published blogs.
   if (isPublishedNow && dbPost?.sector?.slug) {
-    permanentRedirect(publicPathWithLocale(locale, dbPost.sector.slug, slug.trim()));
+    permanentRedirect(publicPathWithLocale(locale, 'news', dbPost.sector.slug, trimmed));
   }
 
-  const hubArticlePath = `/news/${slug.trim()}`;
+  const hubArticlePath = `/news/${trimmed}`;
 
   if (!dbPost || dbPost.status !== 'published' || (dbPost.scheduledPublishAt && dbPost.scheduledPublishAt > now)) {
-    const messagePost = blog.posts[slug];
+    const messagePost = blog.posts[trimmed];
     if (!messagePost) notFound();
 
     return (
@@ -150,10 +240,10 @@ export default async function BlogPostPage({ params }: Props) {
         title={messagePost.title}
         category="News"
         readTime={messagePost.readTime}
-        image={BLOG_POST_META[slug]?.image ?? null}
+        image={BLOG_POST_META[trimmed]?.image ?? null}
         publishedAt={null}
         articlePathname={hubArticlePath}
-        articleSlug={slug.trim()}
+        articleSlug={trimmed}
       />
     );
   }
@@ -172,7 +262,7 @@ export default async function BlogPostPage({ params }: Props) {
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={hubArticlePath}
-      articleSlug={slug.trim()}
+      articleSlug={trimmed}
     />
   );
 }

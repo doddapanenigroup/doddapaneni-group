@@ -16,8 +16,10 @@
  * - Food Processing → food-beverages
  * - Business → staffing-consultancy (organizational / consultancy themes)
  *
+ * If every slug reports "No Blog row", insert rows first: `npm run db:seed:news-corpus`
+ *
  * Run after sectors exist (`npm run db:seed` or equivalent):
- *   node scripts/assign-news-blogs-to-sectors.mjs
+ *   npm run db:blogs:assign-sectors
  *
  * Idempotent: overwrites sectorId for these slugs each run (safe to re-run).
  */
@@ -32,35 +34,12 @@ config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
 import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { NEWS_CORPUS_SLUG_TO_SECTOR_SLUG } from './news-corpus-sector-map.mjs';
 
 const prisma = new PrismaClient();
 
-/** Blog slug → Sector.slug (must match prisma Sector.slug / company-divisions). */
-const BLOG_SLUG_TO_SECTOR_SLUG = {
-  'future-of-ecommerce-2026': 'ecommerce-marketplace',
-  'healthcare-technology-innovations': 'healthcare-medical',
-  'sustainable-construction-practices': 'construction-realestate',
-  'digital-marketing-strategies': 'digital-marketing',
-  'ai-transformation-business': 'software-it-ai',
-  'global-trade-opportunities': 'import-export',
-  'logistics-automation': 'logistics-warehousing',
-  'workforce-development-skills': 'education-skill',
-  'media-digital-transformation': 'media-news-entertainment',
-  'manufacturing-industry-4-0': 'manufacturing-trading',
-  'food-processing-innovation': 'food-beverages',
-  'real-estate-investment-tips': 'construction-realestate',
-  'cloud-computing-benefits': 'software-it-ai',
-  'telemedicine-healthcare': 'healthcare-medical',
-  'sustainable-business-practices': 'staffing-consultancy',
-  'customer-experience-digital-age': 'digital-marketing',
-  'data-security-best-practices': 'software-it-ai',
-  'remote-work-productivity': 'staffing-consultancy',
-  'supply-chain-resilience': 'logistics-warehousing',
-  'entrepreneurship-startup-success': 'staffing-consultancy',
-};
-
 async function main() {
-  const sectorSlugs = [...new Set(Object.values(BLOG_SLUG_TO_SECTOR_SLUG))];
+  const sectorSlugs = [...new Set(Object.values(NEWS_CORPUS_SLUG_TO_SECTOR_SLUG))];
   const sectors = await prisma.sector.findMany({
     where: { slug: { in: sectorSlugs } },
     select: { id: true, slug: true },
@@ -76,7 +55,7 @@ async function main() {
   let updated = 0;
   let notFound = 0;
 
-  for (const [blogSlug, sectorSlug] of Object.entries(BLOG_SLUG_TO_SECTOR_SLUG)) {
+  for (const [blogSlug, sectorSlug] of Object.entries(NEWS_CORPUS_SLUG_TO_SECTOR_SLUG)) {
     const sectorId = bySlug.get(sectorSlug);
     const row = await prisma.blog.updateMany({
       where: { slug: blogSlug },

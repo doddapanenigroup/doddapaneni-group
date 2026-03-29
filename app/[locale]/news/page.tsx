@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
@@ -7,18 +6,13 @@ import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
-import { getBlogMessages } from '@/lib/messages';
-import { mediaUrl } from '@/lib/media';
-import { BLOG_POST_META } from '@/lib/blog-post-meta';
-import BlogListLoadingFallback from '@/components/blog/BlogListLoadingFallback';
+import {
+  COMPANY_DIVISION_NAV_LABELS,
+  COMPANY_DIVISION_SLUGS,
+  type CompanyDivisionSlug,
+} from '@/lib/company-divisions';
+import NewsSectorsHub from '@/components/news/NewsSectorsHub';
 
-const BlogListClient = dynamic(() => import('./BlogListClient'), {
-  loading: () => <BlogListLoadingFallback />,
-});
-import { publishScheduledContent } from '@/lib/publish-scheduled';
-import { listAllPublishedBlogsWithSector } from '@/lib/data/sector-blog-repository';
-
-/** ISR for news listing — full HTML for crawlers; avoids `force-dynamic` + `headers()`. */
 export const revalidate = 120;
 
 type Props = { params: Promise<{ locale: string }> };
@@ -58,25 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function normalizeStoredImage(value: string | null): string | null {
-  if (!value) return null;
-  const s = value.trim();
-  if (!s) return null;
-  if (s.startsWith('/api/media/')) return s;
-  if (s.startsWith('api/media/')) return `/${s}`;
-  if (s.startsWith('http://') || s.startsWith('https://')) {
-    try {
-      const u = new URL(s);
-      if (u.pathname.startsWith('/api/media/')) return u.pathname;
-    } catch {
-      // ignore
-    }
-    return s;
-  }
-  return mediaUrl(s.startsWith('/') ? s.slice(1) : s);
-}
-
-export default async function BlogPage({ params }: Props) {
+export default async function NewsHubPage({ params }: Props) {
   const { locale: paramLocale } = await params;
   const locale = localeFromRouteParam(paramLocale);
 
@@ -84,39 +60,27 @@ export default async function BlogPage({ params }: Props) {
     notFound();
   }
 
-  const blog = getBlogMessages(locale);
-  if (!blog) notFound();
+  const t = await getTranslations({ locale, namespace: 'Blog' });
 
-  const now = new Date();
-  await publishScheduledContent(now);
-  const rows = await listAllPublishedBlogsWithSector(now);
-  const posts =
-    rows.length > 0
-      ? rows.map((r) => {
-          const plain = r.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-          const first = plain.slice(0, 180);
-          const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
-          return {
-            slug: r.slug,
-            href: r.sector?.slug ? `/${r.sector.slug}/${r.slug}` : `/news/${r.slug}`,
-            title: r.title,
-            excerpt: first.length < plain.length ? `${first}...` : first,
-            image: normalizeStoredImage(r.featuredImage),
-            publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
-            readTime: `${readMinutes} min read`,
-            category: r.sector?.name ?? 'News',
-          };
-        })
-      : Object.entries(blog.posts).map(([slug, p]) => ({
-          slug,
-          href: `/news/${slug}`,
-          title: p.title,
-          excerpt: p.excerpt,
-          image: BLOG_POST_META[slug]?.image ?? null,
-          publishedAt: null,
-          readTime: p.readTime,
-          category: p.category,
-        }));
+  const sectors = COMPANY_DIVISION_SLUGS.map((slug) => ({
+    slug,
+    label: COMPANY_DIVISION_NAV_LABELS[slug as CompanyDivisionSlug],
+  }));
 
-  return <BlogListClient locale={locale} blog={blog} posts={posts} />;
+  return (
+    <div className="min-h-screen bg-white">
+      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center">
+          <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">{t('title')}</h1>
+          <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">{t('subtitle')}</p>
+          {t('intro') ? (
+            <p className="mx-auto mt-6 max-w-3xl text-left text-sm leading-relaxed text-blue-100/95 sm:text-base md:text-center">
+              {t('intro')}
+            </p>
+          ) : null}
+        </div>
+      </section>
+      <NewsSectorsHub locale={locale} sectors={sectors} />
+    </div>
+  );
 }

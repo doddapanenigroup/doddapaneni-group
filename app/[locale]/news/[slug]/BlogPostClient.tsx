@@ -15,6 +15,8 @@ type Props = {
   /** Path from site root for analytics/email, e.g. `/news/slug` or `/software-it-ai/slug`. */
   articlePathname: string;
   articleSlug: string;
+  /** When set, “back” links go here instead of `/news` (e.g. `/news/software-it-ai`). */
+  backHref?: string;
   /** Set false for draft preview routes. */
   showEngagement?: boolean;
 };
@@ -30,14 +32,16 @@ export default function BlogPostClient({
   publishedAt,
   articlePathname,
   articleSlug,
+  backHref,
   showEngagement = true,
 }: Props) {
+  const backLink = backHref ?? '/news';
   return (
     <div className="min-h-screen bg-white">
       <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/news"
+            href={backLink}
             locale={locale}
             className="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors"
           >
@@ -99,7 +103,7 @@ export default function BlogPostClient({
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-slate-50 border-t border-slate-200">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/news"
+            href={backLink}
             locale={locale}
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
           >

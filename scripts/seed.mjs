@@ -94,7 +94,7 @@ async function main() {
   console.log(
    (
       'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.\n' +
-      'Optional: run `npm run media:seed` then `npm run db:seed:blogs` to load division blog content (52 published posts).'
+      'Optional: `npm run media:seed` then `npm run db:seed:news-corpus` (20 News articles) and/or `npm run db:seed:blogs` (52 division posts).'
     ).trim(),
   );
 }

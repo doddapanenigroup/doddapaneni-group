@@ -541,7 +541,6 @@
   "Blog": {
     "title": "News",
     "subtitle": "Articles from our divisions on commerce, healthcare operations, construction, logistics, and related topics—written for operators and decision-makers.",
-    "intro": "Posts are edited for clarity and factual accuracy before publication. Dates refer to publication unless stated otherwise; for regulatory, medical, or investment decisions, confirm details with a qualified professional in your jurisdiction.",
     "readMore": "Read more",
     "backToBlog": "Back to News",
     "relatedPosts": "Related news",
@@ -550,6 +549,9 @@
     "emptySectorTitle": "No published news in this sector yet",
     "emptySectorBody": "When posts are published under this division, they will appear here with links to each article.",
     "browseAllNews": "Browse all news",
+    "newsHubCta": "Please click here to check news",
+    "backToSectorNews": "Back to sector news",
+    "sectorNewsSubtitle": "Posts published under this division.",
     "engagementSectionEyebrow": "Connect",
     "engagementSectionTitle": "Get in touch about this article",
     "engagementLeadTitle": "Business inquiry",

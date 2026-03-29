@@ -12,6 +12,7 @@ import {
 import { getDivisionTopicNavItems, topicAnchorIdFromHref } from '@/lib/company-division-nav';
 import { isCompanyDivisionSlug, isSectorLandingContentOnlySlug } from '@/lib/company-divisions';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
+import { newsArticlePath } from '@/lib/news-paths';
 
 type Props = {
   locale: string;
@@ -126,7 +127,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                       key={post.slug}
                       className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
                     >
-                      <Link href={`/${sector.slug}/${post.slug}`} locale={locale} prefetch>
+                      <Link href={newsArticlePath(sector.slug, post.slug)} locale={locale} prefetch>
                         <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                           {imageSrc ? (
                             <Image

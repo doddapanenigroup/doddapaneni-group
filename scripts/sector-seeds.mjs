@@ -1,5 +1,5 @@
 /**
- * Canonical sectors aligned with `app/[locale]/*/company division` routes (Sector.slug).
+ * Canonical sectors aligned with locale-prefixed company-division routes (Sector.slug).
  * Imported by seed.mjs and seed-sectors.mjs — single source of truth.
  */
 export const SECTOR_SEEDS = [
