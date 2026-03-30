@@ -100,14 +100,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ogDescription: true,
       ogImage: true,
       sector: { select: { slug: true, name: true } },
+      translations: {
+        where: { locale },
+        select: {
+          title: true,
+          content: true,
+          metaTitle: true,
+          metaDescription: true,
+          ogTitle: true,
+          ogDescription: true,
+        },
+        take: 1,
+      },
     },
   });
   if (!dbPost) return {};
 
-  const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const tr = dbPost.translations[0];
+  const dispTitle = tr?.title ?? dbPost.title;
+  const dispContent = tr?.content ?? dbPost.content;
+  const dispMetaTitle = tr?.metaTitle ?? dbPost.metaTitle;
+  const dispMetaDesc = tr?.metaDescription ?? dbPost.metaDescription;
+  const dispOgTitle = tr?.ogTitle ?? dbPost.ogTitle;
+  const dispOgDesc = tr?.ogDescription ?? dbPost.ogDescription;
+
+  const plain = dispContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const dynamicDescription = plain.length > 160 ? `${plain.slice(0, 160)}...` : plain;
-  const description = dbPost.metaDescription ?? dynamicDescription;
-  const title = `${dbPost.metaTitle ?? dbPost.title} | ${SITE_NAME}`;
+  const description = dispMetaDesc ?? dynamicDescription;
+  const title = `${dispMetaTitle ?? dispTitle} | ${SITE_NAME}`;
   const image = normalizeStoredImage(dbPost.ogImage ?? dbPost.featuredImage);
   const origin = getSiteOrigin();
   const pathRel = dbPost.sector?.slug
@@ -127,8 +147,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       languages: alternateLanguagesForPathname(origin, pathnameForHreflang),
     },
     openGraph: {
-      title: dbPost.ogTitle ?? title,
-      description: dbPost.ogDescription ?? description,
+      title: dispOgTitle ?? title,
+      description: dispOgDesc ?? description,
       images: image ? [image] : undefined,
       url: canonical,
       siteName: SITE_NAME,
@@ -150,6 +170,8 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
   const blog = getBlogMessages(locale);
   if (!blog) notFound();
 
+  const t = await getTranslations({ locale, namespace: 'Blog' });
+
   if (isCompanyDivisionSlug(trimmed)) {
     const sector = await getPublicSectorBySlug(trimmed);
     if (!sector) notFound();
@@ -161,9 +183,9 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
       page: 1,
       pageSize: 500,
       now,
+      locale,
     });
 
-    const t = await getTranslations({ locale, namespace: 'Blog' });
     const label = canonicalDivisionDisplayName(sector.slug, sector.name);
 
     const posts: NewsSectorPostItem[] = rows.map((r) => {
@@ -176,7 +198,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
         excerpt,
         image: normalizeStoredImage(r.featuredImage),
         publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
-        readTime: `${readMinutes} min read`,
+        readTime: t('minReadMinutes', { minutes: readMinutes }),
       };
     });
 
@@ -215,6 +237,14 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
       status: true,
       scheduledPublishAt: true,
       sector: { select: { slug: true } },
+      translations: {
+        where: { locale },
+        select: {
+          title: true,
+          content: true,
+        },
+        take: 1,
+      },
     },
   });
   const isPublishedNow =
@@ -248,17 +278,20 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
     );
   }
 
-  const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const tr = dbPost.translations[0];
+  const dispTitle = tr?.title ?? dbPost.title;
+  const dispContent = tr?.content ?? dbPost.content;
+  const plain = dispContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
 
   return (
     <BlogPostClient
       locale={locale}
-      blogContent={dbPost.content}
+      blogContent={dispContent}
       backToBlog={blog.backToBlog}
-      title={dbPost.title}
+      title={dispTitle}
       category="News"
-      readTime={`${readMinutes} min read`}
+      readTime={t('minReadMinutes', { minutes: readMinutes })}
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={hubArticlePath}

@@ -6,12 +6,11 @@ import { isLoginEmailDeliveryConfigured, sendUserInviteEmail } from '@/lib/email
 import { generateInviteToken, hashInviteToken, inviteExpiresAt } from '@/lib/user-invite-token';
 import * as z from 'zod';
 import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
-
 const bodySchema = z.object({
   email: z.string().email(),
   role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']),
   expiresInHours: z.number().int().min(1).max(168).optional(), // up to 7 days
-  locale: z.string().min(2).max(8).optional(),
+  locale: z.enum(['en', 'te', 'hi', 'es']).optional(),
 });
 
 function isAdminRole(role: unknown) {

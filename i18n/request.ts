@@ -1,5 +1,6 @@
 import {getRequestConfig} from 'next-intl/server';
 import {routing} from './routing';
+import divisionTopics from '../messages/division-topics.json';
 
 export default getRequestConfig(async ({requestLocale}) => {
   // This typically corresponds to the `[locale]` segment
@@ -12,8 +13,19 @@ export default getRequestConfig(async ({requestLocale}) => {
     locale = routing.defaultLocale;
   }
 
+  const localeMessages = (await import(`../messages/${locale}.json`)).default as Record<string, unknown>;
+  const override = localeMessages.DivisionTopics as Record<string, unknown> | undefined;
+
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default
+    messages: {
+      ...localeMessages,
+      /** English copy lives in `messages/division-topics.json`; locales can override in their JSON. */
+      DivisionTopics: {
+        ...(divisionTopics as Record<string, unknown>),
+        ...(override ?? {}),
+      },
+    },
+    timeZone: 'Asia/Kolkata',
   };
 });

@@ -143,6 +143,7 @@ export type SectorLandingFetch = {
 export async function fetchSectorLandingData(
   sectorSlug: string,
   page: number,
+  locale: string = routing.defaultLocale,
 ): Promise<SectorLandingFetch | null> {
   const sector = await getPublicSectorBySlug(sectorSlug);
   if (!sector) return null;
@@ -155,6 +156,7 @@ export async function fetchSectorLandingData(
     page,
     pageSize: SECTOR_LANDING_PAGE_SIZE,
     now,
+    locale,
   });
 
   const totalPages = Math.max(1, Math.ceil(total / SECTOR_LANDING_PAGE_SIZE));

@@ -1,10 +1,10 @@
 import {
-  COMPANY_DIVISION_NAV_LABELS,
   COMPANY_DIVISION_SLUGS,
   type CompanyDivisionSlug,
   isActiveHomeDivisionSlug,
 } from '@/lib/company-divisions';
 import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
+import { getTranslations } from 'next-intl/server';
 
 export type HomeDivision = {
   name: string;
@@ -16,19 +16,22 @@ export type HomeDivision = {
 const FALLBACK_DESCRIPTION =
   'Programs, insights, and sector-specific capabilities across the Doddapaneni Group portfolio.';
 
-export async function getBusinessDivisionsForHome(): Promise<HomeDivision[]> {
+export async function getBusinessDivisionsForHome(locale: string): Promise<HomeDivision[]> {
   const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
+  const tDivision = await getTranslations({ locale, namespace: 'DivisionLabels' });
+  const tAbout = await getTranslations({ locale, namespace: 'About' });
 
   return COMPANY_DIVISION_SLUGS.map((slug) => {
     const row = bySlug.get(slug);
     const raw = row?.description?.trim();
+    const hasDbDescription = !!(raw && raw.length > 0);
     return {
       slug,
-      name:
-        row?.name?.trim() ??
-        COMPANY_DIVISION_NAV_LABELS[slug as CompanyDivisionSlug] ??
-        slug.replace(/-/g, ' '),
-      description: raw && raw.length > 0 ? raw : FALLBACK_DESCRIPTION,
+      name: tDivision(slug as CompanyDivisionSlug),
+      description:
+        locale === 'en' && hasDbDescription
+          ? raw!
+          : tAbout(`divisionBlurbs.${slug}` as `divisionBlurbs.${CompanyDivisionSlug}`),
       /** First four division slugs link to live public hubs; remaining eight show as launching soon. */
       active: isActiveHomeDivisionSlug(slug),
     };

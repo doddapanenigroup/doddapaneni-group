@@ -6,38 +6,12 @@ import en from '@/messages/en.json';
 import te from '@/messages/te.json';
 import hi from '@/messages/hi.json';
 import es from '@/messages/es.json';
-import bn from '@/messages/bn.json';
-import mr from '@/messages/mr.json';
-import ta from '@/messages/ta.json';
-import gu from '@/messages/gu.json';
-import ur from '@/messages/ur.json';
-import kn from '@/messages/kn.json';
-import or from '@/messages/or.json';
-import ml from '@/messages/ml.json';
-import pa from '@/messages/pa.json';
-import as from '@/messages/as.json';
-import mai from '@/messages/mai.json';
-import sat from '@/messages/sat.json';
-import ks from '@/messages/ks.json';
 
 export const messagesByLocale: Record<string, Record<string, unknown>> = {
   en: en as Record<string, unknown>,
   te: te as Record<string, unknown>,
   hi: hi as Record<string, unknown>,
   es: es as Record<string, unknown>,
-  bn: bn as Record<string, unknown>,
-  mr: mr as Record<string, unknown>,
-  ta: ta as Record<string, unknown>,
-  gu: gu as Record<string, unknown>,
-  ur: ur as Record<string, unknown>,
-  kn: kn as Record<string, unknown>,
-  or: or as Record<string, unknown>,
-  ml: ml as Record<string, unknown>,
-  pa: pa as Record<string, unknown>,
-  as: as as Record<string, unknown>,
-  mai: mai as Record<string, unknown>,
-  sat: sat as Record<string, unknown>,
-  ks: ks as Record<string, unknown>,
 };
 
 export function getMessagesForLocale(locale: string): Record<string, unknown> {

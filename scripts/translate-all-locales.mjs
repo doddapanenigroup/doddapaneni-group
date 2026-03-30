@@ -3,7 +3,7 @@
  * Skips Blog.posts.*.content (use translate-blog-content.mjs for that).
  * Run from project root: node scripts/translate-all-locales.mjs
  *
- * Env: TRANSLATE_DELAY_MS=500 (default); TRANSLATE_LOCALES=bn,mr,ta (optional, only these).
+ * Env: TRANSLATE_DELAY_MS=500 (default); TRANSLATE_LOCALES=te,hi (optional, only these).
  * If you see HTTP 429, wait an hour or set TRANSLATE_DELAY_MS=2000 and run again.
  */
 
@@ -14,10 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MESSAGES_DIR = path.join(__dirname, '../messages');
 const SOURCE = 'en';
-const TARGET_LOCALES = [
-  'te', 'hi', 'es',
-  'bn', 'mr', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks',
-];
+const TARGET_LOCALES = ['te', 'hi', 'es'];
 const MYMEMORY_URL = 'https://api.mymemory.translated.net/get';
 const MAX_CHUNK_BYTES = 400;
 const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 500;

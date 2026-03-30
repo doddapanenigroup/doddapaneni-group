@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
+import { routing } from '@/i18n/routing';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,11 @@ export async function GET(request: Request, { params }: Props) {
   const wantBlogs = url.searchParams.get('blogs') === '1' || url.searchParams.get('include') === 'blogs';
   const limitRaw = url.searchParams.get('limit');
   const limit = Math.min(48, Math.max(1, Number.parseInt(limitRaw ?? '12', 10) || 12));
+  const localeParam = url.searchParams.get('locale')?.trim().toLowerCase();
+  const locale =
+    localeParam && routing.locales.includes(localeParam as (typeof routing.locales)[number])
+      ? localeParam
+      : routing.defaultLocale;
 
   if (!wantBlogs) {
     return NextResponse.json(
@@ -41,6 +47,7 @@ export async function GET(request: Request, { params }: Props) {
     page: 1,
     pageSize: limit,
     now,
+    locale,
   });
 
   return NextResponse.json(

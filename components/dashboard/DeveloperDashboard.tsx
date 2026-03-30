@@ -155,7 +155,7 @@ export default function DeveloperDashboard({
         <p className="px-5 pt-3 text-sm text-slate-600">
           Default: fills <strong>te</strong>, <strong>hi</strong>, and <strong>es</strong> from English via MyMemory (free, no key)—usually a few minutes. For every app locale or a custom list, set{' '}
           <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_ALL_APP_LOCALES=true</code> or{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_LOCALES=bn,mr,ta</code> in{' '}
+          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_LOCALES=te,hi,es</code> in{' '}
           <code className="bg-slate-100 px-1 rounded text-xs">.env</code> (slow in the browser; prefer{' '}
           <code className="bg-slate-100 px-1 rounded text-xs">npm run i18n:translate</code>).
         </p>

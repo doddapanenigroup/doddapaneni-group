@@ -21,3 +21,18 @@ export function resolveAppLocaleFromPathname(pathname: string): AppLocale {
   }
   return routing.defaultLocale;
 }
+
+/**
+ * Path without locale prefix — matches `usePathname()` from `@/i18n/routing` (as-needed prefixing).
+ * Use with `usePathname()` from `next/navigation` when you cannot call next-intl hooks yet (e.g. above `NextIntlClientProvider`).
+ */
+export function stripLocalePrefixFromPathname(fullPathname: string): string {
+  const normalized = fullPathname.startsWith('/') ? fullPathname : `/${fullPathname}`;
+  const segments = normalized.split('/').filter(Boolean);
+  if (segments.length === 0) return '/';
+  if (routing.locales.includes(segments[0] as AppLocale)) {
+    const rest = segments.slice(1);
+    return rest.length ? `/${rest.join('/')}` : '/';
+  }
+  return normalized;
+}

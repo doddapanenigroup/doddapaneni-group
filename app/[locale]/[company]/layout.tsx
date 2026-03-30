@@ -22,12 +22,16 @@ type Props = {
  * Other sector slugs still resolve here but only render page content (no division chrome).
  */
 export default async function CompanySectionLayout({ children, params }: Props) {
-  const { company } = await params;
+  const { company, locale } = await params;
   const slug = company.trim().toLowerCase();
 
   if (!isCompanyDivisionSlug(slug)) {
     return <>{children}</>;
   }
 
-  return <DivisionLayoutServer slug={slug}>{children}</DivisionLayoutServer>;
+  return (
+    <DivisionLayoutServer slug={slug} locale={locale}>
+      {children}
+    </DivisionLayoutServer>
+  );
 }

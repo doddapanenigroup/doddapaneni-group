@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
+import { routing } from '@/i18n/routing';
 import { canonicalDivisionDisplayName } from '@/lib/company-divisions';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publishedBlogWhere, publishedBlogWhereForSector } from '@/lib/data/published-blog';
@@ -17,6 +18,15 @@ const sectorBlogPostSelect = {
   ogDescription: true,
   ogImage: true,
   sector: { select: { slug: true, name: true } },
+} as const;
+
+const translationSelect = {
+  title: true,
+  content: true,
+  metaTitle: true,
+  metaDescription: true,
+  ogTitle: true,
+  ogDescription: true,
 } as const;
 
 export type PublishedSectorBlogPost = {
@@ -43,12 +53,14 @@ export type SectorBlogCardRow = {
 };
 
 /**
- * Single published article under a sector URL (`/[company]/[slug]`).
+ * Single published article under a sector URL (`/news/{sector}/{article}`).
  * Null when sector or post missing, or post does not belong to sector.
+ * `locale` selects auto-translated copy when present (see `syncBlogTranslations`); falls back to English.
  */
 export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedSectorBlogPost(
   sectorSlug: string,
   blogSlug: string,
+  locale: string = routing.defaultLocale,
 ): Promise<PublishedSectorBlogPost | null> {
   await connectDb();
   const now = new Date();
@@ -62,19 +74,35 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
       slug: blogSlug.trim(),
       ...publishedBlogWhereForSector(sector.id, now),
     },
-    select: sectorBlogPostSelect,
+    select: {
+      ...sectorBlogPostSelect,
+      translations: {
+        where: { locale },
+        select: translationSelect,
+        take: 1,
+      },
+    },
   });
 
   if (!post) return null;
-  const rel = post.sector;
+  const tr = post.translations[0];
+  const { translations: _t, sector: rel, ...base } = post;
   if (!rel) return null;
+  const merged = {
+    ...base,
+    title: tr?.title ?? base.title,
+    content: tr?.content ?? base.content,
+    metaTitle: tr?.metaTitle ?? base.metaTitle,
+    metaDescription: tr?.metaDescription ?? base.metaDescription,
+    ogTitle: tr?.ogTitle ?? base.ogTitle,
+    ogDescription: tr?.ogDescription ?? base.ogDescription,
+  };
 
-  const { sector: _ignore, ...rest } = post;
   const sectorPayload = {
     ...rel,
     name: canonicalDivisionDisplayName(rel.slug, rel.name),
   };
-  return { ...rest, sector: sectorPayload };
+  return { ...merged, sector: sectorPayload };
 });
 
 export async function listPublishedBlogsForSectorPage(args: {
@@ -82,9 +110,12 @@ export async function listPublishedBlogsForSectorPage(args: {
   page: number;
   pageSize: number;
   now: Date;
+  /** Request locale; uses `BlogTranslation` when available. */
+  locale?: string;
 }): Promise<{ rows: SectorBlogCardRow[]; total: number }> {
   await connectDb();
   const { sector, page, pageSize, now } = args;
+  const locale = args.locale ?? routing.defaultLocale;
   const where = publishedBlogWhereForSector(sector.id, now);
   const skip = (page - 1) * pageSize;
 
@@ -102,11 +133,32 @@ export async function listPublishedBlogsForSectorPage(args: {
         publishedAt: true,
         metaDescription: true,
         ogDescription: true,
+        translations: {
+          where: { locale },
+          select: {
+            title: true,
+            metaDescription: true,
+            ogDescription: true,
+          },
+          take: 1,
+        },
       },
     }),
   ]);
 
-  return { rows, total };
+  const mapped: SectorBlogCardRow[] = rows.map((r) => {
+    const tr = r.translations[0];
+    return {
+      slug: r.slug,
+      title: tr?.title ?? r.title,
+      featuredImage: r.featuredImage,
+      publishedAt: r.publishedAt,
+      metaDescription: tr?.metaDescription ?? r.metaDescription,
+      ogDescription: tr?.ogDescription ?? r.ogDescription,
+    };
+  });
+
+  return { rows: mapped, total };
 }
 
 const blogListWithSectorSelect = {

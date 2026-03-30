@@ -1,9 +1,9 @@
 'use client';
 
 import { Link, usePathname, routing } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
-import { getDivisionSubpageLabel } from '@/lib/company-division-subpages';
-import type { DivisionTopicNavItem } from '@/lib/company-division-nav';
+import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import CompanyDivisionTopicNav from '@/components/divisions/CompanyDivisionTopicNav';
 
 const SUBPAGES: DivisionSubpage[] = ['about', 'services', 'contact'];
@@ -26,6 +26,7 @@ export default function CompanyDivisionShell({
   topicNavItems?: DivisionTopicNavItem[];
   children: React.ReactNode;
 }) {
+  const t = useTranslations('Blog');
   const pathname = usePathname();
   const { slug } = sector;
   const base = `/${slug}`;
@@ -33,16 +34,31 @@ export default function CompanyDivisionShell({
   const segments = stripLocalePrefix(pathname.split('/').filter(Boolean));
   const isOverview = segments.length === 1 && segments[0] === slug;
 
+  const subpageLabel = (sub: DivisionSubpage): string => {
+    switch (sub) {
+      case 'about':
+        return t('divisionSubpageAbout');
+      case 'services':
+        return t('divisionSubpageServices');
+      case 'contact':
+        return t('divisionSubpageContact');
+      default:
+        return sub;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-800">Division</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-800">
+              {t('divisionShellEyebrow')}
+            </p>
             <p className="text-lg font-bold text-slate-900 sm:text-xl">{sector.name}</p>
           </div>
           <nav
-            aria-label="Division sections"
+            aria-label={t('divisionNavAriaLabel')}
             className="flex flex-wrap gap-2 border-t border-slate-200/80 pt-3 sm:gap-3"
           >
             <Link
@@ -53,7 +69,7 @@ export default function CompanyDivisionShell({
                   : 'rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100'
               }
             >
-              Overview
+              {t('divisionOverview')}
             </Link>
             {SUBPAGES.map((sub) => {
               const href = `${base}/${sub}`;
@@ -68,7 +84,7 @@ export default function CompanyDivisionShell({
                       : 'rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100'
                   }
                 >
-                  {getDivisionSubpageLabel(sub)}
+                  {subpageLabel(sub)}
                 </Link>
               );
             })}

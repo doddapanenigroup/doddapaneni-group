@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
 
 /** Local console checks against production targets (LCP, CLS, INP / FID-style budgets). */
@@ -42,11 +41,18 @@ function flush(metric: Metric) {
 
 export default function WebVitalsReporter() {
   useEffect(() => {
-    onLCP(flush);
-    onINP(flush);
-    onCLS(flush);
-    onFCP(flush);
-    onTTFB(flush);
+    let cancelled = false;
+    void import('web-vitals').then(({ onCLS, onFCP, onINP, onLCP, onTTFB }) => {
+      if (cancelled) return;
+      onLCP(flush);
+      onINP(flush);
+      onCLS(flush);
+      onFCP(flush);
+      onTTFB(flush);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return null;

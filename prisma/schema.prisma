@@ -256,8 +256,30 @@ model Blog {
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
+  translations    BlogTranslation[]
+
   @@index([authorId])
   @@index([sectorId])
+}
+
+// Auto-generated from the canonical English row when a post is published (dashboard).
+model BlogTranslation {
+  id               String   @id @default(cuid())
+  blogId           String   @map("blog_id")
+  blog             Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  locale           String
+  title            String
+  content          String   @db.Text
+  metaTitle        String?  @map("meta_title")
+  metaDescription  String? @map("meta_description")
+  ogTitle          String?  @map("og_title")
+  ogDescription    String?  @map("og_description")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([blogId, locale])
+  @@index([blogId])
+  @@map("blog_translation")
 }
 
 model Sector {

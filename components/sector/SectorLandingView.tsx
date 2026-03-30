@@ -9,7 +9,8 @@ import {
   fetchSectorLandingData,
   normalizeStoredImage,
 } from '@/lib/sector-landing';
-import { getDivisionTopicNavItems, topicAnchorIdFromHref } from '@/lib/company-division-nav';
+import { getTranslatedDivisionTopicNavItems } from '@/lib/company-division-nav-i18n';
+import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
 import { isCompanyDivisionSlug, isSectorLandingContentOnlySlug } from '@/lib/company-divisions';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import { newsArticlePath } from '@/lib/news-paths';
@@ -21,7 +22,7 @@ type Props = {
 };
 
 export default async function SectorLandingView({ locale, sectorSlug, page }: Props) {
-  const data = await fetchSectorLandingData(sectorSlug, page);
+  const data = await fetchSectorLandingData(sectorSlug, page, locale);
   if (!data) {
     if (isCompanyDivisionSlug(sectorSlug)) {
       return <SectorUnavailable locale={locale} slug={sectorSlug} />;
@@ -35,11 +36,17 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   const tBlog = await getTranslations({ locale, namespace: 'Blog' });
   const newsLabel = tBlog('title');
   const allNewsHref = '/news';
-  const topicAnchors = getDivisionTopicNavItems(sectorSlug).filter((i) => topicAnchorIdFromHref(i.href));
+  const topicAnchors = (await getTranslatedDivisionTopicNavItems(sectorSlug, locale)).filter((i) =>
+    topicAnchorIdFromHref(i.href),
+  );
   const contentOnly = isSectorLandingContentOnlySlug(sectorSlug);
 
   const paginationHref = (p: number) =>
     p <= 1 ? `/${sector.slug}` : `/${sector.slug}?page=${p}`;
+
+  const heroDescription =
+    sector.description?.trim() ||
+    tBlog('sectorHeroDescriptionFallback', { name: sector.name });
 
   return (
     <div className="min-h-screen bg-white">
@@ -48,25 +55,29 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
           <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
             {sector.name} — {newsLabel}
           </h1>
-          <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">
-            {sector.description ?? `Latest updates and focus areas in ${sector.name}.`}
-          </p>
+          <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
         </div>
       </section>
 
       {topicAnchors.length > 0 ? (
         <section
-          aria-label="Division focus areas"
+          aria-label={tBlog('focusAreasHeading')}
           className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6 lg:px-8"
         >
           <div className="mx-auto max-w-7xl">
             <h2 className="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-slate-500 sm:text-left">
-              Focus areas
+              {tBlog('focusAreasHeading')}
             </h2>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
               {topicAnchors.map((item) => {
                 const id = topicAnchorIdFromHref(item.href);
                 if (!id) return null;
+                const body =
+                  item.description?.trim() ||
+                  tBlog('topicDescriptionFallback', {
+                    label: item.label,
+                    name: sector.name,
+                  });
                 return (
                   <div
                     key={id}
@@ -74,10 +85,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                     className="scroll-mt-[7.5rem] rounded-2xl border border-slate-200 bg-slate-50/90 p-5 shadow-sm sm:scroll-mt-40"
                   >
                     <h3 className="text-base font-bold text-slate-900">{item.label}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                      {item.description ??
-                        `Learn how we support ${item.label.toLowerCase()} within ${sector.name}.`}
-                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{body}</p>
                   </div>
                 );
               })}
@@ -94,12 +102,10 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                 <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
                   {tBlog('recentPosts')}
                 </h2>
-                <p className="mt-1 text-sm text-slate-600">Posts published under this division.</p>
+                <p className="mt-1 text-sm text-slate-600">{tBlog('sectorNewsSubtitle')}</p>
               </div>
               {rows.length > 0 ? (
-                <p className="text-sm text-slate-500">
-                  {total} {total === 1 ? 'article' : 'articles'}
-                </p>
+                <p className="text-sm text-slate-500">{tBlog('articlesCount', { count: total })}</p>
               ) : null}
             </div>
 
@@ -118,7 +124,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {rows.map((post, postIndex) => {
+                {rows.map((post) => {
                   const excerpt = excerptForSectorBlogCard(post);
                   const readMinutes = estimateReadMinutesForCard(post);
                   const imageSrc = normalizeStoredImage(post.featuredImage);
@@ -164,7 +170,9 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                           </h3>
                           <p className="mb-4 line-clamp-3 text-sm text-slate-600">{excerpt}</p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-slate-500">{readMinutes} min read</span>
+                            <span className="text-xs text-slate-500">
+                              {tBlog('minReadMinutes', { minutes: readMinutes })}
+                            </span>
                             <span className="flex items-center text-sm font-semibold text-blue-600">
                               {tBlog('readMore')}
                               <ArrowRight size={16} className="ml-2" />
@@ -190,10 +198,10 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                   }`}
                   prefetch={false}
                 >
-                  Previous
+                  {tBlog('paginationPrevious')}
                 </Link>
                 <span className="text-sm text-slate-600">
-                  Page {page} of {totalPages}
+                  {tBlog('paginationPage', { page, totalPages })}
                 </span>
                 <Link
                   href={paginationHref(page + 1)}
@@ -205,7 +213,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                   }`}
                   prefetch={false}
                 >
-                  Next
+                  {tBlog('paginationNext')}
                 </Link>
               </div>
             ) : null}

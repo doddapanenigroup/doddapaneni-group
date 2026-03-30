@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/db";
+import { prisma } from '@/lib/db';
+import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 
 /**
  * Promotes any scheduled drafts whose `scheduledPublishAt` is now/past.
@@ -10,11 +11,11 @@ export async function publishScheduledContent(now: Date = new Date()) {
   // Pages: draft -> published
   const pagesPromoted = await prisma.pageContent.updateMany({
     where: {
-      status: "draft",
+      status: 'draft',
       scheduledPublishAt: { lte: now },
     },
     data: {
-      status: "published",
+      status: 'published',
       scheduledPublishAt: null,
     },
   });
@@ -22,7 +23,7 @@ export async function publishScheduledContent(now: Date = new Date()) {
   // Pages: cleanup (published but still has a schedule timestamp)
   const pagesScheduleCleared = await prisma.pageContent.updateMany({
     where: {
-      status: "published",
+      status: 'published',
       scheduledPublishAt: { lte: now },
     },
     data: {
@@ -30,37 +31,33 @@ export async function publishScheduledContent(now: Date = new Date()) {
     },
   });
 
-  // Blogs: draft -> published; if publishedAt is missing, set it to now.
-  const blogsPromotedAndStamped = await prisma.blog.updateMany({
+  // Blogs: promote each due draft individually so we can trigger translation sync per post.
+  const dueBlogs = await prisma.blog.findMany({
     where: {
-      status: "draft",
+      status: 'draft',
       scheduledPublishAt: { lte: now },
-      publishedAt: null,
     },
-    data: {
-      status: "published",
-      scheduledPublishAt: null,
-      publishedAt: now,
-    },
+    select: { id: true, publishedAt: true },
   });
 
-  // Blogs: draft -> published; keep publishedAt if already provided.
-  const blogsPromotedButKeepPublishedAt = await prisma.blog.updateMany({
-    where: {
-      status: "draft",
-      scheduledPublishAt: { lte: now },
-      publishedAt: { not: null },
-    },
-    data: {
-      status: "published",
-      scheduledPublishAt: null,
-    },
-  });
+  let blogsPromoted = 0;
+  for (const b of dueBlogs) {
+    await prisma.blog.update({
+      where: { id: b.id },
+      data: {
+        status: 'published',
+        scheduledPublishAt: null,
+        publishedAt: b.publishedAt ?? now,
+      },
+    });
+    blogsPromoted += 1;
+    scheduleBlogTranslationSync(b.id);
+  }
 
   // Blogs: cleanup (published but still has a schedule timestamp)
   const blogsScheduleCleared = await prisma.blog.updateMany({
     where: {
-      status: "published",
+      status: 'published',
       scheduledPublishAt: { lte: now },
     },
     data: {
@@ -71,9 +68,7 @@ export async function publishScheduledContent(now: Date = new Date()) {
   return {
     pagesPromoted: pagesPromoted.count,
     pagesScheduleCleared: pagesScheduleCleared.count,
-    blogsPromotedAndStamped: blogsPromotedAndStamped.count,
-    blogsPromotedButKeepPublishedAt: blogsPromotedButKeepPublishedAt.count,
+    blogsPromoted,
     blogsScheduleCleared: blogsScheduleCleared.count,
   };
 }
-

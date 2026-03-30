@@ -8,6 +8,7 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
+import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -127,6 +128,8 @@ export async function PATCH(
       where: { slug: currentSlug },
       data,
     });
+
+    scheduleBlogTranslationSync(doc.id);
 
     await logMarketingActivity({
       userId: session.user.id,

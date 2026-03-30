@@ -12,7 +12,7 @@ const DASHBOARD_DEFAULT_LOCALES = ['te', 'hi', 'es'] as const;
 /**
  * Locales to fill from `en.json`:
  * - `TRANSLATE_ALL_APP_LOCALES=true` → every locale in i18n/routing except `en` (very slow; use CLI instead).
- * - `TRANSLATE_LOCALES=bn,mr,ta` → explicit list (comma-separated).
+ * - `TRANSLATE_LOCALES=te,hi` → explicit list (comma-separated; must be app locales).
  * - Otherwise → te, hi, es only.
  */
 export function getTargetLocalesForTranslateAll(): string[] {
@@ -21,11 +21,14 @@ export function getTargetLocalesForTranslateAll(): string[] {
   }
   const raw = process.env.TRANSLATE_LOCALES?.trim();
   if (raw) {
-    return raw
+    const allowed = new Set<string>([...routing.locales]);
+    const list = raw
       .split(',')
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean)
-      .filter((l) => l !== SOURCE_LOCALE);
+      .filter((l) => l !== SOURCE_LOCALE)
+      .filter((l) => allowed.has(l));
+    if (list.length > 0) return list;
   }
   return [...DASHBOARD_DEFAULT_LOCALES];
 }

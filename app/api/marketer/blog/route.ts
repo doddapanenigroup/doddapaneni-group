@@ -7,6 +7,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
+import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -165,6 +166,7 @@ export async function POST(request: Request) {
     });
 
     if (doc.status === 'published') {
+      scheduleBlogTranslationSync(doc.id);
       void notifyContentPublished({
         kind: 'blog',
         locale: routing.defaultLocale,

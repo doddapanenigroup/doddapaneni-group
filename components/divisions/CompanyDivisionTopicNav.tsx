@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Link, usePathname, routing } from '@/i18n/routing';
-import type { DivisionTopicNavItem } from '@/lib/company-division-nav';
+import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
 
 function stripLocaleFromSegments(segments: string[]): string[] {
@@ -33,6 +34,7 @@ function hashFromHref(href: string): string | null {
 }
 
 export default function CompanyDivisionTopicNav({ items }: { items: DivisionTopicNavItem[] }) {
+  const t = useTranslations('Blog');
   const pathname = usePathname();
   const [hash, setHash] = useState('');
 
@@ -61,16 +63,16 @@ export default function CompanyDivisionTopicNav({ items }: { items: DivisionTopi
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Division topics" className="min-w-0">
+    <nav aria-label={t('divisionTopicsAriaLabel')} className="min-w-0">
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-        In this division
+        {t('divisionTopicNavEyebrow')}
       </p>
       <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
         {items.map((item) => {
           const active = isActive(item);
           return (
             <Link
-              key={`${item.label}-${item.href}`}
+              key={`${item.topicId}-${item.href}`}
               href={item.href}
               scroll={!!topicAnchorIdFromHref(item.href)}
               className={

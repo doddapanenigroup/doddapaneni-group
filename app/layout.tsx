@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import type { AbstractIntlMessages } from 'next-intl';
 import type { ReactNode } from 'react';
-import { headers } from 'next/headers';
 import './globals.css';
 import { fontBodyClassNames } from '@/app/fonts';
-import CorporateHubShell from '@/components/corporate/CorporateHubShell';
-import { resolveAppLocaleFromPathname } from '@/lib/locale-from-path';
-import { getMessagesForLocale } from '@/lib/messages';
+import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
 
 const siteOrigin = getSiteOrigin();
@@ -38,22 +34,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? '';
-  const initialLocale = resolveAppLocaleFromPathname(pathname);
-  const initialMessages = getMessagesForLocale(initialLocale) as AbstractIntlMessages;
-
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={initialLocale} suppressHydrationWarning>
+    <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
-        <CorporateHubShell
-          initialPathname={pathname}
-          initialLocale={initialLocale}
-          initialMessages={initialMessages}
-        >
-          {children}
-        </CorporateHubShell>
+        {children}
       </body>
     </html>
   );

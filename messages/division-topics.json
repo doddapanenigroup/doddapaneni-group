@@ -1,0 +1,170 @@
+{
+  "software-it-ai": {
+    "topic-dlsin": {
+      "label": "Dlsin marketplace",
+      "description": "Dlsin is the group’s multivendor commerce platform—catalogue management, checkout, seller dashboards, and secure settlements for independent merchants."
+    },
+    "topic-sellers": {
+      "label": "Seller tooling",
+      "description": "Fulfilment status, dispute workflows, and analytics so sellers can restock and price with evidence—not guesswork."
+    },
+    "topic-platform": {
+      "label": "Platform engineering",
+      "description": "Information technology and AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure."
+    }
+  },
+  "digital-marketing": {
+    "topic-seo": {
+      "label": "SEO",
+      "description": "Organic visibility, technical SEO, and content that ranks."
+    },
+    "topic-ads": {
+      "label": "Ads",
+      "description": "Paid acquisition and performance creative across channels."
+    },
+    "topic-social": {
+      "label": "Social",
+      "description": "Community, brand presence, and social campaigns that convert."
+    }
+  },
+  "healthcare-medical": {
+    "topic-clinical": {
+      "label": "Clinical",
+      "description": "Clinical workflows, compliance-aware tooling, and integrations."
+    },
+    "topic-billing": {
+      "label": "Billing",
+      "description": "Revenue cycle, coding, and payer operations support."
+    },
+    "topic-supplies": {
+      "label": "Supplies",
+      "description": "Medical supplies, devices, and distribution logistics."
+    }
+  },
+  "construction-realestate": {
+    "topic-projects": {
+      "label": "Projects",
+      "description": "End-to-end delivery from planning through commissioning."
+    },
+    "topic-design": {
+      "label": "Design",
+      "description": "Architecture, engineering coordination, and design quality."
+    },
+    "topic-realty": {
+      "label": "Realty",
+      "description": "Development, investment, and property advisory."
+    }
+  },
+  "ecommerce-marketplace": {
+    "topic-stores": {
+      "label": "Stores",
+      "description": "D2C and B2B storefronts engineered for conversion."
+    },
+    "topic-marketplaces": {
+      "label": "Marketplaces",
+      "description": "Multi-vendor platforms, catalog ops, and seller tooling."
+    },
+    "topic-fulfillment": {
+      "label": "Fulfillment",
+      "description": "Order, warehouse, and last-mile orchestration."
+    }
+  },
+  "media-news-entertainment": {
+    "topic-janatha": {
+      "label": "Janatha Mirror",
+      "description": "Digital-first newsroom with sourced reporting, verification, and corrections when facts change—public policy, business, culture, and civic coverage optimised for web and social."
+    },
+    "topic-content": {
+      "label": "Editorial & multimedia",
+      "description": "Formats, production, and distribution at scale—video, interviews, and storytelling built for how audiences read and share today."
+    },
+    "topic-brand": {
+      "label": "Audience & partnerships",
+      "description": "Audience products, brand studios, and partnerships that extend reach while protecting editorial standards."
+    }
+  },
+  "staffing-consultancy": {
+    "topic-hiring": {
+      "label": "Hiring",
+      "description": "Recruitment pipelines and role-specific sourcing."
+    },
+    "topic-hr": {
+      "label": "HR",
+      "description": "Policies, people ops, and workforce planning."
+    },
+    "topic-talent": {
+      "label": "Talent",
+      "description": "Retention, upskilling, and leadership programmes."
+    }
+  },
+  "food-beverages": {
+    "topic-processing": {
+      "label": "Processing",
+      "description": "Safe, efficient processing and packaging lines."
+    },
+    "topic-supply": {
+      "label": "Supply",
+      "description": "Sourcing, cold chain, and supplier governance."
+    },
+    "topic-quality": {
+      "label": "Quality",
+      "description": "QA, traceability, and certification readiness."
+    }
+  },
+  "manufacturing-trading": {
+    "topic-plants": {
+      "label": "Plants",
+      "description": "Plant operations, throughput, and capex efficiency."
+    },
+    "topic-trading": {
+      "label": "Trading",
+      "description": "Wholesale, bulk, and cross-border trade desks."
+    },
+    "topic-industry": {
+      "label": "Industry 4.0",
+      "description": "Automation, data, and connected factory initiatives."
+    }
+  },
+  "logistics-warehousing": {
+    "topic-freight": {
+      "label": "Freight",
+      "description": "Air, ocean, and surface freight orchestration."
+    },
+    "topic-warehouse": {
+      "label": "Warehouse",
+      "description": "Storage, WMS, and inventory accuracy."
+    },
+    "topic-lastmile": {
+      "label": "Last mile",
+      "description": "Final delivery, routing, and customer experience."
+    }
+  },
+  "education-skill": {
+    "topic-training": {
+      "label": "Training",
+      "description": "Instructor-led and hybrid programmes for teams."
+    },
+    "topic-elearning": {
+      "label": "E-learning",
+      "description": "Platforms, cohorts, and measurable learning paths."
+    },
+    "topic-skills": {
+      "label": "Skills",
+      "description": "Vocational and industry certifications."
+    }
+  },
+  "import-export": {
+    "topic-trade": {
+      "label": "Trade",
+      "description": "Import/export desks, sourcing, and channel partners."
+    },
+    "topic-compliance": {
+      "label": "Compliance",
+      "description": "Documentation, customs, and regulatory alignment."
+    },
+    "topic-partners": {
+      "label": "Partners",
+      "description": "Global networks for reliable movement of goods."
+    }
+  }
+}

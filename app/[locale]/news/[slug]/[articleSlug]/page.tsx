@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sectorSlug = sectorParam.trim().toLowerCase();
   if (!isCompanyDivisionSlug(sectorSlug)) return {};
 
-  const row = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug);
+  const row = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug, locale);
   if (!row) return {};
 
   const image = normalizeStoredImage(row.ogImage ?? row.featuredImage);
@@ -76,7 +76,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
 
   const t = await getTranslations({ locale, namespace: 'Blog' });
 
-  const dbPost = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug);
+  const dbPost = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug, locale);
   if (!dbPost) notFound();
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -91,7 +91,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
       backToBlog={t('backToSectorNews')}
       title={dbPost.title}
       category={dbPost.sector.name}
-      readTime={`${readMinutes} min read`}
+      readTime={t('minReadMinutes', { minutes: readMinutes })}
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={articlePath}

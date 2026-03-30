@@ -3,11 +3,16 @@
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 
 /** Dynamic only for visit recorder (browser-only). WebVitalsReporter is static to avoid Turbopack chunk load failures. */
 const RecordVisit = dynamic(() => import('@/components/RecordVisit'), { ssr: false });
+
+/** Below-the-fold footer — separate chunk to shrink initial public bundle. */
+const Footer = dynamic(() => import('@/components/Footer'), {
+  ssr: true,
+  loading: () => <div className="mt-auto min-h-[100px] border-t border-slate-100 bg-slate-50/50" aria-hidden />,
+});
 
 export default function LayoutWithNav({
   children,
