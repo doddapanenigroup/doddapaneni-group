@@ -8,21 +8,22 @@ import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 import { mediaUrl } from '@/lib/media';
 import {
-  getCompanyDivisionNavItems,
+  COMPANY_DIVISION_SLUGS,
   activeCompanyDivisionSlugFromPathname,
+  type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
-
-const COMPANIES_NAV = getCompanyDivisionNavItems();
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [companiesOpen, setCompaniesOpen] = useState(false);
   const [mobileCompaniesOpen, setMobileCompaniesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>({});
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
   const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const t = useTranslations('Navbar');
+  const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
   const locale = useLocale();
@@ -88,6 +89,28 @@ export default function Navbar() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [companiesOpen]);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/public/sectors', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d: any) => {
+        const rows = Array.isArray(d?.sectors) ? d.sectors : [];
+        const map: Record<string, boolean> = {};
+        for (const s of rows) {
+          if (s && typeof s.slug === 'string') {
+            map[String(s.slug).trim().toLowerCase()] = Boolean(s.isLive);
+          }
+        }
+        if (!cancelled) setSectorLive(map);
+      })
+      .catch(() => {
+        if (!cancelled) setSectorLive({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const isTransparent = !scrolled;
   const navbarClasses = isTransparent ? 'bg-transparent border-transparent' : 'bg-transparent backdrop-blur-xl shadow-none';
 
@@ -134,14 +157,16 @@ export default function Navbar() {
           : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 sm:items-start py-3 px-3 sm:px-4'
       }
     >
-      {COMPANIES_NAV.map((item) => {
-        const isActiveHere = activeDivisionSlug === item.slug;
+      {COMPANY_DIVISION_SLUGS.map((slug) => {
+        const isActiveHere = activeDivisionSlug === slug;
+        const isLive = sectorLive[slug] ?? false;
+        const label = tDivision(slug as CompanyDivisionSlug);
 
-        if (item.active) {
+        if (isLive) {
           return (
-            <li key={item.slug} className={mobile ? undefined : 'min-w-0'}>
+            <li key={slug} className={mobile ? undefined : 'min-w-0'}>
               <Link
-                href={`/${item.slug}`}
+                href={`/${slug}`}
                 locale={locale}
                 onClick={() => {
                   setCompaniesOpen(false);
@@ -155,14 +180,14 @@ export default function Navbar() {
                     : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <span className="min-w-0 flex-1 break-words leading-snug">{item.label}</span>
+                <span className="min-w-0 flex-1 break-words leading-snug">{label}</span>
               </Link>
             </li>
           );
         }
 
         return (
-          <li key={item.slug}>
+          <li key={slug}>
             <div
               className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-lg ${
                 isActiveHere
@@ -173,7 +198,7 @@ export default function Navbar() {
               <span
                 className={`min-w-0 flex-1 break-words leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
               >
-                {item.label}
+                {label}
               </span>
               <span className="shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                 {t('comingSoonNav')}

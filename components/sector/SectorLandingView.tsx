@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Calendar, ArrowRight } from 'lucide-react';
+import { getFeaturedBrandsForSector } from '@/lib/sector-featured-companies';
 import {
   estimateReadMinutesForCard,
   excerptForSectorBlogCard,
@@ -11,7 +12,11 @@ import {
 } from '@/lib/sector-landing';
 import { getTranslatedDivisionTopicNavItems } from '@/lib/company-division-nav-i18n';
 import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
-import { isCompanyDivisionSlug, isSectorLandingContentOnlySlug } from '@/lib/company-divisions';
+import {
+  isActiveHomeDivisionSlug,
+  isCompanyDivisionSlug,
+  isSectorLandingContentOnlySlug,
+} from '@/lib/company-divisions';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import { newsArticlePath } from '@/lib/news-paths';
 
@@ -22,10 +27,11 @@ type Props = {
 };
 
 export default async function SectorLandingView({ locale, sectorSlug, page }: Props) {
-  const data = await fetchSectorLandingData(sectorSlug, page, locale);
+  const normalizedSectorSlug = sectorSlug.trim().toLowerCase();
+  const data = await fetchSectorLandingData(normalizedSectorSlug, page, locale);
   if (!data) {
-    if (isCompanyDivisionSlug(sectorSlug)) {
-      return <SectorUnavailable locale={locale} slug={sectorSlug} />;
+    if (isCompanyDivisionSlug(normalizedSectorSlug)) {
+      return <SectorUnavailable locale={locale} slug={normalizedSectorSlug} />;
     }
     notFound();
   }
@@ -33,13 +39,18 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   const { sector, rows, total, totalPages } = data;
   if (total > 0 && rows.length === 0) notFound();
 
+  const sectorKey = sector.slug.trim().toLowerCase();
   const tBlog = await getTranslations({ locale, namespace: 'Blog' });
+  const isActiveSector = isActiveHomeDivisionSlug(sectorKey);
+  const featuredBrands = getFeaturedBrandsForSector(sectorKey);
+  const tHomeBrands = await getTranslations({ locale, namespace: 'Home' });
+  const tSectorBrands = await getTranslations({ locale, namespace: 'SectorLanding' });
   const newsLabel = tBlog('title');
   const allNewsHref = '/news';
-  const topicAnchors = (await getTranslatedDivisionTopicNavItems(sectorSlug, locale)).filter((i) =>
+  const topicAnchors = (await getTranslatedDivisionTopicNavItems(sectorKey, locale)).filter((i) =>
     topicAnchorIdFromHref(i.href),
   );
-  const contentOnly = isSectorLandingContentOnlySlug(sectorSlug);
+  const contentOnly = isSectorLandingContentOnlySlug(sectorKey);
 
   const paginationHref = (p: number) =>
     p <= 1 ? `/${sector.slug}` : `/${sector.slug}?page=${p}`;
@@ -47,6 +58,66 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   const heroDescription =
     sector.description?.trim() ||
     tBlog('sectorHeroDescriptionFallback', { name: sector.name });
+
+  if (isActiveSector) {
+    return (
+      <div className="min-h-screen bg-white">
+        <section className="bg-blue-900 px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl text-center">
+            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sector.name}</h1>
+            <p className="mx-auto mt-4 max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="sector-featured-brands-heading"
+          className="bg-slate-50/80 px-4 py-12 sm:px-6 lg:px-8"
+        >
+          <div className="mx-auto max-w-7xl">
+            <h2
+              id="sector-featured-brands-heading"
+              className="mb-2 text-center font-serif text-2xl font-bold text-slate-900 sm:text-left sm:text-3xl"
+            >
+              {tSectorBrands('featuredProductsHeading')}
+            </h2>
+            <p className="mb-8 text-center text-sm text-slate-600 sm:text-left sm:text-base">
+              {tSectorBrands('featuredProductsLead')}
+            </p>
+
+            {featuredBrands.length === 0 ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+                <p className="text-base font-semibold text-slate-900">{tSectorBrands('emptyTitle')}</p>
+                <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">{tSectorBrands('emptyBody')}</p>
+              </div>
+            ) : (
+              <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+                {featuredBrands.map((brand) => (
+                  <li key={brand.href}>
+                    <Link
+                      href={brand.href}
+                      locale={locale}
+                      className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                    >
+                      <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
+                        <Image
+                          src={brand.imageSrc}
+                          alt={tHomeBrands(brand.altKey)}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 640px) 176px, 192px"
+                          loading="lazy"
+                        />
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,6 +129,47 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
           <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
         </div>
       </section>
+
+      {featuredBrands.length > 0 ? (
+        <section
+          aria-labelledby="sector-featured-brands-heading"
+          className="border-b border-slate-200 bg-slate-50/80 px-4 py-10 sm:px-6 lg:px-8"
+        >
+          <div className="mx-auto max-w-7xl">
+            <h2
+              id="sector-featured-brands-heading"
+              className="mb-2 text-center font-serif text-2xl font-bold text-slate-900 sm:text-left sm:text-3xl"
+            >
+              {tSectorBrands('featuredProductsHeading')}
+            </h2>
+            <p className="mb-8 text-center text-sm text-slate-600 sm:text-left sm:text-base">
+              {tSectorBrands('featuredProductsLead')}
+            </p>
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+              {featuredBrands.map((brand) => (
+                <li key={brand.href}>
+                  <Link
+                    href={brand.href}
+                    locale={locale}
+                    className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                  >
+                    <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
+                      <Image
+                        src={brand.imageSrc}
+                        alt={tHomeBrands(brand.altKey)}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 176px, 192px"
+                        loading="lazy"
+                      />
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
 
       {topicAnchors.length > 0 ? (
         <section

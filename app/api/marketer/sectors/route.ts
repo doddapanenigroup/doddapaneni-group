@@ -14,7 +14,7 @@ export async function GET() {
     await connectDb();
     const items = await prisma.sector.findMany({
       orderBy: { name: 'asc' },
-      select: { id: true, name: true, slug: true, description: true },
+      select: { id: true, name: true, slug: true, description: true, isLive: true },
     });
 
     return NextResponse.json({ items });

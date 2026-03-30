@@ -71,7 +71,7 @@
     "buildingSustainable": "Building Sustainable Businesses",
     "description": "Doddapaneni Group is the parent company for a portfolio of operating divisions and brands. Technology and marketing teams build web and automation solutions; other divisions support healthcare-related supply and billing workflows, construction and property work, import–export desks, manufacturing and wholesale, warehousing and freight, consumer platforms, media, staffing, education, and food-sector programs. We publish sector articles on this site so visitors can see how each unit approaches its market. If you need a formal introduction, regulatory filing reference, or vendor onboarding pack, use the Contact page and we will route you to the right division.",
     "readStory": "Read our full story",
-    "ourGroupCompanies": "Featured group brands on this site",
+    "ourGroupCompanies": "Our Products",
     "drivingExcellence": "DealsMedi (USA health products), Dlsin (multivendor commerce), and Janatha Mirror (digital news) are three public-facing brands you can explore in depth via the links below.",
     "ourServices": "Our Services",
     "diverseSolutions": "For a sector-by-sector list of capabilities, explore Our Services in the header or the Services page.",
@@ -165,7 +165,21 @@
     "exploreDivision": "Explore",
     "logoAltDlsin": "Dlsin multivendor e-commerce platform logo",
     "logoAltJanathaMirror": "Janatha Mirror digital news publication logo",
-    "logoAltDealsmedi": "DealsMedi online medical and health products marketplace logo"
+    "logoAltDealsmedi": "DealsMedi online medical and health products marketplace logo",
+    "companyBrandDlsin": "Dlsin",
+    "companyBrandDealsmedi": "DealsMedi",
+    "companyBrandJanathaMirror": "Janatha Mirror",
+    "sectorCompaniesListHeading": "Our products in this sector",
+    "sectorCompaniesListLead": "Select a company to open its page.",
+    "sectorCompaniesListRowHint": "Open company page",
+    "sectorCompaniesListEmptyTitle": "No companies listed yet",
+    "sectorCompaniesListEmptyBody": "We are preparing this sector's company pages. Please check back soon."
+  },
+  "SectorLanding": {
+    "featuredProductsHeading": "Our products in this sector",
+    "featuredProductsLead": "Select a brand to open its page.",
+    "emptyTitle": "No public brands listed yet",
+    "emptyBody": "We’re preparing this sector’s brand pages. Please check back soon."
   },
   "About": {
     "metaTitle": "About Doddapaneni Group | Vision, Mission & Business Divisions",

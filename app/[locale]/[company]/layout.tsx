@@ -1,5 +1,5 @@
 import DivisionLayoutServer from '@/components/divisions/DivisionLayoutServer';
-import { isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { isActiveHomeDivisionSlug, isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { generateCompanySegmentStaticParams } from '@/lib/company-route-static';
 
 /** Twelve division URLs are generated at build; other sector slugs remain request-rendered. */
@@ -26,6 +26,12 @@ export default async function CompanySectionLayout({ children, params }: Props) 
   const slug = company.trim().toLowerCase();
 
   if (!isCompanyDivisionSlug(slug)) {
+    return <>{children}</>;
+  }
+
+  // For the 4 active sector hubs, render only the page content (company list),
+  // without the division chrome (overview/about/services/contact + focus chips).
+  if (isActiveHomeDivisionSlug(slug)) {
     return <>{children}</>;
   }
 

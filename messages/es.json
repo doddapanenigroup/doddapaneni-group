@@ -68,7 +68,7 @@
     "buildingSustainable": "Construyendo Negocios Sostenibles",
     "description": "Doddapaneni Group es un conglomerado empresarial diversificado que ofrece soluciones innovadoras, escalables y listas para el futuro en múltiples industrias. Nuestra presencia abarca tecnología, atención médica, construcción, comercio global, logística, manufactura, educación, medios y soluciones de fuerza laboral. Nos enfocamos en construir negocios sostenibles que creen valor a largo plazo para clientes, socios y comunidades. Con una base sólida arraigada en la integridad, la excelencia operativa y la innovación, Doddapaneni Group permite a las organizaciones adaptarse, escalar y liderar en mercados competitivos. Nuestro modelo de negocio integrado nos permite ofrecer soluciones integrales bajo un grupo de confianza.",
     "readStory": "Lee nuestra historia completa",
-    "ourGroupCompanies": "Nuestras Empresas del Grupo",
+    "ourGroupCompanies": "Nuestros productos",
     "drivingExcellence": "Impulsando la excelencia en sectores clave.",
     "ourServices": "Nuestros Servicios",
     "diverseSolutions": "Soluciones diversas adaptadas a un mundo complejo y en evolución.",
@@ -165,7 +165,21 @@
     "presenceMapAria": "Mapa estilizado que destaca las oficinas del grupo en India y Estados Unidos",
     "logoAltDlsin": "Logotipo de la plataforma de comercio electrónico multivendedor Dlsin",
     "logoAltJanathaMirror": "Logotipo del medio de noticias digital Janatha Mirror",
-    "logoAltDealsmedi": "Logotipo del marketplace en línea de productos médicos y de salud DealsMedi"
+    "logoAltDealsmedi": "Logotipo del marketplace en línea de productos médicos y de salud DealsMedi",
+    "companyBrandDlsin": "Dlsin",
+    "companyBrandDealsmedi": "DealsMedi",
+    "companyBrandJanathaMirror": "Janatha Mirror",
+    "sectorCompaniesListHeading": "Nuestros productos en este sector",
+    "sectorCompaniesListLead": "Seleccione una empresa para abrir su página.",
+    "sectorCompaniesListRowHint": "Abrir página de la empresa",
+    "sectorCompaniesListEmptyTitle": "Aún no hay empresas en la lista",
+    "sectorCompaniesListEmptyBody": "Estamos preparando las páginas de empresas de este sector. Vuelva a revisar pronto."
+  },
+  "SectorLanding": {
+    "featuredProductsHeading": "Nuestros productos en este sector",
+    "featuredProductsLead": "Seleccione una marca para abrir su página.",
+    "emptyTitle": "Aún no hay marcas públicas",
+    "emptyBody": "Estamos preparando las páginas de marca de este sector. Vuelva a revisar pronto."
   },
   "About": {
     "headerTitle": "Sobre Nosotros",

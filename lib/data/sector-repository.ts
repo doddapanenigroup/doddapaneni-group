@@ -8,6 +8,7 @@ export type PublicSector = {
   name: string;
   slug: string;
   description: string | null;
+  isLive: boolean;
 };
 
 function publicSectorRow(row: {
@@ -15,6 +16,7 @@ function publicSectorRow(row: {
   name: string;
   slug: string;
   description: string | null;
+  isLive: boolean;
 }): PublicSector {
   const slug = row.slug.trim().toLowerCase();
   const name = isCompanyDivisionSlug(slug)
@@ -28,6 +30,7 @@ const sectorPublicSelect = {
   name: true,
   slug: true,
   description: true,
+  isLive: true,
 } as const;
 
 /** Cached: sector landing, division layout, blog post resolution (same request deduped). */

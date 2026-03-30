@@ -10,6 +10,8 @@ import VisitStatsLazy from './VisitStatsLazy';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
 import AdminBackupsPanel from './AdminBackupsPanel';
+import SectorStatusPanel from './SectorStatusPanel';
+import CompaniesAdminPanel from './CompaniesAdminPanel';
 
 type UserRow = {
   id: string;
@@ -124,6 +126,10 @@ export default function AdminDashboard({
       <AdminOpsInsights />
 
       <AdminBackupsPanel />
+
+      <SectorStatusPanel />
+
+      <CompaniesAdminPanel />
 
       <VisitStatsLazy />
     </div>

@@ -11,6 +11,8 @@ import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
 import PermissionMatrixPanel from './PermissionMatrixPanel';
 import FeatureFlagsPanel from './FeatureFlagsPanel';
+import SectorStatusPanel from './SectorStatusPanel';
+import CompaniesAdminPanel from './CompaniesAdminPanel';
 
 type UserRow = {
   id: string;
@@ -127,6 +129,10 @@ export default function SuperAdminDashboard({
       <PermissionMatrixPanel />
 
       <FeatureFlagsPanel />
+
+      <SectorStatusPanel />
+
+      <CompaniesAdminPanel />
 
       <VisitStatsLazy />
     </div>

@@ -1,7 +1,6 @@
 import {
   COMPANY_DIVISION_SLUGS,
   type CompanyDivisionSlug,
-  isActiveHomeDivisionSlug,
 } from '@/lib/company-divisions';
 import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
 import { getTranslations } from 'next-intl/server';
@@ -32,8 +31,8 @@ export async function getBusinessDivisionsForHome(locale: string): Promise<HomeD
         locale === 'en' && hasDbDescription
           ? raw!
           : tAbout(`divisionBlurbs.${slug}` as `divisionBlurbs.${CompanyDivisionSlug}`),
-      /** First four division slugs link to live public hubs; remaining eight show as launching soon. */
-      active: isActiveHomeDivisionSlug(slug),
+      /** Live toggle from DB: drives "Coming soon" and clickability. */
+      active: row?.isLive ?? false,
     };
   });
 }

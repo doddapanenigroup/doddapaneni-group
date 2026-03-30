@@ -287,9 +287,35 @@ model Sector {
   name        String   @unique
   slug        String   @unique
   description String?  @db.Text
+  isLive      Boolean  @default(false) @map("is_live")
   createdAt   DateTime @default(now()) @map("created_at")
 
   blogs Blog[]
+
+  companies Company[]
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logoImage   String?  @map("logo_image")
+  description String?  @db.Text
+
+  facebookUrl  String? @map("facebook_url")
+  instagramUrl String? @map("instagram_url")
+  xUrl         String? @map("x_url")
+  youtubeUrl   String? @map("youtube_url")
+  pinterestUrl String? @map("pinterest_url")
+
+  sectorId String @map("sector_id")
+  sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([sectorId])
+  @@map("company")
 }
 
 enum CampaignStatus {
