@@ -10,6 +10,21 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 const DEFAULT_LOCALE = 'en';
 const LOCALES = ['en', 'te', 'hi', 'es'] as const;
 
+/** Legacy favicon filenames (old metadata); browsers/clients may still request them. */
+const LEGACY_FAVICON_DG_SIZES = [16, 32, 48, 64, 180, 192, 512] as const;
+
+function legacyFaviconRedirects(): NonNullable<
+  Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
+> {
+  return [
+    ...LEGACY_FAVICON_DG_SIZES.map((size) => ({
+      source: `/favicon-dg-${size}.png`,
+      destination: '/logo.webp',
+      permanent: false as const,
+    })),
+  ];
+}
+
 /** Old locale URL prefixes → strip and send to default-locale paths (English, no prefix). */
 const REMOVED_LOCALE_PREFIXES = [
   'bn',
@@ -107,6 +122,7 @@ function hostCanonicalRedirects(): NonNullable<
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      ...legacyFaviconRedirects(),
       ...hostCanonicalRedirects(),
       ...removedLocaleRedirects(),
       { source: '/blog', destination: '/news', permanent: true },

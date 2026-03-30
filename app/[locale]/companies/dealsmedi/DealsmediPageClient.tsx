@@ -5,8 +5,9 @@ import { Link } from '@/i18n/routing';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { Stethoscope, Truck, BedDouble, Pill, ExternalLink, Facebook, Youtube, Instagram, Twitter } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { mediaUrl } from '@/lib/media';
+import CompanyPageForms from '@/components/companies/CompanyPageForms';
 
 const WEBSITE_URL = 'https://dealsmedi.com/';
 
@@ -19,8 +20,8 @@ const DEALSMEDI_SOCIAL = {
 };
 
 export default function DealsMedi() {
-  const locale = useLocale();
   const t = useTranslations('DealsMedi');
+  const tHome = useTranslations('Home');
 
   const features = [
     { key: "respiratory", icon: <Stethoscope size={24} strokeWidth={1.75} /> },
@@ -174,6 +175,12 @@ export default function DealsMedi() {
           </div>
         </div>
       </section>
+
+      <CompanyPageForms
+        companySlug="dealsmedi"
+        sectorSlug="healthcare-medical"
+        companyDisplayName={tHome('companyBrandDealsmedi')}
+      />
     </div>
     </MotionLazy>
   );

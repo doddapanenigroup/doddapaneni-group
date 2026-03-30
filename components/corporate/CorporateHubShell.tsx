@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname as useNextPathname } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import type { AbstractIntlMessages } from 'next-intl';
 import { NextIntlClientProvider } from 'next-intl';
 import LayoutWithNav from '@/components/LayoutWithNav';
@@ -10,6 +10,7 @@ import Providers from '@/components/Providers';
 import type { AppLocale } from '@/lib/locale-from-path';
 import { stripLocalePrefixFromPathname } from '@/lib/locale-from-path';
 import { routing } from '@/i18n/routing';
+import { getMessagesForLocale } from '@/lib/messages';
 
 type Props = {
   children: React.ReactNode;
@@ -37,45 +38,18 @@ export default function CorporateHubShell({
   const pathForNav = stripLocalePrefixFromPathname(fullPath) || initialPathname;
   const urlLocale = useMemo(() => localeFromFullPathname(fullPath), [fullPath]);
 
-  const [intlBundle, setIntlBundle] = useState(() => ({
-    locale: initialLocale,
-    messages: initialMessages,
-  }));
-  const intlRef = useRef(intlBundle);
-  intlRef.current = intlBundle;
-
-  useEffect(() => {
-    if (intlRef.current.locale === urlLocale) return;
-    let cancelled = false;
-    void (async () => {
-      try {
-        const mod =
-          urlLocale === 'en'
-            ? await import('@/messages/en.json')
-            : await import(`@/messages/${urlLocale}.json`);
-        if (!cancelled) {
-          setIntlBundle((prev) => {
-            if (prev.locale === urlLocale) return prev;
-            return { locale: urlLocale, messages: mod.default as AbstractIntlMessages };
-          });
-        }
-      } catch {
-        const mod = await import('@/messages/en.json');
-        if (!cancelled) {
-          setIntlBundle({ locale: 'en', messages: mod.default as AbstractIntlMessages });
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [urlLocale]);
+  // Prefer messages for the URL locale; fall back to the server-provided initial bundle.
+  // `getMessagesForLocale` merges shared namespaces like DivisionTopics/CompanyForms.
+  const messages = useMemo(() => {
+    if (urlLocale === initialLocale) return initialMessages;
+    return getMessagesForLocale(urlLocale) as AbstractIntlMessages;
+  }, [initialLocale, initialMessages, urlLocale]);
 
   return (
     <Providers>
       <NextIntlClientProvider
-        locale={intlBundle.locale}
-        messages={intlBundle.messages}
+        locale={urlLocale}
+        messages={messages}
         timeZone="Asia/Kolkata"
       >
         <LocaleHtmlLang />

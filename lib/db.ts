@@ -1,5 +1,10 @@
 import { prisma } from "./prisma";
 import {
+  connectOncePromise,
+  resetConnectOncePromise,
+  setConnectOncePromise,
+} from "@/lib/db-connection";
+import {
   hasAdminAccess,
   isDeveloper,
   isMarketer,
@@ -9,7 +14,18 @@ import {
 export { prisma };
 
 export async function connectDb(): Promise<void> {
-  await prisma.$connect();
+  // Prisma uses a singleton client (`lib/prisma.ts`). Calling `$connect()` repeatedly
+  // can still cause connection churn under concurrent server renders.
+  // Connect once per process and reuse the same promise.
+  if (!connectOncePromise) {
+    const p = prisma.$connect().catch((err) => {
+      // Allow retries if the initial connect failed.
+      resetConnectOncePromise();
+      throw err;
+    });
+    setConnectOncePromise(p);
+  }
+  await connectOncePromise;
 }
 
 export function isDeveloperRole(role: string): boolean {

@@ -6,6 +6,7 @@ import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { routing } from '@/i18n/routing';
 import { getCompanyBySlug } from '@/lib/data/company-repository';
 import { normalizeStoredImage } from '@/lib/sector-landing';
+import CompanyPageForms from '@/components/companies/CompanyPageForms';
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -80,6 +81,12 @@ export default async function CompanyDynamicPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      <CompanyPageForms
+        companySlug={company.slug}
+        sectorSlug={company.sector.slug}
+        companyDisplayName={company.name}
+      />
     </div>
   );
 }

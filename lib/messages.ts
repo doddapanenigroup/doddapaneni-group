@@ -6,12 +6,30 @@ import en from '@/messages/en.json';
 import te from '@/messages/te.json';
 import hi from '@/messages/hi.json';
 import es from '@/messages/es.json';
+import divisionTopics from '@/messages/division-topics.json';
+import companyForms from '@/messages/company-forms.json';
+
+function mergeSharedMessages(localeMessages: Record<string, unknown>): Record<string, unknown> {
+  const override = localeMessages.DivisionTopics as Record<string, unknown> | undefined;
+  const companyFormsOverride = localeMessages.CompanyForms as Record<string, unknown> | undefined;
+  return {
+    ...localeMessages,
+    DivisionTopics: {
+      ...(divisionTopics as Record<string, unknown>),
+      ...(override ?? {}),
+    },
+    CompanyForms: {
+      ...(companyForms as Record<string, unknown>),
+      ...(companyFormsOverride ?? {}),
+    },
+  };
+}
 
 export const messagesByLocale: Record<string, Record<string, unknown>> = {
-  en: en as Record<string, unknown>,
-  te: te as Record<string, unknown>,
-  hi: hi as Record<string, unknown>,
-  es: es as Record<string, unknown>,
+  en: mergeSharedMessages(en as Record<string, unknown>),
+  te: mergeSharedMessages(te as Record<string, unknown>),
+  hi: mergeSharedMessages(hi as Record<string, unknown>),
+  es: mergeSharedMessages(es as Record<string, unknown>),
 };
 
 export function getMessagesForLocale(locale: string): Record<string, unknown> {

@@ -1,6 +1,7 @@
 import {getRequestConfig} from 'next-intl/server';
 import {routing} from './routing';
 import divisionTopics from '../messages/division-topics.json';
+import companyForms from '../messages/company-forms.json';
 
 export default getRequestConfig(async ({requestLocale}) => {
   // This typically corresponds to the `[locale]` segment
@@ -15,6 +16,7 @@ export default getRequestConfig(async ({requestLocale}) => {
 
   const localeMessages = (await import(`../messages/${locale}.json`)).default as Record<string, unknown>;
   const override = localeMessages.DivisionTopics as Record<string, unknown> | undefined;
+  const companyFormsOverride = localeMessages.CompanyForms as Record<string, unknown> | undefined;
 
   return {
     locale,
@@ -24,6 +26,11 @@ export default getRequestConfig(async ({requestLocale}) => {
       DivisionTopics: {
         ...(divisionTopics as Record<string, unknown>),
         ...(override ?? {}),
+      },
+      /** Shared lead/contact copy; override per locale in `messages/{locale}.json` under `CompanyForms`. */
+      CompanyForms: {
+        ...(companyForms as Record<string, unknown>),
+        ...(companyFormsOverride ?? {}),
       },
     },
     timeZone: 'Asia/Kolkata',

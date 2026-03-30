@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { getFeaturedBrandsForSector } from '@/lib/sector-featured-companies';
 import {
   estimateReadMinutesForCard,
   excerptForSectorBlogCard,
@@ -17,7 +16,10 @@ import {
   isSectorLandingContentOnlySlug,
 } from '@/lib/company-divisions';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
+import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
 import { newsArticlePath } from '@/lib/news-paths';
+import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
+import { isFlagshipCompanySlug } from '@/lib/sector-featured-companies';
 
 type Props = {
   locale: string;
@@ -41,15 +43,15 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   const sectorKey = sector.slug.trim().toLowerCase();
   const tBlog = await getTranslations({ locale, namespace: 'Blog' });
   const isActiveSector = sector.isLive;
-  const featuredBrands = getFeaturedBrandsForSector(sectorKey);
-  const tHomeBrands = await getTranslations({ locale, namespace: 'Home' });
-  const tSectorBrands = await getTranslations({ locale, namespace: 'SectorLanding' });
   const newsLabel = tBlog('title');
   const allNewsHref = '/news';
   const topicAnchors = (await getTranslatedDivisionTopicNavItems(sectorKey, locale)).filter((i) =>
     topicAnchorIdFromHref(i.href),
   );
   const contentOnly = isSectorLandingContentOnlySlug(sectorKey);
+  const companies = await listCompaniesBySectorSlug(sector.slug);
+  const extraCompanies = companies.filter((c) => !isFlagshipCompanySlug(c.slug));
+  const tHome = await getTranslations({ locale, namespace: 'Home' });
 
   const paginationHref = (p: number) =>
     p <= 1 ? `/${sector.slug}` : `/${sector.slug}?page=${p}`;
@@ -68,52 +70,57 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
           </div>
         </section>
 
-        <section
-          aria-labelledby="sector-featured-brands-heading"
-          className="bg-slate-50/80 px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <div className="mx-auto max-w-7xl">
-            <h2
-              id="sector-featured-brands-heading"
-              className="mb-2 text-center font-serif text-2xl font-bold text-slate-900 sm:text-left sm:text-3xl"
-            >
-              {tSectorBrands('featuredProductsHeading')}
-            </h2>
-            <p className="mb-8 text-center text-sm text-slate-600 sm:text-left sm:text-base">
-              {tSectorBrands('featuredProductsLead')}
-            </p>
+        <SectorFeaturedBrandsGrid locale={locale} sectorSlug={sectorKey} />
 
-            {featuredBrands.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-                <p className="text-base font-semibold text-slate-900">{tSectorBrands('emptyTitle')}</p>
-                <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">{tSectorBrands('emptyBody')}</p>
-              </div>
-            ) : (
-              <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-                {featuredBrands.map((brand) => (
-                  <li key={brand.href}>
-                    <Link
-                      href={brand.href}
-                      locale={locale}
-                      className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
-                    >
-                      <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
-                        <Image
-                          src={brand.imageSrc}
-                          alt={tHomeBrands(brand.altKey)}
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 640px) 176px, 192px"
-                          loading="lazy"
-                        />
-                      </div>
-                    </Link>
-                  </li>
-                ))}
+        {extraCompanies.length > 0 ? (
+          <section aria-labelledby="sector-db-companies-heading" className="px-4 py-12 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
+              <h2
+                id="sector-db-companies-heading"
+                className="mb-2 font-serif text-2xl font-bold text-slate-900 sm:text-3xl"
+              >
+                {tHome('sectorCompaniesListHeading')}
+              </h2>
+              <p className="mb-8 text-sm text-slate-600 sm:text-base">{tHome('sectorCompaniesListLead')}</p>
+              <ul className="space-y-4">
+                {extraCompanies.map((c) => {
+                  const href = `/companies/${c.slug}`;
+                  const logoSrc = normalizeStoredImage(c.logoImage);
+                  return (
+                    <li key={c.id}>
+                      <Link
+                        href={href}
+                        locale={locale}
+                        className="flex items-center gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                      >
+                        <div className="relative h-14 w-32 shrink-0 sm:h-16 sm:w-36">
+                          {logoSrc ? (
+                            <Image
+                              src={logoSrc}
+                              alt={c.name}
+                              fill
+                              className="object-contain object-left"
+                              sizes="144px"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="h-full w-full rounded-lg bg-slate-100" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-base font-semibold text-slate-900">{c.name}</p>
+                          <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                            {c.description?.trim() || tHome('sectorCompaniesListRowHint')}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        ) : null}
       </div>
     );
   }
@@ -129,42 +136,53 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
         </div>
       </section>
 
-      {featuredBrands.length > 0 ? (
-        <section
-          aria-labelledby="sector-featured-brands-heading"
-          className="border-b border-slate-200 bg-slate-50/80 px-4 py-10 sm:px-6 lg:px-8"
-        >
+      <SectorFeaturedBrandsGrid locale={locale} sectorSlug={sectorKey} bordered />
+
+      {extraCompanies.length > 0 ? (
+        <section aria-labelledby="sector-db-companies-heading" className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <h2
-              id="sector-featured-brands-heading"
-              className="mb-2 text-center font-serif text-2xl font-bold text-slate-900 sm:text-left sm:text-3xl"
+              id="sector-db-companies-heading"
+              className="mb-2 font-serif text-2xl font-bold text-slate-900 sm:text-3xl"
             >
-              {tSectorBrands('featuredProductsHeading')}
+              {tHome('sectorCompaniesListHeading')}
             </h2>
-            <p className="mb-8 text-center text-sm text-slate-600 sm:text-left sm:text-base">
-              {tSectorBrands('featuredProductsLead')}
-            </p>
-            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {featuredBrands.map((brand) => (
-                <li key={brand.href}>
-                  <Link
-                    href={brand.href}
-                    locale={locale}
-                    className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
-                  >
-                    <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
-                      <Image
-                        src={brand.imageSrc}
-                        alt={tHomeBrands(brand.altKey)}
-                        fill
-                        className="object-contain"
-                        sizes="(max-width: 640px) 176px, 192px"
-                        loading="lazy"
-                      />
-                    </div>
-                  </Link>
-                </li>
-              ))}
+            <p className="mb-8 text-sm text-slate-600 sm:text-base">{tHome('sectorCompaniesListLead')}</p>
+            <ul className="space-y-4">
+              {extraCompanies.map((c) => {
+                const href = `/companies/${c.slug}`;
+                const logoSrc = normalizeStoredImage(c.logoImage);
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={href}
+                      locale={locale}
+                      className="flex items-center gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                    >
+                      <div className="relative h-14 w-32 shrink-0 sm:h-16 sm:w-36">
+                        {logoSrc ? (
+                          <Image
+                            src={logoSrc}
+                            alt={c.name}
+                            fill
+                            className="object-contain object-left"
+                            sizes="144px"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="h-full w-full rounded-lg bg-slate-100" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-base font-semibold text-slate-900">{c.name}</p>
+                        <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                          {c.description?.trim() || tHome('sectorCompaniesListRowHint')}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </section>

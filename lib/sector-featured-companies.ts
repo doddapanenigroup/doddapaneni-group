@@ -1,6 +1,7 @@
-import type { CompanyDivisionSlug } from '@/lib/company-divisions';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { mediaUrl } from '@/lib/media';
+import type { GroupCompanyBrandId } from '@/lib/company-lead-variant';
+import { orderedGroupBrandIdsForSector } from '@/lib/company-lead-variant';
 
 /** Keys under the `Home` message namespace for logo `alt` text. */
 export type SectorFeaturedBrandAltKey =
@@ -21,47 +22,38 @@ export type SectorFeaturedBrand = {
   nameKey: SectorFeaturedBrandNameKey;
 };
 
-const BRANDS_BY_SECTOR: Partial<
-  Record<CompanyDivisionSlug, readonly SectorFeaturedBrand[]>
+const BRAND_BY_ID: Record<
+  GroupCompanyBrandId,
+  SectorFeaturedBrand
 > = {
-  'software-it-ai': [
-    {
-      href: '/companies/dlsin',
-      imageSrc: mediaUrl('dlsin.webp'),
-      altKey: 'logoAltDlsin',
-      nameKey: 'companyBrandDlsin',
-    },
-  ],
-  'healthcare-medical': [
-    {
-      href: '/companies/dealsmedi',
-      imageSrc: mediaUrl('dealsmedi.webp'),
-      altKey: 'logoAltDealsmedi',
-      nameKey: 'companyBrandDealsmedi',
-    },
-  ],
-  'ecommerce-marketplace': [
-    {
-      href: '/companies/dlsin',
-      imageSrc: mediaUrl('dlsin.webp'),
-      altKey: 'logoAltDlsin',
-      nameKey: 'companyBrandDlsin',
-    },
-  ],
-  'digital-marketing': [
-    {
-      href: '/companies/janatha-mirror',
-      imageSrc: mediaUrl('janathamirror.webp'),
-      altKey: 'logoAltJanathaMirror',
-      nameKey: 'companyBrandJanathaMirror',
-    },
-  ],
-  'construction-realestate': [],
+  dlsin: {
+    href: '/companies/dlsin',
+    imageSrc: mediaUrl('dlsin.webp'),
+    altKey: 'logoAltDlsin',
+    nameKey: 'companyBrandDlsin',
+  },
+  dealsmedi: {
+    href: '/companies/dealsmedi',
+    imageSrc: mediaUrl('dealsmedi.webp'),
+    altKey: 'logoAltDealsmedi',
+    nameKey: 'companyBrandDealsmedi',
+  },
+  'janatha-mirror': {
+    href: '/companies/janatha-mirror',
+    imageSrc: mediaUrl('janathamirror.webp'),
+    altKey: 'logoAltJanathaMirror',
+    nameKey: 'companyBrandJanathaMirror',
+  },
 };
 
 export function getFeaturedBrandsForSector(sectorSlug: string): SectorFeaturedBrand[] {
   const key = sectorSlug.trim().toLowerCase();
   if (!isCompanyDivisionSlug(key)) return [];
-  const list = BRANDS_BY_SECTOR[key];
-  return list ? [...list] : [];
+  const order = orderedGroupBrandIdsForSector(key);
+  return order.map((id) => BRAND_BY_ID[id]);
+}
+
+export function isFlagshipCompanySlug(slug: string): boolean {
+  const s = slug.trim().toLowerCase();
+  return s === 'dlsin' || s === 'dealsmedi' || s === 'janatha-mirror';
 }

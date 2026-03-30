@@ -44,16 +44,19 @@ export default function BlogPostClient({
   const articleBody = (
     <>
       {image ? (
-        <section className="relative h-64 min-h-64 w-full overflow-hidden bg-blue-50 md:h-96 md:min-h-96">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            loading="lazy"
-            fetchPriority="low"
-          />
+        <section className="relative w-full overflow-hidden bg-blue-50">
+          <div className="relative mx-auto h-[min(52vh,560px)] w-full min-h-[220px] sm:min-h-[260px] md:min-h-[340px] md:h-[min(58vh,640px)] lg:min-h-[400px] lg:h-[min(60vh,720px)]">
+            <Image
+              src={image}
+              alt={title}
+              sizes="(max-width: 1024px) 100vw, min(100vw, 896px)"
+              width={1920}
+              height={1080}
+              className="h-full w-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </div>
         </section>
       ) : null}
 
@@ -87,23 +90,27 @@ export default function BlogPostClient({
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+      <section className="bg-blue-900 px-4 py-6 sm:px-6 sm:py-8 md:py-9 lg:py-10">
         <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
             locale={locale}
-            className="mb-6 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
+            className="mb-3 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
           >
-            <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
+            <ArrowLeft size={18} className="mr-2 shrink-0" aria-hidden />
             {backToBlog}
           </Link>
-          <div className="mb-4">
-            <span className="inline-block rounded-full border-2 border-white/40 bg-white/10 px-4 py-1 text-sm font-bold text-white">
-              {category}
-            </span>
-          </div>
-          <h1 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">{title}</h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
+          {sectorNavSlug ? null : (
+            <div className="mb-2">
+              <span className="inline-block rounded-full border border-white/35 bg-white/10 px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-white sm:text-sm sm:normal-case sm:tracking-normal">
+                {category}
+              </span>
+            </div>
+          )}
+          <h1 className="mb-3 text-2xl font-bold leading-snug tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.35rem]">
+            {title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-white/90 sm:text-sm">
             {publishedAt ? (
               <div className="flex items-center">
                 <Calendar size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
@@ -123,12 +130,12 @@ export default function BlogPostClient({
       </section>
 
       {sectorNavSlug ? (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-10 pb-16 lg:flex-row lg:items-start lg:gap-12">
-            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72">
+        <div className="px-5 pb-16 sm:px-8 lg:px-0">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
+            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
               <NewsSectorNewsNav locale={locale} currentSlug={sectorNavSlug} />
             </aside>
-            <div className="order-1 min-w-0 flex-1 lg:order-2">{articleBody}</div>
+            <div className="order-1 min-w-0 flex-1 lg:order-2 lg:pr-12 xl:pr-16">{articleBody}</div>
           </div>
         </div>
       ) : (

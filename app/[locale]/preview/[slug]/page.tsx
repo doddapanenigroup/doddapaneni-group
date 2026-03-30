@@ -5,7 +5,6 @@ import { verifyPreviewToken } from "@/lib/preview-token";
 import { isFeatureEnabled } from "@/lib/features";
 import { mediaUrl } from "@/lib/media";
 import BlogPostClient from "../../news/[slug]/BlogPostClient";
-import { BLOG_POST_META } from "@/lib/blog-post-meta";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -94,8 +93,6 @@ export default async function PreviewPage({ params }: Props) {
   const plain = dbPost.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
 
-  const fallbackMeta = BLOG_POST_META[payload.slug as keyof typeof BLOG_POST_META] ?? null;
-
   return (
     <BlogPostClient
       locale={locale}
@@ -104,7 +101,7 @@ export default async function PreviewPage({ params }: Props) {
       title={dbPost.title ?? "News preview"}
       category="News"
       readTime={`${readMinutes} min read`}
-      image={normalizeStoredImage(dbPost.featuredImage) ?? (fallbackMeta?.image ?? null)}
+      image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={`/news/${payload.slug}`}
       articleSlug={payload.slug}

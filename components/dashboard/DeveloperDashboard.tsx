@@ -7,7 +7,6 @@ import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
-import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
 import DeveloperErrorsPanel from './DeveloperErrorsPanel';
 import DeveloperRequestMonitorPanel from './DeveloperRequestMonitorPanel';
@@ -47,13 +46,6 @@ export default function DeveloperDashboard({
     { href: `${base}/companies/dlsin`, label: 'Companies — Dlsin', pageKey: 'companies-dlsin', editFile: 'app/[locale]/companies/dlsin/page.tsx', icon: <Building2 size={20} /> },
     { href: `${base}/companies/janatha-mirror`, label: 'Companies — Janatha Mirror', pageKey: 'companies-janatha-mirror', editFile: 'app/[locale]/companies/janatha-mirror/page.tsx', icon: <Building2 size={20} /> },
     { href: `${base}/news`, label: 'News — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
-    ...Object.keys(BLOG_POST_META).map((slug) => ({
-      href: `${base}/news/${slug}`,
-      label: `Blog — ${slug}`,
-      pageKey: 'messages-en',
-      editFile: 'messages/en.json',
-      icon: <FileText size={20} />,
-    })),
     { href: base, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
   const sitePages = staticPages;

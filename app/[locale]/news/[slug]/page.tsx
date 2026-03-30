@@ -5,7 +5,6 @@ import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
-import { BLOG_POST_META } from '@/lib/blog-post-meta';
 import BlogPostClient from './BlogPostClient';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publicPathWithLocale } from '@/lib/sector-landing';
@@ -82,7 +81,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   await connectDb();
   const now = new Date();
-  await publishScheduledContent(now);
+  if (process.env.NODE_ENV === 'production') {
+    await publishScheduledContent(now);
+  }
   const dbPost = await prisma.blog.findFirst({
     where: {
       slug: trimmed,
@@ -177,7 +178,9 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
     if (!sector) notFound();
 
     const now = new Date();
-    await publishScheduledContent(now);
+    if (process.env.NODE_ENV === 'production') {
+      await publishScheduledContent(now);
+    }
     const { rows } = await listPublishedBlogsForSectorPage({
       sector,
       page: 1,
@@ -232,7 +235,9 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
 
   await connectDb();
   const now = new Date();
-  await publishScheduledContent(now);
+  if (process.env.NODE_ENV === 'production') {
+    await publishScheduledContent(now);
+  }
   const dbPost = await prisma.blog.findUnique({
     where: { slug: trimmed },
     select: {
@@ -276,7 +281,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
         title={messagePost.title}
         category="News"
         readTime={messagePost.readTime}
-        image={BLOG_POST_META[trimmed]?.image ?? null}
+        image={null}
         publishedAt={null}
         articlePathname={hubArticlePath}
         articleSlug={trimmed}

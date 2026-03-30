@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { Newspaper, Globe, Video, Share2, Youtube, Facebook } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { mediaUrl } from '@/lib/media';
+import CompanyPageForms from '@/components/companies/CompanyPageForms';
 
 export default function JanathaMirrorPageClient() {
-  const locale = useLocale();
   const t = useTranslations('JanathaMirror');
+  const tHome = useTranslations('Home');
 
   const features = [
     { key: "unbiasedReporting", icon: <Newspaper size={24} strokeWidth={1.75} /> },
@@ -116,6 +117,12 @@ export default function JanathaMirrorPageClient() {
           </div>
         </div>
       </section>
+
+      <CompanyPageForms
+        companySlug="janatha-mirror"
+        sectorSlug="digital-marketing"
+        companyDisplayName={tHome('companyBrandJanathaMirror')}
+      />
     </div>
     </MotionLazy>
   );

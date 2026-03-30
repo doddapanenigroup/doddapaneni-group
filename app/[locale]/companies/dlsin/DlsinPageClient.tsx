@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { Globe, Truck, CreditCard, Users } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { mediaUrl } from '@/lib/media';
+import CompanyPageForms from '@/components/companies/CompanyPageForms';
 
 export default function DlsinPageClient() {
-  const locale = useLocale();
   const t = useTranslations('Dlsin');
+  const tHome = useTranslations('Home');
 
   const features = [
     { key: "globalMarketplace", icon: <Globe size={24} strokeWidth={1.75} /> },
@@ -93,6 +94,12 @@ export default function DlsinPageClient() {
           </div>
         </div>
       </section>
+
+      <CompanyPageForms
+        companySlug="dlsin"
+        sectorSlug="ecommerce-marketplace"
+        companyDisplayName={tHome('companyBrandDlsin')}
+      />
     </div>
     </MotionLazy>
   );

@@ -11,6 +11,9 @@ const contactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   message: z.string().min(10),
+  companySlug: z.string().optional(),
+  sectorSlug: z.string().optional(),
+  companyPageLabel: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -25,7 +28,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid input', errors: validationResult.error.issues }, { status: 400 });
     }
 
-    const { name, email, message } = validationResult.data;
+    const { name, email, message, companySlug, sectorSlug, companyPageLabel } = validationResult.data;
+    const contextLine = [companyPageLabel, companySlug ? `slug:${companySlug}` : '', sectorSlug ? `sector:${sectorSlug}` : '']
+      .filter(Boolean)
+      .join(' · ');
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const contextHtml = contextLine ? esc(contextLine) : '';
 
     if (!isLoginEmailDeliveryConfigured()) {
       console.error(
@@ -77,7 +86,7 @@ export async function POST(request: Request) {
       to: fromAddr,
       replyTo: email, // Reply directly to the user
       subject: `New Inquiry: ${name} - Doddapaneni Group`,
-      text: `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+      text: `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n${contextLine ? `Context: ${contextLine}\n` : ''}\nMessage:\n${message}`,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
           <h2 style="color: #1e3a8a; border-bottom: 2px solid #eee; padding-bottom: 10px;">New Contact Form Submission</h2>
@@ -90,6 +99,7 @@ export async function POST(request: Request) {
               <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email:</td>
               <td style="padding: 10px 0; border-bottom: 1px solid #eee;"><a href="mailto:${email}" style="color: #1e3a8a; text-decoration: none;">${email}</a></td>
             </tr>
+            ${contextHtml ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Context:</td><td style="padding: 10px 0; border-bottom: 1px solid #eee;">${contextHtml}</td></tr>` : ''}
           </table>
           
           <div style="margin-top: 25px;">

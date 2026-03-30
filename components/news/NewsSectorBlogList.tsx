@@ -37,13 +37,12 @@ export default function NewsSectorBlogList({
 
   return (
     <MotionLazy>
-      <section className="border-t border-blue-100 bg-white px-4 py-14 sm:px-6 md:py-20 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
-            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72">
-              <NewsSectorNewsNav locale={locale} currentSlug={sectorSlug} />
-            </aside>
-            <div className="order-1 min-w-0 flex-1 lg:order-2">
+      <section className="border-t border-blue-100 bg-white px-5 py-14 sm:px-8 md:py-20 lg:px-0">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
+          <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
+            <NewsSectorNewsNav locale={locale} currentSlug={sectorSlug} />
+          </aside>
+          <div className="order-1 min-w-0 flex-1 lg:order-2 lg:pr-12 xl:pr-16">
           {posts.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/40 p-10 text-center">
               <p className="text-lg font-semibold text-blue-950">{t('emptySectorTitle')}</p>
@@ -68,9 +67,10 @@ export default function NewsSectorBlogList({
                         <Image
                           src={post.image}
                           alt={post.title}
-                          fill
+                          width={1200}
+                          height={600}
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition duration-300 group-hover:scale-[1.02]"
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                           loading="lazy"
                           fetchPriority="low"
                         />
@@ -114,7 +114,6 @@ export default function NewsSectorBlogList({
           )}
             </div>
           </div>
-        </div>
       </section>
     </MotionLazy>
   );
