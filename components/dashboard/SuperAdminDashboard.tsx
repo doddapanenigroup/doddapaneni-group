@@ -13,6 +13,8 @@ import PermissionMatrixPanel from './PermissionMatrixPanel';
 import FeatureFlagsPanel from './FeatureFlagsPanel';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
+import DashboardPageHeader from './DashboardPageHeader';
+import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
 
 type UserRow = {
   id: string;
@@ -66,48 +68,31 @@ export default function SuperAdminDashboard({
 
   return (
     <div className="space-y-8">
-      <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Shield size={28} className="opacity-90" />
-              {getDashboardTitle(viewerRole)}
-            </h1>
-            <p className="mt-1 opacity-90 text-sm">Manage users, view visit statistics, and monitor login activity.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowManageModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
-            >
+      <DashboardPageHeader
+        icon={Shield}
+        title={getDashboardTitle(viewerRole)}
+        description="Manage users, view visit statistics, and monitor login activity."
+        actions={
+          <>
+            <button type="button" onClick={() => setShowManageModal(true)} className={dashboardHeaderActionPrimary}>
               <UserCog size={18} />
               Manage employees
             </button>
-            <Link
-              href={`/${locale}/dashboard/employees`}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
-            >
+            <Link href={`/${locale}/dashboard/employees`} className={dashboardHeaderActionSecondary}>
               <UserCircle size={18} />
               Employees
             </Link>
-            <Link
-              href={`/${locale}/dashboard/marketer`}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
-            >
+            <Link href={`/${locale}/dashboard/marketer`} className={dashboardHeaderActionSecondary}>
               <Pencil size={18} />
-              Blogs & SEO
+              Blogs &amp; SEO
             </Link>
-            <Link
-              href={`/${locale}/dashboard/analytics`}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
-            >
+            <Link href={`/${locale}/dashboard/analytics`} className={dashboardHeaderActionSecondary}>
               <BarChart3 size={18} />
               Analytics
             </Link>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {showManageModal && (
         <ManageEmployeesModal

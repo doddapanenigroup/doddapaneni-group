@@ -3,7 +3,7 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 import { mediaUrl } from '@/lib/media';
@@ -27,7 +27,6 @@ export default function Navbar() {
   const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
-  const locale = useLocale();
 
   const activeDivisionSlug = useMemo(
     () => activeCompanyDivisionSlugFromPathname(pathname),
@@ -176,7 +175,6 @@ export default function Navbar() {
             <li key={slug} className={mobile ? undefined : 'min-w-0'}>
               <Link
                 href={`/${slug}`}
-                locale={locale}
                 onClick={() => {
                   setCompaniesOpen(false);
                   onNavigate?.();
@@ -225,7 +223,6 @@ export default function Navbar() {
         <div className="flex min-w-0 items-center">
           <Link
             href="/"
-            locale={locale}
             className="group relative flex h-16 w-[160px] shrink-0 items-center"
             onClick={handleLogoClick}
           >
@@ -243,7 +240,7 @@ export default function Navbar() {
           {navBeforeMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
-              <Link key={link.href} href={link.href} locale={locale} className={linkBaseClass}>
+              <Link key={link.href} href={link.href} className={linkBaseClass}>
                 {link.label}
               </Link>
             ))}
@@ -282,7 +279,7 @@ export default function Navbar() {
           {navAfterMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
-              <Link key={link.href} href={link.href} locale={locale} className={linkBaseClass}>
+              <Link key={link.href} href={link.href} className={linkBaseClass}>
                 {link.label}
               </Link>
             ))}
@@ -311,7 +308,6 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  locale={locale}
                   className="block rounded-md px-3 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900"
                   onClick={() => setIsOpen(false)}
                 >
@@ -345,7 +341,6 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  locale={locale}
                   className="block rounded-md px-3 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900"
                   onClick={() => setIsOpen(false)}
                 >

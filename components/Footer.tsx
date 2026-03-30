@@ -117,11 +117,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {navT('services')}
-                </Link>
-              </li>
-              <li>
                 <Link href="/news" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
                   {navT('blog')}
                 </Link>

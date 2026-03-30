@@ -53,12 +53,14 @@ export default function DashboardSidebar({
   const items = dashboardItems(locale).filter((item) => item.roles.includes(role));
 
   return (
-    <aside className="hidden w-72 shrink-0 xl:block">
-      <div className="sticky top-[78px] rounded-2xl border border-slate-200/80 bg-white/85 p-3 shadow-sm backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/85">
-        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Dashboard Menu
-        </p>
-        <nav className="space-y-1">
+    <aside className="hidden w-64 shrink-0 xl:block">
+      <div className="sticky top-[78px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/20">
+        <div className="border-b border-slate-100/90 px-4 py-3 dark:border-slate-800">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+            Navigate
+          </p>
+        </div>
+        <nav className="space-y-0.5 p-2">
           {items.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href;
@@ -67,23 +69,23 @@ export default function DashboardSidebar({
                 key={item.href}
                 href={item.href}
                 className={[
-                  'flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                   active
-                    ? 'bg-slate-900 text-white dark:bg-violet-600'
-                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800',
+                    ? 'bg-slate-900 text-white shadow-sm dark:bg-blue-600 dark:text-white'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800/80',
                 ].join(' ')}
               >
-                <Icon size={17} className="shrink-0 opacity-90" />
+                <Icon size={18} className="shrink-0 opacity-90" />
                 <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
           <Link
             href={`/${locale}/dashboard`}
-            className="mt-2 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
-            <LayoutDashboard size={16} className="shrink-0" />
-            Dashboard Home
+            <LayoutDashboard size={16} className="shrink-0 opacity-80" />
+            Dashboard home
           </Link>
         </nav>
       </div>

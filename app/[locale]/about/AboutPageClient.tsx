@@ -4,7 +4,7 @@ import { Target, Eye, Award, Building2, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { mediaUrl } from '@/lib/media';
 import { getCompanyDivisionNavItems } from '@/lib/company-divisions';
@@ -12,7 +12,6 @@ import { getCompanyDivisionNavItems } from '@/lib/company-divisions';
 const DIVISIONS_NAV = getCompanyDivisionNavItems();
 
 export default function About() {
-  const locale = useLocale();
   const t = useTranslations('About');
 
   const values = [
@@ -149,7 +148,6 @@ export default function About() {
                     {item.active ? (
                       <Link
                         href={`/${item.slug}`}
-                        locale={locale}
                         className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-800 hover:text-blue-950 sm:text-sm"
                       >
                         {t('exploreHub')}
@@ -167,8 +165,7 @@ export default function About() {
             <p className="mt-10 text-center text-sm text-slate-600 sm:mt-12">
               {t('divisionsCta')}{' '}
               <Link
-                href="/services"
-                locale={locale}
+                href="/#business-divisions"
                 className="font-semibold text-blue-800 underline-offset-2 hover:underline"
               >
                 {t('divisionsCtaLink')}

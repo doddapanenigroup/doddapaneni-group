@@ -25,6 +25,8 @@ import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcuts
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
+import FeatureGate from '@/components/FeatureGate';
+import DashboardPageHeader from './DashboardPageHeader';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -711,7 +713,6 @@ export default function MarketerDashboard({
   const PAGE_KEY_OPTIONS: { value: string; label: string }[] = [
     { value: 'home', label: 'Home' },
     { value: 'about', label: 'About' },
-    { value: 'services', label: 'Services' },
     { value: 'contact', label: 'Contact' },
     { value: 'companies-dealsmedi', label: 'Companies (Dealsmedi)' },
     { value: 'companies-dlsin', label: 'Companies (Dlsin)' },
@@ -1200,54 +1201,52 @@ export default function MarketerDashboard({
 
   return (
     <div className="space-y-8">
-      <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Megaphone size={28} className="opacity-90" />
-          {getDashboardTitle(viewerRole)}
-        </h1>
-        <p className="mt-1 opacity-90 text-sm">
-          Analytics, campaigns, and marketing tools. All data is stored in the database.
-        </p>
-      </header>
+      <DashboardPageHeader
+        icon={Megaphone}
+        title={getDashboardTitle(viewerRole)}
+        description="Analytics, campaigns, and marketing tools. All data is stored in the database."
+      />
 
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
-          <Globe size={20} className="text-slate-600" />
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <h2 className="flex items-center gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 text-lg font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 dark:text-slate-100">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white dark:bg-blue-500">
+            <Globe size={18} aria-hidden />
+          </span>
           Quick links
         </h2>
-        <div className="p-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-3">
           <Link
             href={base}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all"
+            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
           >
-            <Globe size={22} className="text-slate-600" />
-            <span className="font-medium text-slate-800">View site</span>
+            <Globe size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <span className="font-medium text-slate-800 dark:text-slate-100">View site</span>
           </Link>
           <Link
             href={`${base}/contact`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all"
+            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
           >
-            <Mail size={22} className="text-slate-600" />
-            <span className="font-medium text-slate-800">Contact page</span>
+            <Mail size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
           </Link>
           <Link
             href={`${base}/dashboard/analytics`}
-            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all"
+            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-violet-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-violet-500/40"
           >
-            <BarChart3 size={22} className="text-violet-600" />
-            <span className="font-medium text-slate-800">Analytics</span>
+            <BarChart3 size={22} className="shrink-0 text-violet-600 dark:text-violet-400" />
+            <span className="font-medium text-slate-800 dark:text-slate-100">Analytics</span>
           </Link>
         </div>
       </section>
 
       <VisitStatsLazy />
 
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-4">
-        <div className="flex flex-wrap gap-2">
+      <section className="rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <div className="flex flex-wrap gap-1 sm:gap-1.5">
           {[
             ...(canPages ? [{ id: 'pages', label: 'Pages' }] : []),
             ...(canBlogs ? [{ id: 'blogs', label: 'Blogs' }] : []),
@@ -1258,10 +1257,10 @@ export default function MarketerDashboard({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`px-3 py-2 rounded-lg text-sm border ${
+              className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-slate-800 text-white border-slate-800'
-                  : 'bg-white text-slate-700 border-slate-300'
+                  ? 'bg-slate-900 text-white shadow-sm dark:bg-blue-600'
+                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
               }`}
             >
               {tab.label}
@@ -1271,11 +1270,11 @@ export default function MarketerDashboard({
       </section>
 
       {activeTab === 'pages' && (
-        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-3">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
             <div>
-              <h2 className="text-lg font-semibold text-slate-800">Pages management + SEO</h2>
-              <p className="text-sm text-slate-600 mt-1">Select a page, update content, then save.</p>
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Pages management + SEO</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Select a page, update content, then save.</p>
             </div>
             <button
               type="button"
@@ -1362,15 +1361,19 @@ export default function MarketerDashboard({
                   <option value="published">Published</option>
                 </select>
               </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <input
-                  type="datetime-local"
-                  value={pageForm.scheduledPublishAt}
-                  onChange={(e) => setPageForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
-                />
-                <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">Optional: pick a publish date/time. If set to a future time, it will be hidden publicly until due.</p>
-              </div>
+              <FeatureGate feature="scheduling">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input
+                    type="datetime-local"
+                    value={pageForm.scheduledPublishAt}
+                    onChange={(e) => setPageForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                  />
+                  <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
+                    Optional: pick a publish date/time. If set to a future time, it will be hidden publicly until due.
+                  </p>
+                </div>
+              </FeatureGate>
               <input
                 value={pageForm.title}
                 onChange={(e) => setPageForm((f) => ({ ...f, title: e.target.value }))}
@@ -1405,33 +1408,35 @@ export default function MarketerDashboard({
                 url={pageForm.canonicalUrl || `https://doddapanenigroup.net/${locale}/${selectedPageSlug || ''}`}
                 ogImage={pageForm.ogImage}
               />
-              <SeoScorePanel
-                metaTitle={pageForm.metaTitle}
-                metaDescription={pageForm.metaDescription}
-                keywords={pageForm.keywords}
-                content={pageForm.body}
-              />
-              <SeoImprovementsPanel
-                content={pageForm.body}
-                keywordsCsv={pageForm.keywords}
-                metaDescription={pageForm.metaDescription}
-                onCopyKeywords={() => {
-                  const res = computeSeoSuggestions({
-                    contentHtml: pageForm.body,
-                    currentKeywordsCsv: pageForm.keywords,
-                    currentMetaDescription: pageForm.metaDescription,
-                  });
-                  void copyTextToClipboard(res.suggestedKeywordsCsv);
-                }}
-                onCopyMetaDescription={() => {
-                  const res = computeSeoSuggestions({
-                    contentHtml: pageForm.body,
-                    currentKeywordsCsv: pageForm.keywords,
-                    currentMetaDescription: pageForm.metaDescription,
-                  });
-                  void copyTextToClipboard(res.suggestedMetaDescription);
-                }}
-              />
+              <FeatureGate feature="seoScore">
+                <SeoScorePanel
+                  metaTitle={pageForm.metaTitle}
+                  metaDescription={pageForm.metaDescription}
+                  keywords={pageForm.keywords}
+                  content={pageForm.body}
+                />
+                <SeoImprovementsPanel
+                  content={pageForm.body}
+                  keywordsCsv={pageForm.keywords}
+                  metaDescription={pageForm.metaDescription}
+                  onCopyKeywords={() => {
+                    const res = computeSeoSuggestions({
+                      contentHtml: pageForm.body,
+                      currentKeywordsCsv: pageForm.keywords,
+                      currentMetaDescription: pageForm.metaDescription,
+                    });
+                    void copyTextToClipboard(res.suggestedKeywordsCsv);
+                  }}
+                  onCopyMetaDescription={() => {
+                    const res = computeSeoSuggestions({
+                      contentHtml: pageForm.body,
+                      currentKeywordsCsv: pageForm.keywords,
+                      currentMetaDescription: pageForm.metaDescription,
+                    });
+                    void copyTextToClipboard(res.suggestedMetaDescription);
+                  }}
+                />
+              </FeatureGate>
               <div className="flex flex-wrap gap-2 items-center">
                 <button
                   type="button"
@@ -1440,14 +1445,16 @@ export default function MarketerDashboard({
                 >
                   {creatingPage ? 'Create page' : 'Save page changes'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => createPreviewLink("page")}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
-                  disabled={previewLoading || creatingPage || !selectedPageSlug}
-                >
-                  {previewLoading ? "Generating…" : "Preview draft"}
-                </button>
+                <FeatureGate feature="previewSharing">
+                  <button
+                    type="button"
+                    onClick={() => createPreviewLink("page")}
+                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    disabled={previewLoading || creatingPage || !selectedPageSlug}
+                  >
+                    {previewLoading ? "Generating…" : "Preview draft"}
+                  </button>
+                </FeatureGate>
                 {!creatingPage && selectedPageSlug ? (
                   <button
                     type="button"
@@ -1458,42 +1465,44 @@ export default function MarketerDashboard({
                   </button>
                 ) : null}
               </div>
-              {previewLink ? (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
-                  <a
-                    href={previewLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-700 hover:underline truncate"
-                  >
-                    {previewLink}
-                  </a>
-                  <div className="flex gap-2 flex-wrap items-center">
-                    <button
-                      type="button"
-                      onClick={() => void copyTextToClipboard(previewLink)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              <FeatureGate feature="previewSharing">
+                {previewLink ? (
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
+                    <a
+                      href={previewLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-700 hover:underline truncate"
                     >
-                      Copy link
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewLink(null)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
-                    >
-                      Clear
-                    </button>
+                      {previewLink}
+                    </a>
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <button
+                        type="button"
+                        onClick={() => void copyTextToClipboard(previewLink)}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                      >
+                        Copy link
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewLink(null)}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+              </FeatureGate>
             </div>
           </div>
         </section>
       )}
 
       {activeTab === 'blogs' && (
-        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+          <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
             <h2 className="text-lg font-semibold text-slate-800">Blog management + SEO</h2>
           </div>
           <div className="p-5 grid lg:grid-cols-3 gap-5">
@@ -1570,16 +1579,20 @@ export default function MarketerDashboard({
                   disabled={blogForm.status !== 'published'}
                   className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                 />
-                <input
-                  type="datetime-local"
-                  value={blogForm.scheduledPublishAt}
-                  onChange={(e) => setBlogForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
-                  placeholder="Scheduled publish date/time"
-                />
-                <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
-                  Optional: if set to a future time, the blog post won’t show publicly until scheduledPublishAt is due.
-                </p>
+                <FeatureGate feature="scheduling">
+                  <>
+                    <input
+                      type="datetime-local"
+                      value={blogForm.scheduledPublishAt}
+                      onChange={(e) => setBlogForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                      placeholder="Scheduled publish date/time"
+                    />
+                    <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
+                      Optional: if set to a future time, the blog post won’t show publicly until scheduledPublishAt is due.
+                    </p>
+                  </>
+                </FeatureGate>
                 <div className="sm:col-span-2 grid sm:grid-cols-2 gap-3">
                   <div>
                     <input
@@ -1642,43 +1655,47 @@ export default function MarketerDashboard({
                 url={`https://doddapanenigroup.net/${locale === 'en' ? '' : `${locale}/`}news/${blogForm.slug || 'sample-post'}`}
                 ogImage={blogForm.ogImage || blogForm.featuredImage}
               />
-              <SeoScorePanel
-                metaTitle={blogForm.metaTitle}
-                metaDescription={blogForm.metaDescription}
-                keywords={blogForm.keywords}
-                content={blogForm.content}
-              />
-              <SeoImprovementsPanel
-                content={blogForm.content}
-                keywordsCsv={blogForm.keywords}
-                metaDescription={blogForm.metaDescription}
-                onCopyKeywords={() => {
-                  const res = computeSeoSuggestions({
-                    contentHtml: blogForm.content,
-                    currentKeywordsCsv: blogForm.keywords,
-                    currentMetaDescription: blogForm.metaDescription,
-                  });
-                  void copyTextToClipboard(res.suggestedKeywordsCsv);
-                }}
-                onCopyMetaDescription={() => {
-                  const res = computeSeoSuggestions({
-                    contentHtml: blogForm.content,
-                    currentKeywordsCsv: blogForm.keywords,
-                    currentMetaDescription: blogForm.metaDescription,
-                  });
-                  void copyTextToClipboard(res.suggestedMetaDescription);
-                }}
-              />
+              <FeatureGate feature="seoScore">
+                <SeoScorePanel
+                  metaTitle={blogForm.metaTitle}
+                  metaDescription={blogForm.metaDescription}
+                  keywords={blogForm.keywords}
+                  content={blogForm.content}
+                />
+                <SeoImprovementsPanel
+                  content={blogForm.content}
+                  keywordsCsv={blogForm.keywords}
+                  metaDescription={blogForm.metaDescription}
+                  onCopyKeywords={() => {
+                    const res = computeSeoSuggestions({
+                      contentHtml: blogForm.content,
+                      currentKeywordsCsv: blogForm.keywords,
+                      currentMetaDescription: blogForm.metaDescription,
+                    });
+                    void copyTextToClipboard(res.suggestedKeywordsCsv);
+                  }}
+                  onCopyMetaDescription={() => {
+                    const res = computeSeoSuggestions({
+                      contentHtml: blogForm.content,
+                      currentKeywordsCsv: blogForm.keywords,
+                      currentMetaDescription: blogForm.metaDescription,
+                    });
+                    void copyTextToClipboard(res.suggestedMetaDescription);
+                  }}
+                />
+              </FeatureGate>
               <div className="flex gap-2 flex-wrap">
                 <button type="button" onClick={saveBlogSeo} className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm">Save blog</button>
-                <button
-                  type="button"
-                  onClick={() => createPreviewLink("blog")}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
-                  disabled={previewLoading || !selectedBlogSlug}
-                >
-                  {previewLoading ? "Generating…" : "Preview draft"}
-                </button>
+                <FeatureGate feature="previewSharing">
+                  <button
+                    type="button"
+                    onClick={() => createPreviewLink("blog")}
+                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    disabled={previewLoading || !selectedBlogSlug}
+                  >
+                    {previewLoading ? "Generating…" : "Preview draft"}
+                  </button>
+                </FeatureGate>
                 <button
                   type="button"
                   onClick={createBlog}
@@ -1697,42 +1714,44 @@ export default function MarketerDashboard({
                   </button>
                 ) : null}
               </div>
-              {previewLink ? (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
-                  <a
-                    href={previewLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-700 hover:underline truncate"
-                  >
-                    {previewLink}
-                  </a>
-                  <div className="flex gap-2 flex-wrap items-center">
-                    <button
-                      type="button"
-                      onClick={() => void copyTextToClipboard(previewLink)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              <FeatureGate feature="previewSharing">
+                {previewLink ? (
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
+                    <a
+                      href={previewLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-700 hover:underline truncate"
                     >
-                      Copy link
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewLink(null)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
-                    >
-                      Clear
-                    </button>
+                      {previewLink}
+                    </a>
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <button
+                        type="button"
+                        onClick={() => void copyTextToClipboard(previewLink)}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                      >
+                        Copy link
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewLink(null)}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+              </FeatureGate>
             </div>
           </div>
         </section>
       )}
 
       {(activeTab === 'pages' || activeTab === 'blogs') && (
-        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-          <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+          <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
             <ImageIcon size={18} className="text-slate-600" />
             <h2 className="text-lg font-semibold text-slate-800">Media library (StoredImage)</h2>
           </div>
@@ -1817,8 +1836,8 @@ export default function MarketerDashboard({
 
       {/* Campaigns */}
       {activeTab === 'campaigns' && (
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-4">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <Target size={20} className="text-slate-600" />
             Campaign management
@@ -1964,8 +1983,8 @@ export default function MarketerDashboard({
 
       {/* Marketing tools / links */}
       {activeTab === 'links' && (
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-4">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <Link2 size={20} className="text-slate-600" />
             Marketing tools &amp; integrations

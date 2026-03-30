@@ -7,6 +7,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
+import { schedulingForbiddenIfScheduled } from '@/lib/features';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -106,7 +107,12 @@ export async function PATCH(
     if (typeof body.title === 'string') data.title = body.title;
     if (typeof body.body === 'string') data.body = body.body;
     if (body.status === 'draft' || body.status === 'published') data.status = body.status;
-    if ('scheduledPublishAt' in body) data.scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
+    if ('scheduledPublishAt' in body) {
+      const nextSched = dateOrNull(body.scheduledPublishAt);
+      const schedGate = await schedulingForbiddenIfScheduled(nextSched);
+      if (schedGate) return schedGate;
+      data.scheduledPublishAt = nextSched;
+    }
     if ('metaTitle' in body) data.metaTitle = strOrNull(body.metaTitle);
     if ('metaDescription' in body) data.metaDescription = strOrNull(body.metaDescription);
     if ('keywords' in body) data.keywords = strOrNull(body.keywords);

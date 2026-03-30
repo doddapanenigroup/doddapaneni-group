@@ -6,10 +6,9 @@ import path from 'path';
 import { runTranslateAll } from '@/lib/run-translate-all';
 import { hasDeveloperAccess } from '@/lib/role-utils';
 
-const PAGE_KEY_TO_PATH: Record<string, string> = {
+const PAGE_KEY_TO_RELPATH: Record<string, string> = {
   home: 'app/[locale]/page.tsx',
   about: 'app/[locale]/about/page.tsx',
-  services: 'app/[locale]/services/page.tsx',
   contact: 'app/[locale]/contact/page.tsx',
   'companies-dealsmedi': 'app/[locale]/companies/dealsmedi/page.tsx',
   'companies-dlsin': 'app/[locale]/companies/dlsin/page.tsx',
@@ -17,12 +16,36 @@ const PAGE_KEY_TO_PATH: Record<string, string> = {
   'messages-en': 'messages/en.json',
 };
 
+/** Resolves paths with literal segments after `cwd` (paired with `outputFileTracingExcludes` in next.config). */
 function getFilePath(pageKey: string): string | null {
-  const rel = PAGE_KEY_TO_PATH[pageKey];
-  if (!rel) return null;
-  const absolute = path.resolve(process.cwd(), rel);
-  const cwd = process.cwd();
-  if (!absolute.startsWith(cwd)) return null;
+  const root = process.cwd();
+  let absolute: string;
+  switch (pageKey) {
+    case 'home':
+      absolute = path.join(root, 'app', '[locale]', 'page.tsx');
+      break;
+    case 'about':
+      absolute = path.join(root, 'app', '[locale]', 'about', 'page.tsx');
+      break;
+    case 'contact':
+      absolute = path.join(root, 'app', '[locale]', 'contact', 'page.tsx');
+      break;
+    case 'companies-dealsmedi':
+      absolute = path.join(root, 'app', '[locale]', 'companies', 'dealsmedi', 'page.tsx');
+      break;
+    case 'companies-dlsin':
+      absolute = path.join(root, 'app', '[locale]', 'companies', 'dlsin', 'page.tsx');
+      break;
+    case 'companies-janatha-mirror':
+      absolute = path.join(root, 'app', '[locale]', 'companies', 'janatha-mirror', 'page.tsx');
+      break;
+    case 'messages-en':
+      absolute = path.join(root, 'messages', 'en.json');
+      break;
+    default:
+      return null;
+  }
+  if (!absolute.startsWith(root)) return null;
   return absolute;
 }
 
@@ -35,7 +58,7 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const pageKey = url.searchParams.get('pageKey')?.trim();
-  if (!pageKey || !PAGE_KEY_TO_PATH[pageKey]) {
+  if (!pageKey || !PAGE_KEY_TO_RELPATH[pageKey]) {
     return NextResponse.json({ message: 'Invalid pageKey' }, { status: 400 });
   }
 
@@ -48,7 +71,7 @@ export async function GET(request: Request) {
     const content = await readFile(filePath, 'utf-8');
     return NextResponse.json({
       content,
-      filePath: PAGE_KEY_TO_PATH[pageKey],
+      filePath: PAGE_KEY_TO_RELPATH[pageKey],
     });
   } catch (err) {
     console.error('Developer file read error:', err);
@@ -71,7 +94,7 @@ export async function PUT(request: Request) {
   }
 
   const pageKey = body.pageKey?.trim();
-  if (!pageKey || !PAGE_KEY_TO_PATH[pageKey]) {
+  if (!pageKey || !PAGE_KEY_TO_RELPATH[pageKey]) {
     return NextResponse.json({ message: 'Invalid pageKey' }, { status: 400 });
   }
   const content = typeof body.content === 'string' ? body.content : '';
@@ -88,12 +111,12 @@ export async function PUT(request: Request) {
       userEmail: session.user.email ?? '',
       userRole: role ?? '',
       kind: 'file',
-      targetPath: PAGE_KEY_TO_PATH[pageKey],
+      targetPath: PAGE_KEY_TO_RELPATH[pageKey],
       summary: `${content.length} characters`,
     });
     const response: { ok: boolean; filePath: string; translateAll?: Awaited<ReturnType<typeof runTranslateAll>> } = {
       ok: true,
-      filePath: PAGE_KEY_TO_PATH[pageKey],
+      filePath: PAGE_KEY_TO_RELPATH[pageKey],
     };
     if (pageKey === 'messages-en') {
       try {

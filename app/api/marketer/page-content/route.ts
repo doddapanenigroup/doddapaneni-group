@@ -6,6 +6,7 @@ import { logContentEdit } from '@/lib/audit-log';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
+import { schedulingForbiddenIfScheduled } from '@/lib/features';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -91,6 +92,9 @@ export async function POST(request: Request) {
     const content = typeof body.body === 'string' ? body.body : '';
     const seoNote = strOrNull(body.seoNote);
     const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
+    const schedGate = await schedulingForbiddenIfScheduled(scheduledPublishAt);
+    if (schedGate) return schedGate;
+
     const status =
       body.status === 'draft' || body.status === 'published'
         ? (body.status as 'draft' | 'published')

@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
+import { fileURLToPath } from "url";
 import createNextIntlPlugin from 'next-intl/plugin';
+
+/** Stable Turbopack root (avoids picking a parent folder when multiple lockfiles exist). */
+const turbopackRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 const DEFAULT_LOCALE = 'en';
@@ -107,6 +112,7 @@ const nextConfig: NextConfig = {
       { source: '/blog', destination: '/news', permanent: true },
       { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
       { source: '/terms-conditions', destination: '/terms', permanent: true },
+      { source: '/services', destination: '/', permanent: true },
       ...LOCALES
         .filter((loc) => loc !== DEFAULT_LOCALE)
         .flatMap((loc) => [
@@ -121,6 +127,7 @@ const nextConfig: NextConfig = {
             destination: `/${loc}/terms`,
             permanent: true as const,
           },
+          { source: `/${loc}/services`, destination: `/${loc}`, permanent: true as const },
         ]),
     ];
   },
@@ -130,7 +137,11 @@ const nextConfig: NextConfig = {
   // Prisma engine must stay external (local client lives under lib/prisma-generated)
   serverExternalPackages: ["@prisma/client", "prisma", "nodemailer"],
   turbopack: {
-    root: process.cwd(),
+    root: turbopackRoot,
+  },
+  /** Keeps `next.config` out of Turbopack NFT for routes that use `fs` + `process.cwd()` (e.g. developer file editor). */
+  outputFileTracingExcludes: {
+    "*": ["./next.config.ts", "./next.config.mjs", "./next.config.js"],
   },
   // Enable compression
   compress: true,
@@ -163,13 +174,6 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        ],
-      },
-      // Cache static assets
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
       {

@@ -9,6 +9,7 @@ import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { schedulingForbiddenIfScheduled } from '@/lib/features';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -116,7 +117,12 @@ export async function PATCH(
       }
       data.sectorId = sectorResult.sectorId;
     }
-    if ('scheduledPublishAt' in body) data.scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
+    if ('scheduledPublishAt' in body) {
+      const nextSched = dateOrNull(body.scheduledPublishAt);
+      const schedGate = await schedulingForbiddenIfScheduled(nextSched);
+      if (schedGate) return schedGate;
+      data.scheduledPublishAt = nextSched;
+    }
     if ('publishedAt' in body) {
       data.publishedAt =
         typeof body.publishedAt === 'string' && body.publishedAt.trim()

@@ -17,6 +17,7 @@ import DeveloperCachePanel from './DeveloperCachePanel';
 import DeveloperTimelinePanel from './DeveloperTimelinePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
 import FeatureGate from '@/components/FeatureGate';
+import DashboardPageHeader from './DashboardPageHeader';
 
 type SitePage = {
   href: string;
@@ -41,7 +42,6 @@ export default function DeveloperDashboard({
   const staticPages: SitePage[] = [
     { href: `${base}`, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
     { href: `${base}/about`, label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
-    { href: `${base}/services`, label: 'Services', pageKey: 'services', editFile: 'app/[locale]/services/page.tsx', icon: <FileText size={20} /> },
     { href: `${base}/contact`, label: 'Contact', pageKey: 'contact', editFile: 'app/[locale]/contact/page.tsx', icon: <Mail size={20} /> },
     { href: `${base}/companies/dealsmedi`, label: 'Companies — Dealsmedi', pageKey: 'companies-dealsmedi', editFile: 'app/[locale]/companies/dealsmedi/page.tsx', icon: <Building2 size={20} /> },
     { href: `${base}/companies/dlsin`, label: 'Companies — Dlsin', pageKey: 'companies-dlsin', editFile: 'app/[locale]/companies/dlsin/page.tsx', icon: <Building2 size={20} /> },
@@ -62,21 +62,32 @@ export default function DeveloperDashboard({
 
   return (
     <div className="space-y-8">
-      <header className="rounded-2xl bg-slate-800 text-white p-6 shadow-xl border border-slate-600">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Code2 size={28} className="opacity-90" />
-          {getDashboardTitle(viewerRole)}
-        </h1>
-        <p className="mt-1 opacity-90 text-sm">
-          {isDeveloperView
-            ? 'Quick links to site pages. Edit code in your editor and run '
-            : 'Manage content and SEO-facing copy across all pages from your dashboard. Edit files and run '}
-          <code className="bg-white/20 px-1.5 py-0.5 rounded text-sm">npm run dev</code>.
-        </p>
-      </header>
+      <DashboardPageHeader
+        icon={Code2}
+        title={getDashboardTitle(viewerRole)}
+        description={
+          isDeveloperView ? (
+            <>
+              Quick links to site pages. Edit code in your editor and run{' '}
+              <code className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[13px] font-medium text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                npm run dev
+              </code>
+              .
+            </>
+          ) : (
+            <>
+              Manage content and SEO-facing copy across all pages from your dashboard. Edit files and run{' '}
+              <code className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[13px] font-medium text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                npm run dev
+              </code>
+              .
+            </>
+          )
+        }
+      />
 
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
           <h2 className="font-semibold text-slate-800 flex items-center gap-2">
             <BookOpen size={18} className="text-slate-600" />
             How to change the code
@@ -95,8 +106,8 @@ export default function DeveloperDashboard({
         </div>
       </section>
 
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
           <Globe size={20} className="text-slate-600" />
           Site pages — every page on the website
         </h2>
@@ -147,8 +158,8 @@ export default function DeveloperDashboard({
         </div>
       </section>
 
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
           <Languages size={20} className="text-slate-600" />
           Multi-lingual — automatic translation
         </h2>
@@ -213,9 +224,13 @@ export default function DeveloperDashboard({
         <DeveloperObservabilityPanel />
       </FeatureGate>
 
-      <DeveloperErrorsPanel />
+      <FeatureGate feature="errorMonitoring">
+        <DeveloperErrorsPanel />
+      </FeatureGate>
 
-      <DeveloperRequestMonitorPanel />
+      <FeatureGate feature="analyticsDashboard">
+        <DeveloperRequestMonitorPanel />
+      </FeatureGate>
 
       <DeveloperTasksPanel />
 

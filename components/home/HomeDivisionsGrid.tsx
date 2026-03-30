@@ -88,7 +88,7 @@ export default function HomeDivisionsGrid({ divisions }: Props) {
 
           <p className="mt-12 text-center text-sm text-slate-500">
             <Link
-              href="/services"
+              href="/#business-divisions"
               className="font-semibold text-blue-800 underline-offset-4 hover:text-blue-950 hover:underline"
             >
               {t('divisionsFooterServices')}

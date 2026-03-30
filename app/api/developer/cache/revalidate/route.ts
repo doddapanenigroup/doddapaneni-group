@@ -51,7 +51,6 @@ export async function POST(request: Request) {
           '/',
           '/en',
           '/en/about',
-          '/en/services',
           '/en/contact',
           '/en/news',
         ];

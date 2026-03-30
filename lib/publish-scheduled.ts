@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { isFeatureEnabled } from '@/lib/features';
 
 /**
  * Promotes any scheduled drafts whose `scheduledPublishAt` is now/past.
@@ -8,6 +9,15 @@ import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
  * Idempotent by design (safe to run frequently).
  */
 export async function publishScheduledContent(now: Date = new Date()) {
+  if (!(await isFeatureEnabled('scheduling'))) {
+    return {
+      pagesPromoted: 0,
+      pagesScheduleCleared: 0,
+      blogsPromoted: 0,
+      blogsScheduleCleared: 0,
+    };
+  }
+
   // Pages: draft -> published
   const pagesPromoted = await prisma.pageContent.updateMany({
     where: {

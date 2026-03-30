@@ -61,7 +61,7 @@ export default function EmployeesPageView({
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-6 min-h-[480px]">
-        <aside className="w-full lg:w-72 shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <aside className="w-full lg:w-72 shrink-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <div className="p-3 border-b border-slate-200 bg-slate-50/80">
             <h2 className="text-sm font-semibold text-slate-700">Employee list</h2>
           </div>
@@ -103,7 +103,7 @@ export default function EmployeesPageView({
           </nav>
         </aside>
 
-        <main className="flex-1 min-w-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <main className="flex-1 min-w-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           {!selected ? (
             <div className="p-8 text-center text-slate-500">
               <UserCircle size={48} className="mx-auto mb-3 text-slate-300" />

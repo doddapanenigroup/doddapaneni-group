@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { connectDb, prisma } from "@/lib/db";
 import { createPreviewToken, PreviewTokenKind } from "@/lib/preview-token";
 import { hasMarketerAccess } from "@/lib/role-utils";
+import { isFeatureEnabled } from "@/lib/features";
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   return hasMarketerAccess(session?.user?.role as any);
@@ -19,6 +20,13 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user?.id || !allowMarketer(session)) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    if (!(await isFeatureEnabled("previewSharing"))) {
+      return NextResponse.json(
+        { message: "Preview sharing is disabled in Feature flags." },
+        { status: 403 },
+      );
     }
 
     let body: Record<string, unknown>;

@@ -125,7 +125,7 @@ export default function MyActivityPanel() {
 
   if (isMarketer(data.role) && !showDevGrid && showMarketing) {
     return (
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <MarketingBlock data={data} />
       </section>
     );
@@ -134,7 +134,7 @@ export default function MyActivityPanel() {
   return (
     <div className="space-y-6">
       {showDevGrid ? (
-        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center gap-2">
             <History size={20} className="text-slate-600 dark:text-slate-400" />
             Your recent activity
@@ -147,7 +147,7 @@ export default function MyActivityPanel() {
       ) : null}
 
       {showMarketing && (!isMarketer(data.role) || showDevGrid) ? (
-        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <MarketingBlock data={data} />
         </section>
       ) : null}

@@ -9,7 +9,6 @@ import { hasDeveloperAccess } from '@/lib/role-utils';
 const PAGE_KEYS = [
   'home',
   'about',
-  'services',
   'contact',
   'companies-dealsmedi',
   'companies-dlsin',

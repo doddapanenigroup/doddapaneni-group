@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { connectDb, prisma } from "@/lib/db";
 import { verifyPreviewToken } from "@/lib/preview-token";
+import { isFeatureEnabled } from "@/lib/features";
 import { mediaUrl } from "@/lib/media";
 import BlogPostClient from "../../news/[slug]/BlogPostClient";
 import { BLOG_POST_META } from "@/lib/blog-post-meta";
@@ -38,6 +39,10 @@ function normalizeStoredImage(value: string | null): string | null {
 
 export default async function PreviewPage({ params }: Props) {
   const { locale, slug: token } = await params;
+
+  if (!(await isFeatureEnabled("previewSharing"))) {
+    notFound();
+  }
 
   const payload = verifyPreviewToken(token);
   if (!payload) notFound();

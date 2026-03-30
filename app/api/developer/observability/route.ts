@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasDeveloperAccess } from '@/lib/role-utils';
+import { isFeatureEnabled } from '@/lib/features';
 
 function allowedRole(role: string | undefined): boolean {
   return hasDeveloperAccess(role as any);
@@ -22,6 +23,13 @@ export async function GET(request: Request) {
     const role = session?.user?.role;
     if (!session?.user || !allowedRole(role)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    if (!(await isFeatureEnabled('analyticsDashboard'))) {
+      return NextResponse.json(
+        { message: 'Analytics dashboard is disabled in Feature flags.' },
+        { status: 403 },
+      );
     }
 
     const url = new URL(request.url);

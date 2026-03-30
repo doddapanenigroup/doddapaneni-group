@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 type FeatureName =
@@ -54,5 +55,23 @@ async function getFeatureToggle(name: FeatureName): Promise<boolean> {
  */
 export async function isFeatureEnabled(name: FeatureName): Promise<boolean> {
   return getFeatureToggle(name);
+}
+
+/**
+ * Marketer APIs: block non-null `scheduledPublishAt` when Scheduling is off.
+ * `null` always allowed (clears a schedule).
+ */
+export async function schedulingForbiddenIfScheduled(
+  scheduledPublishAt: Date | null,
+): Promise<NextResponse | null> {
+  if (scheduledPublishAt == null) return null;
+  if (await isFeatureEnabled('scheduling')) return null;
+  return NextResponse.json(
+    {
+      message:
+        'Scheduling is disabled. Enable "Scheduling" in Super Admin → Feature flags, or clear the scheduled publish time.',
+    },
+    { status: 403 },
+  );
 }
 

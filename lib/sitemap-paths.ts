@@ -5,7 +5,6 @@ import { DIVISION_SUBPAGES, divisionContentPageKey } from '@/lib/company-divisio
 const STATIC_PAGE_KEY_TO_PATH: Record<string, string> = {
   home: '/',
   about: '/about',
-  services: '/services',
   contact: '/contact',
   faq: '/faq',
   'privacy-policy': '/privacy-policy',

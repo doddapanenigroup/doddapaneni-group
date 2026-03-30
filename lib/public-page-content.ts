@@ -4,7 +4,6 @@ import { publishScheduledContent } from '@/lib/publish-scheduled';
 const PAGE_KEYS = [
   'home',
   'about',
-  'services',
   'contact',
   'companies-dealsmedi',
   'companies-dlsin',

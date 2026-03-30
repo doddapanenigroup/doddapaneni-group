@@ -22,7 +22,6 @@ type ChangeFreq = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>;
 const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFreq }[] = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.9, changeFrequency: 'monthly' },
-  { path: '/services', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/news', priority: 0.9, changeFrequency: 'daily' },
   { path: '/contact', priority: 0.85, changeFrequency: 'monthly' },
   { path: '/companies/dealsmedi', priority: 0.75, changeFrequency: 'monthly' },

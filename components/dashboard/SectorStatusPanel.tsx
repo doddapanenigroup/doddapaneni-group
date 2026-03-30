@@ -72,19 +72,21 @@ export default function SectorStatusPanel() {
 
   if (loading) {
     return (
-      <section className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/20 p-5">
+      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25 p-5">
         <p className="text-sm text-slate-500">Loading sector status…</p>
       </section>
     );
   }
 
   return (
-    <section className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/20 overflow-hidden">
-      <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-        <ToggleLeft size={20} className="text-slate-600" />
+    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+      <div className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900/90 text-white dark:bg-slate-700">
+          <ToggleLeft size={18} aria-hidden />
+        </span>
         <div>
-          <h2 className="text-lg font-semibold text-slate-800">Sector visibility</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Sector visibility</h2>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
             Only the 12 public group sectors are listed (matches the website). When OFF, “Coming soon” in the
             mega-menu; when ON, the sector link works.
           </p>
@@ -97,8 +99,8 @@ export default function SectorStatusPanel() {
         {items.map((s) => (
           <li key={s.slug.trim().toLowerCase()} className="flex items-start justify-between gap-4 p-4">
             <div className="min-w-0">
-              <p className="font-medium text-slate-900">{s.name}</p>
-              <p className="text-xs text-slate-500 font-mono mt-0.5">{s.slug}</p>
+              <p className="font-medium text-slate-900 dark:text-slate-100">{s.name}</p>
+              <p className="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">{s.slug}</p>
             </div>
             <button
               type="button"

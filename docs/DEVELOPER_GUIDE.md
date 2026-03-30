@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:3000** in your browser. Use the **Developer dashboard** (after logging in as Developer) to open each page (Home, About, Services, Contact) and check your changes.
+Open **http://localhost:3000** in your browser. Use the **Developer dashboard** (after logging in as Developer) to open each page (Home, About, Contact) and check your changes.
 
 ## 3. Where to edit what
 
@@ -27,7 +27,6 @@ Open **http://localhost:3000** in your browser. Use the **Developer dashboard** 
 |-------------------------|----------------|
 | **Home page** | `app/[locale]/page.tsx` |
 | **About page** | `app/[locale]/about/page.tsx` |
-| **Services page** | `app/[locale]/services/page.tsx` |
 | **Contact page** | `app/[locale]/contact/page.tsx` |
 | **Shared layout (navbar, footer)** | `components/Navbar.tsx`, `components/Footer.tsx` |
 | **Text / translations** | `messages/en.json`, `messages/te.json`, `messages/hi.json`, `messages/es.json` |
@@ -39,7 +38,7 @@ Save the file; the dev server will reload so you can see changes in the browser.
 ## 4. Test your changes
 
 1. Stay logged in as Developer and go to **Dashboard → Developer**.
-2. Use the **Site pages** links to open Home, About, Services, Contact in new tabs.
+2. Use the **Site pages** links to open Home, About, Contact in new tabs.
 3. After editing code, refresh those tabs (or click the link again) to see the updates.
 
 ## 5. Deploy (optional)

@@ -77,27 +77,29 @@ export default function FeatureFlagsPanel() {
 
   if (loading) {
     return (
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-5">
-        <p className="text-sm text-slate-500">Loading feature flags…</p>
+      <section className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <p className="text-sm text-slate-500 dark:text-slate-400">Loading feature flags…</p>
       </section>
     );
   }
 
   if (error && items.length === 0) {
     return (
-      <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 p-5">
+      <section className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <p className="text-sm text-red-600">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-black/40 overflow-hidden">
-      <div className="p-5 border-b border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 flex items-center gap-2">
-        <Flag size={20} className="text-slate-600" />
+    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+      <div className="flex items-center gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/90 text-white dark:bg-amber-600/90">
+          <Flag size={18} aria-hidden />
+        </span>
         <div>
-          <h2 className="text-lg font-semibold text-slate-800">Feature flags</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Feature flags</h2>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
             Toggle platform features. Changes apply on the next request (cached ~30s on server for some checks).
           </p>
         </div>
@@ -105,13 +107,15 @@ export default function FeatureFlagsPanel() {
 
       {error ? <p className="px-5 pt-3 text-sm text-red-600">{error}</p> : null}
 
-      <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+      <ul className="divide-y divide-slate-100 dark:divide-slate-800/80">
         {items.map((item) => (
           <li key={item.name} className="flex items-start justify-between gap-4 p-4">
             <div className="min-w-0">
-              <p className="font-medium text-slate-900">{item.label}</p>
-              <p className="text-xs text-slate-500 font-mono mt-0.5">{item.name}</p>
-              {item.description ? <p className="text-sm text-slate-600 mt-1">{item.description}</p> : null}
+              <p className="font-medium text-slate-900 dark:text-slate-100">{item.label}</p>
+              <p className="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">{item.name}</p>
+              {item.description ? (
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{item.description}</p>
+              ) : null}
             </div>
             <button
               type="button"

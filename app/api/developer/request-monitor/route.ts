@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import type { Role } from '@/lib/constants';
 import { recordApiRequest, requestMonitor } from '@/lib/request-monitor';
 import { hasDeveloperAccess } from '@/lib/role-utils';
+import { isFeatureEnabled } from '@/lib/features';
 
 function allowedRole(role: Role | undefined): boolean {
   return hasDeveloperAccess(role);
@@ -14,6 +15,13 @@ export async function GET(request: Request) {
     const role = session?.user?.role as Role | undefined;
     if (!session?.user || !allowedRole(role)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    if (!(await isFeatureEnabled('analyticsDashboard'))) {
+      return NextResponse.json(
+        { message: 'Analytics dashboard is disabled in Feature flags.' },
+        { status: 403 },
+      );
     }
 
     recordApiRequest({ request, userId: session.user.id });

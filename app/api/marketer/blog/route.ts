@@ -8,6 +8,7 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { schedulingForbiddenIfScheduled } from '@/lib/features';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -120,6 +121,8 @@ export async function POST(request: Request) {
     const publishedAt =
       body.publishedAt && typeof body.publishedAt === 'string' ? new Date(body.publishedAt) : null;
     const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
+    const schedGate = await schedulingForbiddenIfScheduled(scheduledPublishAt);
+    if (schedGate) return schedGate;
 
     await connectDb();
     const sectorResult = await resolveSectorIdOrError(body.sectorId);

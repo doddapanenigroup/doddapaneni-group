@@ -1,6 +1,7 @@
 import { connectDb, prisma } from "@/lib/db";
 import type { Role } from "@/lib/constants";
 import { notifyServerErrorLogged } from "@/lib/notify";
+import { isFeatureEnabled } from "@/lib/features";
 
 type CaptureUser = { id: string; email?: string | null; role?: Role | string | null } | null | undefined;
 
@@ -31,6 +32,9 @@ export async function captureErrorToDb(args: {
 }) {
   // Must never crash the app. Best-effort logging only.
   try {
+    if (!(await isFeatureEnabled("errorMonitoring"))) {
+      return;
+    }
     await connectDb();
 
     const messageBase = toSafeString(args.error);
