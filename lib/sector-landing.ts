@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { mediaUrl } from '@/lib/media';
 import { routing } from '@/i18n/routing';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
@@ -98,23 +97,6 @@ export function toPositiveSectorPage(raw: string | undefined): number {
   const n = Number.parseInt(raw ?? '1', 10);
   if (!Number.isFinite(n) || n < 1) return 1;
   return n;
-}
-
-/** Path prefix for Link hrefs (matches next-intl /news listing pattern). */
-export async function resolveAppLocale(
-  paramLocale: string,
-): Promise<(typeof routing.locales)[number]> {
-  const pathname = (await headers()).get('x-pathname') ?? '';
-  const fromPath = pathname.split('/').filter(Boolean)[0];
-  const locale = routing.locales.includes(paramLocale as (typeof routing.locales)[number])
-    ? paramLocale
-    : fromPath && routing.locales.includes(fromPath as (typeof routing.locales)[number])
-      ? fromPath
-      : routing.defaultLocale;
-  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
-    return routing.defaultLocale;
-  }
-  return locale as (typeof routing.locales)[number];
 }
 
 /** Same cached lookup as `getPublicSectorBySlug` (`@/lib/data`). */

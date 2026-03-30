@@ -5,14 +5,12 @@ import { routing } from '@/i18n/routing';
 const handleI18nRouting = createMiddleware(routing);
 
 /**
- * Expose the incoming pathname on the request so server components can align locale/messages
- * without forcing the entire document to be dynamic (avoid `headers()` in root layout).
+ * i18n redirects/rewrites only. Do not wrap the request with cloned headers — that breaks
+ * Next.js Flight/RSC document responses (hard refresh can show raw `:HL[...]` / `0:{...}` text).
  * Next.js 16+ uses the `proxy` file convention (formerly `middleware`).
  */
 export function proxy(request: NextRequest) {
-  const nextHeaders = new Headers(request.headers);
-  nextHeaders.set('x-pathname', request.nextUrl.pathname);
-  return handleI18nRouting(new NextRequest(request, { headers: nextHeaders }));
+  return handleI18nRouting(request);
 }
 
 export const config = {

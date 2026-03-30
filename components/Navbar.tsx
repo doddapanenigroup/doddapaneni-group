@@ -2,7 +2,7 @@
 
 import { Link, usePathname } from '@/i18n/routing';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -12,14 +12,36 @@ import {
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 
+const EMPTY_SECTOR_LIVE: Record<string, boolean> = Object.fromEntries(
+  COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
+);
+
+function sectorLiveMapFromApiPayload(d: { sectors?: unknown }): Record<string, boolean> {
+  const rows = Array.isArray(d?.sectors) ? d.sectors : [];
+  const map: Record<string, boolean> = { ...EMPTY_SECTOR_LIVE };
+  for (const s of rows) {
+    if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
+      const key = String((s as { slug: string }).slug)
+        .trim()
+        .toLowerCase();
+      if (key in map) {
+        map[key] = Boolean((s as { isLive?: unknown }).isLive);
+      }
+    }
+  }
+  return map;
+}
+
+const SECTOR_POLL_MS = 5000;
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [companiesOpen, setCompaniesOpen] = useState(false);
   const [mobileCompaniesOpen, setMobileCompaniesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  /** Populated from `/api/public/sectors`; empty until load — no hardcoded “live” slugs. */
-  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>({});
-  const sectorLiveFetchedRef = useRef(false);
+  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>(() => ({ ...EMPTY_SECTOR_LIVE }));
+  /** False until first successful fetch — avoids showing every sector as “Coming soon” while data loads. */
+  const [sectorLiveReady, setSectorLiveReady] = useState(false);
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
   const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,33 +56,26 @@ export default function Navbar() {
   );
   const isOnGroupCompany = activeDivisionSlug !== null;
 
-  const openCompaniesMenu = () => {
-    if (!sectorLiveFetchedRef.current) {
-      sectorLiveFetchedRef.current = true;
-      // Defer network work until the dropdown is actually opened.
-      fetch('/api/public/sectors', { cache: 'no-store' })
-        .then((r) => r.json())
-        .then((d: { sectors?: unknown }) => {
-          const rows = Array.isArray(d?.sectors) ? d.sectors : [];
-          const map: Record<string, boolean> = Object.fromEntries(
-            COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
-          );
-          for (const s of rows) {
-            if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
-              const key = String((s as { slug: string }).slug)
-                .trim()
-                .toLowerCase();
-              if (key in map) {
-                map[key] = Boolean((s as { isLive?: unknown }).isLive);
-              }
-            }
-          }
-          setSectorLive(map);
-        })
-        .catch(() => {
-          setSectorLive(Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])));
-        });
+  const loadLatestSectors = useCallback(async () => {
+    try {
+      const r = await fetch('/api/public/sectors', { cache: 'no-store' });
+      if (!r.ok) throw new Error('sectors');
+      const d = (await r.json()) as { sectors?: unknown };
+      setSectorLive(sectorLiveMapFromApiPayload(d));
+      setSectorLiveReady(true);
+    } catch {
+      /* keep last good map; do not flip everything to “coming soon” on a transient error */
     }
+  }, []);
+
+  useEffect(() => {
+    void loadLatestSectors();
+    const id = window.setInterval(() => void loadLatestSectors(), SECTOR_POLL_MS);
+    return () => window.clearInterval(id);
+  }, [loadLatestSectors]);
+
+  const openCompaniesMenu = () => {
+    void loadLatestSectors();
     if (closeMenuTimerRef.current) {
       clearTimeout(closeMenuTimerRef.current);
       closeMenuTimerRef.current = null;
@@ -73,7 +88,7 @@ export default function Navbar() {
     closeMenuTimerRef.current = setTimeout(() => {
       setCompaniesOpen(false);
       closeMenuTimerRef.current = null;
-    }, 220);
+    }, 280);
   };
 
   useEffect(() => {
@@ -153,65 +168,75 @@ export default function Navbar() {
 
   const inset = 'px-5 sm:px-8 lg:px-12 xl:px-16';
 
-  const renderCompanyRows = (onNavigate?: () => void, mobile = false) => (
-    <ul
-      className={
-        mobile
-          ? 'space-y-0.5 py-1'
-          : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 sm:items-start py-3 px-3 sm:px-4'
-      }
-    >
-      {COMPANY_DIVISION_SLUGS.map((slug) => {
-        const isActiveHere = activeDivisionSlug === slug;
-        const isLive = sectorLive[slug] ?? false;
-        const label = tDivision(slug as CompanyDivisionSlug);
+  const renderCompanyRows = (onNavigate?: () => void, mobile = false) => {
+    if (!sectorLiveReady) {
+      return (
+        <div className={mobile ? 'py-6 px-3 text-center text-sm text-slate-500' : 'py-8 px-4 text-center text-sm text-slate-500'}>
+          {t('sectorLiveLoading')}
+        </div>
+      );
+    }
 
-        if (isLive) {
+    return (
+      <ul
+        className={
+          mobile
+            ? 'space-y-0.5 py-1'
+            : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 sm:items-start py-3 px-3 sm:px-4'
+        }
+      >
+        {COMPANY_DIVISION_SLUGS.map((slug) => {
+          const isActiveHere = activeDivisionSlug === slug;
+          const isLive = sectorLive[slug] ?? false;
+          const label = tDivision(slug as CompanyDivisionSlug);
+
+          if (isLive) {
+            return (
+              <li key={slug} className={mobile ? undefined : 'min-w-0'}>
+                <Link
+                  href={`/${slug}`}
+                  onClick={() => {
+                    setCompaniesOpen(false);
+                    onNavigate?.();
+                  }}
+                  className={`flex items-start gap-3 px-3 py-2.5 text-sm transition-colors ${
+                    mobile ? 'rounded-lg' : 'rounded-lg'
+                  } ${
+                    isActiveHere
+                      ? 'bg-blue-600 text-white font-semibold'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="min-w-0 flex-1 break-words leading-snug">{label}</span>
+                </Link>
+              </li>
+            );
+          }
+
           return (
-            <li key={slug} className={mobile ? undefined : 'min-w-0'}>
-              <Link
-                href={`/${slug}`}
-                onClick={() => {
-                  setCompaniesOpen(false);
-                  onNavigate?.();
-                }}
-                className={`flex items-start gap-3 px-3 py-2.5 text-sm transition-colors ${
-                  mobile ? 'rounded-lg' : 'rounded-lg'
-                } ${
+            <li key={slug}>
+              <div
+                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-lg ${
                   isActiveHere
-                    ? 'bg-blue-600 text-white font-semibold'
-                    : 'text-slate-700 hover:bg-slate-50'
-                }`}
+                    ? 'border-l-2 border-blue-600 bg-blue-50/90 text-slate-800'
+                    : 'text-slate-400'
+                } ${mobile ? '' : ''}`}
               >
-                <span className="min-w-0 flex-1 break-words leading-snug">{label}</span>
-              </Link>
+                <span
+                  className={`min-w-0 flex-1 break-words leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
+                >
+                  {label}
+                </span>
+                <span className="shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                  {t('comingSoonNav')}
+                </span>
+              </div>
             </li>
           );
-        }
-
-        return (
-          <li key={slug}>
-            <div
-              className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-lg ${
-                isActiveHere
-                  ? 'border-l-2 border-blue-600 bg-blue-50/90 text-slate-800'
-                  : 'text-slate-400'
-              } ${mobile ? '' : ''}`}
-            >
-              <span
-                className={`min-w-0 flex-1 break-words leading-snug ${isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'}`}
-              >
-                {label}
-              </span>
-              <span className="shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                {t('comingSoonNav')}
-              </span>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navbarClasses}`}>
@@ -253,7 +278,10 @@ export default function Navbar() {
               aria-expanded={companiesOpen}
               aria-haspopup="true"
               onFocus={openCompaniesMenu}
-              onClick={() => setCompaniesOpen((o) => !o)}
+              onClick={(e) => {
+                e.preventDefault();
+                openCompaniesMenu();
+              }}
             >
               {t('ourCompanies')}
               <ChevronDown
@@ -263,13 +291,15 @@ export default function Navbar() {
             </button>
             {companiesOpen ? (
               <div
-                className="absolute right-0 left-auto top-full z-[60] mt-1 max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5"
+                className="absolute right-0 left-auto top-full z-[60] max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] -mt-1 overflow-y-auto overscroll-contain pt-2"
                 role="region"
                 aria-label={t('ourCompanies')}
                 onMouseEnter={openCompaniesMenu}
                 onMouseLeave={scheduleCloseCompaniesMenu}
               >
-                {renderCompanyRows()}
+                <div className="rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5">
+                  {renderCompanyRows()}
+                </div>
               </div>
             ) : null}
           </div>
@@ -317,39 +347,7 @@ export default function Navbar() {
                 className={`flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-base font-medium hover:bg-slate-50 ${
                   isOnGroupCompany ? 'bg-blue-50 text-blue-950' : 'text-slate-800'
                 }`}
-                onClick={() =>
-                  setMobileCompaniesOpen((o) => {
-                    const next = !o;
-                    if (next && !sectorLiveFetchedRef.current) {
-                      sectorLiveFetchedRef.current = true;
-                      fetch('/api/public/sectors', { cache: 'no-store' })
-                        .then((r) => r.json())
-                        .then((d: { sectors?: unknown }) => {
-                          const rows = Array.isArray(d?.sectors) ? d.sectors : [];
-                          const map: Record<string, boolean> = Object.fromEntries(
-                            COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
-                          );
-                          for (const s of rows) {
-                            if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
-                              const key = String((s as { slug: string }).slug)
-                                .trim()
-                                .toLowerCase();
-                              if (key in map) {
-                                map[key] = Boolean((s as { isLive?: unknown }).isLive);
-                              }
-                            }
-                          }
-                          setSectorLive(map);
-                        })
-                        .catch(() => {
-                          setSectorLive(
-                            Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])),
-                          );
-                        });
-                    }
-                    return next;
-                  })
-                }
+                onClick={() => setMobileCompaniesOpen((o) => !o)}
                 aria-expanded={mobileCompaniesOpen}
               >
                 {t('ourCompanies')}

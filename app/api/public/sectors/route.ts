@@ -14,11 +14,12 @@ export async function GET() {
   const sectors = COMPANY_DIVISION_SLUGS.map((slug) => bySlug.get(slug)).filter(
     (row): row is NonNullable<typeof row> => row != null,
   );
+  // Must not be cached at CDN/browser: admin toggles `isLive` and the navbar polls every ~5s.
   return NextResponse.json(
     { sectors },
     {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'no-store, must-revalidate',
       },
     },
   );

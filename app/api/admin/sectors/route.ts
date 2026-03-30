@@ -1,9 +1,12 @@
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
 import { COMPANY_DIVISION_SLUGS, isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { routing } from '@/i18n/routing';
+import type { Role } from '@/lib/constants';
 import * as z from 'zod';
 
 const canonicalSectorOrder: Map<string, number> = new Map(
@@ -14,7 +17,26 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function isAdminRole(role: unknown) {
-  return hasAdminAccess(role as any);
+  return hasAdminAccess(role as Role | null | undefined);
+}
+
+/** So division pages and layouts drop stale RSC/HTML within a second of toggling `isLive`. */
+function revalidateSectorPublicRoutes() {
+  try {
+    revalidatePath('/', 'layout');
+    for (const slug of COMPANY_DIVISION_SLUGS) {
+      revalidatePath(`/${slug}`, 'layout');
+    }
+    for (const loc of routing.locales) {
+      if (loc === routing.defaultLocale) continue;
+      revalidatePath(`/${loc}`, 'layout');
+      for (const slug of COMPANY_DIVISION_SLUGS) {
+        revalidatePath(`/${loc}/${slug}`, 'layout');
+      }
+    }
+  } catch {
+    /* revalidate is best-effort */
+  }
 }
 
 const patchSchema = z.object({
@@ -77,6 +99,7 @@ export async function PATCH(request: Request) {
       data: { isLive: parsed.data.isLive },
       select: { id: true, slug: true, isLive: true },
     });
+    revalidateSectorPublicRoutes();
     return NextResponse.json({ ok: true, sector: updated });
   } catch (error) {
     await captureErrorToDb({
