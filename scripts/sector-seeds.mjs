@@ -2,76 +2,89 @@
  * Canonical sectors aligned with locale-prefixed company-division routes (Sector.slug).
  * Imported by seed.mjs and seed-sectors.mjs — single source of truth.
  */
+/** When true, sector appears as a normal link in the public mega menu; when false, “Coming soon”. */
 export const SECTOR_SEEDS = [
   {
     name: 'Information Technology & AI Development',
     slug: 'software-it-ai',
+    isLive: true,
     description:
       'Enterprise software, cloud, and AI capabilities that modernize operations, strengthen security, and unlock data-driven growth.',
   },
   {
     name: 'Digital Marketing',
     slug: 'digital-marketing',
+    isLive: true,
     description:
       'Brand, acquisition, and performance marketing across channels — built for measurable reach and lasting engagement.',
   },
   {
     name: 'Healthcare & Medical',
     slug: 'healthcare-medical',
+    isLive: true,
     description:
       'Technology and operations support for providers, payers, and health-tech ventures focused on quality and compliance.',
   },
   {
     name: 'Construction & Real Estate',
     slug: 'construction-realestate',
+    isLive: true,
     description:
       'Project delivery, property platforms, and infrastructure partnerships from planning through handover.',
   },
   {
     name: 'E-commerce Marketplace',
     slug: 'ecommerce-marketplace',
+    isLive: false,
     description:
       'Commerce platforms, catalog and fulfillment integration, and marketplace experiences scaled for multi-region growth.',
   },
   {
     name: 'Media News & Entertainment',
     slug: 'media-news-entertainment',
+    isLive: false,
     description:
       'Content distribution, audience products, and digital experiences for publishers and entertainment brands.',
   },
   {
     name: 'Staff & Consultancy',
     slug: 'staffing-consultancy',
+    isLive: false,
     description:
       'Talent programs, workforce solutions, and advisory services aligned to your industry and growth stage.',
   },
   {
     name: 'Food & Baverages',
     slug: 'food-beverages',
+    isLive: false,
     description:
       'Supply chain, quality, and digital capabilities for food and beverage brands serving regional and global markets.',
   },
   {
     name: 'Manufacturing & Trading',
     slug: 'manufacturing-trading',
+    isLive: false,
     description:
       'Operations, trading networks, and Industry 4.0 initiatives that improve throughput, visibility, and margins.',
   },
   {
     name: 'Logistics & Warehousing',
     slug: 'logistics-warehousing',
+    isLive: false,
     description:
       'Distribution, warehousing, and last-mile optimization for reliability, cost control, and traceability.',
   },
   {
     name: 'Education & Skill Development',
     slug: 'education-skill',
+    isLive: false,
     description:
       'Learning platforms, workforce skilling, and EdTech partnerships that scale training without sacrificing quality.',
   },
   {
     name: 'Import & Export',
     slug: 'import-export',
+    isLive: false,
     description:
       'Cross-border trade facilitation, compliance, and partner networks that keep goods moving efficiently.',
   },

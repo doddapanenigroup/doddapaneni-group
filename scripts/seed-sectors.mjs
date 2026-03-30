@@ -28,10 +28,12 @@ async function main() {
         name: row.name,
         slug: row.slug,
         description: row.description ?? null,
+        isLive: row.isLive ?? false,
       },
       update: {
         name: row.name,
         description: row.description ?? null,
+        isLive: row.isLive ?? false,
       },
     });
     console.log('Upserted sector:', row.name, `(${row.slug})`);

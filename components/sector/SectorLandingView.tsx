@@ -13,7 +13,6 @@ import {
 import { getTranslatedDivisionTopicNavItems } from '@/lib/company-division-nav-i18n';
 import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
 import {
-  isActiveHomeDivisionSlug,
   isCompanyDivisionSlug,
   isSectorLandingContentOnlySlug,
 } from '@/lib/company-divisions';
@@ -41,7 +40,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
 
   const sectorKey = sector.slug.trim().toLowerCase();
   const tBlog = await getTranslations({ locale, namespace: 'Blog' });
-  const isActiveSector = isActiveHomeDivisionSlug(sectorKey);
+  const isActiveSector = sector.isLive;
   const featuredBrands = getFeaturedBrandsForSector(sectorKey);
   const tHomeBrands = await getTranslations({ locale, namespace: 'Home' });
   const tSectorBrands = await getTranslations({ locale, namespace: 'SectorLanding' });

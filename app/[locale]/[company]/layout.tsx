@@ -1,11 +1,13 @@
 import DivisionLayoutServer from '@/components/divisions/DivisionLayoutServer';
-import { isActiveHomeDivisionSlug, isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { generateCompanySegmentStaticParams } from '@/lib/company-route-static';
+import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
 
 /** Twelve division URLs are generated at build; other sector slugs remain request-rendered. */
 export const dynamicParams = true;
 
-export const revalidate = 300;
+// Sector "live" toggles are admin-controlled and should reflect immediately.
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   return generateCompanySegmentStaticParams();
@@ -29,9 +31,10 @@ export default async function CompanySectionLayout({ children, params }: Props) 
     return <>{children}</>;
   }
 
-  // For the 4 active sector hubs, render only the page content (company list),
-  // without the division chrome (overview/about/services/contact + focus chips).
-  if (isActiveHomeDivisionSlug(slug)) {
+  // Live toggle is stored in the DB; when live, render the page content directly
+  // (no division chrome / “Coming soon” shell).
+  const sector = await getPublicSectorBySlug(slug);
+  if (sector?.isLive) {
     return <>{children}</>;
   }
 

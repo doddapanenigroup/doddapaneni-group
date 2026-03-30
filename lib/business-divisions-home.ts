@@ -31,8 +31,8 @@ export async function getBusinessDivisionsForHome(locale: string): Promise<HomeD
         locale === 'en' && hasDbDescription
           ? raw!
           : tAbout(`divisionBlurbs.${slug}` as `divisionBlurbs.${CompanyDivisionSlug}`),
-      /** Live toggle from DB: drives "Coming soon" and clickability. */
-      active: row?.isLive ?? false,
+      /** Live toggle from DB; if row missing (edge case), default to false. */
+      active: row != null ? row.isLive : false,
     };
   });
 }
