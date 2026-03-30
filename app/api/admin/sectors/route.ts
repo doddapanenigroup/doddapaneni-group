@@ -3,7 +3,10 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
+import { COMPANY_DIVISION_SLUGS, isCompanyDivisionSlug } from '@/lib/company-divisions';
 import * as z from 'zod';
+
+const canonicalSectorOrder = new Map(COMPANY_DIVISION_SLUGS.map((s, i) => [s, i]));
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,9 +30,14 @@ export async function GET(request: Request) {
   try {
     await connectDb();
     const sectors = await prisma.sector.findMany({
-      orderBy: { name: 'asc' },
+      where: { slug: { in: [...COMPANY_DIVISION_SLUGS] } },
       select: { id: true, name: true, slug: true, description: true, isLive: true },
     });
+    sectors.sort(
+      (a, b) =>
+        (canonicalSectorOrder.get(a.slug.trim().toLowerCase()) ?? 999) -
+        (canonicalSectorOrder.get(b.slug.trim().toLowerCase()) ?? 999),
+    );
     return NextResponse.json({ sectors });
   } catch (error) {
     await captureErrorToDb({
@@ -58,6 +66,9 @@ export async function PATCH(request: Request) {
     }
 
     const slug = parsed.data.slug.trim().toLowerCase();
+    if (!isCompanyDivisionSlug(slug)) {
+      return NextResponse.json({ message: 'Only the 12 group sectors can be toggled.' }, { status: 400 });
+    }
     await connectDb();
     const updated = await prisma.sector.update({
       where: { slug },

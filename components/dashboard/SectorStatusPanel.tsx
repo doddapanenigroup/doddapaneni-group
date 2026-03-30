@@ -87,7 +87,7 @@ export default function SectorStatusPanel() {
         <div>
           <h2 className="text-lg font-semibold text-slate-800">Sector visibility</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            When OFF, the sector shows as “Coming soon” in the public mega-menu. When ON, it becomes clickable.
+             When OFF, the sector shows as “Coming soon” in the public mega-menu; when ON, it becomes clickable.
           </p>
         </div>
       </div>

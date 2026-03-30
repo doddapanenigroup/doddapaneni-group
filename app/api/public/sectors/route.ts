@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
-import { listAllPublicSectorsOrdered } from '@/lib/data/sector-repository';
+import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
+import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Public read-only list of companies (Prisma `Sector`). Cached at the edge briefly; DB is source of truth.
+ * Public read-only list of the 12 group sectors (same slugs as routes / mega-menu). DB is source of truth for `isLive`.
  */
 export async function GET() {
   await publishScheduledContent(new Date());
-  const sectors = await listAllPublicSectorsOrdered();
+  const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
+  const sectors = COMPANY_DIVISION_SLUGS.map((slug) => bySlug.get(slug)).filter(
+    (row): row is NonNullable<typeof row> => row != null,
+  );
   return NextResponse.json(
     { sectors },
     {
