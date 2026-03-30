@@ -204,13 +204,23 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
 
     return (
       <div className="min-h-screen bg-white">
-        <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-          <div className="mx-auto max-w-7xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">{t('title')}</p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+        <section className="relative overflow-hidden bg-blue-900 px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+            aria-hidden
+          />
+          <div className="relative mx-auto max-w-4xl text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/90">{t('title')}</p>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-[2.75rem] lg:leading-tight">
               {label}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-blue-100 sm:text-lg">{t('sectorNewsSubtitle')}</p>
+            <div className="mx-auto mt-5 h-1 w-16 rounded-full bg-white/90" aria-hidden />
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/95 sm:text-lg">
+              {t('sectorNewsSubtitle')}
+            </p>
           </div>
         </section>
         <NewsSectorBlogList

@@ -3,10 +3,15 @@ import { getServerSession } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { recordApiRequest } from '@/lib/request-monitor';
-import { isDashboardRole } from '@/lib/role-utils';
+import { hasAdminAccess, isDashboardRole } from '@/lib/role-utils';
 
 function clampTake(n: number) {
   return Math.min(Math.max(n, 1), 15);
+}
+
+/** Strip ILIKE wildcards so user input cannot broaden matches unexpectedly. */
+function sanitizeSearchQuery(raw: string): string {
+  return raw.replace(/[%_\\]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export const runtime = 'nodejs';
@@ -17,12 +22,6 @@ export async function GET(request: Request) {
   recordApiRequest({ request, userId: session?.user?.id ?? null });
   const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
 
-  console.info('[dashboard/search] auth check', {
-    hasSession: Boolean(session?.user?.id),
-    userId: session?.user?.id ?? null,
-    role: role ?? null,
-  });
-
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
@@ -31,15 +30,18 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const q = (url.searchParams.get('q') ?? '').trim();
+  const qRaw = (url.searchParams.get('q') ?? '').trim();
+  const q = sanitizeSearchQuery(qRaw);
   const take = clampTake(Number(url.searchParams.get('limit') ?? '8'));
 
   if (q.length < 2) {
     return NextResponse.json({
-      query: q,
+      query: qRaw,
       users: [],
       pages: [],
       blogs: [],
+      sectors: [],
+      companies: [],
     });
   }
 
@@ -47,8 +49,9 @@ export async function GET(request: Request) {
     await connectDb();
 
     const pattern = { contains: q, mode: 'insensitive' as const };
+    const admin = hasAdminAccess(role as any);
 
-    const [users, pages, blogs] = await Promise.all([
+    const [users, pages, blogs, sectors, companies] = await Promise.all([
       prisma.user.findMany({
         where: {
           OR: [
@@ -69,7 +72,14 @@ export async function GET(request: Request) {
       }),
       prisma.pageContent.findMany({
         where: {
-          OR: [{ title: pattern }, { slug: pattern }, { pageKey: pattern }],
+          OR: [
+            { title: pattern },
+            { slug: pattern },
+            { pageKey: pattern },
+            { metaTitle: pattern },
+            { metaDescription: pattern },
+            { keywords: pattern },
+          ],
         },
         take,
         select: {
@@ -83,7 +93,13 @@ export async function GET(request: Request) {
       }),
       prisma.blog.findMany({
         where: {
-          OR: [{ title: pattern }, { slug: pattern }],
+          OR: [
+            { title: pattern },
+            { slug: pattern },
+            { metaTitle: pattern },
+            { metaDescription: pattern },
+            { keywords: pattern },
+          ],
         },
         take,
         select: {
@@ -91,13 +107,39 @@ export async function GET(request: Request) {
           title: true,
           slug: true,
           status: true,
+          sector: { select: { slug: true } },
         },
         orderBy: { updatedAt: 'desc' },
       }),
+      admin
+        ? prisma.sector.findMany({
+            where: {
+              OR: [{ name: pattern }, { slug: pattern }, { description: pattern }],
+            },
+            take,
+            select: { id: true, name: true, slug: true },
+            orderBy: { name: 'asc' },
+          })
+        : Promise.resolve([]),
+      admin
+        ? prisma.company.findMany({
+            where: {
+              OR: [{ name: pattern }, { slug: pattern }, { description: pattern }],
+            },
+            take,
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              sector: { select: { slug: true } },
+            },
+            orderBy: { name: 'asc' },
+          })
+        : Promise.resolve([]),
     ]);
 
     return NextResponse.json({
-      query: q,
+      query: qRaw,
       users: users.map((u) => ({
         id: u.id,
         email: u.email,
@@ -117,6 +159,18 @@ export async function GET(request: Request) {
         title: b.title,
         slug: b.slug,
         status: b.status,
+        sectorSlug: b.sector?.slug ?? null,
+      })),
+      sectors: sectors.map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+      })),
+      companies: companies.map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        sectorSlug: c.sector?.slug ?? null,
       })),
     });
   } catch (err) {

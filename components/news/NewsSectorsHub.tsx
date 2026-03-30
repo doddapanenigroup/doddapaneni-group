@@ -16,8 +16,8 @@ export default function NewsSectorsHub({ locale, sectors }: Props) {
 
   return (
     <MotionLazy>
-      <section className="border-t border-slate-100 bg-slate-50 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-        <div className="mx-auto max-w-5xl">
+      <section className="border-t border-blue-100 bg-white px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+        <div className="mx-auto max-w-6xl">
           <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {sectors.map((s, index) => (
               <m.li
@@ -27,13 +27,13 @@ export default function NewsSectorsHub({ locale, sectors }: Props) {
                 viewport={{ once: true, margin: '-20px' }}
                 transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.2) }}
               >
-                <article className="flex h-full flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:border-blue-200 hover:shadow-md">
-                  <h2 className="text-lg font-bold leading-snug text-slate-900">{s.label}</h2>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                <article className="flex h-full flex-col rounded-2xl border-2 border-blue-100 bg-white p-6 shadow-[0_2px_12px_rgba(30,58,138,0.06)] transition hover:border-blue-900 hover:shadow-[0_8px_28px_rgba(30,58,138,0.12)]">
+                  <h2 className="text-lg font-bold leading-snug text-blue-950">{s.label}</h2>
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-blue-900/80">
                     <Link
                       href={newsSectorListPath(s.slug)}
                       locale={locale}
-                      className="font-semibold text-blue-700 underline-offset-2 hover:text-blue-900 hover:underline"
+                      className="inline-flex items-center font-bold text-blue-900 underline decoration-2 underline-offset-4 transition hover:text-blue-950"
                     >
                       {t('newsHubCta')}
                     </Link>

@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
+import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 export const runtime = 'nodejs';
 
@@ -15,6 +17,11 @@ function safeBaseName(name: string) {
 }
 
 export async function POST(req: Request) {
+  const session = await auth();
+  if (!session?.user?.id || !hasMarketerAccess(session.user.role as any)) {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
+
   let form: FormData;
   try {
     form = await req.formData();
@@ -49,6 +56,7 @@ export async function POST(req: Request) {
   const fileName = `${base}-${suffix}.webp`;
   const storageKey = `uploads/${fileName}`;
 
+  await connectDb();
   await prisma.storedImage.upsert({
     where: { key: storageKey },
     create: {

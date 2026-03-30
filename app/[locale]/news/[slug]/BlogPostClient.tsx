@@ -38,26 +38,26 @@ export default function BlogPostClient({
   const backLink = backHref ?? '/news';
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
             locale={locale}
-            className="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors"
+            className="mb-6 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
           >
-            <ArrowLeft size={20} className="mr-2" />
+            <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
             {backToBlog}
           </Link>
           <div className="mb-4">
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-200 text-sm font-semibold rounded-full">
+            <span className="inline-block rounded-full border-2 border-white/40 bg-white/10 px-4 py-1 text-sm font-bold text-white">
               {category}
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">{title}</h1>
-          <div className="flex items-center gap-4 text-blue-200 text-sm">
+          <h1 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">{title}</h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
             {publishedAt ? (
               <div className="flex items-center">
-                <Calendar size={16} className="mr-2" />
+                <Calendar size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
                 {new Date(publishedAt).toLocaleDateString(locale, {
                   year: 'numeric',
                   month: 'long',
@@ -66,7 +66,7 @@ export default function BlogPostClient({
               </div>
             ) : null}
             <div className="flex items-center">
-              <Clock size={16} className="mr-2" />
+              <Clock size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
               {readTime}
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function BlogPostClient({
       </section>
 
       {image ? (
-        <section className="relative h-64 min-h-64 w-full overflow-hidden bg-slate-100 md:h-96 md:min-h-96">
+        <section className="relative h-64 min-h-64 w-full overflow-hidden bg-blue-50 md:h-96 md:min-h-96">
           <Image
             src={image}
             alt={title}
@@ -87,10 +87,10 @@ export default function BlogPostClient({
         </section>
       ) : null}
 
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <article className="max-w-4xl mx-auto">
+      <section className="bg-white px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <article className="mx-auto max-w-4xl">
           <div
-            className="prose prose-slate prose-lg max-w-none"
+            className="prose prose-lg max-w-none text-blue-950 prose-headings:text-blue-950 prose-headings:font-bold prose-p:text-blue-900/90 prose-a:font-semibold prose-a:text-blue-900 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-li:text-blue-900/90"
             dangerouslySetInnerHTML={{ __html: blogContent ?? '' }}
           />
         </article>
@@ -100,14 +100,14 @@ export default function BlogPostClient({
         <NewsPostEngagement articleSlug={articleSlug} articleTitle={title} articlePathname={articlePathname} />
       ) : null}
 
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-4xl mx-auto">
+      <section className="border-t-2 border-blue-100 bg-white px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
             locale={locale}
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+            className="inline-flex items-center text-base font-bold text-blue-900 transition-colors hover:text-blue-950"
           >
-            <ArrowLeft size={20} className="mr-2" />
+            <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
             {backToBlog}
           </Link>
         </div>

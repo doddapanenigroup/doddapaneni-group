@@ -14,6 +14,9 @@ import {
   type PublicSector,
 } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
+import { publicPathWithLocale } from '@/lib/public-path-with-locale';
+
+export { publicPathWithLocale };
 
 export const SECTOR_LANDING_PAGE_SIZE = 12;
 
@@ -98,12 +101,6 @@ export function toPositiveSectorPage(raw: string | undefined): number {
 }
 
 /** Path prefix for Link hrefs (matches next-intl /news listing pattern). */
-export function publicPathWithLocale(locale: string, ...segments: string[]): string {
-  const path = `/${segments.filter(Boolean).join('/')}`;
-  if (locale === routing.defaultLocale) return path;
-  return `/${locale}${path}`;
-}
-
 export async function resolveAppLocale(
   paramLocale: string,
 ): Promise<(typeof routing.locales)[number]> {

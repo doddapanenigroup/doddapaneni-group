@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Building2, PlusCircle, Save, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Building2, ImagePlus, PlusCircle, Save, Trash2, X } from 'lucide-react';
 import { COMPANY_DIVISION_SLUGS, pickCanonicalSectorRows } from '@/lib/company-divisions';
 
 type SectorRow = { id: string; name: string; slug: string; isLive: boolean };
@@ -54,6 +54,8 @@ export default function CompaniesAdminPanel() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -93,6 +95,35 @@ export default function CompaniesAdminPanel() {
     };
   }, [load]);
 
+  async function uploadCompanyLogo(file: File) {
+    setError(null);
+    if (file.type && !file.type.startsWith('image/')) {
+      setError('Please choose an image file.');
+      return;
+    }
+    setLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: fd });
+      const json = (await res.json().catch(() => ({}))) as { url?: string; message?: string };
+      if (!res.ok) throw new Error(json.message || 'Logo upload failed');
+      if (!json.url) throw new Error('Upload did not return a URL');
+      setForm((f) => ({ ...f, logoImage: json.url! }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Logo upload failed');
+      if (logoFileRef.current) logoFileRef.current.value = '';
+      setForm((f) => ({ ...f, logoImage: '' }));
+    } finally {
+      setLogoUploading(false);
+    }
+  }
+
+  function clearCompanyLogo() {
+    setForm((f) => ({ ...f, logoImage: '' }));
+    if (logoFileRef.current) logoFileRef.current.value = '';
+  }
+
   async function createCompany() {
     setSaving(true);
     setError(null);
@@ -116,6 +147,7 @@ export default function CompaniesAdminPanel() {
       const json = (await res.json().catch(() => ({}))) as any;
       if (!res.ok) throw new Error(json.message || 'Create failed');
       setForm(EMPTY_FORM);
+      if (logoFileRef.current) logoFileRef.current.value = '';
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Create failed');
@@ -200,15 +232,52 @@ export default function CompaniesAdminPanel() {
               })}
             </select>
           </label>
-          <label className="block">
-            <span className="text-xs font-semibold text-slate-700">Company logo (image path/url)</span>
-            <input
-              value={form.logoImage}
-              onChange={(e) => setForm((f) => ({ ...f, logoImage: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              placeholder="/api/media/dlsin.webp"
-            />
-          </label>
+          <div className="block md:col-span-2">
+            <span className="text-xs font-semibold text-slate-700">Company logo</span>
+            <p className="mt-0.5 text-[11px] text-slate-500">
+              Upload any image; it is converted to WebP, stored in the media library, and the public URL is saved on the company.
+            </p>
+            <div className="mt-2 flex flex-wrap items-start gap-3">
+              <input
+                ref={logoFileRef}
+                type="file"
+                accept="image/*"
+                disabled={logoUploading}
+                className="block w-full max-w-xs text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-800 hover:file:bg-slate-200 disabled:opacity-50"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void uploadCompanyLogo(file);
+                }}
+              />
+              {form.logoImage ? (
+                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.logoImage}
+                    alt="Logo preview"
+                    className="h-14 w-14 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-mono text-slate-600 break-all">{form.logoImage}</p>
+                    <button
+                      type="button"
+                      onClick={clearCompanyLogo}
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700"
+                    >
+                      <X size={14} aria-hidden />
+                      Remove logo
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            {logoUploading ? (
+              <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                <ImagePlus size={14} className="animate-pulse" aria-hidden />
+                Converting to WebP and saving to media…
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <label className="mt-4 block">
@@ -290,12 +359,27 @@ export default function CompaniesAdminPanel() {
           <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200 overflow-hidden bg-white">
             {companies.map((c) => (
               <li key={c.id} className="flex items-center justify-between gap-4 p-4">
-                <div className="min-w-0">
-                  <p className="font-medium text-slate-900">{c.name}</p>
-                  <p className="text-xs text-slate-500 font-mono">{c.slug}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Sector: {c.sector?.name ?? '—'}
-                  </p>
+                <div className="flex min-w-0 items-center gap-3">
+                  {c.logoImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={c.logoImage}
+                      alt=""
+                      className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-[10px] text-slate-400">
+                      No logo
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900">{c.name}</p>
+                    <p className="text-xs text-slate-500 font-mono">{c.slug}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Sector: {c.sector?.name ?? '—'}
+                    </p>
+                  </div>
                 </div>
                 <button
                   type="button"
