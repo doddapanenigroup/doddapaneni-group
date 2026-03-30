@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "dlsin",
+    "name": "Dlsin",
+    "sectorSlug": "ecommerce-marketplace",
+    "logoImage": "dlsin.webp",
+    "description": "Multivendor e-commerce marketplace — vendor tools, secure payments, and logistics-friendly workflows."
+  },
+  {
+    "slug": "dealsmedi",
+    "name": "DealsMedi",
+    "sectorSlug": "healthcare-medical",
+    "logoImage": "dealsmedi.webp",
+    "description": "Online medical and health products marketplace focused on respiratory care, mobility, and home healthcare essentials.",
+    "facebookUrl": "https://www.facebook.com/profile.php?id=61582923667373",
+    "xUrl": "https://x.com/dealsmedi",
+    "instagramUrl": "https://www.instagram.com/dealsmedi/",
+    "youtubeUrl": "https://www.youtube.com/@dealsmedi",
+    "pinterestUrl": "https://in.pinterest.com/dealsmedi/"
+  },
+  {
+    "slug": "janatha-mirror",
+    "name": "Janatha Mirror",
+    "sectorSlug": "digital-marketing",
+    "logoImage": "janathamirror.webp",
+    "description": "Digital news and media — reporting, multimedia content, and public-interest coverage.",
+    "youtubeUrl": "https://www.youtube.com/@janathamirror8181",
+    "facebookUrl": "https://www.facebook.com/janathamirrornews"
+  }
+]

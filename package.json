@@ -16,6 +16,7 @@
     "i18n:translate": "node scripts/translate-all-locales.mjs",
     "i18n:translate-blog": "node scripts/translate-blog-content.mjs",
     "db:seed": "node scripts/seed.mjs",
+    "db:seed:flagship-companies": "node scripts/seed-flagship-companies.mjs",
     "db:seed:blogs": "node scripts/seed-division-blogs.mjs",
     "db:news:delete-in-divisions": "node scripts/delete-news-blogs-in-divisions.mjs",
     "db:reset": "node scripts/reset-and-seed.mjs",

@@ -12,6 +12,10 @@ type Props = {
 
 export default async function SectorFeaturedBrandsGrid({ locale, sectorSlug, bordered }: Props) {
   const featuredBrands = getFeaturedBrandsForSector(sectorSlug);
+  if (featuredBrands.length === 0) {
+    return null;
+  }
+
   const tHome = await getTranslations({ locale, namespace: 'Home' });
   const tSectorBrands = await getTranslations({ locale, namespace: 'SectorLanding' });
 
@@ -31,35 +35,28 @@ export default async function SectorFeaturedBrandsGrid({ locale, sectorSlug, bor
           {tSectorBrands('featuredProductsLead')}
         </p>
 
-        {featuredBrands.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-base font-semibold text-slate-900">{tSectorBrands('emptyTitle')}</p>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">{tSectorBrands('emptyBody')}</p>
-          </div>
-        ) : (
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-            {featuredBrands.map((brand) => (
-              <li key={brand.href}>
-                <Link
-                  href={brand.href}
-                  locale={locale}
-                  className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
-                >
-                  <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
-                    <Image
-                      src={brand.imageSrc}
-                      alt={tHome(brand.altKey)}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 640px) 176px, 192px"
-                      loading="lazy"
-                    />
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+          {featuredBrands.map((brand) => (
+            <li key={brand.href}>
+              <Link
+                href={brand.href}
+                locale={locale}
+                className="flex min-h-[9rem] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+              >
+                <div className="relative h-20 w-full max-w-[11rem] sm:h-24 sm:max-w-[12rem]">
+                  <Image
+                    src={brand.imageSrc}
+                    alt={tHome(brand.altKey)}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 640px) 176px, 192px"
+                    loading="lazy"
+                  />
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

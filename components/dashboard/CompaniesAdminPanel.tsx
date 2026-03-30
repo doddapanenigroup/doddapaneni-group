@@ -33,6 +33,9 @@ type FormState = {
   pinterestUrl: string;
 };
 
+/** Group flagship slugs — should exist in DB for sector pages + admin list; `sync-flagships` upserts them. */
+const FLAGSHIP_SLUGS = ['dlsin', 'dealsmedi', 'janatha-mirror'] as const;
+
 const EMPTY_FORM: FormState = {
   name: '',
   slug: '',
@@ -55,7 +58,12 @@ export default function CompaniesAdminPanel() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [syncingFlagships, setSyncingFlagships] = useState(false);
   const logoFileRef = useRef<HTMLInputElement>(null);
+
+  const missingFlagshipSlugs = FLAGSHIP_SLUGS.filter(
+    (slug) => !companies.some((c) => c.slug === slug),
+  );
 
   const load = useCallback(async () => {
     setError(null);
@@ -153,6 +161,30 @@ export default function CompaniesAdminPanel() {
       setError(e instanceof Error ? e.message : 'Create failed');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function syncFlagshipCompanies() {
+    setSyncingFlagships(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/companies/sync-flagships', { method: 'POST' });
+      const json = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        skipped?: string[];
+        upserted?: string[];
+      };
+      if (!res.ok) throw new Error(json.message || 'Sync failed');
+      if (json.skipped?.length) {
+        setError(
+          `Some companies were skipped (sector missing in DB): ${json.skipped.join(', ')}. Run a full db:seed first.`,
+        );
+      }
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Sync failed');
+    } finally {
+      setSyncingFlagships(false);
     }
   }
 
@@ -352,7 +384,27 @@ export default function CompaniesAdminPanel() {
       </div>
 
       <div className="p-5">
-        <h3 className="text-sm font-semibold text-slate-800 mb-3">Existing companies</h3>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="text-sm font-semibold text-slate-800">Existing companies</h3>
+          {missingFlagshipSlugs.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => void syncFlagshipCompanies()}
+              disabled={syncingFlagships}
+              className="inline-flex shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-900 hover:bg-blue-100 disabled:opacity-50 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-100 dark:hover:bg-blue-900/40"
+            >
+              {syncingFlagships
+                ? 'Syncing…'
+                : `Add flagship companies (${missingFlagshipSlugs.join(', ')})`}
+            </button>
+          ) : null}
+        </div>
+        {missingFlagshipSlugs.length > 0 ? (
+          <p className="mb-3 text-xs text-slate-600 dark:text-slate-400">
+            DealsMedi and Janatha Mirror (and Dlsin if missing) are defined in the project seed. Use the button
+            above to create or update them in the database so they appear here and on sector pages.
+          </p>
+        ) : null}
         {companies.length === 0 ? (
           <p className="text-sm text-slate-500">No companies yet.</p>
         ) : (
