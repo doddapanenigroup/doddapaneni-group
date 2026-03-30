@@ -10,25 +10,16 @@ import { mediaUrl } from '@/lib/media';
 import {
   COMPANY_DIVISION_SLUGS,
   activeCompanyDivisionSlugFromPathname,
-  isActiveHomeDivisionSlug,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
-
-function initialSectorLiveMap(): Record<string, boolean> {
-  const m: Record<string, boolean> = {};
-  for (const s of COMPANY_DIVISION_SLUGS) {
-    m[s] = isActiveHomeDivisionSlug(s);
-  }
-  return m;
-}
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [companiesOpen, setCompaniesOpen] = useState(false);
   const [mobileCompaniesOpen, setMobileCompaniesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  /** Defaults match the four live hubs until `/api/public/sectors` loads from DB. */
-  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>(initialSectorLiveMap);
+  /** Populated from `/api/public/sectors`; empty until load — no hardcoded “live” slugs. */
+  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>({});
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
   const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -103,18 +94,26 @@ export default function Navbar() {
     let cancelled = false;
     fetch('/api/public/sectors', { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d: any) => {
+      .then((d: { sectors?: unknown }) => {
         const rows = Array.isArray(d?.sectors) ? d.sectors : [];
-        const map: Record<string, boolean> = {};
+        const map: Record<string, boolean> = Object.fromEntries(
+          COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
+        );
         for (const s of rows) {
-          if (s && typeof s.slug === 'string') {
-            map[String(s.slug).trim().toLowerCase()] = Boolean(s.isLive);
+          if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
+            const key = String((s as { slug: string }).slug)
+              .trim()
+              .toLowerCase();
+            if (key in map) {
+              map[key] = Boolean((s as { isLive?: unknown }).isLive);
+            }
           }
         }
         if (!cancelled) setSectorLive(map);
       })
       .catch(() => {
-        if (!cancelled) setSectorLive({});
+        if (!cancelled)
+          setSectorLive(Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])));
       });
     return () => {
       cancelled = true;

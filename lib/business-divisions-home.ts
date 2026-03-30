@@ -4,6 +4,7 @@ import {
 } from '@/lib/company-divisions';
 import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
 import { getTranslations } from 'next-intl/server';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export type HomeDivision = {
   name: string;
@@ -16,6 +17,7 @@ const FALLBACK_DESCRIPTION =
   'Programs, insights, and sector-specific capabilities across the Doddapaneni Group portfolio.';
 
 export async function getBusinessDivisionsForHome(locale: string): Promise<HomeDivision[]> {
+  noStore();
   const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
   const tDivision = await getTranslations({ locale, namespace: 'DivisionLabels' });
   const tAbout = await getTranslations({ locale, namespace: 'About' });

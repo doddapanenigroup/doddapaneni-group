@@ -22,7 +22,7 @@ function publicSectorRow(row: {
   const name = isCompanyDivisionSlug(slug)
     ? canonicalDivisionDisplayName(slug, row.name)
     : row.name.trim() || slug;
-  return { ...row, name };
+  return { ...row, slug, name };
 }
 
 const sectorPublicSelect = {
@@ -50,11 +50,19 @@ export async function listPublicSectorsBySlugs(
 ): Promise<Map<string, PublicSector>> {
   await connectDb();
   if (slugs.length === 0) return new Map();
+  const normalized = [...new Set(slugs.map((s) => s.trim().toLowerCase()))];
   const rows = await prisma.sector.findMany({
-    where: { slug: { in: [...slugs] } },
+    where: {
+      OR: normalized.map((slug) => ({ slug: { equals: slug, mode: 'insensitive' as const } })),
+    },
     select: sectorPublicSelect,
   });
-  return new Map(rows.map((r) => [r.slug, publicSectorRow(r)]));
+  return new Map(
+    rows.map((r) => {
+      const p = publicSectorRow(r);
+      return [p.slug, p] as const;
+    }),
+  );
 }
 
 export async function listAllPublicSectorsOrdered(): Promise<PublicSector[]> {
