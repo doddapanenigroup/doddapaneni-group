@@ -24,6 +24,7 @@ import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
+import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -823,7 +824,7 @@ export default function MarketerDashboard({
   useEffect(() => {
     fetch('/api/marketer/sectors')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setSectors((d?.items ?? []) as SectorRow[]))
+      .then((d) => setSectors(pickCanonicalSectorRows((d?.items ?? []) as SectorRow[])))
       .catch(() => setSectors([]))
       .finally(() => setSectorsLoading(false));
   }, []);

@@ -37,6 +37,22 @@ export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
   return (COMPANY_DIVISION_SLUGS as readonly string[]).includes(s);
 }
 
+const CANONICAL_SLUG_SET = new Set(COMPANY_DIVISION_SLUGS as readonly string[]);
+
+/**
+ * Admin / dashboards: only the 12 group-division sectors belong in UI. Drops legacy/extra `Sector` rows.
+ * Order matches `COMPANY_DIVISION_SLUGS`; first row wins if the API returns duplicate slugs.
+ */
+export function pickCanonicalSectorRows<T extends { slug: string }>(rows: readonly T[]): T[] {
+  const bySlug = new Map<string, T>();
+  for (const row of rows) {
+    const key = row.slug.trim().toLowerCase();
+    if (!CANONICAL_SLUG_SET.has(key)) continue;
+    if (!bySlug.has(key)) bySlug.set(key, row);
+  }
+  return COMPANY_DIVISION_SLUGS.map((slug) => bySlug.get(slug)).filter((x): x is T => x != null);
+}
+
 /**
  * Public UI label for a sector row: use the canonical twelve-division name when `slug` matches,
  * otherwise the database name (e.g. custom sectors) or `fallback`.

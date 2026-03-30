@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Building2, PlusCircle, Save, Trash2 } from 'lucide-react';
-import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
+import { COMPANY_DIVISION_SLUGS, pickCanonicalSectorRows } from '@/lib/company-divisions';
 
 type SectorRow = { id: string; name: string; slug: string; isLive: boolean };
 
@@ -55,8 +55,6 @@ export default function CompaniesAdminPanel() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
-  const canonicalOrder = useMemo(() => new Map(COMPANY_DIVISION_SLUGS.map((s, i) => [s, i])), []);
-
   const load = useCallback(async () => {
     setError(null);
     const [r1, r2] = await Promise.all([
@@ -75,11 +73,10 @@ export default function CompaniesAdminPanel() {
     }
     const d1 = (await r1.json()) as { sectors?: SectorRow[] };
     const d2 = (await r2.json()) as { companies?: CompanyRow[] };
-    const sectorRows = (d1.sectors ?? []).slice();
-    sectorRows.sort((a, b) => (canonicalOrder.get(a.slug as any) ?? 999) - (canonicalOrder.get(b.slug as any) ?? 999));
+    const sectorRows = pickCanonicalSectorRows(d1.sectors ?? []);
     setSectors(sectorRows);
     setCompanies(d2.companies ?? []);
-  }, [canonicalOrder]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

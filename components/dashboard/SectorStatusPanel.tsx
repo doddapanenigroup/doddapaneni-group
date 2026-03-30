@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ToggleLeft } from 'lucide-react';
-import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
+import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 
 type SectorRow = {
   id: string;
@@ -18,8 +18,6 @@ export default function SectorStatusPanel() {
   const [error, setError] = useState<string | null>(null);
   const [updatingSlug, setUpdatingSlug] = useState<string | null>(null);
 
-  const canonicalOrder = useMemo(() => new Map(COMPANY_DIVISION_SLUGS.map((s, i) => [s, i])), []);
-
   const load = useCallback(async () => {
     setError(null);
     const res = await fetch('/api/admin/sectors', { cache: 'no-store' });
@@ -33,10 +31,9 @@ export default function SectorStatusPanel() {
       return;
     }
     const data = (await res.json()) as { sectors?: SectorRow[] };
-    const rows = (data.sectors ?? []).slice();
-    rows.sort((a, b) => (canonicalOrder.get(a.slug as any) ?? 999) - (canonicalOrder.get(b.slug as any) ?? 999));
+    const rows = pickCanonicalSectorRows(data.sectors ?? []);
     setItems(rows);
-  }, [canonicalOrder]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,17 +51,18 @@ export default function SectorStatusPanel() {
   }, [load]);
 
   async function toggle(slug: string, isLive: boolean) {
-    setUpdatingSlug(slug);
+    const key = slug.trim().toLowerCase();
+    setUpdatingSlug(key);
     setError(null);
     try {
       const res = await fetch('/api/admin/sectors', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, isLive }),
+        body: JSON.stringify({ slug: key, isLive }),
       });
       const json = (await res.json().catch(() => ({}))) as { message?: string };
       if (!res.ok) throw new Error(json.message || 'Update failed');
-      setItems((prev) => prev.map((s) => (s.slug === slug ? { ...s, isLive } : s)));
+      setItems((prev) => prev.map((s) => (s.slug.trim().toLowerCase() === key ? { ...s, isLive } : s)));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Update failed');
     } finally {
@@ -87,7 +85,8 @@ export default function SectorStatusPanel() {
         <div>
           <h2 className="text-lg font-semibold text-slate-800">Sector visibility</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-             When OFF, the sector shows as “Coming soon” in the public mega-menu; when ON, it becomes clickable.
+            Only the 12 public group sectors are listed (matches the website). When OFF, “Coming soon” in the
+            mega-menu; when ON, the sector link works.
           </p>
         </div>
       </div>
@@ -96,7 +95,7 @@ export default function SectorStatusPanel() {
 
       <ul className="divide-y divide-slate-100">
         {items.map((s) => (
-          <li key={s.id} className="flex items-start justify-between gap-4 p-4">
+          <li key={s.slug.trim().toLowerCase()} className="flex items-start justify-between gap-4 p-4">
             <div className="min-w-0">
               <p className="font-medium text-slate-900">{s.name}</p>
               <p className="text-xs text-slate-500 font-mono mt-0.5">{s.slug}</p>
@@ -105,7 +104,7 @@ export default function SectorStatusPanel() {
               type="button"
               role="switch"
               aria-checked={s.isLive}
-              disabled={updatingSlug === s.slug}
+              disabled={updatingSlug === s.slug.trim().toLowerCase()}
               onClick={() => toggle(s.slug, !s.isLive)}
               className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-50 ${
                 s.isLive ? 'bg-emerald-600' : 'bg-slate-300'
