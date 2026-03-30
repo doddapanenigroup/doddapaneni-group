@@ -726,6 +726,8 @@
     "newsHubCta": "समाचार देखने के लिए यहाँ क्लिक करें",
     "backToSectorNews": "क्षेत्र समाचार पर वापस जाएं",
     "sectorNewsSubtitle": "इस विभाग के तहत प्रकाशित पोस्ट।",
+    "sectorNewsNavHeading": "क्षेत्र समाचार",
+    "sectorNewsNavAriaLabel": "अन्य क्षेत्रों के समाचार पृष्ठों पर जाएँ",
     "sectorHeroDescriptionFallback": "{name} में नवीनतम अपडेट और फोकस क्षेत्र।",
     "focusAreasHeading": "फोकस क्षेत्र",
     "topicDescriptionFallback": "{name} में {label} के लिए हम कैसे सहायता करते हैं, जानें।",

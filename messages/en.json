@@ -581,6 +581,8 @@
     "newsHubCta": "Please click here to check news",
     "backToSectorNews": "Back to sector news",
     "sectorNewsSubtitle": "Posts published under this division.",
+    "sectorNewsNavHeading": "Sector news",
+    "sectorNewsNavAriaLabel": "Switch between sector news pages",
     "sectorHeroDescriptionFallback": "Latest updates and focus areas in {name}.",
     "focusAreasHeading": "Focus areas",
     "topicDescriptionFallback": "Learn how we support {label} within {name}.",

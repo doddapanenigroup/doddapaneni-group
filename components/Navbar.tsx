@@ -6,7 +6,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
-import { mediaUrl } from '@/lib/media';
 import {
   COMPANY_DIVISION_SLUGS,
   activeCompanyDivisionSlugFromPathname,
@@ -20,6 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   /** Populated from `/api/public/sectors`; empty until load — no hardcoded “live” slugs. */
   const [sectorLive, setSectorLive] = useState<Record<string, boolean>>({});
+  const sectorLiveFetchedRef = useRef(false);
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
   const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -35,6 +35,32 @@ export default function Navbar() {
   const isOnGroupCompany = activeDivisionSlug !== null;
 
   const openCompaniesMenu = () => {
+    if (!sectorLiveFetchedRef.current) {
+      sectorLiveFetchedRef.current = true;
+      // Defer network work until the dropdown is actually opened.
+      fetch('/api/public/sectors', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((d: { sectors?: unknown }) => {
+          const rows = Array.isArray(d?.sectors) ? d.sectors : [];
+          const map: Record<string, boolean> = Object.fromEntries(
+            COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
+          );
+          for (const s of rows) {
+            if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
+              const key = String((s as { slug: string }).slug)
+                .trim()
+                .toLowerCase();
+              if (key in map) {
+                map[key] = Boolean((s as { isLive?: unknown }).isLive);
+              }
+            }
+          }
+          setSectorLive(map);
+        })
+        .catch(() => {
+          setSectorLive(Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])));
+        });
+    }
     if (closeMenuTimerRef.current) {
       clearTimeout(closeMenuTimerRef.current);
       closeMenuTimerRef.current = null;
@@ -88,36 +114,6 @@ export default function Navbar() {
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [companiesOpen]);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/public/sectors', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d: { sectors?: unknown }) => {
-        const rows = Array.isArray(d?.sectors) ? d.sectors : [];
-        const map: Record<string, boolean> = Object.fromEntries(
-          COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
-        );
-        for (const s of rows) {
-          if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
-            const key = String((s as { slug: string }).slug)
-              .trim()
-              .toLowerCase();
-            if (key in map) {
-              map[key] = Boolean((s as { isLive?: unknown }).isLive);
-            }
-          }
-        }
-        if (!cancelled) setSectorLive(map);
-      })
-      .catch(() => {
-        if (!cancelled)
-          setSectorLive(Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const isTransparent = !scrolled;
   const navbarClasses = isTransparent ? 'bg-transparent border-transparent' : 'bg-transparent backdrop-blur-xl shadow-none';
@@ -227,11 +223,12 @@ export default function Navbar() {
             onClick={handleLogoClick}
           >
             <Image
-              src={mediaUrl('logo.webp')}
+              src="/logo.webp"
               alt={companyName}
-              fill
-              className="object-contain object-left"
-              sizes="160px"
+              width={160}
+              height={64}
+              className="h-16 w-[160px] object-contain object-left"
+              sizes="(max-width: 640px) 160px, 160px"
               priority
             />
           </Link>
@@ -320,7 +317,39 @@ export default function Navbar() {
                 className={`flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-base font-medium hover:bg-slate-50 ${
                   isOnGroupCompany ? 'bg-blue-50 text-blue-950' : 'text-slate-800'
                 }`}
-                onClick={() => setMobileCompaniesOpen((o) => !o)}
+                onClick={() =>
+                  setMobileCompaniesOpen((o) => {
+                    const next = !o;
+                    if (next && !sectorLiveFetchedRef.current) {
+                      sectorLiveFetchedRef.current = true;
+                      fetch('/api/public/sectors', { cache: 'no-store' })
+                        .then((r) => r.json())
+                        .then((d: { sectors?: unknown }) => {
+                          const rows = Array.isArray(d?.sectors) ? d.sectors : [];
+                          const map: Record<string, boolean> = Object.fromEntries(
+                            COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
+                          );
+                          for (const s of rows) {
+                            if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
+                              const key = String((s as { slug: string }).slug)
+                                .trim()
+                                .toLowerCase();
+                              if (key in map) {
+                                map[key] = Boolean((s as { isLive?: unknown }).isLive);
+                              }
+                            }
+                          }
+                          setSectorLive(map);
+                        })
+                        .catch(() => {
+                          setSectorLive(
+                            Object.fromEntries(COMPANY_DIVISION_SLUGS.map((slug) => [slug, false])),
+                          );
+                        });
+                    }
+                    return next;
+                  })
+                }
                 aria-expanded={mobileCompaniesOpen}
               >
                 {t('ourCompanies')}

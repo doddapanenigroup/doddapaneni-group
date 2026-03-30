@@ -726,6 +726,8 @@
     "newsHubCta": "వార్తల కోసం ఇక్కడ క్లిక్ చేయండి",
     "backToSectorNews": "రంగ వార్తలకు తిరిగి వెళ్లండి",
     "sectorNewsSubtitle": "ఈ విభాగంలో ప్రచురించబడిన పోస్ట్‌లు.",
+    "sectorNewsNavHeading": "సెక్టార్ వార్తలు",
+    "sectorNewsNavAriaLabel": "ఇతర సెక్టార్ వార్తా పేజీల మధ్య మారండి",
     "sectorHeroDescriptionFallback": "{name}లో తాజా నవీకరణలు మరియు దృష్టి ప్రాంతాలు.",
     "focusAreasHeading": "దృష్టి ప్రాంతాలు",
     "topicDescriptionFallback": "{name}లో {label}కు మేము ఎలా మద్దతు ఇస్తామో తెలుసుకోండి.",

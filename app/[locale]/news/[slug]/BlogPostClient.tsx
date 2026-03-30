@@ -2,6 +2,7 @@ import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
 import NewsPostEngagement from '@/components/news/NewsPostEngagement';
+import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
 
 type Props = {
   locale: string;
@@ -17,6 +18,8 @@ type Props = {
   articleSlug: string;
   /** When set, “back” links go here instead of `/news` (e.g. `/news/software-it-ai`). */
   backHref?: string;
+  /** When set, left sidebar lists all sector news hubs (division articles). */
+  sectorNavSlug?: string;
   /** Set false for draft preview routes. */
   showEngagement?: boolean;
 };
@@ -33,46 +36,13 @@ export default function BlogPostClient({
   articlePathname,
   articleSlug,
   backHref,
+  sectorNavSlug,
   showEngagement = true,
 }: Props) {
   const backLink = backHref ?? '/news';
-  return (
-    <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <Link
-            href={backLink}
-            locale={locale}
-            className="mb-6 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
-          >
-            <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
-            {backToBlog}
-          </Link>
-          <div className="mb-4">
-            <span className="inline-block rounded-full border-2 border-white/40 bg-white/10 px-4 py-1 text-sm font-bold text-white">
-              {category}
-            </span>
-          </div>
-          <h1 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">{title}</h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
-            {publishedAt ? (
-              <div className="flex items-center">
-                <Calendar size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
-                {new Date(publishedAt).toLocaleDateString(locale, {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </div>
-            ) : null}
-            <div className="flex items-center">
-              <Clock size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
-              {readTime}
-            </div>
-          </div>
-        </div>
-      </section>
 
+  const articleBody = (
+    <>
       {image ? (
         <section className="relative h-64 min-h-64 w-full overflow-hidden bg-blue-50 md:h-96 md:min-h-96">
           <Image
@@ -112,6 +82,58 @@ export default function BlogPostClient({
           </Link>
         </div>
       </section>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen bg-white">
+      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <Link
+            href={backLink}
+            locale={locale}
+            className="mb-6 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
+          >
+            <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
+            {backToBlog}
+          </Link>
+          <div className="mb-4">
+            <span className="inline-block rounded-full border-2 border-white/40 bg-white/10 px-4 py-1 text-sm font-bold text-white">
+              {category}
+            </span>
+          </div>
+          <h1 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">{title}</h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
+            {publishedAt ? (
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
+                {new Date(publishedAt).toLocaleDateString(locale, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </div>
+            ) : null}
+            <div className="flex items-center">
+              <Clock size={16} className="mr-2 shrink-0 opacity-90" aria-hidden />
+              {readTime}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {sectorNavSlug ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-10 pb-16 lg:flex-row lg:items-start lg:gap-12">
+            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72">
+              <NewsSectorNewsNav locale={locale} currentSlug={sectorNavSlug} />
+            </aside>
+            <div className="order-1 min-w-0 flex-1 lg:order-2">{articleBody}</div>
+          </div>
+        </div>
+      ) : (
+        articleBody
+      )}
     </div>
   );
 }

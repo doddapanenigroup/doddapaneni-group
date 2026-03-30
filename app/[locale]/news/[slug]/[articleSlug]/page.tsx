@@ -97,6 +97,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
       articlePathname={articlePath}
       articleSlug={articleSlug.trim()}
       backHref={sectorListPath}
+      sectorNavSlug={sectorSlug}
     />
   );
 }

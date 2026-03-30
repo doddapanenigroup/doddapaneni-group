@@ -6,6 +6,7 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import MotionLazy from '@/components/motion/MotionLazy';
+import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
 import { newsArticlePath } from '@/lib/news-paths';
 
 export type NewsSectorPostItem = {
@@ -38,6 +39,11 @@ export default function NewsSectorBlogList({
     <MotionLazy>
       <section className="border-t border-blue-100 bg-white px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
+            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72">
+              <NewsSectorNewsNav locale={locale} currentSlug={sectorSlug} />
+            </aside>
+            <div className="order-1 min-w-0 flex-1 lg:order-2">
           {posts.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/40 p-10 text-center">
               <p className="text-lg font-semibold text-blue-950">{t('emptySectorTitle')}</p>
@@ -46,7 +52,7 @@ export default function NewsSectorBlogList({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
               {posts.map((post, index) => (
                 <m.article
                   key={post.slug}
@@ -106,6 +112,8 @@ export default function NewsSectorBlogList({
               ))}
             </div>
           )}
+            </div>
+          </div>
         </div>
       </section>
     </MotionLazy>

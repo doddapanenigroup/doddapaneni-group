@@ -726,6 +726,8 @@
     "newsHubCta": "Haga clic aquí para ver las noticias",
     "backToSectorNews": "Volver a las noticias del sector",
     "sectorNewsSubtitle": "Entradas publicadas bajo esta división.",
+    "sectorNewsNavHeading": "Noticias por sector",
+    "sectorNewsNavAriaLabel": "Cambiar entre páginas de noticias por sector",
     "sectorHeroDescriptionFallback": "Últimas novedades y áreas de enfoque en {name}.",
     "focusAreasHeading": "Áreas de enfoque",
     "topicDescriptionFallback": "Descubra cómo apoyamos {label} dentro de {name}.",
