@@ -6,7 +6,9 @@ import { hasAdminAccess } from '@/lib/role-utils';
 import { COMPANY_DIVISION_SLUGS, isCompanyDivisionSlug } from '@/lib/company-divisions';
 import * as z from 'zod';
 
-const canonicalSectorOrder = new Map(COMPANY_DIVISION_SLUGS.map((s, i) => [s, i]));
+const canonicalSectorOrder: Map<string, number> = new Map(
+  COMPANY_DIVISION_SLUGS.map((s, i) => [s, i]),
+);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

@@ -5,7 +5,9 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
 
-const canonicalSectorOrder = new Map(COMPANY_DIVISION_SLUGS.map((s, i) => [s, i]));
+const canonicalSectorOrder: Map<string, number> = new Map(
+  COMPANY_DIVISION_SLUGS.map((s, i) => [s, i]),
+);
 
 export async function GET() {
   try {
