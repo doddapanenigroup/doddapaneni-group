@@ -1,15 +1,51 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
+import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
+import { routing } from '@/i18n/routing';
+import type { Role } from '@/lib/constants';
 import * as z from 'zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function isAdminRole(role: unknown) {
-  return hasAdminAccess(role as any);
+  return hasAdminAccess(role as Role | null | undefined);
+}
+
+function revalidateCompanyPublicRoutes(sectorSlugs: string[], companySlugs: string[]) {
+  try {
+    revalidatePath('/', 'layout');
+    revalidatePath('/companies', 'layout');
+    const normalizedSectors = sectorSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean);
+    const uniqueSectors = [...new Set(normalizedSectors.length ? normalizedSectors : [...COMPANY_DIVISION_SLUGS])];
+    for (const slug of uniqueSectors) {
+      revalidatePath(`/${slug}`, 'layout');
+    }
+
+    const normalizedCompanies = [...new Set(companySlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
+    for (const companySlug of normalizedCompanies) {
+      revalidatePath(`/companies/${companySlug}`, 'page');
+      for (const loc of routing.locales) {
+        if (loc === routing.defaultLocale) continue;
+        revalidatePath(`/${loc}/companies/${companySlug}`, 'page');
+      }
+    }
+
+    for (const loc of routing.locales) {
+      if (loc === routing.defaultLocale) continue;
+      revalidatePath(`/${loc}`, 'layout');
+      revalidatePath(`/${loc}/companies`, 'layout');
+      for (const slug of uniqueSectors) {
+        revalidatePath(`/${loc}/${slug}`, 'layout');
+      }
+    }
+  } catch {
+    /* best effort */
+  }
 }
 
 const patchSchema = z.object({
@@ -42,7 +78,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ message: 'Invalid input', errors: parsed.error.issues }, { status: 400 });
     }
 
-    const data: any = {};
+    const data: {
+      name?: string;
+      slug?: string;
+      logoImage?: string | null;
+      description?: string | null;
+      facebookUrl?: string | null;
+      instagramUrl?: string | null;
+      xUrl?: string | null;
+      youtubeUrl?: string | null;
+      pinterestUrl?: string | null;
+      sectorId?: string;
+    } = {};
     if (parsed.data.name != null) data.name = parsed.data.name.trim();
     if (parsed.data.slug != null) data.slug = parsed.data.slug.trim().toLowerCase().replace(/\s+/g, '-');
     if ('logoImage' in parsed.data) data.logoImage = parsed.data.logoImage?.trim() || null;
@@ -54,6 +101,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if ('pinterestUrl' in parsed.data) data.pinterestUrl = parsed.data.pinterestUrl?.trim() || null;
 
     await connectDb();
+    const existing = await prisma.company.findUnique({
+      where: { id },
+      select: { slug: true, sector: { select: { slug: true } } },
+    });
+    if (!existing) return NextResponse.json({ message: 'Company not found' }, { status: 404 });
+
     if (parsed.data.sectorSlug != null) {
       const sector = await prisma.sector.findUnique({
         where: { slug: parsed.data.sectorSlug.trim().toLowerCase() },
@@ -68,6 +121,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       data,
       select: { id: true, name: true, slug: true, updatedAt: true },
     });
+    revalidateCompanyPublicRoutes(
+      [existing.sector.slug, parsed.data.sectorSlug ?? existing.sector.slug],
+      [existing.slug, updated.slug],
+    );
     return NextResponse.json({ ok: true, company: updated });
   } catch (error) {
     await captureErrorToDb({
@@ -93,7 +150,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
   try {
     await connectDb();
+    const existing = await prisma.company.findUnique({
+      where: { id },
+      select: { slug: true, sector: { select: { slug: true } } },
+    });
+    if (!existing) return NextResponse.json({ message: 'Company not found' }, { status: 404 });
     await prisma.company.delete({ where: { id } });
+    revalidateCompanyPublicRoutes([existing.sector.slug], [existing.slug]);
     return NextResponse.json({ ok: true });
   } catch (error) {
     await captureErrorToDb({

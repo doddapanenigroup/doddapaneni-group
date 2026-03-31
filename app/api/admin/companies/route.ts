@@ -1,15 +1,50 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
+import { COMPANY_DIVISION_SLUGS } from '@/lib/company-divisions';
+import { routing } from '@/i18n/routing';
+import type { Role } from '@/lib/constants';
 import * as z from 'zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function isAdminRole(role: unknown) {
-  return hasAdminAccess(role as any);
+  return hasAdminAccess(role as Role | null | undefined);
+}
+
+function revalidateCompanyPublicRoutes(targetSectorSlug?: string | null, targetCompanySlug?: string | null) {
+  try {
+    revalidatePath('/', 'layout');
+    revalidatePath('/companies', 'layout');
+    const sectorSlugs = targetSectorSlug
+      ? [targetSectorSlug.trim().toLowerCase()]
+      : [...COMPANY_DIVISION_SLUGS];
+    for (const slug of sectorSlugs) {
+      revalidatePath(`/${slug}`, 'layout');
+    }
+    if (targetCompanySlug?.trim()) {
+      const companySlug = targetCompanySlug.trim().toLowerCase();
+      revalidatePath(`/companies/${companySlug}`, 'page');
+      for (const loc of routing.locales) {
+        if (loc === routing.defaultLocale) continue;
+        revalidatePath(`/${loc}/companies/${companySlug}`, 'page');
+      }
+    }
+    for (const loc of routing.locales) {
+      if (loc === routing.defaultLocale) continue;
+      revalidatePath(`/${loc}`, 'layout');
+      revalidatePath(`/${loc}/companies`, 'layout');
+      for (const slug of sectorSlugs) {
+        revalidatePath(`/${loc}/${slug}`, 'layout');
+      }
+    }
+  } catch {
+    /* best effort */
+  }
 }
 
 const createSchema = z.object({
@@ -107,6 +142,7 @@ export async function POST(request: Request) {
       },
       select: { id: true, name: true, slug: true },
     });
+    revalidateCompanyPublicRoutes(sectorSlug, slug);
 
     return NextResponse.json({ ok: true, company }, { status: 201 });
   } catch (error) {

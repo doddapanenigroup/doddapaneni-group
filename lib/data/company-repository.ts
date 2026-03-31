@@ -1,4 +1,3 @@
-import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
 
 export type PublicCompany = {
@@ -15,7 +14,7 @@ export type PublicCompany = {
   sector: { id: string; name: string; slug: string };
 };
 
-export const listCompaniesBySectorSlug = cache(async function listCompaniesBySectorSlug(
+export async function listCompaniesBySectorSlug(
   sectorSlug: string,
 ): Promise<PublicCompany[]> {
   await connectDb();
@@ -38,9 +37,9 @@ export const listCompaniesBySectorSlug = cache(async function listCompaniesBySec
     },
   });
   return rows as unknown as PublicCompany[];
-});
+}
 
-export const getCompanyBySlug = cache(async function getCompanyBySlug(
+export async function getCompanyBySlug(
   companySlug: string,
 ): Promise<PublicCompany | null> {
   await connectDb();
@@ -62,5 +61,5 @@ export const getCompanyBySlug = cache(async function getCompanyBySlug(
     },
   });
   return (row as unknown as PublicCompany) ?? null;
-});
+}
 

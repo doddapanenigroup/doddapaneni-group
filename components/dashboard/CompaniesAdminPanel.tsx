@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Building2, ImagePlus, PlusCircle, Save, Trash2, X } from 'lucide-react';
+import { Building2, ImagePlus, Pencil, PlusCircle, Save, Trash2, X } from 'lucide-react';
 import { COMPANY_DIVISION_SLUGS, pickCanonicalSectorRows } from '@/lib/company-divisions';
 
 type SectorRow = { id: string; name: string; slug: string; isLive: boolean };
@@ -33,6 +33,8 @@ type FormState = {
   pinterestUrl: string;
 };
 
+type ApiMessage = { message?: string };
+
 /** Group flagship slugs — should exist in DB for sector pages + admin list; `sync-flagships` upserts them. */
 const FLAGSHIP_SLUGS = ['dlsin', 'dealsmedi', 'janatha-mirror'] as const;
 
@@ -56,7 +58,10 @@ export default function CompaniesAdminPanel() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [editCompanyId, setEditCompanyId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<FormState>(EMPTY_FORM);
   const [logoUploading, setLogoUploading] = useState(false);
   const [syncingFlagships, setSyncingFlagships] = useState(false);
   const logoFileRef = useRef<HTMLInputElement>(null);
@@ -152,7 +157,7 @@ export default function CompaniesAdminPanel() {
           pinterestUrl: form.pinterestUrl || null,
         }),
       });
-      const json = (await res.json().catch(() => ({}))) as any;
+      const json = (await res.json().catch(() => ({}))) as ApiMessage;
       if (!res.ok) throw new Error(json.message || 'Create failed');
       setForm(EMPTY_FORM);
       if (logoFileRef.current) logoFileRef.current.value = '';
@@ -193,13 +198,70 @@ export default function CompaniesAdminPanel() {
     setError(null);
     try {
       const res = await fetch(`/api/admin/companies/${encodeURIComponent(id)}`, { method: 'DELETE' });
-      const json = (await res.json().catch(() => ({}))) as any;
+      const json = (await res.json().catch(() => ({}))) as ApiMessage;
       if (!res.ok) throw new Error(json.message || 'Delete failed');
       setCompanies((prev) => prev.filter((c) => c.id !== id));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Delete failed');
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  function editStateFromCompany(c: CompanyRow): FormState {
+    return {
+      name: c.name ?? '',
+      slug: c.slug ?? '',
+      sectorSlug: c.sector?.slug ?? COMPANY_DIVISION_SLUGS[0],
+      logoImage: c.logoImage ?? '',
+      description: c.description ?? '',
+      facebookUrl: c.facebookUrl ?? '',
+      instagramUrl: c.instagramUrl ?? '',
+      xUrl: c.xUrl ?? '',
+      youtubeUrl: c.youtubeUrl ?? '',
+      pinterestUrl: c.pinterestUrl ?? '',
+    };
+  }
+
+  function startEditCompany(c: CompanyRow) {
+    setError(null);
+    setEditCompanyId(c.id);
+    setEditForm(editStateFromCompany(c));
+  }
+
+  function cancelEditCompany() {
+    setEditCompanyId(null);
+    setEditForm(EMPTY_FORM);
+  }
+
+  async function saveEditedCompany(id: string) {
+    setUpdatingId(id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/companies/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name,
+          slug: editForm.slug,
+          sectorSlug: editForm.sectorSlug,
+          logoImage: editForm.logoImage || null,
+          description: editForm.description || null,
+          facebookUrl: editForm.facebookUrl || null,
+          instagramUrl: editForm.instagramUrl || null,
+          xUrl: editForm.xUrl || null,
+          youtubeUrl: editForm.youtubeUrl || null,
+          pinterestUrl: editForm.pinterestUrl || null,
+        }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { message?: string };
+      if (!res.ok) throw new Error(json.message || 'Update failed');
+      await load();
+      cancelEditCompany();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Update failed');
+    } finally {
+      setUpdatingId(null);
     }
   }
 
@@ -412,38 +474,155 @@ export default function CompaniesAdminPanel() {
         ) : (
           <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200 overflow-hidden bg-white">
             {companies.map((c) => (
-              <li key={c.id} className="flex items-center justify-between gap-4 p-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  {c.logoImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={c.logoImage}
-                      alt=""
-                      className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-[10px] text-slate-400">
-                      No logo
+              <li key={c.id} className="p-4">
+                {editCompanyId === c.id ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <input
+                        value={editForm.name}
+                        onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Company name"
+                      />
+                      <input
+                        value={editForm.slug}
+                        onChange={(e) => setEditForm((f) => ({ ...f, slug: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-mono"
+                        placeholder="company-slug"
+                      />
+                      <select
+                        value={editForm.sectorSlug}
+                        onChange={(e) => setEditForm((f) => ({ ...f, sectorSlug: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      >
+                        {COMPANY_DIVISION_SLUGS.map((slug) => {
+                          const label = sectors.find((s) => s.slug === slug)?.name ?? slug;
+                          return (
+                            <option key={slug} value={slug}>
+                              {label}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <input
+                        value={editForm.logoImage}
+                        onChange={(e) => setEditForm((f) => ({ ...f, logoImage: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Logo URL"
+                      />
                     </div>
-                  )}
-                  <div className="min-w-0">
-                    <p className="font-medium text-slate-900">{c.name}</p>
-                    <p className="text-xs text-slate-500 font-mono">{c.slug}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Sector: {c.sector?.name ?? '—'}
-                    </p>
+                    <textarea
+                      value={editForm.description}
+                      onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                      className="min-h-20 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      placeholder="Description"
+                    />
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <input
+                        value={editForm.facebookUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, facebookUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Facebook URL"
+                      />
+                      <input
+                        value={editForm.instagramUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, instagramUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Instagram URL"
+                      />
+                      <input
+                        value={editForm.xUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, xUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="X URL"
+                      />
+                      <input
+                        value={editForm.youtubeUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, youtubeUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="YouTube URL"
+                      />
+                      <input
+                        value={editForm.pinterestUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, pinterestUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Pinterest URL"
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => saveEditedCompany(c.id)}
+                        disabled={updatingId === c.id || !editForm.name.trim() || !editForm.slug.trim()}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-900 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                      >
+                        <Save size={16} />
+                        {updatingId === c.id ? 'Saving…' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditCompany}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <X size={16} />
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCompany(c.id)}
+                        disabled={deletingId === c.id}
+                        className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => deleteCompany(c.id)}
-                  disabled={deletingId === c.id}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-                >
-                  <Trash2 size={16} />
-                  Delete
-                </button>
+                ) : (
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {c.logoImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={c.logoImage}
+                          alt=""
+                          className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-[10px] text-slate-400">
+                          No logo
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-900">{c.name}</p>
+                        <p className="text-xs text-slate-500 font-mono">{c.slug}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Sector: {c.sector?.name ?? '—'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startEditCompany(c)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <Pencil size={16} />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCompany(c.id)}
+                        disabled={deletingId === c.id}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
