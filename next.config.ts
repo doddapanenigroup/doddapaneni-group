@@ -192,6 +192,12 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
+      // Critical: prevent CDN/proxy from caching HTML without varying on Next.js RSC/Flight headers.
+      // Some hosts cache HTML aggressively and can serve an RSC payload as the document (shows `:HL[...] 0:{tree...}`).
+      {
+        source: '/((?!api|_next|.*\\..*).*)',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
       {
         source: '/api/media/(.*)',
         headers: [
