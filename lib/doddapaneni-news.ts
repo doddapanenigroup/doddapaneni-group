@@ -242,7 +242,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'Media News & Entertainment',
+    name: 'Media, News & Entertainment',
     slug: 'media-news-entertainment',
     shortDescription: 'Audience growth, content distribution, and monetization strategy for modern media brands.',
     serviceTypeOptions: ['Editorial strategy', 'Audience growth', 'Video monetization', 'Publishing platform'],

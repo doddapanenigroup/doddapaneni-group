@@ -43,7 +43,7 @@
     "healthcare-medical": "Healthcare & Medical",
     "construction-realestate": "Construction & Real Estate",
     "ecommerce-marketplace": "E-commerce Marketplace",
-    "media-news-entertainment": "Media News & Entertainment",
+    "media-news-entertainment": "Media, News & Entertainment",
     "staffing-consultancy": "Human Resources & Consultancy",
     "food-beverages": "Food & Baverages",
     "manufacturing-trading": "Manufacturing & Trading",
@@ -119,7 +119,7 @@
         "description": "We offer end-to-end logistics solutions including freight and cargo handling, storage and warehousing, supply chain management, and last-mile delivery services."
       },
       "media": {
-        "title": "Media News & Entertainment",
+        "title": "Media, News & Entertainment",
         "description": "Our media division manages digital news portals, media production, video and content creation, and advertising network management."
       },
       "manufacturing": {
@@ -184,7 +184,7 @@
   },
   "About": {
     "metaTitle": "About Doddapaneni Group | Vision, Mission & Business Divisions",
-    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media News & Entertainment, Human Resources & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
+    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media, News & Entertainment, Human Resources & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
     "metaKeywords": "Doddapaneni Group, diversified conglomerate, corporate vision, business divisions, technology, healthcare, construction, digital marketing, import export, corporate profile",
     "metaOgTitle": "About Doddapaneni Group",
     "metaOgDescription": "A corporate portfolio across twelve industries—built on integrity, innovation, and long-term value for partners and communities.",
