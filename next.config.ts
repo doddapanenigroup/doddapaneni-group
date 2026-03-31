@@ -181,6 +181,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', 'framer-motion', 'next-intl', 'recharts'],
+    validateRSCRequestHeaders: true,
   },
   async headers() {
     return [

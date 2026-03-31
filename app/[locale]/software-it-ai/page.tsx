@@ -5,6 +5,8 @@ import { routing } from '@/i18n/routing';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { sectorLandingMetadata } from '@/lib/sector-landing';
 
+export const dynamic = 'force-dynamic';
+
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

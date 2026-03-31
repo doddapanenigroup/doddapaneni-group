@@ -10,6 +10,8 @@ import CompanyPageForms from '@/components/companies/CompanyPageForms';
 import { mediaUrl } from '@/lib/media';
 import { ExternalLink } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 function paragraphsFromText(raw: string | null | undefined): string[] {
   const s = raw?.trim();
   if (!s) return [];
