@@ -788,7 +788,7 @@ export default function MarketerDashboard({
     const qs = blogSectorFilter
       ? `?sectorId=${encodeURIComponent(blogSectorFilter)}`
       : '';
-    fetch(`/api/marketer/blog${qs}`)
+    fetch(`/api/marketer/news${qs}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         const items = (d?.items ?? []) as BlogRow[];
@@ -1001,7 +1001,7 @@ export default function MarketerDashboard({
       ...blogForm,
       featuredImage: blogForm.featuredImage || null,
     };
-    const res = await fetch(`/api/marketer/blog/${encodeURIComponent(selectedBlogSlug)}`, {
+    const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1036,7 +1036,7 @@ export default function MarketerDashboard({
     if (!selectedBlogSlug) return;
     if (!confirm('Delete this blog?')) return;
 
-    const res = await fetch(`/api/marketer/blog/${encodeURIComponent(selectedBlogSlug)}`, {
+    const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
       method: 'DELETE',
     });
     if (!res.ok) return;
@@ -1071,7 +1071,7 @@ export default function MarketerDashboard({
   async function createBlog() {
     if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) return;
     if (!blogForm.sectorId.trim()) return;
-    const res = await fetch('/api/marketer/blog', {
+    const res = await fetch('/api/marketer/news', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(blogForm),

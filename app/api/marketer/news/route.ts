@@ -71,7 +71,7 @@ export async function GET(request: Request) {
     }
 
     await connectDb();
-    const blogs = await prisma.blog.findMany({
+    const blogs = await prisma.news.findMany({
       where: {
         ...(status === 'draft' || status === 'published' ? { status } : {}),
         ...(sectorIdFilter.sectorId ? { sectorId: sectorIdFilter.sectorId } : {}),
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     if (!sectorResult.ok) {
       return NextResponse.json({ message: sectorResult.message }, { status: sectorResult.status });
     }
-    const doc = await prisma.blog.create({
+    const doc = await prisma.news.create({
       data: {
         title,
         slug,

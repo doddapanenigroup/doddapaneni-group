@@ -7,6 +7,7 @@ import { hasAdminAccess } from '@/lib/role-utils';
 import { COMPANY_DIVISION_SLUGS, isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { routing } from '@/i18n/routing';
 import type { Role } from '@/lib/constants';
+import { syncCanonicalSectors } from '@/lib/sync-canonical-sectors';
 import * as z from 'zod';
 
 const canonicalSectorOrder: Map<string, number> = new Map(
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
 
   try {
     await connectDb();
+    await syncCanonicalSectors();
     const sectors = await prisma.sector.findMany({
       where: { slug: { in: [...COMPANY_DIVISION_SLUGS] } },
       select: { id: true, name: true, slug: true, description: true, isLive: true },

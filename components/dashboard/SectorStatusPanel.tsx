@@ -99,8 +99,22 @@ export default function SectorStatusPanel() {
         {items.map((s) => (
           <li key={s.slug.trim().toLowerCase()} className="flex items-start justify-between gap-4 p-4">
             <div className="min-w-0">
-              <p className="font-medium text-slate-900 dark:text-slate-100">{s.name}</p>
-              <p className="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">{s.slug}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-medium text-slate-900 dark:text-slate-100">{s.name}</p>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                    s.isLive
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200'
+                      : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  {s.isLive ? 'Live' : 'Coming soon'}
+                </span>
+              </div>
+              <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">{s.slug}</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                DB status: <span className="font-medium text-slate-700 dark:text-slate-200">is_live = {s.isLive ? 'true' : 'false'}</span>
+              </p>
             </div>
             <button
               type="button"
@@ -122,6 +136,10 @@ export default function SectorStatusPanel() {
           </li>
         ))}
       </ul>
+      <p className="border-t border-slate-100 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        Database rows listed: {items.length} / 12
+        {items.length < 12 ? ' — refresh this page or run `npm run db:sync-sectors`.' : '.'}
+      </p>
     </section>
   );
 }

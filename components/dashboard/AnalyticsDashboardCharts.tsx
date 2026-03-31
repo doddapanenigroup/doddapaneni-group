@@ -26,10 +26,10 @@ export type AnalyticsBarRow = { label: string; views: number; fullPath: string }
 type Props = {
   lineData: AnalyticsLinePoint[];
   topBars: AnalyticsBarRow[];
-  blogBars: AnalyticsBarRow[];
+  newsBars: AnalyticsBarRow[];
 };
 
-export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }: Props) {
+export default function AnalyticsDashboardCharts({ lineData, topBars, newsBars }: Props) {
   return (
     <>
       <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
@@ -117,18 +117,18 @@ export default function AnalyticsDashboardCharts({ lineData, topBars, blogBars }
         <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
           <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
             <BookOpen size={18} className="text-slate-600 dark:text-slate-400" />
-            Blog performance
+            News performance
           </h2>
           <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
             Views by news URL (from public site tracking). Web Vitals LCP average for news URLs shown
             in summary cards.
           </p>
           <div className="w-full min-w-0" style={{ minHeight: DASHBOARD_CHART_HEIGHT }}>
-            {blogBars.length > 0 ? (
+            {newsBars.length > 0 ? (
               <SafeResponsiveChart height={DASHBOARD_CHART_HEIGHT}>
                 <BarChart
                   layout="vertical"
-                  data={blogBars}
+                  data={newsBars}
                   margin={{ left: 4, right: 16, top: 8, bottom: 8 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#33415522" horizontal={false} />

@@ -36,7 +36,7 @@ model User {
   passwordChangeLogs         PasswordChangeLog[]      @relation("PasswordChangeTarget")
   loginEmailOtps             LoginEmailOtp[]
   adminEmployeeCreateOtps    AdminEmployeeCreateOtp[]
-  blogs                      Blog[]
+  newsPosts                  News[]
   invitesCreated             UserInvite[]             @relation("InviteCreator")
   notifications              Notification[]
 }
@@ -229,12 +229,12 @@ enum PageStatus {
   published
 }
 
-enum BlogStatus {
+enum NewsStatus {
   draft
   published
 }
 
-model Blog {
+model News {
   id              String     @id @default(cuid())
   title           String
   slug            String     @unique
@@ -244,7 +244,7 @@ model Blog {
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   sectorId        String?    @map("sector_id")
   sector          Sector?    @relation(fields: [sectorId], references: [id], onDelete: SetNull)
-  status          BlogStatus @default(draft)
+  status          NewsStatus @default(draft)
   publishedAt     DateTime?  @map("published_at")
   scheduledPublishAt DateTime? @map("scheduled_publish_at")
   metaTitle       String?    @map("meta_title")
@@ -256,17 +256,18 @@ model Blog {
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
-  translations    BlogTranslation[]
+  translations    NewsTranslation[]
 
   @@index([authorId])
   @@index([sectorId])
+  @@map("news")
 }
 
 // Auto-generated from the canonical English row when a post is published (dashboard).
-model BlogTranslation {
+model NewsTranslation {
   id               String   @id @default(cuid())
-  blogId           String   @map("blog_id")
-  blog             Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  newsId           String   @map("news_id")
+  news             News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
   locale           String
   title            String
   content          String   @db.Text
@@ -277,9 +278,9 @@ model BlogTranslation {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  @@unique([blogId, locale])
-  @@index([blogId])
-  @@map("blog_translation")
+  @@unique([newsId, locale])
+  @@index([newsId])
+  @@map("news_translation")
 }
 
 model Sector {
@@ -290,7 +291,7 @@ model Sector {
   isLive      Boolean  @default(false) @map("is_live")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  blogs Blog[]
+  news News[]
 
   companies Company[]
 }

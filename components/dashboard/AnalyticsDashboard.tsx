@@ -20,10 +20,10 @@ export type AnalyticsPayload = {
   since: string;
   until: string;
   productionTrafficOnly: boolean;
-  totals: { pageViews: number; blogViews: number };
+  totals: { pageViews: number; newsViews: number };
   series: { date: string; views: number }[];
   topPages: { path: string; views: number }[];
-  blog: {
+  news: {
     totalViews: number;
     topPosts: { path: string; views: number }[];
     lcpAvgMs: number | null;
@@ -110,8 +110,8 @@ export default function AnalyticsDashboard({
       fullPath: p.path,
     })) ?? [];
 
-  const blogBars =
-    data?.blog.topPosts.map((p) => ({
+  const newsBars =
+    data?.news.topPosts.map((p) => ({
       label: truncatePath(p.path),
       views: p.views,
       fullPath: p.path,
@@ -133,7 +133,7 @@ export default function AnalyticsDashboard({
             Analytics
           </h1>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            Page views, top pages, and blog performance from production traffic.
+            Page views, top pages, and news URL performance from production traffic.
           </p>
         </div>
         <div className="flex rounded-xl border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-50 dark:bg-slate-800/60">
@@ -221,7 +221,7 @@ export default function AnalyticsDashboard({
                 <BookOpen size={14} /> News views
               </p>
               <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
-                {data.blog.totalViews.toLocaleString()}
+                {data.news.totalViews.toLocaleString()}
               </p>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Paths matching /news/ (and legacy /blog/)
@@ -232,19 +232,19 @@ export default function AnalyticsDashboard({
                 News LCP (avg)
               </p>
               <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
-                {data.blog.lcpAvgMs != null
-                  ? `${data.blog.lcpAvgMs} ms`
+                {data.news.lcpAvgMs != null
+                  ? `${data.news.lcpAvgMs} ms`
                   : '—'}
               </p>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {data.blog.lcpSamples > 0
-                  ? `${data.blog.lcpSamples} samples on news URLs`
+                {data.news.lcpSamples > 0
+                  ? `${data.news.lcpSamples} samples on news URLs`
                   : 'No LCP samples for news paths'}
               </p>
             </div>
           </div>
 
-          <AnalyticsCharts lineData={lineData} topBars={topBars} blogBars={blogBars} />
+          <AnalyticsCharts lineData={lineData} topBars={topBars} newsBars={newsBars} />
 
           <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-4">

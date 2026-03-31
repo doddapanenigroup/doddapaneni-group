@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     }
 
     // blog
-    const doc = await prisma.blog.findFirst({
+    const doc = await prisma.news.findFirst({
       where: {
         slug,
         OR: [{ status: "draft" }, { status: "published", scheduledPublishAt: { gt: now } }],

@@ -30,12 +30,12 @@ import {
 
 type UserHit = { id: string; email: string; name: string | null; username: string | null; role: string };
 type PageHit = { id: string; title: string; slug: string; locale: string; status: string };
-type BlogHit = { id: string; title: string; slug: string; status: string; sectorSlug?: string | null };
+type NewsHit = { id: string; title: string; slug: string; status: string; sectorSlug?: string | null };
 type SectorHit = { id: string; name: string; slug: string };
 type CompanyHit = { id: string; name: string; slug: string; sectorSlug?: string | null };
 
 type FlatItem = {
-  kind: 'user' | 'page' | 'blog' | 'nav' | 'sector' | 'company';
+  kind: 'user' | 'page' | 'news' | 'nav' | 'sector' | 'company';
   key: string;
   title: string;
   subtitle: string;
@@ -48,7 +48,7 @@ function pagePublicPath(pageLocale: string, slug: string): string {
   return publicPathWithLocale(pageLocale, ...parts);
 }
 
-function blogPublicPath(dashboardLocale: string, slug: string, sectorSlug: string | null | undefined) {
+function newsPublicPath(dashboardLocale: string, slug: string, sectorSlug: string | null | undefined) {
   if (sectorSlug) return publicPathWithLocale(dashboardLocale, 'news', sectorSlug, slug);
   return publicPathWithLocale(dashboardLocale, 'news', slug);
 }
@@ -87,7 +87,7 @@ function buildFlatItems(
   data: {
     users: UserHit[];
     pages: PageHit[];
-    blogs: BlogHit[];
+    news: NewsHit[];
     sectors?: SectorHit[];
     companies?: CompanyHit[];
   },
@@ -111,13 +111,13 @@ function buildFlatItems(
       href: pagePublicPath(p.locale, p.slug),
     });
   }
-  for (const b of data.blogs) {
+  for (const b of data.news) {
     items.push({
-      kind: 'blog',
-      key: `b:${b.id}`,
+      kind: 'news',
+      key: `n:${b.id}`,
       title: b.title,
       subtitle: `${b.slug} · ${b.status}${b.sectorSlug ? ` · ${b.sectorSlug}` : ''}`,
-      href: blogPublicPath(dashboardLocale, b.slug, b.sectorSlug),
+      href: newsPublicPath(dashboardLocale, b.slug, b.sectorSlug),
     });
   }
   for (const s of data.sectors ?? []) {
@@ -147,7 +147,7 @@ function hitIcon(kind: FlatItem['kind']) {
       return User;
     case 'page':
       return FileText;
-    case 'blog':
+    case 'news':
       return BookOpen;
     case 'nav':
       return LayoutDashboard;
@@ -241,7 +241,7 @@ export default function GlobalSearchPalette({
         const json = (await res.json()) as {
           users: UserHit[];
           pages: PageHit[];
-          blogs: BlogHit[];
+          news: NewsHit[];
           sectors?: SectorHit[];
           companies?: CompanyHit[];
         };
@@ -249,7 +249,7 @@ export default function GlobalSearchPalette({
           const apiItems = buildFlatItems(locale, {
             users: json.users ?? [],
             pages: json.pages ?? [],
-            blogs: json.blogs ?? [],
+            news: json.news ?? [],
             sectors: json.sectors ?? [],
             companies: json.companies ?? [],
           });
@@ -372,7 +372,7 @@ export default function GlobalSearchPalette({
                 {showHintTwoChars ? (
                   <p className="px-4 py-3 text-center text-xs text-slate-500 dark:text-slate-400">
                     Matching dashboard pages below. Type <strong>2+ characters</strong> to also search users,
-                    CMS pages, blogs, sectors, and companies.
+                    CMS pages, news articles, sectors, and companies.
                   </p>
                 ) : null}
                 {showEmptyNoMatches ? (

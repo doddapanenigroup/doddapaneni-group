@@ -48,18 +48,18 @@ async function getOrCreateDefaultSector() {
 async function main() {
   const sector = await getOrCreateDefaultSector();
 
-  const before = await prisma.blog.count({ where: { sectorId: null } });
+  const before = await prisma.news.count({ where: { sectorId: null } });
   if (before === 0) {
     console.log('No blogs missing sectorId. Nothing to update.');
     return;
   }
 
-  const result = await prisma.blog.updateMany({
+  const result = await prisma.news.updateMany({
     where: { sectorId: null },
     data: { sectorId: sector.id },
   });
 
-  const after = await prisma.blog.count({ where: { sectorId: null } });
+  const after = await prisma.news.count({ where: { sectorId: null } });
 
   console.log('Default sector assignment complete.');
   console.log('Default sector:', `${sector.name} (${sector.slug})`);

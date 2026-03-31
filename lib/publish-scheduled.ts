@@ -76,7 +76,7 @@ export async function publishScheduledContent(
   });
 
   // Blogs: promote each due draft individually so we can trigger translation sync per post.
-  const dueBlogs = await prisma.blog.findMany({
+  const dueBlogs = await prisma.news.findMany({
     where: {
       status: 'draft',
       scheduledPublishAt: { lte: now },
@@ -86,7 +86,7 @@ export async function publishScheduledContent(
 
   let blogsPromoted = 0;
   for (const b of dueBlogs) {
-    await prisma.blog.update({
+    await prisma.news.update({
       where: { id: b.id },
       data: {
         status: 'published',
@@ -99,7 +99,7 @@ export async function publishScheduledContent(
   }
 
   // Blogs: cleanup (published but still has a schedule timestamp)
-  const blogsScheduleCleared = await prisma.blog.updateMany({
+  const blogsScheduleCleared = await prisma.news.updateMany({
     where: {
       status: 'published',
       scheduledPublishAt: { lte: now },

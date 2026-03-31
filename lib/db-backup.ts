@@ -25,7 +25,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
   const [
     users,
     pages,
-    blogs,
+    newsArticles,
     storedImages,
     featureToggles,
     roleModulePermissions,
@@ -45,7 +45,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
   ] = await Promise.all([
     prisma.user.findMany(),
     prisma.pageContent.findMany(),
-    prisma.blog.findMany(),
+    prisma.news.findMany() as Promise<unknown[]>,
     prisma.storedImage.findMany({
       select: includeMedia
         ? undefined
@@ -82,7 +82,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     tables: {
       User: users,
       PageContent: pages,
-      Blog: blogs,
+      News: newsArticles,
       StoredImage: storedImages,
       FeatureToggle: featureToggles,
       RoleModulePermission: roleModulePermissions,

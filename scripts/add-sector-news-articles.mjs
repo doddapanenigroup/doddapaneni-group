@@ -4,7 +4,7 @@
  *  - digital-marketing (Digital Marketing) -> public/DM.webp
  *  - healthcare-medical (Healthcare & Medical) -> public/hcm.webp
  *
- * It writes to the `Blog` table so the existing sector news pages pick it up automatically.
+ * It writes to the `news` table so sector news pages pick it up automatically.
  *
  * Images: we reference disk via `/api/media/<publicKey>`, which serves files from `public/` first.
  *
@@ -206,7 +206,7 @@ async function main() {
     const sector = sectorBySlug.get(a.sectorSlug);
     if (!sector) continue;
 
-    const existing = await prisma.blog.findUnique({ where: { slug: a.slug } });
+    const existing = await prisma.news.findUnique({ where: { slug: a.slug } });
 
     const data = {
       title: a.title,
@@ -226,11 +226,11 @@ async function main() {
     };
 
     if (existing) {
-      await prisma.blog.update({ where: { slug: a.slug }, data });
+      await prisma.news.update({ where: { slug: a.slug }, data });
       updated++;
       console.log('Updated blog:', a.slug);
     } else {
-      await prisma.blog.create({ data: { slug: a.slug, ...data } });
+      await prisma.news.create({ data: { slug: a.slug, ...data } });
       created++;
       console.log('Created blog:', a.slug);
     }

@@ -75,7 +75,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         await tx.adminEmployeeCreateOtp.deleteMany({});
         await tx.roleModulePermission.deleteMany({});
         await tx.featureToggle.deleteMany({});
-        await tx.blog.deleteMany({});
+        await tx.news.deleteMany({});
         await tx.pageContent.deleteMany({});
         // StoredImage: do not delete by default to avoid large binary loss; restore will upsert metadata.
       }
@@ -134,8 +134,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         });
       }
 
-      for (const b of (t.Blog ?? []) as any[]) {
-        await tx.blog.upsert({
+      for (const b of (t.News ?? t.Blog ?? []) as any[]) {
+        await tx.news.upsert({
           where: { slug: b.slug },
           create: {
             title: b.title,
@@ -143,6 +143,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             content: b.content,
             featuredImage: b.featuredImage ?? null,
             authorId: b.authorId,
+            sectorId: b.sectorId ?? null,
             status: b.status ?? 'draft',
             publishedAt: b.publishedAt ? new Date(b.publishedAt) : null,
             scheduledPublishAt: b.scheduledPublishAt ? new Date(b.scheduledPublishAt) : null,
@@ -158,6 +159,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             content: b.content,
             featuredImage: b.featuredImage ?? null,
             authorId: b.authorId,
+            sectorId: b.sectorId ?? null,
             status: b.status ?? 'draft',
             publishedAt: b.publishedAt ? new Date(b.publishedAt) : null,
             scheduledPublishAt: b.scheduledPublishAt ? new Date(b.scheduledPublishAt) : null,

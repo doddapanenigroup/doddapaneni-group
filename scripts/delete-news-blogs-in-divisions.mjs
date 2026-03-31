@@ -51,11 +51,11 @@ async function main() {
     process.exit(1);
   }
 
-  const before = await prisma.blog.count({
+  const before = await prisma.news.count({
     where: { sector: { slug: { in: DIVISION_SLUGS } } },
   });
 
-  const result = await prisma.blog.deleteMany({
+  const result = await prisma.news.deleteMany({
     where: { sector: { slug: { in: DIVISION_SLUGS } } },
   });
 

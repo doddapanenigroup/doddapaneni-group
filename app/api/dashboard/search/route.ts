@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       query: qRaw,
       users: [],
       pages: [],
-      blogs: [],
+      news: [],
       sectors: [],
       companies: [],
     });
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     const pattern = { contains: q, mode: 'insensitive' as const };
     const admin = hasAdminAccess(role as any);
 
-    const [users, pages, blogs, sectors, companies] = await Promise.all([
+    const [users, pages, newsArticles, sectors, companies] = await Promise.all([
       prisma.user.findMany({
         where: {
           OR: [
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
         },
         orderBy: { updatedAt: 'desc' },
       }),
-      prisma.blog.findMany({
+      prisma.news.findMany({
         where: {
           OR: [
             { title: pattern },
@@ -154,7 +154,7 @@ export async function GET(request: Request) {
         locale: p.locale,
         status: p.status,
       })),
-      blogs: blogs.map((b) => ({
+      news: newsArticles.map((b) => ({
         id: b.id,
         title: b.title,
         slug: b.slug,

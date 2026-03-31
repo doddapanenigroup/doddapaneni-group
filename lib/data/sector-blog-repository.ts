@@ -69,7 +69,7 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
   const sector = await getPublicSectorBySlug(sectorSlug);
   if (!sector) return null;
 
-  const post = await prisma.blog.findFirst({
+  const post = await prisma.news.findFirst({
     where: {
       slug: blogSlug.trim(),
       ...publishedBlogWhereForSector(sector.id, now),
@@ -120,8 +120,8 @@ export async function listPublishedBlogsForSectorPage(args: {
   const skip = (page - 1) * pageSize;
 
   const [total, rows] = await Promise.all([
-    prisma.blog.count({ where }),
-    prisma.blog.findMany({
+    prisma.news.count({ where }),
+    prisma.news.findMany({
       where,
       orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
       skip,
@@ -184,7 +184,7 @@ export type BlogListRowWithSector = {
 /** All published posts with sector link — main `/news` index (DB is source of truth when rows exist). */
 export async function listAllPublishedBlogsWithSector(now: Date): Promise<BlogListRowWithSector[]> {
   await connectDb();
-  const rows = await prisma.blog.findMany({
+  const rows = await prisma.news.findMany({
     where: publishedBlogWhere(now),
     orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
     select: blogListWithSectorSelect,

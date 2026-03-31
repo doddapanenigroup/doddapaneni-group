@@ -2,12 +2,20 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, Filter } from 'lucide-react';
+import { formatLoginLogSummary } from '@/lib/login-log-display';
 
-type UserFilter = { id: string; email: string; name: string | null; role: string };
+type UserFilter = { id: string; email: string; name: string | null; username: string | null; role: string };
 type Payload = {
   users: UserFilter[];
   summary: { loginLogs: number; pageViews: number; webVitals: number; visits: number };
-  loginLogs: { id: string; userEmail: string; userRole: string; loggedAt: string }[];
+  loginLogs: {
+    id: string;
+    userEmail: string;
+    userName: string | null;
+    userUsername: string | null;
+    userRole: string;
+    loggedAt: string;
+  }[];
   pageViews: { id: string; path: string; visitedAt: string }[];
   webVitals: { id: string; name: string; value: number; rating: string | null; pagePath: string | null; createdAt: string }[];
   visits: { id: string; visitedAt: string; pagePath: string | null; ipAddress: string | null }[];
@@ -58,11 +66,16 @@ export default function DeveloperObservabilityPanel() {
         </select>
         <select value={userId} onChange={(e) => setUserId(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
           <option value="">All users</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.email} ({u.role})
-            </option>
-          ))}
+          {users.map((u) => {
+            const label =
+              [u.name?.trim(), u.username?.trim() ? `@${u.username.trim()}` : null].filter(Boolean).join(' · ') ||
+              u.email;
+            return (
+              <option key={u.id} value={u.id}>
+                {label} · {u.role}
+              </option>
+            );
+          })}
         </select>
         <button type="button" onClick={() => load()} className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-700 text-white px-4 py-2 text-sm hover:bg-slate-800">
           <Filter size={16} />
@@ -84,7 +97,18 @@ export default function DeveloperObservabilityPanel() {
               <Metric label="Visits" value={data.summary.visits} />
             </div>
 
-            <TableBlock title="LoginLog (user activity)" rows={data.loginLogs.map((r) => `${new Date(r.loggedAt).toLocaleString()} — ${r.userEmail} (${r.userRole})`)} />
+            <TableBlock
+              title="LoginLog (user activity)"
+              rows={data.loginLogs.map(
+                (r) =>
+                  `${new Date(r.loggedAt).toLocaleString()} — ${formatLoginLogSummary({
+                    userEmail: r.userEmail,
+                    userName: r.userName,
+                    userUsername: r.userUsername,
+                    userRole: r.userRole,
+                  })}`,
+              )}
+            />
             <TableBlock title="DeveloperPageView (page tracking)" rows={data.pageViews.map((r) => `${new Date(r.visitedAt).toLocaleString()} — ${r.path}`)} />
             <TableBlock title="WebVitalReport (performance)" rows={data.webVitals.map((r) => `${new Date(r.createdAt).toLocaleString()} — ${r.name}: ${r.value} ${r.rating ? `(${r.rating})` : ''}`)} />
             <TableBlock title="Visit (traffic)" rows={data.visits.map((r) => `${new Date(r.visitedAt).toLocaleString()} — ${r.pagePath ?? '/'} ${r.ipAddress ? `(${r.ipAddress})` : ''}`)} />

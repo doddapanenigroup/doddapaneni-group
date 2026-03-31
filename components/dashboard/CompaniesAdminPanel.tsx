@@ -255,10 +255,12 @@ export default function CompaniesAdminPanel() {
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
             >
               {COMPANY_DIVISION_SLUGS.map((slug) => {
-                const label = sectors.find((s) => s.slug === slug)?.name ?? slug;
+                const row = sectors.find((s) => s.slug.trim().toLowerCase() === slug);
+                const label = row?.name ?? slug;
+                const live = row?.isLive ?? false;
                 return (
                   <option key={slug} value={slug}>
-                    {label}
+                    {label} — {live ? 'Live' : 'Coming soon'}
                   </option>
                 );
               })}

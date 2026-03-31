@@ -84,7 +84,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (process.env.NODE_ENV === 'production') {
     await publishScheduledContent(now);
   }
-  const dbPost = await prisma.blog.findFirst({
+  const dbPost = await prisma.news.findFirst({
     where: {
       slug: trimmed,
       status: 'published',
@@ -238,7 +238,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
   if (process.env.NODE_ENV === 'production') {
     await publishScheduledContent(now);
   }
-  const dbPost = await prisma.blog.findUnique({
+  const dbPost = await prisma.news.findUnique({
     where: { slug: trimmed },
     select: {
       title: true,

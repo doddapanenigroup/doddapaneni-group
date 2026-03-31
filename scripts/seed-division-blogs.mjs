@@ -302,7 +302,7 @@ async function main() {
       const featured = mediaPath(imgKey);
       const publishedAt = new Date(baseDate - (offset + 1) * 86400000 * 2);
 
-      const existing = await prisma.blog.findUnique({ where: { slug } });
+      const existing = await prisma.news.findUnique({ where: { slug } });
       const data = {
         title,
         content,
@@ -321,10 +321,10 @@ async function main() {
       };
 
       if (existing) {
-        await prisma.blog.update({ where: { slug }, data });
+        await prisma.news.update({ where: { slug }, data });
         updated++;
       } else {
-        await prisma.blog.create({ data: { slug, ...data } });
+        await prisma.news.create({ data: { slug, ...data } });
         created++;
       }
       offset++;

@@ -17,7 +17,9 @@
     "i18n:translate-blog": "node scripts/translate-blog-content.mjs",
     "db:seed": "node scripts/seed.mjs",
     "db:seed:flagship-companies": "node scripts/seed-flagship-companies.mjs",
+    "db:sync-sectors": "node scripts/sync-canonical-sectors.mjs",
     "db:seed:blogs": "node scripts/seed-division-blogs.mjs",
+    "db:import-static-news": "npx tsx scripts/import-doddapaneni-news-to-db.ts",
     "db:news:delete-in-divisions": "node scripts/delete-news-blogs-in-divisions.mjs",
     "db:reset": "node scripts/reset-and-seed.mjs",
     "db:push": "prisma db push",
@@ -67,6 +69,7 @@
     "eslint-config-next": "16.1.6",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

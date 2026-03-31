@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: Promise<{ slug: string }> };
 
 /**
- * Public company (sector) by slug. Optional `?blogs=1&limit=12` returns recent published posts for that sector.
+ * Public sector by slug. Optional `?news=1` or `?blogs=1` (legacy) returns recent published posts.
  */
 export async function GET(request: Request, { params }: Props) {
   const { slug: raw } = await params;
@@ -53,6 +53,8 @@ export async function GET(request: Request, { params }: Props) {
   return NextResponse.json(
     {
       sector,
+      news: { total, items: rows },
+      /** @deprecated use `news` */
       blogs: { total, items: rows },
     },
     { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } },

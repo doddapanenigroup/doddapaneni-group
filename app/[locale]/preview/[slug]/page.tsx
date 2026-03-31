@@ -83,7 +83,7 @@ export default async function PreviewPage({ params }: Props) {
   }
 
   // blog
-  const dbPost = await prisma.blog.findFirst({
+  const dbPost = await prisma.news.findFirst({
     where: { slug: payload.slug },
     select: { title: true, content: true, featuredImage: true, publishedAt: true },
   });

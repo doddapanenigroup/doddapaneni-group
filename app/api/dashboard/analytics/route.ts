@@ -145,11 +145,11 @@ export async function GET(request: Request) {
       productionTrafficOnly: process.env.NODE_ENV !== 'production',
       totals: {
         pageViews: pageViewsTotal,
-        blogViews: blogTotalViews,
+        newsViews: blogTotalViews,
       },
       series,
       topPages,
-      blog: {
+      news: {
         totalViews: blogTotalViews,
         topPosts: topBlogPosts,
         lcpAvgMs:

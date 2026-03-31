@@ -20,42 +20,42 @@ async function translateOptional(str: string | null, locale: string): Promise<st
 }
 
 /**
- * Fills or updates `BlogTranslation` rows from the canonical English `Blog` row.
+ * Fills or updates `NewsTranslation` rows from the canonical English `News` row.
  * Called after publish from the marketer API and when scheduled posts go live.
  * Set `BLOG_AUTO_TRANSLATE=0` to skip (English only in UI until re-enabled).
  */
-export async function syncBlogTranslations(blogId: string): Promise<void> {
+export async function syncBlogTranslations(newsId: string): Promise<void> {
   if (process.env.BLOG_AUTO_TRANSLATE === '0') {
     return;
   }
 
   await connectDb();
-  const blog = await prisma.blog.findUnique({ where: { id: blogId } });
-  if (!blog) return;
+  const post = await prisma.news.findUnique({ where: { id: newsId } });
+  if (!post) return;
 
-  if (blog.status !== 'published') {
-    await prisma.blogTranslation.deleteMany({ where: { blogId } });
+  if (post.status !== 'published') {
+    await prisma.newsTranslation.deleteMany({ where: { newsId } });
     return;
   }
 
   for (const locale of translationTargets()) {
     try {
-      const title = await translateText(blog.title, locale, SOURCE_LOCALE);
+      const title = await translateText(post.title, locale, SOURCE_LOCALE);
       await delay(DELAY_MS);
 
-      const metaTitle = await translateOptional(blog.metaTitle, locale);
-      const metaDescription = await translateOptional(blog.metaDescription, locale);
-      const ogTitle = await translateOptional(blog.ogTitle, locale);
-      const ogDescription = await translateOptional(blog.ogDescription, locale);
+      const metaTitle = await translateOptional(post.metaTitle, locale);
+      const metaDescription = await translateOptional(post.metaDescription, locale);
+      const ogTitle = await translateOptional(post.ogTitle, locale);
+      const ogDescription = await translateOptional(post.ogDescription, locale);
 
-      const content = await translateHtmlContent(blog.content, locale, SOURCE_LOCALE);
+      const content = await translateHtmlContent(post.content, locale, SOURCE_LOCALE);
 
-      await prisma.blogTranslation.upsert({
+      await prisma.newsTranslation.upsert({
         where: {
-          blogId_locale: { blogId, locale },
+          newsId_locale: { newsId, locale },
         },
         create: {
-          blogId,
+          newsId,
           locale,
           title,
           content,
@@ -74,14 +74,14 @@ export async function syncBlogTranslations(blogId: string): Promise<void> {
         },
       });
     } catch (e) {
-      console.error(`[blog-translations] sync failed blogId=${blogId} locale=${locale}`, e);
+      console.error(`[blog-translations] sync failed newsId=${newsId} locale=${locale}`, e);
     }
   }
 }
 
-export function scheduleBlogTranslationSync(blogId: string): void {
+export function scheduleBlogTranslationSync(newsId: string): void {
   if (process.env.BLOG_AUTO_TRANSLATE === '0') return;
-  void syncBlogTranslations(blogId).catch((e) => {
-    console.error(`[blog-translations] scheduleBlogTranslationSync failed blogId=${blogId}`, e);
+  void syncBlogTranslations(newsId).catch((e) => {
+    console.error(`[blog-translations] scheduleBlogTranslationSync failed newsId=${newsId}`, e);
   });
 }

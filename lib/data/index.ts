@@ -1,5 +1,5 @@
 /**
- * Central read-model for companies ({@link Sector}) and {@link Blog} content.
+ * Central read-model for companies ({@link Sector}) and {@link News} content.
  * Use these modules from RSC, route handlers, and internal APIs — avoid ad-hoc Prisma in UI.
  */
 export {

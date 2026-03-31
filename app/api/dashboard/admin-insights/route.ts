@@ -11,7 +11,7 @@ import type {
 } from '@/lib/prisma-generated';
 
 type LoginWithUser = Prisma.LoginLogGetPayload<{
-  include: { user: { select: { email: true; name: true; role: true } } };
+  include: { user: { select: { email: true; name: true; username: true; role: true } } };
 }>;
 
 type DashboardVisitByRole = {
@@ -59,7 +59,7 @@ export async function GET() {
         take: 40,
         orderBy: { loggedAt: 'desc' },
         include: {
-          user: { select: { email: true, name: true, role: true } },
+          user: { select: { email: true, name: true, username: true, role: true } },
         },
       }),
       prisma.contentEditLog.findMany({
@@ -91,6 +91,7 @@ export async function GET() {
         loggedOutAt: l.loggedOutAt ? l.loggedOutAt.toISOString() : null,
         userEmail: l.user.email,
         userName: l.user.name,
+        userUsername: l.user.username,
         userRole: l.user.role,
       })),
       contentEdits: (contentEdits as ContentEditLog[]).map((c) => ({

@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     const [users, loginLogs, pageViews, webVitals, visits] = await Promise.all([
       prisma.user.findMany({
         where: { role: { in: ['DEVELOPER', 'ADMIN', 'SUPER_ADMIN'] } },
-        select: { id: true, email: true, name: true, role: true },
+        select: { id: true, email: true, name: true, username: true, role: true },
         orderBy: { createdAt: 'desc' },
       }),
       prisma.loginLog.findMany({
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
           userId: true,
           loggedAt: true,
           loggedOutAt: true,
-          user: { select: { email: true, role: true, name: true } },
+          user: { select: { email: true, role: true, name: true, username: true } },
         },
         orderBy: { loggedAt: 'desc' },
         take,
@@ -118,6 +118,7 @@ export async function GET(request: Request) {
         userId: l.userId,
         userEmail: l.user.email,
         userName: l.user.name,
+        userUsername: l.user.username,
         userRole: l.user.role,
         loggedAt: l.loggedAt.toISOString(),
         loggedOutAt: l.loggedOutAt ? l.loggedOutAt.toISOString() : null,

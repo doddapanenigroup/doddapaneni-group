@@ -57,8 +57,8 @@ export async function GET(
 
     const { slug } = await params;
     await connectDb();
-    const doc = await prisma.blog.findUnique({ where: { slug: slug.trim() } });
-    if (!doc) return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    const doc = await prisma.news.findUnique({ where: { slug: slug.trim() } });
+    if (!doc) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
     return NextResponse.json({ item: doc });
   } catch (error) {
     await captureErrorToDb({
@@ -95,8 +95,8 @@ export async function PATCH(
     }
 
     await connectDb();
-    const existing = await prisma.blog.findUnique({ where: { slug: currentSlug } });
-    if (!existing) return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    const existing = await prisma.news.findUnique({ where: { slug: currentSlug } });
+    if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
     const data: Record<string, unknown> = {};
     if (typeof body.title === 'string' && body.title.trim()) data.title = body.title.trim();
@@ -130,7 +130,7 @@ export async function PATCH(
           : null;
     }
 
-    const doc = await prisma.blog.update({
+    const doc = await prisma.news.update({
       where: { slug: currentSlug },
       data,
     });
@@ -208,10 +208,10 @@ export async function DELETE(
     if (!s) return NextResponse.json({ message: 'Invalid slug' }, { status: 400 });
 
     await connectDb();
-    const existing = await prisma.blog.findUnique({ where: { slug: s } });
-    if (!existing) return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    const existing = await prisma.news.findUnique({ where: { slug: s } });
+    if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
-    await prisma.blog.delete({ where: { slug: s } });
+    await prisma.news.delete({ where: { slug: s } });
     await logMarketingActivity({
       userId: session.user.id,
       userEmail: session.user.email ?? '',
@@ -233,8 +233,8 @@ export async function DELETE(
     await writeAuditLog({
       request,
       actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
-      action: 'content.blog.delete',
-      targetType: 'Blog',
+      action: 'content.news.delete',
+      targetType: 'News',
       targetId: existing.id,
       targetLabel: existing.slug,
       payload: { slug: existing.slug, title: existing.title },

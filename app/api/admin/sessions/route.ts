@@ -33,7 +33,7 @@ export async function GET(request: Request) {
         userId: true,
         loggedAt: true,
         loggedOutAt: true,
-        user: { select: { email: true, role: true, name: true } },
+        user: { select: { email: true, role: true, name: true, username: true } },
       },
     });
 
@@ -58,6 +58,7 @@ export async function GET(request: Request) {
       userId: l.userId,
       userEmail: l.user.email,
       userName: l.user.name,
+      userUsername: l.user.username,
       userRole: l.user.role,
       loggedAt: l.loggedAt.toISOString(),
       loggedOutAt: l.loggedOutAt ? l.loggedOutAt.toISOString() : null,
@@ -71,6 +72,7 @@ export async function GET(request: Request) {
         userId: string;
         userEmail: string;
         userName: string | null;
+        userUsername: string | null;
         userRole: string;
         deviceUserAgent: string | null;
         activeSessions: { id: string; loggedAt: string }[];
@@ -83,6 +85,7 @@ export async function GET(request: Request) {
           userId: s.userId,
           userEmail: s.userEmail,
           userName: s.userName ?? null,
+          userUsername: s.userUsername ?? null,
           userRole: String(s.userRole),
           deviceUserAgent: s.deviceUserAgent,
           activeSessions: [],

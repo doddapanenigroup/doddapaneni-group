@@ -9,6 +9,8 @@ type Insights = {
     loggedAt: string;
     loggedOutAt: string | null;
     userEmail: string;
+    userName: string | null;
+    userUsername: string | null;
     userRole: string;
   }[];
   contentEdits: {
@@ -39,6 +41,7 @@ type ActiveSessionsResponse = {
     userId: string;
     userEmail: string;
     userName: string | null;
+    userUsername: string | null;
     userRole: string;
     deviceUserAgent: string | null;
     activeSessions: { id: string; loggedAt: string }[];
@@ -135,11 +138,21 @@ export default function AdminOpsInsights() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-slate-900">
-                      {u.userEmail}
-                      {u.userName ? <span className="text-slate-500"> · {u.userName}</span> : null}
+                      {u.userName?.trim() ? (
+                        <span>{u.userName.trim()}</span>
+                      ) : (
+                        <span className="text-slate-500">No display name</span>
+                      )}
+                      {u.userUsername?.trim() ? (
+                        <span className="text-slate-600"> · @{u.userUsername.trim()}</span>
+                      ) : null}
                     </p>
                     <p className="text-slate-600">
-                      {u.userRole} · {toDeviceLabel(u.deviceUserAgent)}
+                      <span className="font-medium text-slate-800">{u.userRole}</span>
+                      {' · '}
+                      {u.userEmail}
+                      {' · '}
+                      {toDeviceLabel(u.deviceUserAgent)}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
                       Latest login:{' '}
@@ -213,13 +226,20 @@ export default function AdminOpsInsights() {
           ) : (
             data.recentLogins.map((l) => (
               <li key={l.id} className="p-4 text-sm">
-                <span className="font-medium text-slate-900">{l.userEmail}</span>
-                <span className="text-slate-500"> · {l.userRole}</span>
-                <br />
-                <span className="text-xs text-slate-500">
+                <p className="font-medium text-slate-900">
+                  {l.userName?.trim() ? l.userName.trim() : <span className="text-slate-500">No display name</span>}
+                  {l.userUsername?.trim() ? (
+                    <span className="font-normal text-slate-600"> · @{l.userUsername.trim()}</span>
+                  ) : null}
+                  <span className="ml-2 inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                    {l.userRole}
+                  </span>
+                </p>
+                <p className="mt-0.5 text-xs text-slate-600">{l.userEmail}</p>
+                <p className="mt-1 text-xs text-slate-500">
                   In: {new Date(l.loggedAt).toLocaleString()}
                   {l.loggedOutAt ? ` · Out: ${new Date(l.loggedOutAt).toLocaleString()}` : ' · Still active'}
-                </span>
+                </p>
               </li>
             ))
           )}
