@@ -5,6 +5,7 @@ export type PublicCompany = {
   name: string;
   slug: string;
   logoImage: string | null;
+  heroImage: string | null;
   description: string | null;
   facebookUrl: string | null;
   instagramUrl: string | null;
@@ -27,6 +28,7 @@ export async function listCompaniesBySectorSlug(
       name: true,
       slug: true,
       logoImage: true,
+      heroImage: true,
       description: true,
       facebookUrl: true,
       instagramUrl: true,
@@ -51,6 +53,7 @@ export async function getCompanyBySlug(
       name: true,
       slug: true,
       logoImage: true,
+      heroImage: true,
       description: true,
       facebookUrl: true,
       instagramUrl: true,

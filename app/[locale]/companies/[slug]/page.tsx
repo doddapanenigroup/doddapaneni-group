@@ -7,6 +7,17 @@ import { routing } from '@/i18n/routing';
 import { getCompanyBySlug } from '@/lib/data/company-repository';
 import { normalizeStoredImage } from '@/lib/sector-landing';
 import CompanyPageForms from '@/components/companies/CompanyPageForms';
+import { mediaUrl } from '@/lib/media';
+
+function defaultHeroImageForSector(sectorSlug: string): string {
+  const s = sectorSlug.trim().toLowerCase();
+  if (s === 'healthcare-medical') return mediaUrl('medical.webp');
+  if (s === 'ecommerce-marketplace') return mediaUrl('ecommerce.webp');
+  if (s === 'digital-marketing') return mediaUrl('digital-marketing.webp');
+  if (s === 'construction-realestate') return mediaUrl('real-estate.webp');
+  if (s === 'media-news-entertainment') return mediaUrl('news.webp');
+  return mediaUrl('about.webp');
+}
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -33,6 +44,7 @@ export default async function CompanyDynamicPage({ params }: Props) {
   if (!company) notFound();
 
   const logoSrc = normalizeStoredImage(company.logoImage);
+  const heroSrc = normalizeStoredImage(company.heroImage) || defaultHeroImageForSector(company.sector.slug);
   const socials = [
     { label: 'Facebook', href: company.facebookUrl },
     { label: 'Instagram', href: company.instagramUrl },
@@ -42,45 +54,72 @@ export default async function CompanyDynamicPage({ params }: Props) {
   ].filter((s) => !!s.href);
 
   return (
-    <div className="min-h-screen bg-white px-4 pb-16 pt-24 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="flex flex-col gap-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-start sm:p-10">
-          <div className="relative h-20 w-44 shrink-0">
+    <div className="min-h-screen bg-white">
+      <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl text-center">
+          <div className="relative mx-auto h-12 w-[160px] overflow-hidden rounded">
             {logoSrc ? (
-              <Image src={logoSrc} alt={company.name} fill className="object-contain object-left" sizes="176px" />
+              <Image src={logoSrc} alt={`${company.name} logo`} fill className="object-contain" sizes="160px" />
             ) : (
-              <div className="h-full w-full rounded-xl bg-slate-100" />
+              <div className="h-full w-full rounded bg-white/10" />
             )}
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Company</p>
-            <h1 className="mt-2 text-3xl font-bold text-slate-900">{company.name}</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Sector:{' '}
-              <Link href={`/${company.sector.slug}`} locale={locale} className="font-semibold text-blue-900 hover:underline">
-                {company.sector.name}
-              </Link>
-            </p>
-            {company.description ? <p className="mt-5 text-base leading-relaxed text-slate-700">{company.description}</p> : null}
+          {company.description?.trim() ? (
+            <p className="mt-2 text-blue-200 text-sm max-w-2xl mx-auto">{company.description.trim()}</p>
+          ) : null}
+        </div>
+      </section>
 
-            {socials.length > 0 ? (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {socials.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href!}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-white"
-                  >
-                    {s.label}
-                  </a>
-                ))}
-              </div>
-            ) : null}
+      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-block w-12 h-0.5 rounded-full bg-blue-800 mb-4" />
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 tracking-tight">{company.name}</h1>
+              <p className="text-sm text-slate-600 mb-5">
+                Sector:{' '}
+                <Link href={`/${company.sector.slug}`} locale={locale} className="font-semibold text-blue-900 hover:underline">
+                  {company.sector.name}
+                </Link>
+              </p>
+              {company.description?.trim() ? (
+                <p className="text-slate-700 text-base leading-relaxed">{company.description.trim()}</p>
+              ) : (
+                <p className="text-slate-700 text-base leading-relaxed">
+                  Learn more about {company.name} and get in touch with our team.
+                </p>
+              )}
+
+              {socials.length > 0 ? (
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {socials.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href!}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-900 hover:bg-blue-50"
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="relative aspect-[4/3] w-full min-h-[12.5rem] overflow-hidden rounded-xl border border-blue-200 bg-slate-100">
+              <Image
+                src={heroSrc}
+                alt={`${company.name} hero`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <CompanyPageForms
         companySlug={company.slug}

@@ -44,7 +44,7 @@
     "construction-realestate": "Construction & Real Estate",
     "ecommerce-marketplace": "E-commerce Marketplace",
     "media-news-entertainment": "Media News & Entertainment",
-    "staffing-consultancy": "Staff & Consultancy",
+    "staffing-consultancy": "Human Resources & Consultancy",
     "food-beverages": "Food & Baverages",
     "manufacturing-trading": "Manufacturing & Trading",
     "logistics-warehousing": "Logistics & Warehousing",
@@ -126,8 +126,8 @@
         "title": "Manufacturing & Trading",
         "description": "We operate industrial manufacturing units, custom production facilities, and bulk wholesale trading operations to support diverse industry needs."
       },
-      "staffing": {
-        "title": "Staff & Consultancy",
+    "staffing": {
+        "title": "Human Resources & Consultancy",
         "description": "We assist organizations with recruitment and staffing, HR consulting, and workforce management, helping businesses build efficient and high-performing teams."
       }
     },
@@ -136,7 +136,7 @@
     "hubHeroEyebrow": "Corporate hub",
     "hubHeroTitle": "Doddapaneni Group",
     "hubHeroSubtitle": "Diversified operations",
-    "hubHeroLead": "Specialised verticals—technology, healthcare, commerce, infrastructure, and more—unified under one disciplined operating model.",
+    "hubHeroLead": "Specialised verticals—Technology, Healthcare, E-commerce, Infrastructure, and more—unified under one disciplined operating model.",
     "divisionsSectionTitle": "Business divisions",
     "divisionsSectionSubtitle": "Four hubs are live today with full sector pages and published insights. Eight additional divisions are preparing to launch—listed here for transparency.",
     "viewCompany": "View Company",
@@ -184,7 +184,7 @@
   },
   "About": {
     "metaTitle": "About Doddapaneni Group | Vision, Mission & Business Divisions",
-    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media News & Entertainment, Staff & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
+    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media News & Entertainment, Human Resources & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
     "metaKeywords": "Doddapaneni Group, diversified conglomerate, corporate vision, business divisions, technology, healthcare, construction, digital marketing, import export, corporate profile",
     "metaOgTitle": "About Doddapaneni Group",
     "metaOgDescription": "A corporate portfolio across twelve industries—built on integrity, innovation, and long-term value for partners and communities.",

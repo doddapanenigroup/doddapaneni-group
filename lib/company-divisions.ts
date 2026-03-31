@@ -90,7 +90,7 @@ export const COMPANY_DIVISION_NAV_LABELS: Record<CompanyDivisionSlug, string> = 
   'construction-realestate': 'Construction & Real Estate',
   'ecommerce-marketplace': 'E-commerce Marketplace',
   'media-news-entertainment': 'Media News & Entertainment',
-  'staffing-consultancy': 'Staff & Consultancy',
+  'staffing-consultancy': 'Human Resources & Consultancy',
   'food-beverages': 'Food & Baverages',
   'manufacturing-trading': 'Manufacturing & Trading',
   'logistics-warehousing': 'Logistics & Warehousing',

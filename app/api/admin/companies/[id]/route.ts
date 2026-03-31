@@ -53,6 +53,7 @@ const patchSchema = z.object({
   slug: z.string().min(1).max(120).optional(),
   sectorSlug: z.string().min(1).max(120).optional(),
   logoImage: z.string().max(500).optional().nullable(),
+  heroImage: z.string().max(500).optional().nullable(),
   description: z.string().max(4000).optional().nullable(),
   facebookUrl: z.string().max(500).optional().nullable(),
   instagramUrl: z.string().max(500).optional().nullable(),
@@ -82,6 +83,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       name?: string;
       slug?: string;
       logoImage?: string | null;
+      heroImage?: string | null;
       description?: string | null;
       facebookUrl?: string | null;
       instagramUrl?: string | null;
@@ -93,6 +95,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (parsed.data.name != null) data.name = parsed.data.name.trim();
     if (parsed.data.slug != null) data.slug = parsed.data.slug.trim().toLowerCase().replace(/\s+/g, '-');
     if ('logoImage' in parsed.data) data.logoImage = parsed.data.logoImage?.trim() || null;
+    if ('heroImage' in parsed.data) data.heroImage = parsed.data.heroImage?.trim() || null;
     if ('description' in parsed.data) data.description = parsed.data.description?.trim() || null;
     if ('facebookUrl' in parsed.data) data.facebookUrl = parsed.data.facebookUrl?.trim() || null;
     if ('instagramUrl' in parsed.data) data.instagramUrl = parsed.data.instagramUrl?.trim() || null;

@@ -263,7 +263,7 @@ export const DODDAPANENI_NEWS_SECTORS: NewsSector[] = [
     ],
   },
   {
-    name: 'Staff & Consultancy',
+    name: 'Human Resources & Consultancy',
     slug: 'staffing-consultancy',
     shortDescription: 'Talent acquisition and advisory services for high-skill and growth-critical roles.',
     serviceTypeOptions: ['Permanent hiring', 'Contract staffing', 'Executive search', 'Consulting'],

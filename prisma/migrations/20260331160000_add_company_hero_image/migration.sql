@@ -1,0 +1,1 @@
+ALTER TABLE "company" ADD COLUMN IF NOT EXISTS "hero_image" TEXT;

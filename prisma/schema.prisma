@@ -7,6 +7,9 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Neon/pgBouncer pooler URLs (transaction pooling) can break Prisma migrate advisory locks.
+  // Set DIRECT_DATABASE_URL to the non-pooler connection string for migrations.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 enum Role {
@@ -301,6 +304,7 @@ model Company {
   name        String
   slug        String   @unique
   logoImage   String?  @map("logo_image")
+  heroImage   String?  @map("hero_image")
   description String?  @db.Text
 
   facebookUrl  String? @map("facebook_url")

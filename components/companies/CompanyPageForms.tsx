@@ -60,24 +60,25 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
   return (
     <section className="border-t border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
-          <span className="inline-block h-0.5 w-10 rounded-full bg-blue-800" />
-          <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">{t('leadTitle')}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">{t('leadIntro')}</p>
-          <div className="mt-8">
-            <CompanyLeadForm
-              variant={variant}
-              companySlug={companySlug}
-              sectorSlug={sectorSlug}
-              companyDisplayName={companyDisplayName}
-            />
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
+            <span className="inline-block h-0.5 w-10 rounded-full bg-blue-800" />
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">{t('leadTitle')}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-slate-600">{t('leadIntro')}</p>
+            <div className="mt-8">
+              <CompanyLeadForm
+                variant={variant}
+                companySlug={companySlug}
+                sectorSlug={sectorSlug}
+                companyDisplayName={companyDisplayName}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">{t('contactTitle')}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">{t('contactIntro')}</p>
-          <form onSubmit={submitContact} className="mx-auto mt-8 max-w-2xl space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">{t('contactTitle')}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-slate-600">{t('contactIntro')}</p>
+            <form onSubmit={submitContact} className="mx-auto mt-8 max-w-2xl space-y-4">
             <div>
               <label htmlFor="co-contact-name" className={labelClass}>
                 {t('fieldFullName')} <span className="text-red-600">*</span>
@@ -129,6 +130,7 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
             {cStatus === 'ok' ? <p className="text-sm font-medium text-emerald-700">{t('contactSuccess')}</p> : null}
             {cStatus === 'err' ? <p className="text-sm font-medium text-red-600">{t('contactError')}</p> : null}
           </form>
+          </div>
         </div>
       </div>
     </section>

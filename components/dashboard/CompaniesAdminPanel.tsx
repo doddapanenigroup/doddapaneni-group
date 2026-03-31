@@ -11,6 +11,7 @@ type CompanyRow = {
   name: string;
   slug: string;
   logoImage: string | null;
+  heroImage: string | null;
   description: string | null;
   facebookUrl: string | null;
   instagramUrl: string | null;
@@ -25,6 +26,7 @@ type FormState = {
   slug: string;
   sectorSlug: string;
   logoImage: string;
+  heroImage: string;
   description: string;
   facebookUrl: string;
   instagramUrl: string;
@@ -43,6 +45,7 @@ const EMPTY_FORM: FormState = {
   slug: '',
   sectorSlug: COMPANY_DIVISION_SLUGS[0],
   logoImage: '',
+  heroImage: '',
   description: '',
   facebookUrl: '',
   instagramUrl: '',
@@ -63,8 +66,10 @@ export default function CompaniesAdminPanel() {
   const [editCompanyId, setEditCompanyId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<FormState>(EMPTY_FORM);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
   const [syncingFlagships, setSyncingFlagships] = useState(false);
   const logoFileRef = useRef<HTMLInputElement>(null);
+  const heroFileRef = useRef<HTMLInputElement>(null);
 
   const missingFlagshipSlugs = FLAGSHIP_SLUGS.filter(
     (slug) => !companies.some((c) => c.slug === slug),
@@ -132,9 +137,38 @@ export default function CompaniesAdminPanel() {
     }
   }
 
+  async function uploadCompanyHeroImage(file: File) {
+    setError(null);
+    if (file.type && !file.type.startsWith('image/')) {
+      setError('Please choose an image file.');
+      return;
+    }
+    setHeroUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: fd });
+      const json = (await res.json().catch(() => ({}))) as { url?: string; message?: string };
+      if (!res.ok) throw new Error(json.message || 'Image upload failed');
+      if (!json.url) throw new Error('Upload did not return a URL');
+      setForm((f) => ({ ...f, heroImage: json.url! }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Image upload failed');
+      if (heroFileRef.current) heroFileRef.current.value = '';
+      setForm((f) => ({ ...f, heroImage: '' }));
+    } finally {
+      setHeroUploading(false);
+    }
+  }
+
   function clearCompanyLogo() {
     setForm((f) => ({ ...f, logoImage: '' }));
     if (logoFileRef.current) logoFileRef.current.value = '';
+  }
+
+  function clearCompanyHeroImage() {
+    setForm((f) => ({ ...f, heroImage: '' }));
+    if (heroFileRef.current) heroFileRef.current.value = '';
   }
 
   async function createCompany() {
@@ -149,6 +183,7 @@ export default function CompaniesAdminPanel() {
           slug: form.slug,
           sectorSlug: form.sectorSlug,
           logoImage: form.logoImage || null,
+          heroImage: form.heroImage || null,
           description: form.description || null,
           facebookUrl: form.facebookUrl || null,
           instagramUrl: form.instagramUrl || null,
@@ -161,6 +196,7 @@ export default function CompaniesAdminPanel() {
       if (!res.ok) throw new Error(json.message || 'Create failed');
       setForm(EMPTY_FORM);
       if (logoFileRef.current) logoFileRef.current.value = '';
+      if (heroFileRef.current) heroFileRef.current.value = '';
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Create failed');
@@ -214,6 +250,7 @@ export default function CompaniesAdminPanel() {
       slug: c.slug ?? '',
       sectorSlug: c.sector?.slug ?? COMPANY_DIVISION_SLUGS[0],
       logoImage: c.logoImage ?? '',
+      heroImage: c.heroImage ?? '',
       description: c.description ?? '',
       facebookUrl: c.facebookUrl ?? '',
       instagramUrl: c.instagramUrl ?? '',
@@ -246,6 +283,7 @@ export default function CompaniesAdminPanel() {
           slug: editForm.slug,
           sectorSlug: editForm.sectorSlug,
           logoImage: editForm.logoImage || null,
+          heroImage: editForm.heroImage || null,
           description: editForm.description || null,
           facebookUrl: editForm.facebookUrl || null,
           instagramUrl: editForm.instagramUrl || null,
@@ -368,6 +406,53 @@ export default function CompaniesAdminPanel() {
               ) : null}
             </div>
             {logoUploading ? (
+              <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                <ImagePlus size={14} className="animate-pulse" aria-hidden />
+                Converting to WebP and saving to media…
+              </p>
+            ) : null}
+          </div>
+
+          <div className="block md:col-span-2">
+            <span className="text-xs font-semibold text-slate-700">Company hero image (big image)</span>
+            <p className="mt-0.5 text-[11px] text-slate-500">
+              This image shows on the company page (right side), like the DealsMedi example screenshot.
+            </p>
+            <div className="mt-2 flex flex-wrap items-start gap-3">
+              <input
+                ref={heroFileRef}
+                type="file"
+                accept="image/*"
+                disabled={heroUploading}
+                className="block w-full max-w-xs text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-800 hover:file:bg-slate-200 disabled:opacity-50"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void uploadCompanyHeroImage(file);
+                }}
+              />
+              {form.heroImage ? (
+                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.heroImage}
+                    alt="Hero image preview"
+                    className="h-14 w-20 shrink-0 rounded-lg border border-slate-200 bg-white object-cover"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-mono text-slate-600 break-all">{form.heroImage}</p>
+                    <button
+                      type="button"
+                      onClick={clearCompanyHeroImage}
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700"
+                    >
+                      <X size={14} aria-hidden />
+                      Remove image
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            {heroUploading ? (
               <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
                 <ImagePlus size={14} className="animate-pulse" aria-hidden />
                 Converting to WebP and saving to media…
@@ -509,6 +594,12 @@ export default function CompaniesAdminPanel() {
                         onChange={(e) => setEditForm((f) => ({ ...f, logoImage: e.target.value }))}
                         className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                         placeholder="Logo URL"
+                      />
+                      <input
+                        value={editForm.heroImage}
+                        onChange={(e) => setEditForm((f) => ({ ...f, heroImage: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Hero image URL"
                       />
                     </div>
                     <textarea
