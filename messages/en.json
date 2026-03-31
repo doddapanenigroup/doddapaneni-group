@@ -126,7 +126,7 @@
         "title": "Manufacturing & Trading",
         "description": "We operate industrial manufacturing units, custom production facilities, and bulk wholesale trading operations to support diverse industry needs."
       },
-    "staffing": {
+      "staffing": {
         "title": "Human Resources & Consultancy",
         "description": "We assist organizations with recruitment and staffing, HR consulting, and workforce management, helping businesses build efficient and high-performing teams."
       }
@@ -138,7 +138,7 @@
     "hubHeroSubtitle": "Diversified operations",
     "hubHeroLead": "Specialised verticals—Technology, Healthcare, E-commerce, Infrastructure, and more—unified under one disciplined operating model.",
     "divisionsSectionTitle": "Business divisions",
-    "divisionsSectionSubtitle": "Four hubs are live today with full sector pages and published insights. Eight additional divisions are preparing to launch—listed here for transparency.",
+    "divisionsSectionSubtitle": "",
     "viewCompany": "View Company",
     "launchingSoon": "Launching Soon",
     "inactiveDivisionHint": "Division hub, programmes, and published insights will appear here as we go live.",
