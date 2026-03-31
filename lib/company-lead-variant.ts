@@ -34,8 +34,8 @@ export function primaryBrandIdForSector(sectorSlug: string): GroupCompanyBrandId
 export function orderedGroupBrandIdsForSector(sectorSlug: string): GroupCompanyBrandId[] {
   const key = sectorSlug.trim().toLowerCase();
 
-  // IT & AI sector is a content hub only — no flagship brand cards on this division page.
-  if (key === 'software-it-ai') {
+  // Division hubs without a flagship product grid on the page.
+  if (key === 'software-it-ai' || key === 'construction-realestate') {
     return [];
   }
 
