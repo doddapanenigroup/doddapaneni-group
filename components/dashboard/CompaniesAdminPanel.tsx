@@ -12,7 +12,9 @@ type CompanyRow = {
   slug: string;
   logoImage: string | null;
   heroImage: string | null;
+  websiteUrl: string | null;
   description: string | null;
+  aboutContent: string | null;
   facebookUrl: string | null;
   instagramUrl: string | null;
   xUrl: string | null;
@@ -27,7 +29,9 @@ type FormState = {
   sectorSlug: string;
   logoImage: string;
   heroImage: string;
+  websiteUrl: string;
   description: string;
+  aboutContent: string;
   facebookUrl: string;
   instagramUrl: string;
   xUrl: string;
@@ -46,7 +50,9 @@ const EMPTY_FORM: FormState = {
   sectorSlug: COMPANY_DIVISION_SLUGS[0],
   logoImage: '',
   heroImage: '',
+  websiteUrl: '',
   description: '',
+  aboutContent: '',
   facebookUrl: '',
   instagramUrl: '',
   xUrl: '',
@@ -184,7 +190,9 @@ export default function CompaniesAdminPanel() {
           sectorSlug: form.sectorSlug,
           logoImage: form.logoImage || null,
           heroImage: form.heroImage || null,
+          websiteUrl: form.websiteUrl || null,
           description: form.description || null,
+          aboutContent: form.aboutContent || null,
           facebookUrl: form.facebookUrl || null,
           instagramUrl: form.instagramUrl || null,
           xUrl: form.xUrl || null,
@@ -251,7 +259,9 @@ export default function CompaniesAdminPanel() {
       sectorSlug: c.sector?.slug ?? COMPANY_DIVISION_SLUGS[0],
       logoImage: c.logoImage ?? '',
       heroImage: c.heroImage ?? '',
+      websiteUrl: c.websiteUrl ?? '',
       description: c.description ?? '',
+      aboutContent: c.aboutContent ?? '',
       facebookUrl: c.facebookUrl ?? '',
       instagramUrl: c.instagramUrl ?? '',
       xUrl: c.xUrl ?? '',
@@ -284,7 +294,9 @@ export default function CompaniesAdminPanel() {
           sectorSlug: editForm.sectorSlug,
           logoImage: editForm.logoImage || null,
           heroImage: editForm.heroImage || null,
+          websiteUrl: editForm.websiteUrl || null,
           description: editForm.description || null,
+          aboutContent: editForm.aboutContent || null,
           facebookUrl: editForm.facebookUrl || null,
           instagramUrl: editForm.instagramUrl || null,
           xUrl: editForm.xUrl || null,
@@ -345,6 +357,15 @@ export default function CompaniesAdminPanel() {
               onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               placeholder="dealsmedi"
+            />
+          </label>
+          <label className="block md:col-span-2">
+            <span className="text-xs font-semibold text-slate-700">Website URL (button link)</span>
+            <input
+              value={form.websiteUrl}
+              onChange={(e) => setForm((f) => ({ ...f, websiteUrl: e.target.value }))}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="https://example.com"
             />
           </label>
           <label className="block">
@@ -468,6 +489,16 @@ export default function CompaniesAdminPanel() {
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
             className="mt-1 min-h-28 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
             placeholder="Short summary shown on sector page."
+          />
+        </label>
+
+        <label className="mt-4 block">
+          <span className="text-xs font-semibold text-slate-700">About content (left-side text on company page)</span>
+          <textarea
+            value={form.aboutContent}
+            onChange={(e) => setForm((f) => ({ ...f, aboutContent: e.target.value }))}
+            className="mt-1 min-h-32 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            placeholder="Write 1–3 paragraphs. Use blank lines to separate paragraphs."
           />
         </label>
 
@@ -601,12 +632,24 @@ export default function CompaniesAdminPanel() {
                         className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                         placeholder="Hero image URL"
                       />
+                      <input
+                        value={editForm.websiteUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, websiteUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="Website URL"
+                      />
                     </div>
                     <textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
                       className="min-h-20 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                       placeholder="Description"
+                    />
+                    <textarea
+                      value={editForm.aboutContent}
+                      onChange={(e) => setEditForm((f) => ({ ...f, aboutContent: e.target.value }))}
+                      className="min-h-28 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      placeholder="About content (paragraphs separated by blank lines)"
                     />
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                       <input

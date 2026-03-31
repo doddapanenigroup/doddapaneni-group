@@ -305,7 +305,9 @@ model Company {
   slug        String   @unique
   logoImage   String?  @map("logo_image")
   heroImage   String?  @map("hero_image")
+  websiteUrl  String?  @map("website_url")
   description String?  @db.Text
+  aboutContent String? @db.Text @map("about_content")
 
   facebookUrl  String? @map("facebook_url")
   instagramUrl String? @map("instagram_url")

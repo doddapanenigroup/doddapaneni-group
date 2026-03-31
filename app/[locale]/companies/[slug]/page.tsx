@@ -8,6 +8,16 @@ import { getCompanyBySlug } from '@/lib/data/company-repository';
 import { normalizeStoredImage } from '@/lib/sector-landing';
 import CompanyPageForms from '@/components/companies/CompanyPageForms';
 import { mediaUrl } from '@/lib/media';
+import { ExternalLink } from 'lucide-react';
+
+function paragraphsFromText(raw: string | null | undefined): string[] {
+  const s = raw?.trim();
+  if (!s) return [];
+  return s
+    .split(/\n\s*\n/g)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
 
 function defaultHeroImageForSector(sectorSlug: string): string {
   const s = sectorSlug.trim().toLowerCase();
@@ -45,6 +55,7 @@ export default async function CompanyDynamicPage({ params }: Props) {
 
   const logoSrc = normalizeStoredImage(company.logoImage);
   const heroSrc = normalizeStoredImage(company.heroImage) || defaultHeroImageForSector(company.sector.slug);
+  const aboutParagraphs = paragraphsFromText(company.aboutContent) || [];
   const socials = [
     { label: 'Facebook', href: company.facebookUrl },
     { label: 'Instagram', href: company.instagramUrl },
@@ -67,6 +78,17 @@ export default async function CompanyDynamicPage({ params }: Props) {
           {company.description?.trim() ? (
             <p className="mt-2 text-blue-200 text-sm max-w-2xl mx-auto">{company.description.trim()}</p>
           ) : null}
+          {company.websiteUrl?.trim() ? (
+            <a
+              href={company.websiteUrl.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 mt-3 rounded-lg font-semibold text-blue-900 bg-white hover:bg-blue-100 transition-colors text-sm"
+            >
+              Visit website
+              <ExternalLink size={16} strokeWidth={1.75} />
+            </a>
+          ) : null}
         </div>
       </section>
 
@@ -82,7 +104,15 @@ export default async function CompanyDynamicPage({ params }: Props) {
                   {company.sector.name}
                 </Link>
               </p>
-              {company.description?.trim() ? (
+              {aboutParagraphs.length > 0 ? (
+                <div className="space-y-4">
+                  {aboutParagraphs.map((p, i) => (
+                    <p key={`${company.slug}-about-${i}`} className="text-slate-700 text-base leading-relaxed">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              ) : company.description?.trim() ? (
                 <p className="text-slate-700 text-base leading-relaxed">{company.description.trim()}</p>
               ) : (
                 <p className="text-slate-700 text-base leading-relaxed">
