@@ -4,6 +4,7 @@ import './globals.css';
 import { fontBodyClassNames } from '@/app/fonts';
 import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 
 const siteOrigin = getSiteOrigin();
 
@@ -35,9 +36,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13';
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
+        <GoogleAnalytics measurementId={gaId} />
         {children}
       </body>
     </html>
