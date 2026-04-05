@@ -168,16 +168,12 @@ export default function Navbar() {
 
   const inset = 'px-5 sm:px-8 lg:px-12 xl:px-16';
 
-  const renderCompanyRows = (onNavigate?: () => void, mobile = false, liquidGlass = false) => {
+  const renderCompanyRows = (onNavigate?: () => void, mobile = false) => {
     if (!sectorLiveReady) {
       return (
         <div
           className={
-            mobile
-              ? 'py-6 px-3 text-center text-sm text-slate-500'
-              : liquidGlass
-                ? 'py-8 px-4 text-center text-sm text-slate-600/90'
-                : 'py-8 px-4 text-center text-sm text-slate-500'
+            mobile ? 'py-6 px-3 text-center text-sm text-slate-500' : 'py-6 px-4 text-center text-sm text-slate-500'
           }
         >
           {t('sectorLiveLoading')}
@@ -190,7 +186,7 @@ export default function Navbar() {
         className={
           mobile
             ? 'space-y-0.5 py-1'
-            : 'grid grid-cols-1 gap-0.5 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-0.5 sm:items-start py-3 px-3 sm:px-4'
+            : 'flex flex-col gap-0.5 py-2 px-2 sm:px-3'
         }
       >
         {COMPANY_DIVISION_SLUGS.map((slug) => {
@@ -207,16 +203,10 @@ export default function Navbar() {
                     setCompaniesOpen(false);
                     onNavigate?.();
                   }}
-                  className={`flex items-start gap-3 px-3 py-2.5 text-sm transition-colors ${
-                    mobile ? 'rounded-lg' : 'rounded-lg'
-                  } ${
+                  className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-md ${
                     isActiveHere
-                      ? liquidGlass && !mobile
-                        ? 'bg-blue-600/95 font-semibold text-white shadow-md shadow-blue-900/25 backdrop-blur-sm'
-                        : 'bg-blue-600 font-semibold text-white'
-                      : liquidGlass && !mobile
-                        ? 'text-slate-800 hover:bg-white/35'
-                        : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-blue-600 font-semibold text-white'
+                      : 'text-slate-800 hover:bg-slate-100'
                   }`}
                 >
                   <span className="min-w-0 flex-1 break-words leading-snug">{label}</span>
@@ -228,36 +218,18 @@ export default function Navbar() {
           return (
             <li key={slug}>
               <div
-                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-lg ${
-                  isActiveHere
-                    ? liquidGlass && !mobile
-                      ? 'border-l-2 border-blue-500/80 bg-white/30 text-slate-900 backdrop-blur-sm'
-                      : 'border-l-2 border-blue-600 bg-blue-50/90 text-slate-800'
-                    : liquidGlass && !mobile
-                      ? 'text-slate-500'
-                      : 'text-slate-400'
-                } ${mobile ? '' : ''}`}
+                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-md ${
+                  isActiveHere ? 'border-l-2 border-blue-600 bg-blue-50 text-slate-800' : 'text-slate-500'
+                }`}
               >
                 <span
                   className={`min-w-0 flex-1 break-words leading-snug ${
-                    isActiveHere
-                      ? liquidGlass && !mobile
-                        ? 'font-semibold text-slate-900'
-                        : 'font-semibold text-slate-900'
-                      : liquidGlass && !mobile
-                        ? 'text-slate-600'
-                        : 'text-slate-500'
+                    isActiveHere ? 'font-semibold text-slate-900' : 'text-slate-500'
                   }`}
                 >
                   {label}
                 </span>
-                <span
-                  className={`shrink-0 whitespace-nowrap rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-                    liquidGlass && !mobile
-                      ? 'border border-white/40 bg-white/45 text-slate-600 backdrop-blur-sm'
-                      : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
+                <span className="shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
                   {t('comingSoonNav')}
                 </span>
               </div>
@@ -327,19 +299,9 @@ export default function Navbar() {
                 onMouseEnter={openCompaniesMenu}
                 onMouseLeave={scheduleCloseCompaniesMenu}
               >
-                <div className="ml-auto max-h-[min(32rem,calc(100vh-8rem))] w-[min(36rem,calc(100%-0.5rem))] sm:w-[min(42rem,calc(100%-1rem))] lg:w-[min(56rem,calc(100%-1.5rem))] overflow-y-auto overscroll-contain">
-                  <div
-                    className={[
-                      'relative isolate overflow-hidden rounded-2xl',
-                      'border border-white/55',
-                      'bg-gradient-to-br from-white/55 via-white/25 to-white/10',
-                      'shadow-[0_8px_40px_rgba(15,23,42,0.12),0_2px_12px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.85)]',
-                      'backdrop-blur-2xl backdrop-saturate-150',
-                      'ring-1 ring-inset ring-white/70',
-                      'before:pointer-events-none before:absolute before:inset-x-8 before:top-0 before:z-20 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:opacity-90',
-                    ].join(' ')}
-                  >
-                    <div className="relative z-10">{renderCompanyRows(undefined, false, true)}</div>
+                <div className="ml-auto max-h-[min(32rem,calc(100vh-8rem))] w-[min(28rem,calc(100%-0.5rem))] sm:w-[min(34rem,calc(100%-1rem))] overflow-y-auto overscroll-contain">
+                  <div className="rounded-lg border border-slate-200 bg-white shadow-lg">
+                    {renderCompanyRows(undefined, false)}
                   </div>
                 </div>
               </div>
