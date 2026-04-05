@@ -291,14 +291,16 @@ export default function Navbar() {
             </button>
             {companiesOpen ? (
               <div
-                className="absolute right-0 left-auto top-full z-[60] max-h-[min(32rem,calc(100vh-8rem))] w-[min(56rem,calc(100vw-2rem))] -mt-1 overflow-y-auto overscroll-contain pt-2"
+                className={`fixed inset-x-0 top-16 z-[60] ${inset} pt-2`}
                 role="region"
                 aria-label={t('ourCompanies')}
                 onMouseEnter={openCompaniesMenu}
                 onMouseLeave={scheduleCloseCompaniesMenu}
               >
-                <div className="rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5">
-                  {renderCompanyRows()}
+                <div className="ml-auto max-h-[min(32rem,calc(100vh-8rem))] w-[min(36rem,calc(100%-0.5rem))] sm:w-[min(42rem,calc(100%-1rem))] lg:w-[min(56rem,calc(100%-1.5rem))] overflow-y-auto overscroll-contain">
+                  <div className="rounded-xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5">
+                    {renderCompanyRows()}
+                  </div>
                 </div>
               </div>
             ) : null}
