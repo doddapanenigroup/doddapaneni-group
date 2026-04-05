@@ -2,7 +2,7 @@
 
 import { Link, usePathname } from '@/i18n/routing';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -34,6 +34,19 @@ function sectorLiveMapFromApiPayload(d: { sectors?: unknown }): Record<string, b
 
 const SECTOR_POLL_MS = 5000;
 
+/** Viewport-fixed mega menu: anchored to the trigger’s left edge and opens toward the right, clamped to the viewport. */
+function megaMenuPositionFromButton(buttonEl: HTMLElement) {
+  const r = buttonEl.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const margin = 16;
+  const maxW =
+    vw >= 640 ? Math.min(34 * 16, vw - margin * 2) : Math.min(28 * 16, vw - margin * 2);
+  const width = maxW;
+  let left = r.left;
+  left = Math.max(margin, Math.min(left, vw - width - margin));
+  return { top: r.bottom, left, width };
+}
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [companiesOpen, setCompaniesOpen] = useState(false);
@@ -44,7 +57,9 @@ export default function Navbar() {
   const [sectorLiveReady, setSectorLiveReady] = useState(false);
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
+  const companiesButtonRef = useRef<HTMLButtonElement>(null);
   const closeMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [megaMenuBox, setMegaMenuBox] = useState<{ top: number; left: number; width: number } | null>(null);
   const t = useTranslations('Navbar');
   const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
@@ -129,6 +144,31 @@ export default function Navbar() {
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [companiesOpen]);
+
+  const updateMegaMenuPosition = useCallback(() => {
+    const btn = companiesButtonRef.current;
+    if (!btn) return;
+    setMegaMenuBox(megaMenuPositionFromButton(btn));
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!companiesOpen) {
+      setMegaMenuBox(null);
+      return;
+    }
+    updateMegaMenuPosition();
+  }, [companiesOpen, updateMegaMenuPosition]);
+
+  useEffect(() => {
+    if (!companiesOpen) return;
+    const onScrollOrResize = () => updateMegaMenuPosition();
+    window.addEventListener('scroll', onScrollOrResize, true);
+    window.addEventListener('resize', onScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }, [companiesOpen, updateMegaMenuPosition]);
 
   const isTransparent = !scrolled;
   const navbarClasses = isTransparent ? 'bg-transparent border-transparent' : 'bg-transparent backdrop-blur-xl shadow-none';
@@ -241,26 +281,26 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navbarClasses}`}>
-      <div className={`flex h-16 w-full items-center justify-between ${inset}`}>
+    <nav className={`fixed top-0 inset-x-0 z-50 overflow-visible transition-all duration-300 ${navbarClasses}`}>
+      <div className={`flex h-20 w-full items-center justify-between ${inset}`}>
         <div className="flex min-w-0 items-center">
           <Link
             href="/"
-            className="group relative flex h-16 w-[160px] shrink-0 items-center"
+            className="group flex h-20 shrink-0 items-center"
             onClick={handleLogoClick}
           >
             <Image
-              src="/doddapaneni-logo.png"
+              src="/logo.webp"
               alt={companyName}
-              width={160}
-              height={64}
-              className="h-16 w-[160px] object-contain object-left"
-              sizes="(max-width: 640px) 160px, 160px"
+              width={256}
+              height={256}
               priority
+              sizes="(max-width: 640px) 140px, 200px"
+              className="block h-14 w-auto max-w-[200px] object-contain object-left sm:h-16"
             />
           </Link>
         </div>
-        <div className="hidden shrink-0 items-center space-x-6 md:flex md:space-x-8">
+        <div className="hidden shrink-0 items-center space-x-6 overflow-visible md:flex md:space-x-8">
           {navBeforeMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
@@ -275,6 +315,7 @@ export default function Navbar() {
             onMouseLeave={scheduleCloseCompaniesMenu}
           >
             <button
+              ref={companiesButtonRef}
               type="button"
               className={companiesTriggerClass}
               aria-expanded={companiesOpen}
@@ -291,13 +332,18 @@ export default function Navbar() {
                 aria-hidden
               />
             </button>
-            {companiesOpen ? (
+            {companiesOpen && megaMenuBox ? (
               <div
-                className="absolute right-0 top-full z-[60] pt-1"
+                className="fixed z-[60] pt-1"
+                style={{
+                  top: megaMenuBox.top,
+                  left: megaMenuBox.left,
+                  width: megaMenuBox.width,
+                }}
                 role="region"
                 aria-label={t('ourCompanies')}
               >
-                <div className="max-h-[min(32rem,calc(100vh-8rem))] w-[min(28rem,calc(100vw-2rem))] sm:w-[min(34rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain">
+                <div className="max-h-[min(32rem,calc(100vh-8rem))] w-full overflow-y-auto overscroll-contain">
                   <div className="rounded-lg border border-slate-200 bg-white shadow-lg">
                     {renderCompanyRows(undefined, false)}
                   </div>

@@ -29,9 +29,14 @@ export async function generateMetadata({
     title,
     description,
     icons: {
-      icon: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
-      shortcut: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
-      apple: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
+      /** Same asset; `sizes` hints help browsers pick a crisp icon (tabs are still ~16–32px OS-controlled). */
+      icon: [
+        { url: '/logo.webp', type: 'image/webp', sizes: '48x48' },
+        { url: '/logo.webp', type: 'image/webp', sizes: '96x96' },
+        { url: '/logo.webp', type: 'image/webp', sizes: '192x192' },
+      ],
+      shortcut: [{ url: '/logo.webp', type: 'image/webp' }],
+      apple: [{ url: '/logo.webp', type: 'image/webp', sizes: '180x180' }],
     },
     openGraph: {
       title,

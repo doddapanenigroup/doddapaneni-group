@@ -18,6 +18,15 @@ export const metadata: Metadata = {
   description:
     'Corporate site for Doddapaneni Group: twelve operating divisions, group companies including DealsMedi and Dlsin, and offices in Telangana (India) and Florida (USA).',
   robots: { index: true, follow: true },
+  icons: {
+    icon: [
+      { url: '/logo.webp', type: 'image/webp', sizes: '48x48' },
+      { url: '/logo.webp', type: 'image/webp', sizes: '96x96' },
+      { url: '/logo.webp', type: 'image/webp', sizes: '192x192' },
+    ],
+    shortcut: [{ url: '/logo.webp', type: 'image/webp' }],
+    apple: [{ url: '/logo.webp', type: 'image/webp', sizes: '180x180' }],
+  },
   openGraph: {
     type: 'website',
     siteName: 'Doddapaneni Group',

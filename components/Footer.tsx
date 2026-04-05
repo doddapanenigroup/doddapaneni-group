@@ -92,13 +92,13 @@ export default function Footer() {
 
         <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-10">
           <div className="lg:max-w-md">
-            <div className="relative mb-3 h-9 w-[90px] md:mb-4 md:h-16 md:w-[160px]">
+            <div className="relative mb-3 h-16 w-[160px] md:mb-4 md:h-20 md:w-[200px]">
               <Image
-                src="/doddapaneni-logo.png"
+                src="/logo.webp"
                 alt={COMPANY_NAME}
                 fill
                 className="object-contain object-left"
-                sizes="(max-width: 768px) 90px, 160px"
+                sizes="(max-width: 768px) 160px, 200px"
                 loading="lazy"
               />
             </div>

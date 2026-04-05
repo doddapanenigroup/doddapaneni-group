@@ -22,7 +22,7 @@ const HomeDivisionsGrid = dynamic(() => import('./HomeDivisionsGrid'), {
 const HomePageBelowFold = dynamic(() => import('./HomePageBelowFold'), {
   loading: () => (
     <div
-      className="flex min-h-[52rem] flex-col items-center bg-[linear-gradient(180deg,rgba(248,250,252,0.6)_0%,transparent_18%,transparent_100%)] pt-16"
+      className="flex min-h-[52rem] flex-col items-center bg-[linear-gradient(180deg,rgba(248,250,252,0.6)_0%,transparent_18%,transparent_100%)] pt-20"
       role="status"
       aria-busy="true"
       aria-label="Loading page sections"

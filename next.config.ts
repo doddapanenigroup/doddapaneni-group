@@ -19,7 +19,7 @@ function legacyFaviconRedirects(): NonNullable<
   return [
     ...LEGACY_FAVICON_DG_SIZES.map((size) => ({
       source: `/favicon-dg-${size}.png`,
-      destination: '/doddapaneni-logo.png',
+      destination: '/logo.webp',
       permanent: false as const,
     })),
   ];

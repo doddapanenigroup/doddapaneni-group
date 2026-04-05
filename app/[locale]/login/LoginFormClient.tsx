@@ -263,13 +263,13 @@ export default function LoginFormClient({
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <div className="relative mx-auto mb-6 h-20 w-20 shrink-0">
+        <div className="relative mx-auto mb-6 h-28 w-28 shrink-0">
           <Image
             src="/doddapaneni-logo.png"
             alt="Logo"
             fill
             className="object-contain"
-            sizes="80px"
+            sizes="112px"
             loading="lazy"
           />
         </div>
