@@ -6,7 +6,6 @@ import { getSectorBySlug } from '@/lib/sector-landing';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
 import { normalizeStoredImage } from '@/lib/sector-landing';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
-import { isFlagshipCompanySlug } from '@/lib/sector-featured-companies';
 
 type Props = {
   locale: string;
@@ -19,11 +18,10 @@ export default async function SectorCompaniesOnlyView({ locale, sectorSlug }: Pr
   if (!sector) notFound();
 
   const companies = await listCompaniesBySectorSlug(sector.slug);
-  const extraCompanies = companies.filter((c) => !isFlagshipCompanySlug(c.slug));
   const tHome = await getTranslations({ locale, namespace: 'Home' });
 
   const heroDescription = sector.description?.trim();
-  const showDbCompanies = extraCompanies.length > 0;
+  const showDbCompanies = companies.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,7 +48,7 @@ export default async function SectorCompaniesOnlyView({ locale, sectorSlug }: Pr
             <p className="mb-8 text-sm text-slate-600 sm:text-base">{tHome('sectorCompaniesListLead')}</p>
 
             <ul className="space-y-4">
-              {extraCompanies.map((c) => {
+              {companies.map((c) => {
                 const href = `/companies/${c.slug}`;
                 const logoSrc = normalizeStoredImage(c.logoImage);
                 return (

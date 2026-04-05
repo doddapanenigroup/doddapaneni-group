@@ -16,7 +16,7 @@
     "i18n:translate": "node scripts/translate-all-locales.mjs",
     "i18n:translate-blog": "node scripts/translate-blog-content.mjs",
     "db:seed": "node scripts/seed.mjs",
-    "db:seed:flagship-companies": "node scripts/seed-flagship-companies.mjs",
+    "db:delete-flagship-companies": "node scripts/delete-flagship-companies.mjs",
     "db:sync-sectors": "node scripts/sync-canonical-sectors.mjs",
     "db:seed:blogs": "node scripts/seed-division-blogs.mjs",
     "db:import-static-news": "npx tsx scripts/import-doddapaneni-news-to-db.ts",

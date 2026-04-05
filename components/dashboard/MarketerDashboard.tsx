@@ -714,9 +714,6 @@ export default function MarketerDashboard({
     { value: 'home', label: 'Home' },
     { value: 'about', label: 'About' },
     { value: 'contact', label: 'Contact' },
-    { value: 'companies-dealsmedi', label: 'Companies (Dealsmedi)' },
-    { value: 'companies-dlsin', label: 'Companies (Dlsin)' },
-    { value: 'companies-janatha-mirror', label: 'Companies (Janatha Mirror)' },
   ];
   const [pageForm, setPageForm] = useState({
     pageKey: '',

@@ -1,8 +1,8 @@
 {
   "software-it-ai": {
-    "topic-dlsin": {
-      "label": "Dlsin marketplace",
-      "description": "Dlsin is the group’s multivendor commerce platform—catalogue management, checkout, seller dashboards, and secure settlements for independent merchants."
+    "topic-commerce": {
+      "label": "Commerce platforms",
+      "description": "Multivendor commerce—catalogue management, checkout, seller tooling, and secure settlements for independent merchants."
     },
     "topic-sellers": {
       "label": "Seller tooling",
@@ -70,9 +70,9 @@
     }
   },
   "media-news-entertainment": {
-    "topic-janatha": {
-      "label": "Janatha Mirror",
-      "description": "Digital-first newsroom with sourced reporting, verification, and corrections when facts change—public policy, business, culture, and civic coverage optimised for web and social."
+    "topic-newsroom": {
+      "label": "Newsroom",
+      "description": "Digital-first reporting with verification and corrections—public policy, business, culture, and civic coverage optimised for web and social."
     },
     "topic-content": {
       "label": "Editorial & multimedia",

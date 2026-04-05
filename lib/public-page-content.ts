@@ -1,14 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 
-const PAGE_KEYS = [
-  'home',
-  'about',
-  'contact',
-  'companies-dealsmedi',
-  'companies-dlsin',
-  'companies-janatha-mirror',
-] as const;
+const PAGE_KEYS = ['home', 'about', 'contact'] as const;
 
 function getCanonicalPageKey(key: string): string | null {
   const k = key.toLowerCase().replace(/\s+/g, '-');
@@ -16,16 +9,7 @@ function getCanonicalPageKey(key: string): string | null {
 }
 
 function pageKeyToSlugBase(pageKey: string): string {
-  switch (pageKey) {
-    case 'companies-dealsmedi':
-      return 'companies/dealsmedi';
-    case 'companies-dlsin':
-      return 'companies/dlsin';
-    case 'companies-janatha-mirror':
-      return 'companies/janatha-mirror';
-    default:
-      return pageKey;
-  }
+  return pageKey;
 }
 
 function contentSlug(pageKey: string, locale: string): string {

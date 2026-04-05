@@ -19,7 +19,6 @@ import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
 import { newsArticlePath } from '@/lib/news-paths';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
-import { isFlagshipCompanySlug } from '@/lib/sector-featured-companies';
 
 type Props = {
   locale: string;
@@ -50,7 +49,6 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   );
   const contentOnly = isSectorLandingContentOnlySlug(sectorKey);
   const companies = await listCompaniesBySectorSlug(sector.slug);
-  const extraCompanies = companies.filter((c) => !isFlagshipCompanySlug(c.slug));
   const tHome = await getTranslations({ locale, namespace: 'Home' });
 
   const paginationHref = (p: number) =>
@@ -72,7 +70,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
 
         <SectorFeaturedBrandsGrid locale={locale} sectorSlug={sectorKey} />
 
-        {extraCompanies.length > 0 ? (
+        {companies.length > 0 ? (
           <section aria-labelledby="sector-db-companies-heading" className="px-4 py-12 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
               <h2
@@ -83,7 +81,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
               </h2>
               <p className="mb-8 text-sm text-slate-600 sm:text-base">{tHome('sectorCompaniesListLead')}</p>
               <ul className="space-y-4">
-                {extraCompanies.map((c) => {
+                {companies.map((c) => {
                   const href = `/companies/${c.slug}`;
                   const logoSrc = normalizeStoredImage(c.logoImage);
                   return (
@@ -138,7 +136,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
 
       <SectorFeaturedBrandsGrid locale={locale} sectorSlug={sectorKey} bordered />
 
-      {extraCompanies.length > 0 ? (
+      {companies.length > 0 ? (
         <section aria-labelledby="sector-db-companies-heading" className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <h2
@@ -149,7 +147,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
             </h2>
             <p className="mb-8 text-sm text-slate-600 sm:text-base">{tHome('sectorCompaniesListLead')}</p>
             <ul className="space-y-4">
-              {extraCompanies.map((c) => {
+              {companies.map((c) => {
                 const href = `/companies/${c.slug}`;
                 const logoSrc = normalizeStoredImage(c.logoImage);
                 return (

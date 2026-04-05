@@ -15,7 +15,6 @@ config({ path: path.join(projectRoot, '.env') });
 import { PrismaClient } from '../lib/prisma-generated/index.js';
 import bcrypt from 'bcryptjs';
 import { SECTOR_SEEDS } from './sector-seeds.mjs';
-import { upsertFlagshipCompanies } from './seed-flagship-companies.mjs';
 
 const prisma = new PrismaClient();
 
@@ -93,8 +92,6 @@ async function main() {
     });
     console.log('Upserted sector:', row.name, `(${row.slug})`);
   }
-
-  await upsertFlagshipCompanies(prisma);
 
   console.log(
    (

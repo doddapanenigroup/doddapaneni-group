@@ -36,7 +36,7 @@ export function getDivisionSubpagePlaceholder(
       return {
         heading: `Services — ${sectorName}`,
         paragraphs: [
-          `Outline flagship offers, delivery models, and engagement types for ${sectorName}. This block is stand-in text only.`,
+          `Outline priority offers, delivery models, and engagement types for ${sectorName}. This block is stand-in text only.`,
           'Consider listing service lines, SLAs, and industries served. Structured content can later replace this section from the CMS.',
         ],
       };

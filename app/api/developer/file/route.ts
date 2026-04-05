@@ -10,9 +10,6 @@ const PAGE_KEY_TO_RELPATH: Record<string, string> = {
   home: 'app/[locale]/page.tsx',
   about: 'app/[locale]/about/page.tsx',
   contact: 'app/[locale]/contact/page.tsx',
-  'companies-dealsmedi': 'app/[locale]/companies/dealsmedi/page.tsx',
-  'companies-dlsin': 'app/[locale]/companies/dlsin/page.tsx',
-  'companies-janatha-mirror': 'app/[locale]/companies/janatha-mirror/page.tsx',
   'messages-en': 'messages/en.json',
 };
 
@@ -29,15 +26,6 @@ function getFilePath(pageKey: string): string | null {
       break;
     case 'contact':
       absolute = path.join(root, 'app', '[locale]', 'contact', 'page.tsx');
-      break;
-    case 'companies-dealsmedi':
-      absolute = path.join(root, 'app', '[locale]', 'companies', 'dealsmedi', 'page.tsx');
-      break;
-    case 'companies-dlsin':
-      absolute = path.join(root, 'app', '[locale]', 'companies', 'dlsin', 'page.tsx');
-      break;
-    case 'companies-janatha-mirror':
-      absolute = path.join(root, 'app', '[locale]', 'companies', 'janatha-mirror', 'page.tsx');
       break;
     case 'messages-en':
       absolute = path.join(root, 'messages', 'en.json');

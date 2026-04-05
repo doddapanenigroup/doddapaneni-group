@@ -2,14 +2,14 @@ import type { CompanyDivisionSlug } from '@/lib/company-divisions';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 
 export type DivisionTopicNavRef = {
-  /** Hash id without `#`, e.g. `topic-dlsin` */
+  /** Hash id without `#`, e.g. `topic-commerce` */
   topicId: string;
   href: string;
 };
 
 const TOPIC_NAV_BY_SLUG = {
   'software-it-ai': [
-    { topicId: 'topic-dlsin', href: '/software-it-ai#topic-dlsin' },
+    { topicId: 'topic-commerce', href: '/software-it-ai#topic-commerce' },
     { topicId: 'topic-sellers', href: '/software-it-ai#topic-sellers' },
     { topicId: 'topic-platform', href: '/software-it-ai#topic-platform' },
   ],
@@ -34,7 +34,7 @@ const TOPIC_NAV_BY_SLUG = {
     { topicId: 'topic-fulfillment', href: '/ecommerce-marketplace#topic-fulfillment' },
   ],
   'media-news-entertainment': [
-    { topicId: 'topic-janatha', href: '/media-news-entertainment#topic-janatha' },
+    { topicId: 'topic-newsroom', href: '/media-news-entertainment#topic-newsroom' },
     { topicId: 'topic-content', href: '/media-news-entertainment#topic-content' },
     { topicId: 'topic-brand', href: '/media-news-entertainment#topic-brand' },
   ],
