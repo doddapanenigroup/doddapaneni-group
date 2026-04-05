@@ -15,7 +15,8 @@ import {
   canonicalDivisionDisplayName,
   isCompanyDivisionSlug,
 } from '@/lib/company-divisions';
-import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
+import { getCompanyDivisionSectorsMap } from '@/lib/data/sector-repository';
+import { sectorLiveMapFromBySlugMap } from '@/lib/sector-live-shared';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
 import NewsSectorBlogList from '@/components/news/NewsSectorBlogList';
 import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
@@ -51,10 +52,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const trimmed = slug.trim();
 
   if (isCompanyDivisionSlug(trimmed)) {
-    const sector = await getPublicSectorBySlug(trimmed);
+    const [bySlug, t] = await Promise.all([
+      getCompanyDivisionSectorsMap(),
+      getTranslations({ locale, namespace: 'Blog' }),
+    ]);
+    const sector = bySlug.get(trimmed.toLowerCase());
     if (!sector) return {};
     const label = canonicalDivisionDisplayName(sector.slug, sector.name);
-    const t = await getTranslations({ locale, namespace: 'Blog' });
     const title = `${label} — ${t('title')} | ${SITE_NAME}`;
     const description = t('sectorNewsSubtitle');
     const origin = getSiteOrigin();
@@ -174,7 +178,8 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: 'Blog' });
 
   if (isCompanyDivisionSlug(trimmed)) {
-    const sector = await getPublicSectorBySlug(trimmed);
+    const bySlug = await getCompanyDivisionSectorsMap();
+    const sector = bySlug.get(trimmed.toLowerCase());
     if (!sector) notFound();
 
     const now = new Date();
@@ -190,6 +195,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
     });
 
     const label = canonicalDivisionDisplayName(sector.slug, sector.name);
+    const initialSectorLiveMap = sectorLiveMapFromBySlugMap(bySlug);
 
     const posts: NewsSectorPostItem[] = rows.map((r) => {
       const raw = (r.metaDescription?.trim() || r.ogDescription?.trim()) ?? '';
@@ -228,6 +234,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
           sectorLabel={label}
           readMoreLabel={t('readMore')}
           posts={posts}
+          initialSectorLiveMap={initialSectorLiveMap}
         />
       </div>
     );

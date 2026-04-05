@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import {
@@ -8,15 +9,59 @@ import {
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { newsSectorListPath } from '@/lib/news-paths';
+import {
+  EMPTY_SECTOR_LIVE_MAP,
+  NEWS_SECTOR_LIVE_FIRST_POLL_MS,
+  NEWS_SECTOR_LIVE_POLL_MS,
+  sectorLiveMapFromApiPayload,
+} from '@/lib/sector-live-shared';
 
 type Props = {
   locale: string;
   currentSlug: string;
+  /** Server snapshot; polling refreshes when admins toggle `isLive`. */
+  initialSectorLiveMap?: Record<string, boolean>;
 };
 
-export default function NewsSectorNewsNav({ locale, currentSlug }: Props) {
+export default function NewsSectorNewsNav({ locale, currentSlug, initialSectorLiveMap }: Props) {
   const t = useTranslations('Blog');
+  const tNav = useTranslations('Navbar');
   const normalized = currentSlug.trim().toLowerCase();
+  const [liveBySlug, setLiveBySlug] = useState<Record<string, boolean>>(() => ({
+    ...EMPTY_SECTOR_LIVE_MAP,
+    ...initialSectorLiveMap,
+  }));
+
+  useEffect(() => {
+    if (initialSectorLiveMap) {
+      setLiveBySlug((prev) => ({ ...prev, ...initialSectorLiveMap }));
+    }
+  }, [initialSectorLiveMap]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let intervalId: ReturnType<typeof setInterval> | number | undefined;
+    const load = async () => {
+      try {
+        const r = await fetch('/api/public/sectors', { cache: 'no-store' });
+        if (!r.ok || cancelled) return;
+        const d = (await r.json()) as { sectors?: unknown };
+        setLiveBySlug(sectorLiveMapFromApiPayload(d));
+      } catch {
+        /* keep last map */
+      }
+    };
+    const firstTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      void load();
+      intervalId = window.setInterval(() => void load(), NEWS_SECTOR_LIVE_POLL_MS);
+    }, NEWS_SECTOR_LIVE_FIRST_POLL_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(firstTimer);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <nav
@@ -37,20 +82,41 @@ export default function NewsSectorNewsNav({ locale, currentSlug }: Props) {
         {COMPANY_DIVISION_SLUGS.map((slug) => {
           const active = slug === normalized;
           const label = COMPANY_DIVISION_NAV_LABELS[slug as CompanyDivisionSlug];
+          const isLive = liveBySlug[slug] ?? false;
+          const inactiveLink =
+            'block rounded-xl border-2 border-transparent px-3 py-2.5 text-sm font-semibold leading-snug text-blue-900 transition hover:border-blue-200 hover:bg-blue-50';
+          const inactiveSoon =
+            'block rounded-xl border-2 border-dashed border-blue-200/80 bg-slate-50/90 px-3 py-2.5 text-sm font-semibold leading-snug text-blue-900/60';
+          const activeLive = 'block rounded-xl bg-blue-900 px-3 py-2.5 text-sm font-bold leading-snug text-white';
+          const activeSoon =
+            'block rounded-xl border-2 border-blue-300 bg-slate-100 px-3 py-2.5 text-sm font-bold leading-snug text-blue-950';
+
+          if (isLive) {
+            return (
+              <li key={slug}>
+                <Link
+                  href={newsSectorListPath(slug)}
+                  locale={locale}
+                  className={active ? activeLive : inactiveLink}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {label}
+                </Link>
+              </li>
+            );
+          }
+
           return (
             <li key={slug}>
-              <Link
-                href={newsSectorListPath(slug)}
-                locale={locale}
-                className={
-                  active
-                    ? 'block rounded-xl bg-blue-900 px-3 py-2.5 text-sm font-bold leading-snug text-white'
-                    : 'block rounded-xl border-2 border-transparent px-3 py-2.5 text-sm font-semibold leading-snug text-blue-900 transition hover:border-blue-200 hover:bg-blue-50'
-                }
+              <span
+                className={active ? activeSoon : inactiveSoon}
                 aria-current={active ? 'page' : undefined}
               >
-                {label}
-              </Link>
+                <span className="block">{label}</span>
+                <span className="mt-1 block text-[11px] font-bold uppercase tracking-wide text-blue-900/50">
+                  {tNav('comingSoonNav')}
+                </span>
+              </span>
             </li>
           );
         })}

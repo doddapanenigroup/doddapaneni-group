@@ -24,6 +24,7 @@ type Props = {
   sectorLabel: string;
   readMoreLabel: string;
   posts: NewsSectorPostItem[];
+  initialSectorLiveMap?: Record<string, boolean>;
 };
 
 export default function NewsSectorBlogList({
@@ -32,6 +33,7 @@ export default function NewsSectorBlogList({
   sectorLabel,
   readMoreLabel,
   posts,
+  initialSectorLiveMap,
 }: Props) {
   const t = useTranslations('Blog');
 
@@ -40,7 +42,11 @@ export default function NewsSectorBlogList({
       <section className="border-t border-blue-100 bg-white px-5 py-14 sm:px-8 md:py-20 lg:px-0">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
           <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
-            <NewsSectorNewsNav locale={locale} currentSlug={sectorSlug} />
+            <NewsSectorNewsNav
+              locale={locale}
+              currentSlug={sectorSlug}
+              initialSectorLiveMap={initialSectorLiveMap}
+            />
           </aside>
           <div className="order-1 min-w-0 flex-1 lg:order-2 lg:pr-12 xl:pr-16">
           {posts.length === 0 ? (

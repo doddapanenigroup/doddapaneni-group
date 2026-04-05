@@ -11,6 +11,7 @@ import {
   COMPANY_DIVISION_SLUGS,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
+import { getSectorLiveMapFromDb } from '@/lib/data/sector-repository';
 import NewsSectorsHub from '@/components/news/NewsSectorsHub';
 
 export const revalidate = 120;
@@ -60,11 +61,15 @@ export default async function NewsHubPage({ params }: Props) {
     notFound();
   }
 
-  const t = await getTranslations({ locale, namespace: 'Blog' });
+  const [t, sectorLiveMap] = await Promise.all([
+    getTranslations({ locale, namespace: 'Blog' }),
+    getSectorLiveMapFromDb(),
+  ]);
 
   const sectors = COMPANY_DIVISION_SLUGS.map((slug) => ({
     slug,
     label: COMPANY_DIVISION_NAV_LABELS[slug as CompanyDivisionSlug],
+    isLive: sectorLiveMap[slug] ?? false,
   }));
 
   return (

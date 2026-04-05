@@ -20,6 +20,8 @@ type Props = {
   backHref?: string;
   /** When set, left sidebar lists all sector news hubs (division articles). */
   sectorNavSlug?: string;
+  /** DB snapshot for sector “live” flags (sidebar matches navbar). */
+  initialSectorLiveMap?: Record<string, boolean>;
   /** Set false for draft preview routes. */
   showEngagement?: boolean;
 };
@@ -37,6 +39,7 @@ export default function BlogPostClient({
   articleSlug,
   backHref,
   sectorNavSlug,
+  initialSectorLiveMap,
   showEngagement = true,
 }: Props) {
   const backLink = backHref ?? '/news';
@@ -133,7 +136,11 @@ export default function BlogPostClient({
         <div className="px-5 pb-16 sm:px-8 lg:px-0">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
             <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
-              <NewsSectorNewsNav locale={locale} currentSlug={sectorNavSlug} />
+              <NewsSectorNewsNav
+                locale={locale}
+                currentSlug={sectorNavSlug}
+                initialSectorLiveMap={initialSectorLiveMap}
+              />
             </aside>
             <div className="order-1 min-w-0 flex-1 lg:order-2 lg:pr-12 xl:pr-16">{articleBody}</div>
           </div>

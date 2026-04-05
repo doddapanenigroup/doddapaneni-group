@@ -11,26 +11,7 @@ import {
   activeCompanyDivisionSlugFromPathname,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
-
-const EMPTY_SECTOR_LIVE: Record<string, boolean> = Object.fromEntries(
-  COMPANY_DIVISION_SLUGS.map((slug) => [slug, false]),
-);
-
-function sectorLiveMapFromApiPayload(d: { sectors?: unknown }): Record<string, boolean> {
-  const rows = Array.isArray(d?.sectors) ? d.sectors : [];
-  const map: Record<string, boolean> = { ...EMPTY_SECTOR_LIVE };
-  for (const s of rows) {
-    if (s && typeof s === 'object' && typeof (s as { slug?: unknown }).slug === 'string') {
-      const key = String((s as { slug: string }).slug)
-        .trim()
-        .toLowerCase();
-      if (key in map) {
-        map[key] = Boolean((s as { isLive?: unknown }).isLive);
-      }
-    }
-  }
-  return map;
-}
+import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
 
 const SECTOR_POLL_MS = 5000;
 
@@ -52,7 +33,7 @@ export default function Navbar() {
   const [companiesOpen, setCompaniesOpen] = useState(false);
   const [mobileCompaniesOpen, setMobileCompaniesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>(() => ({ ...EMPTY_SECTOR_LIVE }));
+  const [sectorLive, setSectorLive] = useState<Record<string, boolean>>(() => ({ ...EMPTY_SECTOR_LIVE_MAP }));
   /** False until first successful fetch — avoids showing every sector as “Coming soon” while data loads. */
   const [sectorLiveReady, setSectorLiveReady] = useState(false);
   const thresholdRef = useRef(300);

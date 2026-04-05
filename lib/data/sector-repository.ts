@@ -1,6 +1,11 @@
 import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
-import { canonicalDivisionDisplayName, isCompanyDivisionSlug } from '@/lib/company-divisions';
+import {
+  canonicalDivisionDisplayName,
+  COMPANY_DIVISION_SLUGS,
+  isCompanyDivisionSlug,
+} from '@/lib/company-divisions';
+import { sectorLiveMapFromBySlugMap } from '@/lib/sector-live-shared';
 
 /** Public Sector (company) row — single shape for UI, SEO, and APIs. */
 export type PublicSector = {
@@ -63,6 +68,19 @@ export async function listPublicSectorsBySlugs(
       return [p.slug, p] as const;
     }),
   );
+}
+
+/** Single query for all 12 division sectors; React `cache` dedupes metadata + page in one request. */
+export const getCompanyDivisionSectorsMap = cache(async function getCompanyDivisionSectorsMap(): Promise<
+  Map<string, PublicSector>
+> {
+  return listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
+});
+
+/** Server-only: `isLive` map for news layouts (uses cached division sectors query). */
+export async function getSectorLiveMapFromDb(): Promise<Record<string, boolean>> {
+  const bySlug = await getCompanyDivisionSectorsMap();
+  return sectorLiveMapFromBySlugMap(bySlug);
 }
 
 export async function listAllPublicSectorsOrdered(): Promise<PublicSector[]> {

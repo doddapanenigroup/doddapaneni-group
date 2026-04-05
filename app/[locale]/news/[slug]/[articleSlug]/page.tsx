@@ -10,6 +10,7 @@ import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
+import { getSectorLiveMapFromDb } from '@/lib/data/sector-repository';
 import BlogPostClient from '../BlogPostClient';
 
 export const revalidate = 120;
@@ -83,6 +84,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
   const articlePath = newsArticlePath(sectorSlug, articleSlug.trim());
   const sectorListPath = newsSectorListPath(sectorSlug);
+  const initialSectorLiveMap = await getSectorLiveMapFromDb();
 
   return (
     <BlogPostClient
@@ -98,6 +100,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
       articleSlug={articleSlug.trim()}
       backHref={sectorListPath}
       sectorNavSlug={sectorSlug}
+      initialSectorLiveMap={initialSectorLiveMap}
     />
   );
 }
