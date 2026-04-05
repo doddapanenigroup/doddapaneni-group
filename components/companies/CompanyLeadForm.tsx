@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import type { LeadFormVariant } from '@/lib/company-lead-variant';
@@ -16,6 +16,7 @@ type LeadFormSelectProps = {
   onChange: (v: string) => void;
   required?: boolean;
   placeholder?: string;
+  disabled?: boolean;
   children: React.ReactNode;
 };
 
@@ -26,6 +27,7 @@ function LeadFormSelect({
   onChange,
   required,
   placeholder,
+  disabled,
   children,
 }: LeadFormSelectProps) {
   return (
@@ -39,7 +41,8 @@ function LeadFormSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        className={inputClass}
+        disabled={disabled}
+        className={`${inputClass} ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
       >
         <option value="">{placeholder ?? 'Select…'}</option>
         {children}
@@ -89,6 +92,14 @@ export default function CompanyLeadForm({
   const [preferredContactMethod, setPreferredContactMethod] = useState('');
   const [comments, setComments] = useState('');
   const [consentTcpa, setConsentTcpa] = useState(false);
+
+  const isRenting = transactionType === t('reOptRent');
+  const hasTransactionType = Boolean(transactionType);
+
+  /** Clear budget when transaction type changes so ranges stay valid (buy/sell vs rent). */
+  useEffect(() => {
+    setBudgetRange('');
+  }, [transactionType]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,13 +272,28 @@ export default function CompanyLeadForm({
             label={t('fieldBudgetRange')}
             value={budgetRange}
             onChange={setBudgetRange}
-            required
+            required={hasTransactionType}
+            disabled={!hasTransactionType}
             placeholder={t('selectPlaceholder')}
           >
-            <option value={t('reBudget1')}>{t('reBudget1')}</option>
-            <option value={t('reBudget2')}>{t('reBudget2')}</option>
-            <option value={t('reBudget3')}>{t('reBudget3')}</option>
-            <option value={t('reBudget4')}>{t('reBudget4')}</option>
+            {hasTransactionType && isRenting ? (
+              <>
+                <option value={t('reRentBudget1')}>{t('reRentBudget1')}</option>
+                <option value={t('reRentBudget2')}>{t('reRentBudget2')}</option>
+                <option value={t('reRentBudget3')}>{t('reRentBudget3')}</option>
+                <option value={t('reRentBudget4')}>{t('reRentBudget4')}</option>
+                <option value={t('reRentBudget5')}>{t('reRentBudget5')}</option>
+                <option value={t('reRentBudget6')}>{t('reRentBudget6')}</option>
+              </>
+            ) : hasTransactionType ? (
+              <>
+                <option value={t('reBudget0')}>{t('reBudget0')}</option>
+                <option value={t('reBudget1')}>{t('reBudget1')}</option>
+                <option value={t('reBudget2')}>{t('reBudget2')}</option>
+                <option value={t('reBudget3')}>{t('reBudget3')}</option>
+                <option value={t('reBudget4')}>{t('reBudget4')}</option>
+              </>
+            ) : null}
           </LeadFormSelect>
           <LeadFormSelect
             id="lead-prop"

@@ -250,7 +250,7 @@ export default function Navbar() {
             onClick={handleLogoClick}
           >
             <Image
-              src="/logo.webp"
+              src="/doddapaneni-logo.png"
               alt={companyName}
               width={160}
               height={64}

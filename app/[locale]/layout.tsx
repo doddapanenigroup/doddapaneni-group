@@ -29,9 +29,9 @@ export async function generateMetadata({
     title,
     description,
     icons: {
-      icon: [{ url: '/logo.webp', type: 'image/webp' }],
-      shortcut: [{ url: '/logo.webp', type: 'image/webp' }],
-      apple: [{ url: '/logo.webp', type: 'image/webp' }],
+      icon: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
+      shortcut: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
+      apple: [{ url: '/doddapaneni-logo.png', type: 'image/png' }],
     },
     openGraph: {
       title,

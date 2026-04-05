@@ -3,7 +3,6 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
-import { mediaUrl } from '@/lib/media';
 
 export default function LeftSidebar() {
   const pathname = usePathname();
@@ -25,7 +24,7 @@ export default function LeftSidebar() {
         onClick={handleLogoClick}
       >
         <Image
-          src={mediaUrl('logo.webp')}
+          src="/doddapaneni-logo.png"
           alt={companyName}
           fill
           className="object-contain transition-transform group-hover:scale-105"

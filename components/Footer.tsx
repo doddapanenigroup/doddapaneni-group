@@ -4,8 +4,6 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
-import { mediaUrl } from '@/lib/media';
-
 function PinterestIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -96,7 +94,7 @@ export default function Footer() {
           <div className="lg:max-w-md">
             <div className="relative mb-3 h-9 w-[90px] md:mb-4 md:h-16 md:w-[160px]">
               <Image
-                src={mediaUrl('logo.webp')}
+                src="/doddapaneni-logo.png"
                 alt={COMPANY_NAME}
                 fill
                 className="object-contain object-left"

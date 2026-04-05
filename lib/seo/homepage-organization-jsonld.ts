@@ -25,7 +25,7 @@ export function buildHomepageOrganizationJsonLd(
   sectorsBySlug?: Map<string, { name: string; slug: string }>,
 ): Record<string, unknown> {
   const siteUrl = absoluteUrlForLocale(origin, locale, '/');
-  const logoUrl = `${origin.replace(/\/$/, '')}/logo.webp`;
+  const logoUrl = `${origin.replace(/\/$/, '')}/doddapaneni-logo.png`;
 
   const subOrganization = (COMPANY_DIVISION_SLUGS as readonly CompanyDivisionSlug[]).map((slug) => {
     const row = sectorsBySlug?.get(slug);

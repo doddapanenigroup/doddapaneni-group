@@ -9,7 +9,6 @@ import { signIn, useSession } from 'next-auth/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
-import { mediaUrl } from '@/lib/media';
 
 const AUTH_DEBUG =
   process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' || process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true';
@@ -266,7 +265,7 @@ export default function LoginFormClient({
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         <div className="relative mx-auto mb-6 h-20 w-20 shrink-0">
           <Image
-            src={mediaUrl('logo.webp')}
+            src="/doddapaneni-logo.png"
             alt="Logo"
             fill
             className="object-contain"

@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send, CheckCircle2, ExternalLink } from 'lucide-re
 import { useState } from 'react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,10 +12,13 @@ import * as z from 'zod';
 /** E.164 for tel: — keep in sync with displayed numbers in locale messages */
 const PHONE_HREF = { india: 'tel:+918142246666', usa: 'tel:+13522308586' } as const;
 
+/** Canonical inbox; used if a locale leaves `ContactPage.emailAddress` empty */
+const CONTACT_EMAIL_FALLBACK = 'info@doddapanenigroup.net';
+
 export default function ContactPageClient() {
-  const locale = useLocale();
   const t = useTranslations('ContactPage');
   const [showSuccess, setShowSuccess] = useState(false);
+  const contactEmail = t('emailAddress').trim() || CONTACT_EMAIL_FALLBACK;
 
   const contactSchema = z.object({
     name: z.string().min(1, t('nameRequired')),
@@ -97,10 +100,10 @@ export default function ContactPageClient() {
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold uppercase tracking-wide text-slate-500">{t('emailTitle')}</h3>
                         <a
-                          href={`mailto:${t('emailAddress')}`}
+                          href={`mailto:${contactEmail}`}
                           className="mt-1 inline-flex items-center gap-1 break-all text-base font-semibold text-blue-900 underline-offset-2 hover:text-blue-700 hover:underline"
                         >
-                          {t('emailAddress')}
+                          {contactEmail}
                           <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-60" aria-hidden />
                         </a>
                         <p className="mt-2 text-xs text-slate-500 sm:text-sm">{t('emailResponse')}</p>
