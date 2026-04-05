@@ -194,10 +194,19 @@ const nextConfig: NextConfig = {
         ],
       },
       // Critical: prevent CDN/proxy from caching HTML without varying on Next.js RSC/Flight headers.
-      // Some hosts cache HTML aggressively and can serve an RSC payload as the document (shows `:HL[...] 0:{tree...}`).
+      // `private` tells shared caches (Cloudflare, etc.) not to store the response; `no-store` alone is
+      // sometimes ignored. `CDN-Cache-Control` / `Surrogate-Control` are honored by major edge providers.
       {
         source: '/((?!api|_next|.*\\..*).*)',
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'private, no-store, no-cache, must-revalidate, max-age=0',
+          },
+          { key: 'CDN-Cache-Control', value: 'private, no-store' },
+          { key: 'Surrogate-Control', value: 'no-store' },
+          { key: 'Pragma', value: 'no-cache' },
+        ],
       },
       {
         source: '/api/media/(.*)',
