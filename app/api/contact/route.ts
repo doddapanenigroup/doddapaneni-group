@@ -5,7 +5,12 @@ import {
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
 } from '@/lib/email';
+import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
+
+function esc(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 const contactSchema = z.object({
   name: z.string().min(1),
@@ -32,8 +37,6 @@ export async function POST(request: Request) {
     const contextLine = [companyPageLabel, companySlug ? `slug:${companySlug}` : '', sectorSlug ? `sector:${sectorSlug}` : '']
       .filter(Boolean)
       .join(' · ');
-    const esc = (s: string) =>
-      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const contextHtml = contextLine ? esc(contextLine) : '';
 
     if (!isLoginEmailDeliveryConfigured()) {
@@ -55,21 +58,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
     }
 
-    // Email to the user
+    await connectDb();
+    try {
+      await prisma.companyFormSubmission.create({
+        data: {
+          formType: 'contact',
+          companySlug: companySlug ?? null,
+          sectorSlug: sectorSlug ?? null,
+          email,
+          fullName: name,
+          payloadJson: JSON.stringify({
+            name,
+            email,
+            message,
+            companySlug,
+            sectorSlug,
+            companyPageLabel,
+          }),
+        },
+      });
+    } catch (dbErr) {
+      console.error('[contact] DB save failed', dbErr);
+      return NextResponse.json({ message: 'Could not save submission.' }, { status: 500 });
+    }
+
+    const safeName = esc(name);
+    const safeMessage = esc(message);
+
+    // Email to the user (copy of what they wrote)
     const userMailOptions = {
       from: `"Doddapaneni Group" <${fromAddr}>`,
       to: email,
       replyTo: fromAddr,
-      subject: `Thank you for contacting Doddapaneni Group`,
-      text: `Hello ${name},\n\nThank you for reaching out to Doddapaneni Group. We have received your message:\n\n"${message}"\n\nOur team will review your inquiry and get back to you shortly.\n\nBest regards,\nDoddapaneni Group Team`,
+      subject: `Copy of your message — Doddapaneni Group`,
+      text: `Hello ${name},\n\nThank you for reaching out. Below is a copy of your message. Our team will review it and get back to you shortly.\n\n---\n${message}\n---\n\nBest regards,\nDoddapaneni Group Team`,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
           <h2 style="color: #1e3a8a; border-bottom: 2px solid #eee; padding-bottom: 10px;">Thank you for contacting us</h2>
-          <p>Hello <strong>${name}</strong>,</p>
-          <p>Thank you for reaching out to Doddapaneni Group. We have successfully received your message.</p>
-          <div style="background-color: #f9fafb; border-left: 4px solid #1e3a8a; padding: 15px; margin: 20px 0; font-style: italic; color: #555;">
-            "${message}"
-          </div>
+          <p>Hello <strong>${safeName}</strong>,</p>
+          <p>Here is a <strong>copy of the message</strong> you sent:</p>
+          <div style="background-color: #f9fafb; border-left: 4px solid #1e3a8a; padding: 15px; margin: 20px 0; color: #333; white-space: pre-wrap;">${safeMessage}</div>
           <p>Our team will review your inquiry and get back to you as soon as possible.</p>
           <br/>
           <div style="border-top: 1px solid #eee; padding-top: 20px; font-size: 14px; color: #666;">
@@ -93,18 +121,18 @@ export async function POST(request: Request) {
           <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <tr>
               <td style="padding: 10px 0; border-bottom: 1px solid #eee; width: 100px; font-weight: bold; color: #555;">Name:</td>
-              <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${name}</td>
+              <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${safeName}</td>
             </tr>
             <tr>
               <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email:</td>
-              <td style="padding: 10px 0; border-bottom: 1px solid #eee;"><a href="mailto:${email}" style="color: #1e3a8a; text-decoration: none;">${email}</a></td>
+              <td style="padding: 10px 0; border-bottom: 1px solid #eee;"><a href="mailto:${esc(email)}" style="color: #1e3a8a; text-decoration: none;">${esc(email)}</a></td>
             </tr>
             ${contextHtml ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Context:</td><td style="padding: 10px 0; border-bottom: 1px solid #eee;">${contextHtml}</td></tr>` : ''}
           </table>
           
           <div style="margin-top: 25px;">
             <p style="font-weight: bold; color: #555; margin-bottom: 10px;">Message:</p>
-            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; white-space: pre-wrap; border: 1px solid #e5e7eb;">${message}</div>
+            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; white-space: pre-wrap; border: 1px solid #e5e7eb;">${safeMessage}</div>
           </div>
           
           <div style="margin-top: 30px; font-size: 13px; color: #888;">

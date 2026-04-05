@@ -134,6 +134,31 @@ export default function CompanyLeadForm({
         return;
       }
       setStatus('ok');
+      setFullName('');
+      setEmail('');
+      setPhone('');
+      setZipCode('');
+      setServiceType('');
+      setTransactionType('');
+      setBudgetRange('');
+      setPropertyType('');
+      setTimeline('');
+      setLoanPreapproved('');
+      setInsuranceType('');
+      setAgeRange('');
+      setCoverageAmount('');
+      setCurrentlyInsured('');
+      setConditionInterest('');
+      setPreferredSpecialist('');
+      setAppointmentTimeframe('');
+      setInsuranceStatusHealth('');
+      setInterest('');
+      setBudget('');
+      setCompanyName('');
+      setBestTimeToCall('');
+      setPreferredContactMethod('');
+      setComments('');
+      setConsentTcpa(false);
     } catch {
       setStatus('err');
     }

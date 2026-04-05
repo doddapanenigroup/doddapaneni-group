@@ -325,6 +325,22 @@ model Company {
   @@map("company")
 }
 
+/// Lead / contact submissions from public company pages (`/companies/[slug]`).
+model CompanyFormSubmission {
+  id          String   @id @default(cuid())
+  formType    String   @map("form_type")
+  companySlug String?  @map("company_slug")
+  sectorSlug  String?  @map("sector_slug")
+  email       String
+  fullName    String?  @map("full_name")
+  payloadJson String   @map("payload_json") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([formType, createdAt(sort: Desc)])
+  @@index([companySlug, createdAt(sort: Desc)])
+  @@map("company_form_submission")
+}
+
 enum CampaignStatus {
   draft
   active

@@ -5,6 +5,7 @@ import {
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
 } from '@/lib/email';
+import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import type { LeadFormVariant } from '@/lib/company-lead-variant';
 
@@ -103,6 +104,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Email is not configured on the server.' }, { status: 500 });
     }
 
+    await connectDb();
+    try {
+      await prisma.companyFormSubmission.create({
+        data: {
+          formType: 'lead',
+          companySlug: d.companySlug,
+          sectorSlug: d.sectorSlug,
+          email: d.email,
+          fullName: d.fullName,
+          payloadJson: JSON.stringify(d),
+        },
+      });
+    } catch (dbErr) {
+      console.error('[company-lead] DB save failed', dbErr);
+      return NextResponse.json({ message: 'Could not save submission.' }, { status: 500 });
+    }
+
     const fromAddr = getSmtpUser();
     const transporter = createMailTransporter();
     if (!transporter || !fromAddr) {
@@ -173,13 +191,31 @@ export async function POST(request: Request) {
       html: htmlBody,
     });
 
+    const confirmText = [
+      `Hello ${d.fullName},`,
+      '',
+      'Thank you for your inquiry. Below is a copy of what you submitted. Our team will review your details and contact you shortly.',
+      '',
+      ...lines.map(([k, v]) => `${k}: ${v}`),
+      '',
+      '— Doddapaneni Group',
+    ].join('\n');
+
+    const confirmHtml = `
+      <div style="font-family:sans-serif;max-width:640px;color:#333;">
+        <p>Hello <strong>${esc(d.fullName)}</strong>,</p>
+        <p>Thank you for your inquiry. Here is a <strong>copy of your submission</strong>. Our team will review your details and contact you shortly.</p>
+        <table style="width:100%;border-collapse:collapse;margin-top:12px;">${rowsHtml}</table>
+        <p style="margin-top:16px;color:#555;">— Doddapaneni Group</p>
+      </div>`;
+
     await transporter.sendMail({
       from: `"Doddapaneni Group" <${fromAddr}>`,
       to: d.email,
       replyTo: fromAddr,
-      subject: `We received your request — ${d.companyDisplayName || 'Doddapaneni Group'}`,
-      text: `Hello ${d.fullName},\n\nThank you for your inquiry. Our team will review your details and contact you shortly.\n\n— Doddapaneni Group`,
-      html: `<p>Hello <strong>${esc(d.fullName)}</strong>,</p><p>Thank you for your inquiry. Our team will review your details and contact you shortly.</p><p>— Doddapaneni Group</p>`,
+      subject: `Copy of your request — ${d.companyDisplayName || d.companySlug}`,
+      text: confirmText,
+      html: confirmHtml,
     });
 
     return NextResponse.json({ message: 'ok' }, { status: 200 });
