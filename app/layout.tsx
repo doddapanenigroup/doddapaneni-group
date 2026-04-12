@@ -36,6 +36,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@DoddapanenGroup',
   },
+  verification: {
+    google: 'hz1gnEwKPg6vepXcHuuze94PQ1z2V22paJkCNYdy3xY',
+  },
 };
 
 export const viewport: Viewport = {
