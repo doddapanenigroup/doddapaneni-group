@@ -48,20 +48,15 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13';
+  const gaDisabled =
+    process.env.NEXT_PUBLIC_DISABLE_GA === '1' || process.env.NEXT_PUBLIC_DISABLE_GA === 'true';
+  const gaId = gaDisabled
+    ? ''
+    : (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13');
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
-      <head>
-        <link
-          rel="preload"
-          href="/image.webp"
-          as="image"
-          type="image/webp"
-          fetchPriority="high"
-        />
-      </head>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
-        <GoogleAnalytics measurementId={gaId} />
+        {gaId ? <GoogleAnalytics measurementId={gaId} /> : null}
         {children}
       </body>
     </html>

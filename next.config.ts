@@ -121,6 +121,11 @@ function hostCanonicalRedirects(): NonNullable<
 }
 
 const nextConfig: NextConfig = {
+  compiler: {
+    /** Drops stray `console.log` in production (keeps `error` / `warn`) — slightly less main-thread work in audits. */
+    removeConsole:
+      process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
+  },
   async redirects() {
     return [
       ...legacyFaviconRedirects(),
@@ -179,7 +184,12 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      'next-auth/react',
+    ],
     validateRSCRequestHeaders: true,
   },
   async headers() {
