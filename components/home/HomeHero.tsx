@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { AppLocale } from '@/i18n/locales';
 
+/** Static asset in `public/` — plain `img` avoids `/_next/image` so the browser can fetch LCP bytes immediately. */
 const BANNER_IMAGE = '/image.webp';
 
 export type HomeHeroCopy = {
@@ -38,15 +38,14 @@ export default function HomeHero({ locale, copy }: Props) {
   return (
     <section className="relative min-h-[22rem] overflow-hidden px-4 pt-20 pb-14 text-white sm:min-h-[26rem] sm:px-6 sm:pt-24 sm:pb-16 md:min-h-[28rem] md:pt-28 md:pb-20 lg:px-8">
       <div className="absolute inset-0 z-0 bg-slate-900">
-        <Image
+        <img
           src={BANNER_IMAGE}
           alt={heroImageAlt}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1536px) 100vw, 1920px"
-          quality={65}
-          className="object-cover opacity-45"
-          priority
+          width={1920}
+          height={1080}
+          decoding="async"
           fetchPriority="high"
+          className="h-full w-full object-cover opacity-45"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/95 to-blue-950/90" />
         <div

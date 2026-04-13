@@ -1,19 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { headers } from 'next/headers';
 import './globals.css';
 import { fontBodyClassNames } from '@/app/fonts';
 import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
-
-/** `/{locale}` only (home) — used to preload hero image without triggering audits on other routes. */
-function isLocaleHomePath(pathname: string): boolean {
-  const p = pathname.replace(/\/$/, '') || '/';
-  const parts = p.split('/').filter(Boolean);
-  if (parts.length !== 1) return false;
-  return (routing.locales as readonly string[]).includes(parts[0]!);
-}
 
 const siteOrigin = getSiteOrigin();
 
@@ -56,11 +47,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
-  const h = await headers();
-  const path = h.get('x-pathname') ?? '';
-  const preloadHero = path ? isLocaleHomePath(path) : false;
-
+export default function RootLayout({ children }: { children: ReactNode }) {
   const gaDisabled =
     process.env.NEXT_PUBLIC_DISABLE_GA === '1' || process.env.NEXT_PUBLIC_DISABLE_GA === 'true';
   const gaId = gaDisabled
@@ -68,17 +55,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     : (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13');
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
-      <head>
-        {preloadHero ? (
-          <link
-            rel="preload"
-            href="/image.webp"
-            as="image"
-            type="image/webp"
-            fetchPriority="high"
-          />
-        ) : null}
-      </head>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
         {gaId ? <GoogleAnalytics measurementId={gaId} /> : null}
         {children}

@@ -1,6 +1,8 @@
 import { createTranslator } from '@/lib/translation-format';
 import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { preload } from 'react-dom';
 import HomepageOrganizationJsonLd from '@/components/seo/HomepageOrganizationJsonLd';
 import { getBusinessDivisionsForHome } from '@/lib/business-divisions-home';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
@@ -19,6 +21,11 @@ import { getSiteOrigin } from '@/lib/site-origin';
 export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string }> };
+
+async function HomePageWithDivisions({ locale }: { locale: string }) {
+  const divisions = await getBusinessDivisionsForHome(locale);
+  return <HomePage divisions={divisions} />;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: paramLocale } = await params;
@@ -58,10 +65,27 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  const [divisions, cms] = await Promise.all([
-    getBusinessDivisionsForHome(locale),
-    findPublishedPageContent('home', locale),
-  ]);
+  /** CMS override must be decided before the default hub (hero + divisions). */
+  const cms = await findPublishedPageContent('home', locale);
+
+  if (cms && (cms.title || cms.body)) {
+    return (
+      <>
+        <ContentPageBoundary pageKey="home" locale={locale} cms={cms}>
+          {null}
+        </ContentPageBoundary>
+        <Suspense fallback={null}>
+          <HomepageOrganizationJsonLd locale={locale} />
+        </Suspense>
+      </>
+    );
+  }
+
+  /**
+   * React `preload` (home only) + divisions behind Suspense so LCP is not blocked by
+   * `getBusinessDivisionsForHome`. JSON-LD is deferred so it does not block the hero stream.
+   */
+  preload('/image.webp', { as: 'image', type: 'image/webp', fetchPriority: 'high' });
 
   const tHome = createTranslator(getDictionary(locale), 'Home');
   const heroCopy: HomeHeroCopy = {
@@ -77,13 +101,25 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <HomepageOrganizationJsonLd locale={locale} />
       <ContentPageBoundary pageKey="home" locale={locale} cms={cms}>
         <>
           <HomeHero locale={appLocale} copy={heroCopy} />
-          <HomePage divisions={divisions} />
+          <Suspense
+            fallback={
+              <div
+                className="min-h-[28rem] bg-slate-100"
+                aria-busy="true"
+                aria-label="Loading"
+              />
+            }
+          >
+            <HomePageWithDivisions locale={locale} />
+          </Suspense>
         </>
       </ContentPageBoundary>
+      <Suspense fallback={null}>
+        <HomepageOrganizationJsonLd locale={locale} />
+      </Suspense>
     </>
   );
 }
