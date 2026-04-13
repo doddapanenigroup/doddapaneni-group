@@ -12,6 +12,8 @@ RUN apt-get update \
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+# postinstall / prepare run `prisma generate` — schema must exist before `npm ci`
+COPY prisma ./prisma
 RUN npm ci
 
 FROM base AS builder
