@@ -16,6 +16,13 @@ if (!process.env.AUTH_SECRET) {
 const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 'true';
 
 const nextAuth = NextAuth({
+  /**
+   * Required on self‑hosted production (e.g. DigitalOcean, Hostinger) where `NODE_ENV === "production"`
+   * and you are not on Vercel/Cloudflare Pages. Without this, Auth.js treats the request host as
+   * untrusted and `/api/auth/session` returns 500 (AuthError / “server configuration”).
+   * @see https://authjs.dev/reference/core#trusthost
+   */
+  trustHost: true,
   providers: [
     Credentials({
       name: 'credentials',
