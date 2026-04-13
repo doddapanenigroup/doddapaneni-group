@@ -1,6 +1,17 @@
 # Production image (Node 20 + Next.js standalone). Prisma client is generated at build time (Linux engine).
-# Build:  docker build --build-arg AUTH_SECRET="$(openssl rand -base64 32)" -t doddapaneni-group .
-# Run:    docker run --rm -p 3000:3000 -e DATABASE_URL=... -e AUTH_SECRET=... -e NEXTAUTH_URL=https://your.domain \
+#
+# Prisma requires DATABASE_URL + DIRECT_DATABASE_URL in the environment for:
+#   - `npm ci` (postinstall: prisma generate)
+#   - `npm run build` (prebuild + Next SSG, which runs real DB queries)
+# DigitalOcean App Platform: mark both as encrypted secrets and enable "Available at build time".
+# Your Postgres/Neon must allow connections from DO build workers (often public + SSL).
+#
+# Build:  docker build \
+#   --build-arg AUTH_SECRET="$(openssl rand -base64 32)" \
+#   --build-arg DATABASE_URL="postgresql://..." \
+#   --build-arg DIRECT_DATABASE_URL="postgresql://..." \
+#   -t doddapaneni-group .
+# Run:    docker run --rm -p 3000:3000 -e DATABASE_URL=... -e DIRECT_DATABASE_URL=... -e AUTH_SECRET=... -e NEXTAUTH_URL=https://your.domain \
 #           -e EMAIL_USER=... -e EMAIL_PASS=... [-e SMTP_*] doddapaneni-group
 
 # syntax=docker/dockerfile:1
@@ -11,6 +22,10 @@ RUN apt-get update \
 
 FROM base AS deps
 WORKDIR /app
+ARG DATABASE_URL
+ARG DIRECT_DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL
 COPY package.json package-lock.json ./
 # postinstall / prepare run `prisma generate` — schema must exist before `npm ci`
 COPY prisma ./prisma
@@ -20,6 +35,10 @@ FROM base AS builder
 WORKDIR /app
 ARG AUTH_SECRET=replace-with-openssl-rand-base64-32-at-build
 ENV AUTH_SECRET=$AUTH_SECRET
+ARG DATABASE_URL
+ARG DIRECT_DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
