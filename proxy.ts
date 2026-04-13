@@ -3,11 +3,11 @@ import { routing } from '@/i18n/routing';
 
 const LOCALE_SET = new Set<string>(routing.locales);
 
-/** Same anti-cache values as `next.config.ts` HTML rule — belt-and-suspenders at the edge. */
-const NO_STORE_HTML = 'private, no-store, no-cache, must-revalidate, max-age=0';
+/** Match `next.config.ts`: bfcache-friendly document policy; edge still skips caching HTML. */
+const DOCUMENT_CACHE_CONTROL = 'private, max-age=0, must-revalidate';
 
-function applyNoStoreHeaders(res: NextResponse) {
-  res.headers.set('Cache-Control', NO_STORE_HTML);
+function applyDocumentCacheHeaders(res: NextResponse) {
+  res.headers.set('Cache-Control', DOCUMENT_CACHE_CONTROL);
   res.headers.set('CDN-Cache-Control', 'private, no-store');
   res.headers.set('Surrogate-Control', 'no-store');
 }
@@ -27,7 +27,7 @@ export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `/${routing.defaultLocale}`;
     const res = NextResponse.redirect(url);
-    applyNoStoreHeaders(res);
+    applyDocumentCacheHeaders(res);
     return res;
   }
 
@@ -35,12 +35,12 @@ export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `/${routing.defaultLocale}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
     const res = NextResponse.redirect(url);
-    applyNoStoreHeaders(res);
+    applyDocumentCacheHeaders(res);
     return res;
   }
 
   const res = NextResponse.next();
-  applyNoStoreHeaders(res);
+  applyDocumentCacheHeaders(res);
   return res;
 }
 

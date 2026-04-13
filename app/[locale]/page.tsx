@@ -11,8 +11,8 @@ import { getCachedLayoutPageSeo } from '@/lib/cached-layout-seo';
 import { absoluteUrlForLocale, alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 
-/** Divisions depend on admin `Sector.is_live` toggles — avoid stale “Launching soon” vs nav mismatch. */
-export const dynamic = 'force-dynamic';
+/** Sector live flags refresh via `unstable_cache` + `revalidateTag('sectors-public')` on admin toggle. */
+export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string }> };
 

@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
@@ -24,6 +24,7 @@ function isAdminRole(role: unknown) {
 /** So division pages and layouts drop stale RSC/HTML within a second of toggling `isLive`. */
 function revalidateSectorPublicRoutes() {
   try {
+    revalidateTag('sectors-public', 'page');
     revalidatePath('/', 'layout');
     for (const slug of COMPANY_DIVISION_SLUGS) {
       revalidatePath(`/${slug}`, 'layout');

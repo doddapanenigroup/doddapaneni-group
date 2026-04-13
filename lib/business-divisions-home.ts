@@ -5,7 +5,13 @@ import {
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
-import { unstable_noStore as noStore } from 'next/cache';
+import { unstable_cache } from 'next/cache';
+
+const cachedDivisionRows = unstable_cache(
+  async () => listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS),
+  ['home-division-sector-rows'],
+  { revalidate: 60, tags: ['sectors-public'] },
+);
 
 export type HomeDivision = {
   name: string;
@@ -18,8 +24,7 @@ const FALLBACK_DESCRIPTION =
   'Programs, insights, and sector-specific capabilities across the Doddapaneni Group portfolio.';
 
 export async function getBusinessDivisionsForHome(locale: string): Promise<HomeDivision[]> {
-  noStore();
-  const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
+  const bySlug = await cachedDivisionRows();
   const tDivision = createTranslator(getDictionary(locale), 'DivisionLabels');
   const tAbout = createTranslator(getDictionary(locale), 'About');
 

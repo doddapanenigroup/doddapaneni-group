@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
 import { routing } from '@/i18n/routing';
@@ -18,7 +17,6 @@ export async function GET(request: Request, { params }: Props) {
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
   }
 
-  await publishScheduledContent(new Date());
   const now = new Date();
   const sector = await getPublicSectorBySlug(slug);
   if (!sector) {

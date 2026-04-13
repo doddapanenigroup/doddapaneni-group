@@ -43,7 +43,7 @@ export default function NewsSectorNewsNav({ locale, currentSlug, initialSectorLi
     let intervalId: ReturnType<typeof setInterval> | number | undefined;
     const load = async () => {
       try {
-        const r = await fetch('/api/public/sectors', { cache: 'no-store' });
+        const r = await fetch('/api/public/sectors');
         if (!r.ok || cancelled) return;
         const d = (await r.json()) as { sectors?: unknown };
         setLiveBySlug(sectorLiveMapFromApiPayload(d));

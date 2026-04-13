@@ -192,19 +192,17 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
-      // Critical: prevent CDN/proxy from caching HTML without varying on Next.js RSC/Flight headers.
-      // `private` tells shared caches (Cloudflare, etc.) not to store the response; `no-store` alone is
-      // sometimes ignored. `CDN-Cache-Control` / `Surrogate-Control` are honored by major edge providers.
+      // `private` keeps shared/CDN caches from serving one user’s HTML to another. Avoid `no-store` on the
+      // document so browsers can use the back/forward cache (bfcache). Edge still opts out via CDN-Cache-Control.
       {
         source: '/((?!api|_next|.*\\..*).*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'private, no-store, no-cache, must-revalidate, max-age=0',
+            value: 'private, max-age=0, must-revalidate',
           },
           { key: 'CDN-Cache-Control', value: 'private, no-store' },
           { key: 'Surrogate-Control', value: 'no-store' },
-          { key: 'Pragma', value: 'no-cache' },
         ],
       },
       {

@@ -13,7 +13,8 @@ import {
 } from '@/lib/company-divisions';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
 
-const SECTOR_POLL_MS = 5000;
+/** Align with `/api/public/sectors` short HTTP cache — avoids hammering the origin and inflating “fully loaded” metrics. */
+const SECTOR_POLL_MS = 60_000;
 
 /** Viewport-fixed mega menu: anchored to the trigger’s left edge and opens toward the right, clamped to the viewport. */
 function megaMenuPositionFromButton(buttonEl: HTMLElement) {
@@ -54,7 +55,7 @@ export default function Navbar() {
 
   const loadLatestSectors = useCallback(async () => {
     try {
-      const r = await fetch('/api/public/sectors', { cache: 'no-store' });
+      const r = await fetch('/api/public/sectors');
       if (!r.ok) throw new Error('sectors');
       const d = (await r.json()) as { sectors?: unknown };
       setSectorLive(sectorLiveMapFromApiPayload(d));
