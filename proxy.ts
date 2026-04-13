@@ -39,7 +39,13 @@ export function proxy(request: NextRequest) {
     return res;
   }
 
-  const res = NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+  const res = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
   applyDocumentCacheHeaders(res);
   return res;
 }

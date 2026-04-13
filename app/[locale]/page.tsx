@@ -4,8 +4,11 @@ import type { Metadata } from 'next';
 import HomepageOrganizationJsonLd from '@/components/seo/HomepageOrganizationJsonLd';
 import { getBusinessDivisionsForHome } from '@/lib/business-divisions-home';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
+import HomeHero from '@/components/home/HomeHero';
+import type { HomeHeroCopy } from '@/components/home/HomeHero';
 import HomePage from '@/components/home/HomePage';
 import { findPublishedPageContent } from '@/lib/public-page-content';
+import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { getCachedLayoutPageSeo } from '@/lib/cached-layout-seo';
@@ -60,11 +63,26 @@ export default async function Page({ params }: Props) {
     findPublishedPageContent('home', locale),
   ]);
 
+  const tHome = createTranslator(getDictionary(locale), 'Home');
+  const heroCopy: HomeHeroCopy = {
+    heroImageAlt: tHome('heroImageAlt'),
+    hubHeroTitle: tHome('hubHeroTitle'),
+    hubHeroSubtitle: tHome('hubHeroSubtitle'),
+    hubHeroLead: tHome('hubHeroLead'),
+    businessDivisions: tHome('businessDivisions'),
+    learnAboutUs: tHome('learnAboutUs'),
+    getInTouch: tHome('getInTouch'),
+  };
+  const appLocale = localeFromRouteParam(locale);
+
   return (
     <>
       <HomepageOrganizationJsonLd locale={locale} />
       <ContentPageBoundary pageKey="home" locale={locale} cms={cms}>
-        <HomePage divisions={divisions} />
+        <>
+          <HomeHero locale={appLocale} copy={heroCopy} />
+          <HomePage divisions={divisions} />
+        </>
       </ContentPageBoundary>
     </>
   );

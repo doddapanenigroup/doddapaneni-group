@@ -176,7 +176,7 @@ const nextConfig: NextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     // Allow hero LCP images to use quality=72 (used in `components/home/HomePage.tsx`).
-    qualities: [68, 72, 75],
+    qualities: [65, 68, 72, 75],
     minimumCacheTTL: 3600,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
