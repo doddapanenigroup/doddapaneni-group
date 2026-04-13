@@ -4,11 +4,20 @@ import {
   COMPANY_DIVISION_SLUGS,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
-import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
+import { listPublicSectorsBySlugs, type PublicSector } from '@/lib/data/sector-repository';
 import { unstable_cache } from 'next/cache';
 
+/** Plain record — `unstable_cache` serializes results, so a `Map` would lose `.get` after restore. */
 const cachedDivisionRows = unstable_cache(
-  async () => listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS),
+  async (): Promise<Record<string, PublicSector>> => {
+    const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
+    const out: Record<string, PublicSector> = {};
+    for (const slug of COMPANY_DIVISION_SLUGS) {
+      const row = bySlug.get(slug);
+      if (row) out[slug] = row;
+    }
+    return out;
+  },
   ['home-division-sector-rows'],
   { revalidate: 60, tags: ['sectors-public'] },
 );
@@ -29,7 +38,7 @@ export async function getBusinessDivisionsForHome(locale: string): Promise<HomeD
   const tAbout = createTranslator(getDictionary(locale), 'About');
 
   return COMPANY_DIVISION_SLUGS.map((slug) => {
-    const row = bySlug.get(slug);
+    const row = bySlug[slug];
     const raw = row?.description?.trim();
     const hasDbDescription = !!(raw && raw.length > 0);
     return {

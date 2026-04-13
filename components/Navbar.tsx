@@ -2,7 +2,15 @@
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  useCallback,
+  useSyncExternalStore,
+} from 'react';
 import { useTranslations } from '@/lib/dictionary-react';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -15,6 +23,28 @@ import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector
 
 /** Align with `/api/public/sectors` short HTTP cache — avoids hammering the origin and inflating “fully loaded” metrics. */
 const SECTOR_POLL_MS = 60_000;
+
+/** Tailwind `md:` breakpoint — must match `hidden md:flex` / `md:hidden` usage for nav. */
+const MD_MIN_WIDTH_QUERY = '(min-width: 768px)';
+
+function subscribeMdMq(onChange: () => void) {
+  const mq = window.matchMedia(MD_MIN_WIDTH_QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+}
+
+function getMdMqSnapshot() {
+  return window.matchMedia(MD_MIN_WIDTH_QUERY).matches;
+}
+
+/** Avoid hydration mismatch: assume mobile until client subscribes. */
+function getMdMqServerSnapshot() {
+  return false;
+}
+
+function useMdNavBreakpoint() {
+  return useSyncExternalStore(subscribeMdMq, getMdMqSnapshot, getMdMqServerSnapshot);
+}
 
 /** Viewport-fixed mega menu: anchored to the trigger’s left edge and opens toward the right, clamped to the viewport. */
 function megaMenuPositionFromButton(buttonEl: HTMLElement) {
@@ -30,12 +60,13 @@ function megaMenuPositionFromButton(buttonEl: HTMLElement) {
 }
 
 export default function Navbar() {
+  const isMdUp = useMdNavBreakpoint();
   const [isOpen, setIsOpen] = useState(false);
   const [companiesOpen, setCompaniesOpen] = useState(false);
   const [mobileCompaniesOpen, setMobileCompaniesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sectorLive, setSectorLive] = useState<Record<string, boolean>>(() => ({ ...EMPTY_SECTOR_LIVE_MAP }));
-  /** False until first successful fetch — avoids showing every sector as “Coming soon” while data loads. */
+  /** False until first sectors fetch attempt finishes — avoids flashing “Coming soon” before we know live flags. */
   const [sectorLiveReady, setSectorLiveReady] = useState(false);
   const thresholdRef = useRef(300);
   const companiesRef = useRef<HTMLDivElement>(null);
@@ -59,9 +90,10 @@ export default function Navbar() {
       if (!r.ok) throw new Error('sectors');
       const d = (await r.json()) as { sectors?: unknown };
       setSectorLive(sectorLiveMapFromApiPayload(d));
-      setSectorLiveReady(true);
     } catch {
       /* keep last good map; do not flip everything to “coming soon” on a transient error */
+    } finally {
+      setSectorLiveReady(true);
     }
   }, []);
 
@@ -93,6 +125,17 @@ export default function Navbar() {
       if (closeMenuTimerRef.current) clearTimeout(closeMenuTimerRef.current);
     };
   }, []);
+
+  /** Never leave the desktop mega-menu portal open on mobile — it can sit at (0,0) and block all taps. */
+  useEffect(() => {
+    if (!isMdUp) {
+      setCompaniesOpen(false);
+      if (closeMenuTimerRef.current) {
+        clearTimeout(closeMenuTimerRef.current);
+        closeMenuTimerRef.current = null;
+      }
+    }
+  }, [isMdUp]);
 
   useEffect(() => {
     const updateThreshold = () => {
@@ -314,7 +357,7 @@ export default function Navbar() {
                 aria-hidden
               />
             </button>
-            {companiesOpen && megaMenuBox ? (
+            {companiesOpen && megaMenuBox && isMdUp ? (
               <div
                 className="fixed z-[60] pt-1"
                 style={{
@@ -346,7 +389,12 @@ export default function Navbar() {
           <LanguageSwitcher isTransparent={isTransparent} />
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => {
+              setIsOpen((open) => {
+                if (open) setMobileCompaniesOpen(false);
+                return !open;
+              });
+            }}
             className={`inline-flex items-center justify-center rounded-md p-2 transition-colors focus:outline-none ${mobileButtonClass}`}
             aria-expanded={isOpen}
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
@@ -377,7 +425,13 @@ export default function Navbar() {
                 className={`flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-base font-medium hover:bg-slate-50 ${
                   isOnGroupCompany ? 'bg-blue-50 text-blue-950' : 'text-slate-800'
                 }`}
-                onClick={() => setMobileCompaniesOpen((o) => !o)}
+                onClick={() => {
+                  setMobileCompaniesOpen((o) => {
+                    const next = !o;
+                    if (next) void loadLatestSectors();
+                    return next;
+                  });
+                }}
                 aria-expanded={mobileCompaniesOpen}
               >
                 {t('ourCompanies')}
@@ -387,8 +441,11 @@ export default function Navbar() {
                 />
               </button>
               {mobileCompaniesOpen ? (
-                <div className="border-l-2 border-blue-100 bg-slate-50/80 pl-2">
-                  {renderCompanyRows(() => setIsOpen(false), true)}
+                <div className="max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain border-l-2 border-blue-100 bg-slate-50/80 pl-2 [-webkit-overflow-scrolling:touch]">
+                  {renderCompanyRows(() => {
+                    setIsOpen(false);
+                    setMobileCompaniesOpen(false);
+                  }, true)}
                 </div>
               ) : null}
             </div>
