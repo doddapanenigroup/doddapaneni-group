@@ -6,11 +6,12 @@ import { Inter, Merriweather } from 'next/font/google';
  */
 
 /**
- * Primary UI — variable Inter = one woff2 instead of multiple static weights (smaller total transfer,
- * fewer render-blocking requests vs loading 400/500/600/700 separately).
+ * Primary UI — variable Inter = one woff2. `latin` only keeps the file smaller than `latin+latin-ext`
+ * (helps GTmetrix “critical request chain” / font bytes). Indic copy uses system UI fonts via CSS fallbacks.
+ * Re-add `latin-ext` if you need Polish/Czech/etc. in Latin script.
  */
 export const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   display: 'swap',
   preload: true,
   variable: '--font-inter',
@@ -18,11 +19,10 @@ export const inter = Inter({
 });
 
 /**
- * Display / headings (`font-serif`). `preload: false` avoids competing with Inter on first paint;
- * glyphs load when serif headings render.
+ * Display / headings (`font-serif`). `preload: false` avoids competing with Inter on first paint.
  */
 export const merriweather = Merriweather({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   weight: ['400', '700'],
   display: 'swap',
   variable: '--font-merriweather',
