@@ -1,9 +1,10 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import {
   COMPANY_DIVISION_SLUGS,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { listPublicSectorsBySlugs } from '@/lib/data/sector-repository';
-import { getTranslations } from 'next-intl/server';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export type HomeDivision = {
@@ -19,8 +20,8 @@ const FALLBACK_DESCRIPTION =
 export async function getBusinessDivisionsForHome(locale: string): Promise<HomeDivision[]> {
   noStore();
   const bySlug = await listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
-  const tDivision = await getTranslations({ locale, namespace: 'DivisionLabels' });
-  const tAbout = await getTranslations({ locale, namespace: 'About' });
+  const tDivision = createTranslator(getDictionary(locale), 'DivisionLabels');
+  const tAbout = createTranslator(getDictionary(locale), 'About');
 
   return COMPANY_DIVISION_SLUGS.map((slug) => {
     const row = bySlug.get(slug);

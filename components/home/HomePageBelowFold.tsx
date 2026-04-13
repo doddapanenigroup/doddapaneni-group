@@ -3,7 +3,7 @@
 import { Building2, Landmark, Network } from 'lucide-react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 
 export default function HomePageBelowFold() {
   const t = useTranslations('Home');

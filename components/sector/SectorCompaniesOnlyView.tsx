@@ -1,8 +1,10 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import { getSectorBySlug } from '@/lib/sector-landing';
+import { sectorHeroSubtitleForLocale, sectorPublicName } from '@/lib/sector-localized-copy';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
 import { normalizeStoredImage } from '@/lib/sector-landing';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
@@ -18,16 +20,22 @@ export default async function SectorCompaniesOnlyView({ locale, sectorSlug }: Pr
   if (!sector) notFound();
 
   const companies = await listCompaniesBySectorSlug(sector.slug);
-  const tHome = await getTranslations({ locale, namespace: 'Home' });
+  const tHome = createTranslator(getDictionary(locale), 'Home');
 
-  const heroDescription = sector.description?.trim();
+  const sectorTitle = sectorPublicName(locale, sector.slug, sector.name);
+  const heroDescription = sectorHeroSubtitleForLocale(
+    locale,
+    sector.slug,
+    sector.description,
+    sectorTitle,
+  );
   const showDbCompanies = companies.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
       <section className="bg-blue-900 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sector.name}</h1>
+          <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sectorTitle}</h1>
           {heroDescription ? (
             <p className="mx-auto mt-4 max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
           ) : null}

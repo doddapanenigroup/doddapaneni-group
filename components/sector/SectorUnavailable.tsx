@@ -1,6 +1,7 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import Link from 'next/link';
 import { ArrowLeft, Building2 } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
 import { COMPANY_DIVISION_NAV_LABELS, type CompanyDivisionSlug } from '@/lib/company-divisions';
 import { publicPathWithLocale } from '@/lib/sector-landing';
 
@@ -17,7 +18,7 @@ export default async function SectorUnavailable({ locale, slug }: Props) {
   const label = COMPANY_DIVISION_NAV_LABELS[slug];
   const homeHref = publicPathWithLocale(locale);
   const blogHref = publicPathWithLocale(locale, 'news');
-  const t = await getTranslations({ locale, namespace: 'Blog' });
+  const t = createTranslator(getDictionary(locale), 'Blog');
 
   return (
     <div className="min-h-screen bg-slate-50">

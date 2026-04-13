@@ -3,8 +3,13 @@
  * Skips Blog.posts.*.content (use translate-blog-content.mjs for that).
  * Run from project root: node scripts/translate-all-locales.mjs
  *
- * Env: TRANSLATE_DELAY_MS=500 (default); TRANSLATE_LOCALES=te,hi (optional, only these).
- * If you see HTTP 429, wait an hour or set TRANSLATE_DELAY_MS=2000 and run again.
+ * Env:
+ *   TRANSLATE_DELAY_MS=500 (default)
+ *   TRANSLATE_LOCALES=te,hi (optional, only these)
+ *   TRANSLATE_ONLY_PREFIXES=SoftwareItAiSector,DigitalMarketingSector (optional; dot-path prefixes)
+ *   TRANSLATE_ENGINE=lingva (default) | mymemory — Lingva is a Google Translate front-end and avoids MyMemory 429s.
+ *   LINGVA_BASE=https://lingva.ml (optional mirror)
+ * If you see HTTP 429 on mymemory, switch to lingva or set TRANSLATE_DELAY_MS=2000.
  */
 
 import fs from 'fs';
@@ -16,7 +21,9 @@ const MESSAGES_DIR = path.join(__dirname, '../messages');
 const SOURCE = 'en';
 const TARGET_LOCALES = ['te', 'hi', 'es'];
 const MYMEMORY_URL = 'https://api.mymemory.translated.net/get';
-const MAX_CHUNK_BYTES = 400;
+const LINGVA_BASE = (process.env.LINGVA_BASE || 'https://lingva.ml').replace(/\/$/, '');
+const TRANSLATE_ENGINE = (process.env.TRANSLATE_ENGINE || 'lingva').toLowerCase();
+const MAX_CHUNK_BYTES = 350;
 const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 500;
 
 function loadJSON(filePath) {
@@ -86,7 +93,39 @@ function chunkText(text, maxBytes) {
   return chunks;
 }
 
-async function translateText(text, targetLocale, sourceLocale = SOURCE) {
+async function translateTextLingva(text, targetLocale, sourceLocale = SOURCE) {
+  const t = text.trim();
+  if (!t) return text;
+  if (targetLocale === sourceLocale) return text;
+  const chunks = chunkText(t, MAX_CHUNK_BYTES);
+  const out = [];
+  for (const chunk of chunks) {
+    const pathSeg = encodeURIComponent(chunk);
+    const url = `${LINGVA_BASE}/api/v1/${sourceLocale}/${targetLocale}/${pathSeg}`;
+    let lastErr;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const res = await fetch(url, {signal: AbortSignal.timeout(45_000)});
+      if (res.ok) {
+        const data = await res.json();
+        const translated = data?.translation;
+        out.push(typeof translated === 'string' ? translated : chunk);
+        break;
+      }
+      lastErr = new Error(`HTTP ${res.status}`);
+      if ((res.status === 429 || res.status === 503) && attempt < 3) {
+        const backoff = (attempt + 1) * 5000;
+        console.warn(`  Lingva ${res.status}, waiting ${backoff / 1000}s...`);
+        await delay(backoff);
+      } else {
+        throw lastErr;
+      }
+    }
+    await delay(DELAY_MS);
+  }
+  return out.join(chunks.length > 1 ? ' ' : '');
+}
+
+async function translateTextMymemory(text, targetLocale, sourceLocale = SOURCE) {
   const t = text.trim();
   if (!t) return text;
   if (targetLocale === sourceLocale) return text;
@@ -97,7 +136,7 @@ async function translateText(text, targetLocale, sourceLocale = SOURCE) {
     const url = `${MYMEMORY_URL}?q=${encodeURIComponent(chunk)}&langpair=${encodeURIComponent(langpair)}`;
     let lastErr;
     for (let attempt = 0; attempt < 3; attempt++) {
-      const res = await fetch(url);
+      const res = await fetch(url, {signal: AbortSignal.timeout(45_000)});
       if (res.ok) {
         const data = await res.json();
         const translated = data?.responseData?.translatedText;
@@ -118,6 +157,12 @@ async function translateText(text, targetLocale, sourceLocale = SOURCE) {
   return out.join(chunks.length > 1 ? ' ' : '');
 }
 
+async function translateText(text, targetLocale, sourceLocale = SOURCE) {
+  return TRANSLATE_ENGINE === 'mymemory'
+    ? translateTextMymemory(text, targetLocale, sourceLocale)
+    : translateTextLingva(text, targetLocale, sourceLocale);
+}
+
 function shouldSkipKey(keyPath, value) {
   if (!/^Blog\.posts\.[^.]+\.content$/.test(keyPath)) return false;
   return value.includes('<');
@@ -131,12 +176,24 @@ async function main() {
     ? TARGET_LOCALES.filter((l) => onlyLocales.includes(l))
     : TARGET_LOCALES;
 
+  const onlyPrefixes = process.env.TRANSLATE_ONLY_PREFIXES
+    ? process.env.TRANSLATE_ONLY_PREFIXES.split(',').map((s) => s.trim()).filter(Boolean)
+    : null;
+
   console.log('Loading en.json...');
   const enData = loadJSON(path.join(MESSAGES_DIR, `${SOURCE}.json`));
   const leaves = getLeafKeys(enData);
-  const toTranslate = leaves.filter(({ path: p, value: v }) => !shouldSkipKey(p, v));
+  let toTranslate = leaves.filter(({ path: p, value: v }) => !shouldSkipKey(p, v));
+  if (onlyPrefixes && onlyPrefixes.length > 0) {
+    toTranslate = toTranslate.filter(({ path: p }) =>
+      onlyPrefixes.some((pref) => p === pref || p.startsWith(`${pref}.`)),
+    );
+    console.log(`Filter TRANSLATE_ONLY_PREFIXES: ${onlyPrefixes.join(', ')} → ${toTranslate.length} keys`);
+  }
   console.log(`Total keys: ${leaves.length}, skipping blog HTML content: ${leaves.length - toTranslate.length}`);
-  console.log(`Translating to: ${locales.join(', ')} (delay ${DELAY_MS}ms)\n`);
+  console.log(
+    `Engine: ${TRANSLATE_ENGINE}${TRANSLATE_ENGINE === 'lingva' ? ` (${LINGVA_BASE})` : ''}\nTranslating to: ${locales.join(', ')} (delay ${DELAY_MS}ms)\n`,
+  );
 
   for (const locale of locales) {
     const filePath = path.join(MESSAGES_DIR, `${locale}.json`);
@@ -163,6 +220,10 @@ async function main() {
         const translatedValue = await translateText(enValue, locale, SOURCE);
         setNestedKey(data, keyPath, translatedValue);
         translated++;
+        if (translated % 10 === 0) {
+          console.log(`  ${locale}: ${translated} strings…`);
+          saveJSON(filePath, data);
+        }
       } catch (err) {
         console.error(`  ${locale} ${keyPath}: ${err.message}`);
         setNestedKey(data, keyPath, enValue);

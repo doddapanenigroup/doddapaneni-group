@@ -1,4 +1,4 @@
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import type { NewsSector } from '@/lib/doddapaneni-news';
 
 type Props = {

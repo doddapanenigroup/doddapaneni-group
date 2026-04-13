@@ -1,7 +1,7 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { useTranslations, useAppLocale as useLocale } from '@/lib/dictionary-react';
+import { Link } from '@/i18n/navigation';
 import { Shield, ExternalLink } from 'lucide-react';
 
 function PolicyLink({

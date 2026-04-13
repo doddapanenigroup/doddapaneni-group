@@ -1,12 +1,13 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
 import type { Role } from '@/lib/constants';
 import { isAdmin, isDeveloper, isMarketer, isSuperAdmin } from '@/lib/role-utils';
 
-export default async function DashboardPage() {
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function DashboardPage({ params }: Props) {
   const session = await auth();
-  const locale = await getLocale();
+  const { locale } = await params;
 
   if (!session?.user) {
     redirect(`/${locale}/login`);

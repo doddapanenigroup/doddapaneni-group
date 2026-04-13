@@ -6,9 +6,6 @@ export type SitemapPathname = string;
 
 export function pathWithLocale(locale: string, pathname: string): string {
   const p = pathname === '/' ? '' : pathname;
-  if (locale === routing.defaultLocale) {
-    return p === '' ? '/' : pathname;
-  }
   return p === '' ? `/${locale}` : `/${locale}${pathname}`;
 }
 

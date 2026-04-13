@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { routing } from '@/i18n/routing';
 
 // This ensures the required URL shape `/preview/[token]` works.
 // The app itself renders previews under `/{locale}/preview/[token]`.

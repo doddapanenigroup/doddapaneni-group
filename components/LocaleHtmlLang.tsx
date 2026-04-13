@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useLocale } from 'next-intl';
+import { useAppLocale as useLocale } from '@/lib/dictionary-react';
 
 /** Keeps <html lang> in sync with next-intl when the document shell lives in app/layout.tsx */
 export default function LocaleHtmlLang() {

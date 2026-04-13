@@ -1,6 +1,5 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { canAccessEmployeesDashboard } from '@/lib/dashboard-access';
@@ -32,9 +31,11 @@ type EmployeeWithStats = {
   isActive: boolean;
 };
 
-export default async function EmployeesPage() {
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function EmployeesPage({ params }: Props) {
   const session = await auth();
-  const locale = await getLocale();
+  const { locale } = await params;
 
   const role = session?.user?.role;
   if (!session?.user || !canAccessEmployeesDashboard(role as Role | null | undefined)) {

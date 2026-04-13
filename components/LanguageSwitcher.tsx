@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import { Link, usePathname } from '@/i18n/routing';
+import { useAppLocale as useLocale } from '@/lib/dictionary-react';
+import { Link, usePathname } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 import { Globe } from 'lucide-react';
 

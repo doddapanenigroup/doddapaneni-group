@@ -1,13 +1,14 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
 import type { Role } from '@/lib/constants';
 import { canAccessDeveloperDashboard } from '@/lib/dashboard-access';
 import DeveloperDashboard from '@/components/dashboard/DeveloperDashboard';
 
-export default async function DeveloperDashboardPage() {
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function DeveloperDashboardPage({ params }: Props) {
   const session = await auth();
-  const locale = await getLocale();
+  const { locale } = await params;
 
   const role = session?.user?.role;
   if (!session?.user || !canAccessDeveloperDashboard(role as Role | null | undefined)) {

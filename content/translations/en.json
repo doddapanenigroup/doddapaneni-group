@@ -1,0 +1,1115 @@
+{
+  "Metadata": {
+    "title": "Business Solutions Company | Doddapaneni Group IT, Healthcare & Digital Services",
+    "description": "Business solutions company Doddapaneni Group offers IT, healthcare, construction, and digital marketing services to drive growth and innovation."
+  },
+  "Navbar": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "ourCompanies": "Our Services",
+    "sectorLiveLoading": "Loading sectors…",
+    "comingSoonNav": "Coming soon",
+    "blog": "News",
+    "contact": "Contact Us",
+    "language": "Language"
+  },
+  "Footer": {
+    "tagline": "A diversified group with offices in India and the United States",
+    "companyLegalNav": "Company & legal",
+    "companyLegalNavAria": "Company and legal links",
+    "quickLinks": "Explore",
+    "contact": "Contact",
+    "rights": "All rights reserved.",
+    "phone": "Phone",
+    "address": "Address",
+    "email": "Email",
+    "newsletter": "Newsletter",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "subscribed": "Thank you for subscribing!",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsConditions": "Terms & Conditions",
+    "termsShort": "Terms",
+    "disclaimer": "Disclaimer",
+    "faq": "FAQ / Support",
+    "sitemap": "Sitemap",
+    "followUs": "Follow Us"
+  },
+  "DivisionLabels": {
+    "software-it-ai": "Information Technology & AI Development",
+    "digital-marketing": "Digital Marketing",
+    "healthcare-medical": "Healthcare & Medical",
+    "construction-realestate": "Construction & Real Estate",
+    "ecommerce-marketplace": "E-commerce Marketplace",
+    "media-news-entertainment": "Media, News & Entertainment",
+    "staffing-consultancy": "Human Resources & Consultancy",
+    "food-beverages": "Food & Baverages",
+    "manufacturing-trading": "Manufacturing & Trading",
+    "logistics-warehousing": "Logistics & Warehousing",
+    "education-skill": "Education & Skill Development",
+    "import-export": "Import & Export"
+  },
+  "Home": {
+    "innovating": "Multi-sector operations • India & USA",
+    "heroImageAlt": "Modern office architecture at dusk, representing Doddapaneni Group corporate presence",
+    "homeSectionImageAlt": "Colleagues collaborating on business planning and operations",
+    "strengthsSectionHeading": "How we work with clients and partners",
+    "heroTitle": "Building <highlight>Future-Ready</highlight> Businesses",
+    "heroTitleLine1": "Building <highlight>Future-Ready</highlight>",
+    "heroTitleLine2": "Businesses",
+    "heroSubtitle": "We run twelve focused divisions—from software and digital marketing to healthcare support, construction, trade, and logistics—so you can work with one group that understands operational detail, not just slide decks.",
+    "exploreServices": "Explore Our Services",
+    "learnAboutUs": "Learn About Us",
+    "globalReach": "India and United States presence",
+    "globalReachDesc": "Registered operations and commercial teams in Telangana, India, and Ocala, Florida, with digital products and trading relationships that extend further where our divisions serve clients.",
+    "sustainableGrowth": "Measured growth",
+    "sustainableGrowthDesc": "We invest in processes, training, and technology that hold up under audit and scale—so growth does not come at the cost of compliance, safety, or client trust.",
+    "trustedPartner": "Clear accountability",
+    "trustedPartnerDesc": "Each division has named responsibilities, documented standards, and escalation paths. Partners receive straightforward communication—not generic promises.",
+    "whoWeAre": "Who We Are",
+    "buildingSustainable": "Building Sustainable Businesses",
+    "description": "Doddapaneni Group is the parent company for a portfolio of operating divisions and brands. Technology and marketing teams build web and automation solutions; other divisions support healthcare-related supply and billing workflows, construction and property work, import–export desks, manufacturing and wholesale, warehousing and freight, consumer platforms, media, staffing, education, and food-sector programs. We publish sector articles on this site so visitors can see how each unit approaches its market. If you need a formal introduction, regulatory filing reference, or vendor onboarding pack, use the Contact page and we will route you to the right division.",
+    "readStory": "Read our full story",
+    "ourGroupCompanies": "Our Products",
+    "drivingExcellence": "DealsMedi (USA health products), Dlsin (multivendor commerce), and Janatha Mirror (digital news) are three public-facing brands you can explore in depth via the links below.",
+    "ourServices": "Our Services",
+    "diverseSolutions": "For a sector-by-sector list of capabilities, explore Our Services in the header or the Services page.",
+    "viewAllServices": "View all services",
+    "learnMore": "Learn more",
+    "readyToTransform": "Ready to Transform Your Business?",
+    "partnerWithUs": "Partner with Doddapaneni Group for innovative solutions and sustainable growth.",
+    "getInTouch": "Get in Touch",
+    "servicesList": {
+      "ecommerce": {
+        "title": "E-commerce Marketplace",
+        "description": "We design, develop, and manage scalable e-commerce ecosystems that support modern business models. Our solutions include online retail platforms, multi-vendor marketplaces, global trading portals, and dropshipping and wholesale systems optimized for performance and growth."
+      },
+      "software": {
+        "title": "Information Technology & AI Development",
+        "description": "We provide end-to-end digital solutions including web and mobile application development, AI-powered automation, chatbots, cloud services, SaaS platforms, and IT consulting. Our technology solutions are designed to enhance efficiency, security, and scalability."
+      },
+      "digitalMarketing": {
+        "title": "Digital Marketing",
+        "description": "Our digital marketing services focus on building brand visibility and driving measurable growth. We offer SEO and keyword optimization, social media management, branding and advertising campaigns, and lead generation through performance-driven strategies."
+      },
+      "healthcare": {
+        "title": "Healthcare & Medical",
+        "description": "We support healthcare providers with medical equipment trading and comprehensive backend services. Our offerings include CPAP and BiPAP devices, medical consumables, wholesale distribution, medical billing and coding, insurance claims processing, EHR/EMR integration, telehealth billing, and complete Revenue Cycle Management solutions."
+      },
+      "construction": {
+        "title": "Construction & Real Estate",
+        "description": "We deliver construction and real estate solutions covering building construction, architectural design, real estate development, and property consulting, ensuring quality, compliance, and timely execution."
+      },
+      "importExport": {
+        "title": "Import & Export",
+        "description": "We facilitate international trade through global sourcing, wholesale exports, international trading, and cross-border logistics, enabling smooth and compliant global operations."
+      },
+      "food": {
+        "title": "Food & Baverages",
+        "description": "Our food processing and beverage division focuses on packaged food production, beverage manufacturing, and efficient food supply chain distribution."
+      },
+      "education": {
+        "title": "Education & Skill Development",
+        "description": "We provide training programs, vocational courses, e-learning platforms, and certification programs designed to build industry-relevant skills and career-ready professionals."
+      },
+      "logistics": {
+        "title": "Logistics & Warehousing",
+        "description": "We offer end-to-end logistics solutions including freight and cargo handling, storage and warehousing, supply chain management, and last-mile delivery services."
+      },
+      "media": {
+        "title": "Media, News & Entertainment",
+        "description": "Our media division manages digital news portals, media production, video and content creation, and advertising network management."
+      },
+      "manufacturing": {
+        "title": "Manufacturing & Trading",
+        "description": "We operate industrial manufacturing units, custom production facilities, and bulk wholesale trading operations to support diverse industry needs."
+      },
+      "staffing": {
+        "title": "Human Resources & Consultancy",
+        "description": "We assist organizations with recruitment and staffing, HR consulting, and workforce management, helping businesses build efficient and high-performing teams."
+      }
+    },
+    "businessDivisions": "Business divisions",
+    "businessDivisionsSubtitle": "Twelve industry verticals across the group—each with dedicated capabilities, sector insights, and published articles.",
+    "hubHeroEyebrow": "Corporate hub",
+    "hubHeroTitle": "Doddapaneni Group",
+    "hubHeroSubtitle": "Diversified operations",
+    "hubHeroLead": "Specialised verticals—Technology, Healthcare, E-commerce, Infrastructure, and more—unified under one disciplined operating model.",
+    "divisionsSectionTitle": "Business divisions",
+    "divisionsSectionSubtitle": "",
+    "viewCompany": "View Company",
+    "launchingSoon": "Launching Soon",
+    "inactiveDivisionHint": "Division hub, programmes, and published insights will appear here as we go live.",
+    "divisionsFooterServices": "View all group services",
+    "leadershipTitle": "Group leadership",
+    "leadershipSubtitle": "Strategic direction follows a disciplined governance model: clear accountability at board and executive level, with each division led by sector-focused teams.",
+    "leadershipGovTitle": "Board & governance",
+    "leadershipGovBody": "Oversight of capital, risk, and long-term strategy ensures transparency and alignment across every operating unit.",
+    "leadershipExecTitle": "Executive office",
+    "leadershipExecBody": "Group strategy becomes operational priorities here—coordinating cross-division programmes, standards, and compliance.",
+    "leadershipDivTitle": "Division leadership",
+    "leadershipDivBody": "Each vertical has named leadership with P&L ownership, documented standards, and direct responsibility for client outcomes.",
+    "presenceTitle": "Global presence",
+    "presenceSubtitle": "Anchored in South-Central India and the United States—with digital products and trading relationships that extend wherever our divisions serve partners.",
+    "presenceIndiaLabel": "India",
+    "presenceIndiaLoc": "Telangana — Hyderabad region",
+    "presenceIndiaDesc": "Registered operations and teams across technology, healthcare, construction, media, and shared services.",
+    "presenceUsLabel": "United States",
+    "presenceUsLoc": "Florida — Ocala",
+    "presenceUsDesc": "USA commerce, healthcare marketplace programmes, and North American partner coordination.",
+    "presenceMapAria": "Stylised map highlighting group offices in India and the United States",
+    "hubTitle": "Doddapaneni Group – Our Business Divisions",
+    "hubSubtitle": "Each card links to sector articles and context where that hub is live. Other divisions are listed for transparency and will gain full hubs as content and programmes mature.",
+    "comingSoonLabel": "Coming soon",
+    "exploreDivision": "Explore",
+    "logoAltDlsin": "Dlsin multivendor e-commerce platform logo",
+    "logoAltJanathaMirror": "Janatha Mirror digital news publication logo",
+    "logoAltDealsmedi": "DealsMedi online medical and health products marketplace logo",
+    "companyBrandDlsin": "Dlsin",
+    "companyBrandDealsmedi": "DealsMedi",
+    "companyBrandJanathaMirror": "Janatha Mirror",
+    "sectorCompaniesListHeading": "Our products in this sector",
+    "sectorCompaniesListLead": "Select a company to open its page.",
+    "sectorCompaniesListRowHint": "Open company page",
+    "sectorCompaniesListEmptyTitle": "No companies listed yet",
+    "sectorCompaniesListEmptyBody": "We are preparing this sector's company pages. Please check back soon."
+  },
+  "SectorLanding": {
+    "featuredProductsHeading": "Our products in this sector",
+    "featuredProductsLead": "Select a brand to open its page.",
+    "emptyTitle": "No public brands listed yet",
+    "emptyBody": "We’re preparing this sector’s brand pages. Please check back soon."
+  },
+  "About": {
+    "metaTitle": "About Doddapaneni Group | Vision, Mission & Business Divisions",
+    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media, News & Entertainment, Human Resources & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
+    "metaKeywords": "Doddapaneni Group, diversified conglomerate, corporate vision, business divisions, technology, healthcare, construction, digital marketing, import export, corporate profile",
+    "metaOgTitle": "About Doddapaneni Group",
+    "metaOgDescription": "A corporate portfolio across twelve industries—built on integrity, innovation, and long-term value for partners and communities.",
+    "headerTitle": "About Doddapaneni Group",
+    "headerSubtitle": "A diversified business group delivering disciplined execution, responsible growth, and enduring relationships across twelve sector verticals.",
+    "introTitle": "Corporate profile",
+    "introImageAlt": "Corporate leadership and strategy discussion representing Doddapaneni Group",
+    "introText": "Doddapaneni Group is a diversified enterprise organized for scale, governance, and cross-industry collaboration. We combine sector depth with group-level standards in compliance, quality, and client service—so every division can move quickly without compromising the trust placed in our name. Our work spans technology and digital services, healthcare and medical ecosystems, construction and real estate, global trade, industrial operations, logistics, consumer-facing platforms, media, talent services, education, and food and beverage value chains. We partner with clients, institutions, and operators who expect clarity of scope, measurable outcomes, and alignment with long-term economic and social impact.",
+    "visionTitle": "Group vision",
+    "visionText": "To be a globally respected business group known for ethical leadership, operational excellence, and the ability to mobilize capabilities across industries—so clients and communities benefit from solutions that are innovative, reliable, and built to last.",
+    "missionTitle": "Mission",
+    "missionText": "To deliver high-quality, scalable offerings in each division; to invest in people, processes, and technology that raise the bar for service; to honor our commitments to partners, regulators, and society; and to grow sustainably while strengthening the companies and markets we serve.",
+    "companiesTitle": "Our Group of Companies",
+    "companiesSubtitle": "A unified ecosystem of specialized businesses.",
+    "divisionsTitle": "Our business divisions",
+    "divisionsSubtitle": "A single group structure with dedicated sector leadership and shared standards of governance.",
+    "divisionsLead": "Each division contributes distinct expertise while aligning to group principles: clear accountability, disciplined risk management, and relentless focus on outcomes for stakeholders.",
+    "exploreHub": "View division",
+    "comingSoonBadge": "Coming soon",
+    "divisionsCta": "Explore group services and capabilities across sectors.",
+    "divisionsCtaLink": "Our services",
+    "valuesTitle": "Core values",
+    "valuesSubtitle": "Non-negotiable principles that guide decisions at every level of the organization.",
+    "valuesList": {
+      "integrity": "Integrity",
+      "transparency": "Transparency",
+      "customerFocus": "Customer focus",
+      "innovation": "Innovation",
+      "operationalExcellence": "Operational excellence",
+      "sustainableGrowth": "Sustainable growth"
+    },
+    "divisionBlurbs": {
+      "software-it-ai": "Enterprise software, cloud, and AI capabilities that modernize operations, strengthen security, and support data-driven decisions.",
+      "digital-marketing": "Brand, acquisition, and performance programs engineered for measurable reach, reputation, and engagement.",
+      "healthcare-medical": "Support for providers, payers, and health-tech ventures with an emphasis on quality, compliance, and dependable delivery.",
+      "construction-realestate": "Project execution, property and infrastructure initiatives from planning and design through delivery and stewardship.",
+      "ecommerce-marketplace": "Commerce platforms, catalog and fulfillment integration, and marketplace models designed for multi-region scale.",
+      "media-news-entertainment": "Content, audience products, and digital experiences for publishers and entertainment brands.",
+      "staffing-consultancy": "Talent, workforce programs, and advisory services aligned to industry context and growth stage.",
+      "food-beverages": "Capabilities across supply, quality, and distribution for food and beverage brands serving regional and global demand.",
+      "manufacturing-trading": "Industrial operations, trading networks, and productivity initiatives that improve throughput and visibility.",
+      "logistics-warehousing": "Distribution, storage, and last-mile solutions oriented to reliability, cost discipline, and traceability.",
+      "education-skill": "Learning, skilling, and EdTech partnerships that scale training while safeguarding quality and outcomes.",
+      "import-export": "Cross-border trade, compliance, and partner networks that keep goods and documentation moving efficiently."
+    },
+    "industries": {
+      "it": "IT & AI",
+      "construction": "Construction",
+      "importExport": "Import/Export",
+      "healthcare": "Healthcare",
+      "logistics": "Logistics",
+      "manufacturing": "Manufacturing"
+    }
+  },
+  "ServicesPage": {
+    "title": "Our Services",
+    "description": "Below is a plain-language overview of what each Doddapaneni Group division works on. Capabilities vary by contract, region, and regulatory context—use the Contact form for a scoped discussion.",
+    "listHeading": "Division capabilities at a glance",
+    "diverseVentures": "Doddapaneni Group operates across this sector.",
+    "companyDesc": {
+      "dealsmedi": "Your trusted online marketplace for medical and health products in the USA—CPAP, BiPAP, mobility aids, and more.",
+      "dlsin": "A multivendor e-commerce platform connecting buyers and sellers worldwide with secure payments and fast logistics.",
+      "janathaMirror": "A digital-first media enterprise delivering reliable news and engaging content with journalistic integrity."
+    }
+  },
+  "ContactPage": {
+    "metaTitle": "Contact Doddapaneni Group | Reach Our Team",
+    "metaDescription": "Contact Doddapaneni Group by email, phone, or our enquiry form. India and USA offices. We reply to business inquiries promptly.",
+    "metaKeywords": "contact Doddapaneni Group, business inquiry, corporate office, India, USA, email",
+    "metaOgTitle": "Contact Doddapaneni Group",
+    "metaOgDescription": "Reach our team for partnerships, services, and general enquiries—professional response within one business day.",
+    "headerTitle": "Contact Us",
+    "headerIntro": "Use this page for corporate enquiries, media, vendor onboarding, and partnerships. State your organisation, country, and which division or brand you need so we route the message correctly.",
+    "headerSubtitle": "Partnerships, services, and general enquiries—our team will respond with clarity and care.",
+    "getInTouch": "How to reach us",
+    "emailTitle": "Email",
+    "emailAddress": "info@doddapanenigroup.net",
+    "emailResponse": "We aim to respond within one business day.",
+    "phoneTitle": "Phone",
+    "phoneIndia": "+91 814 224 6666",
+    "phoneIndiaLabel": "India",
+    "phoneUSA": "+1 (352) 230-8586",
+    "phoneUSALabel": "United States",
+    "phoneAvailability": "Monday–Friday, 9:00–18:00 (local office time).",
+    "locationsTitle": "Offices",
+    "locationIndia": "India (registered office)",
+    "addressIndia": "Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, 500085",
+    "locationUSA": "USA",
+    "addressUSA": "5052 SW 40th PL, Ocala, Florida, 34474",
+    "mapTitle": "Map — India office vicinity",
+    "mapCaption": "Location reference: Hyderabad region, Telangana, India. For exact directions, use the address above.",
+    "formTitle": "Send a message",
+    "formSubtitle": "Please include your organisation and how we can assist.",
+    "successTitle": "Message Sent!",
+    "successMessage": "Thank you for contacting us. We'll be in touch soon.",
+    "formName": "Full Name",
+    "formNamePlaceholder": "Enter Your Name",
+    "formEmail": "Email Address",
+    "formEmailPlaceholder": "Enter Your Email",
+    "formMessage": "Message",
+    "formMessagePlaceholder": "How can we help you?",
+    "sendButton": "Send Message",
+    "sendingButton": "Sending...",
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "messageRequired": "Message is required",
+    "messageMinLength": "Message must be at least 10 characters"
+  },
+  "Dlsin": {
+    "partOf": "Part of Doddapaneni Group",
+    "subtitle": "Multivendor storefronts, payments integration, and seller tooling from the group’s commerce division.",
+    "sectionTitle": "Why the platform exists",
+    "p1": "Dlsin exists so independent sellers and small brands can list inventory, receive orders, and settle payments without building a full technology stack from scratch. The product team focuses on catalogue management, checkout stability, and dispute-handling workflows.",
+    "p2": "Buyers get search, category browsing, and order tracking in one place. Seller dashboards expose fulfilment status and basic analytics so merchants can restock or adjust pricing on evidence, not guesswork.",
+    "features": {
+      "globalMarketplace": {
+        "title": "Global Marketplace",
+        "description": "Connecting buyers and sellers from around the world on a single, unified platform."
+      },
+      "securePayments": {
+        "title": "Secure Payments",
+        "description": "Advanced encryption and secure payment gateways ensuring safe transactions for all users."
+      },
+      "fastLogistics": {
+        "title": "Fast Logistics",
+        "description": "Integrated logistics network for timely deliveries across borders."
+      },
+      "vendorTools": {
+        "title": "Vendor Tools",
+        "description": "Comprehensive dashboard and analytics for sellers to manage and grow their business."
+      }
+    }
+  },
+  "JanathaMirror": {
+    "partOf": "Part of Doddapaneni Group",
+    "subtitle": "Digital reporting and analysis from the group’s media unit.",
+    "followUs": "Follow us",
+    "sectionTitle": "Editorial focus",
+    "p1": "Janatha Mirror publishes news and features for readers who want sourced reporting—not recycled press releases. Editors prioritise verification, bylines, and corrections when facts change.",
+    "p2": "Coverage spans public policy, business, culture, and civic issues, with distribution optimised for web and social channels so stories reach readers where they already spend time.",
+    "features": {
+      "unbiasedReporting": {
+        "title": "Unbiased Reporting",
+        "description": "Delivering facts as they are, without bias or distortion."
+      },
+      "digitalFirst": {
+        "title": "Digital First",
+        "description": "Optimized for the modern web, mobile, and social platforms."
+      },
+      "multimediaContent": {
+        "title": "Multimedia Content",
+        "description": "Rich video content, interviews, and documentaries."
+      },
+      "globalPerspective": {
+        "title": "Global Perspective",
+        "description": "Local stories with global relevance and international coverage."
+      }
+    }
+  },
+  "DealsMedi": {
+    "partOf": "Part of Doddapaneni Group",
+    "subtitle": "Your trusted online marketplace for medical and health products in the USA.",
+    "followUs": "Follow us",
+    "sectionTitle": "Medical & Health Products for the USA",
+    "p1": "DealsMedi is a website which sells medical products only in the USA, including prescription-required products and non-prescription products. CPAP, BiPAP, oxygen concentrators, hospital beds, mobility chairs, and everything in between are available through our platform.",
+    "p2": "From respiratory care and sleep therapy to mobility aids, bathroom safety, orthopedic supports, and medical supplies—DealsMedi brings you a single trusted marketplace for healthcare and wellness products. Shop with confidence at dealsmedi.com.",
+    "websiteUrl": "https://dealsmedi.com/",
+    "visitWebsite": "Visit DealsMedi",
+    "features": {
+      "respiratory": {
+        "title": "Respiratory & Sleep Therapy",
+        "description": "CPAP, BiPAP machines, oxygen concentrators, masks, and sleep apnea therapy products."
+      },
+      "mobility": {
+        "title": "Mobility & Daily Living",
+        "description": "Mobility scooters, wheelchairs, rollators, bathroom safety, and daily living aids."
+      },
+      "bedsAndChairs": {
+        "title": "Hospital Beds & Chairs",
+        "description": "Hospital beds, electric beds, mobility chairs, and homecare equipment."
+      },
+      "prescriptionAndOTC": {
+        "title": "Prescription & OTC",
+        "description": "Prescription-required and over-the-counter medical and health products."
+      }
+    }
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "homeButton": "Go Back Home"
+  },
+  "Error": {
+    "title": "Something went wrong!",
+    "description": "We apologize for the inconvenience. An unexpected error has occurred.",
+    "retry": "Try again"
+  },
+  "PrivacyPolicy": {
+    "metaTitle": "Privacy Policy | Doddapaneni Group",
+    "metaDescription": "Privacy Policy for Doddapaneni Group: data collection, cookies, advertising (including Google AdSense), third-party services, and your choices.",
+    "metaKeywords": "privacy policy, Doddapaneni Group, cookies, personal data, Google AdSense, advertising, third-party services",
+    "metaOgTitle": "Privacy Policy — Doddapaneni Group",
+    "metaOgDescription": "How we collect, use, and protect your information—including cookies and third-party advertising technologies.",
+    "title": "Privacy Policy",
+    "subtitle": "How we collect, use, and protect personal information when you use our websites and services.",
+    "lastUpdated": "Last updated: 27 March 2026",
+    "introduction": "Doddapaneni Group (“we”, “us”, “our”) respects your privacy. This Privacy Policy explains—in plain terms—what information we collect on this corporate website, how we use it, how cookies and similar technologies function here, how partners such as Google may process data when we show ads, and what choices you retain. It is written for visitors, clients, and partners who browse doddapanenigroup.net (and related company sites we operate). By continuing to use the site, you acknowledge this Policy where applicable law allows.",
+    "tocAriaLabel": "Privacy policy sections",
+    "tocIntro": "This policy covers:",
+    "tocData": "Data collection",
+    "tocCookies": "Cookies & similar technologies",
+    "tocThirdParty": "Third-party services & advertising",
+    "tocUse": "How we use information",
+    "tocSecurity": "Security & retention",
+    "tocRights": "Your rights & contact",
+    "tocChanges": "Changes",
+    "informationWeCollect": "1. Data collection",
+    "informationWeCollectLead": "We collect information in the following ways:",
+    "informationWeCollectDesc": "We may collect information that you provide directly to us, including your name, email address, phone number, and any other information you choose to provide when you contact us or subscribe to our newsletter.",
+    "informationWeCollectYouProvideTitle": "Information you provide",
+    "informationWeCollectYouProvideDesc": "When you contact us, subscribe to updates, submit forms, or otherwise communicate with us, you may provide identifiers such as your name, email address, phone number, organisation, and the content of your message. We use this to respond, provide services, and meet our contractual and legal obligations.",
+    "informationWeCollectAutoTitle": "Information collected automatically",
+    "informationWeCollectAutoDesc": "When you visit our website, our servers and partners may automatically receive technical data such as IP address, approximate location derived from IP, browser type and version, device type, operating system, referring URLs, pages viewed, and timestamps. This helps us secure the site, measure performance, debug issues, and understand aggregate usage.",
+    "informationWeCollectSensitiveTitle": "Sensitive categories",
+    "informationWeCollectSensitiveDesc": "We do not intentionally solicit special categories of personal data (such as health data) through general website forms. Please do not submit sensitive information unless a specific form clearly requires it for a stated purpose.",
+    "cookies": "2. Cookies & similar technologies",
+    "cookiesDesc": "Our website may use cookies to improve your browsing experience. You can control cookie preferences through your browser settings.",
+    "cookiesLead": "Cookies are small text files stored on your device. We and our partners may also use pixels, local storage, and similar technologies for the purposes described below.",
+    "cookiesEssentialTitle": "Essential & functional",
+    "cookiesEssentialDesc": "Some cookies are necessary for security, load balancing, language or locale preferences, and core site functionality. These may be set without consent where permitted by law.",
+    "cookiesAnalyticsTitle": "Analytics & performance",
+    "cookiesAnalyticsDesc": "We may use analytics tools to collect aggregated statistics about traffic and navigation. Where required, we rely on your consent or legitimate interests to improve our content and user experience.",
+    "cookiesAdvertisingTitle": "Advertising & personalised content",
+    "cookiesAdvertisingDesc": "We may use third-party advertising services (such as Google AdSense) that set cookies or use advertising identifiers to show ads on our site, measure ad delivery, and—depending on your settings and applicable law—personalise ads based on your visits to this and other websites. These partners may combine data from our site with data from other sites and apps.",
+    "cookiesChoicesTitle": "Your choices",
+    "cookiesChoicesDesc": "You can control cookies through your browser settings (including blocking or deleting cookies). You can also visit Google’s Ads Settings and the NAI / DAA opt-out resources to learn more about personalised ads and limit certain uses. Note that disabling cookies may affect site features.",
+    "thirdParty": "3. Third-party services",
+    "thirdPartyDesc": "We may use third-party services that collect, monitor, and analyze information to help us improve our website and services.",
+    "thirdPartyLead": "We may integrate services provided by third parties. These providers process data under their own policies and may act as independent controllers or processors.",
+    "thirdPartyGoogleTitle": "Google services",
+    "thirdPartyGoogleDesc": "Our site may use Google services such as Google AdSense (advertising) and, where implemented, Google Analytics or related measurement tools. Google’s use of advertising cookies enables it and its partners to serve ads based on users’ visits to our site and/or other sites on the Internet. You can review how Google uses information from sites that use its services at the link below, and read Google’s Privacy Policy for more detail.",
+    "thirdPartyOtherTitle": "Other providers",
+    "thirdPartyOtherDesc": "We may use additional providers for hosting, email delivery, content delivery, security, or embedded media. Each processes only the data needed to perform its role.",
+    "thirdPartyLiabilityTitle": "External sites",
+    "thirdPartyLiabilityDesc": "Our website may link to external sites. We are not responsible for their privacy practices. Please read the policies of any site you visit.",
+    "adsenseNoticeTitle": "Advertising disclosure (AdSense & similar programmes)",
+    "adsenseNoticeDesc": "Where we display third-party ads, those ads may be personalised using cookies or mobile identifiers, subject to your choices and applicable regulations. Third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to our website or other websites. Users may opt out of personalised advertising by adjusting ad settings in their Google Account or using industry opt-out tools where available. EU / UK / similar users may see consent mechanisms as required by law.",
+    "howWeUse": "4. How we use information",
+    "howWeUseDesc": "We use personal and technical information to: operate and improve our website; respond to enquiries and provide customer support; send administrative or service-related messages; analyse traffic and performance; deliver and measure advertising where enabled; detect fraud, abuse, and security incidents; comply with law, regulation, or legal process; and enforce our terms.",
+    "dataProtection": "5. Security & retention",
+    "dataProtectionDesc": "We implement appropriate technical and organisational measures designed to protect personal information. No method of transmission over the Internet is completely secure. We retain information only as long as necessary for the purposes above, unless a longer period is required by law or legitimate business needs (such as resolving disputes).",
+    "yourRights": "6. Your rights & contact",
+    "yourRightsDesc": "Depending on your location, you may have rights to access, rectify, delete, restrict, or object to certain processing, or to data portability. You may also withdraw consent where processing is consent-based. To exercise rights or ask questions about this Policy, contact us via the details on our Contact page (for example info [at] doddapanenigroup.net). We may need to verify your identity before fulfilling certain requests.",
+    "childrenTitle": "Children",
+    "childrenDesc": "Our website is not directed at children under 16 (or the age required in your jurisdiction). We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us so we can delete it.",
+    "internationalTitle": "International transfers",
+    "internationalDesc": "We may process data in India, the United States, the European Economic Area, or other regions where we or our providers operate. We use appropriate safeguards as required by applicable law when data crosses borders.",
+    "changes": "7. Changes to this policy",
+    "changesDesc": "We may update this Privacy Policy to reflect legal, technical, or business changes. The “Last updated” date at the top will be revised when we post a new version. Continued use of the site after changes constitutes acceptance unless applicable law requires additional consent.",
+    "partnerSitesLinkLabel": "How Google uses data from sites that use its services",
+    "googlePrivacyLinkLabel": "Google Privacy Policy",
+    "googleAdsSettingsLabel": "Google Ads Settings",
+    "naIResourceLabel": "Network Advertising Initiative — consumer opt-out",
+    "externalLinkTitle": "Opens in a new tab",
+    "contactPageLink": "Go to Contact"
+  },
+  "TermsConditions": {
+    "metaTitle": "Terms of Service | Doddapaneni Group",
+    "metaDescription": "Terms of Service for Doddapaneni Group websites: acceptable use, intellectual property, disclaimers, limitation of liability, and governing terms.",
+    "metaKeywords": "terms of service, terms of use, Doddapaneni Group, website legal, user agreement",
+    "metaOgTitle": "Terms of Service — Doddapaneni Group",
+    "metaOgDescription": "Rules and conditions for using Doddapaneni Group’s websites and online materials.",
+    "title": "Terms of Service",
+    "subtitle": "Rules and conditions for accessing and using our websites, content, and online services.",
+    "lastUpdated": "Last updated: 27 March 2026",
+    "notLegalAdvice": "This document is provided for general information. It does not constitute legal advice. If you require advice about your specific situation, consult a qualified professional.",
+    "tocAriaLabel": "Terms sections",
+    "tocIntro": "Sections",
+    "tocAcceptance": "Agreement to terms",
+    "tocLicense": "Access & acceptable use",
+    "tocIp": "Intellectual property",
+    "tocDisclaimer": "Disclaimers & liability",
+    "tocLaw": "Governing law & disputes",
+    "tocChanges": "Changes & contact",
+    "contactPageLink": "Go to Contact",
+    "acceptance": "1. Agreement to these terms",
+    "acceptanceDesc": "By accessing or using any website, application, or online service operated by Doddapaneni Group or its affiliates (collectively, “we”, “us”, “our”), you agree to these Terms of Service and our Privacy Policy. If you do not agree, you must not use the site. Additional terms may apply to specific services, products, or portals; in case of conflict, the more specific terms control for that offering.",
+    "eligibilityTitle": "2. Eligibility",
+    "eligibilityDesc": "You represent that you have the legal capacity to enter into these terms in your jurisdiction and, where you act on behalf of an organisation, that you are authorised to bind that organisation. You must not use the site in any country or manner prohibited by applicable sanctions, export controls, or law.",
+    "useLicense": "3. Licence to use the website",
+    "useLicenseDesc": "Subject to these Terms, we grant you a limited, non-exclusive, non-transferable, revocable licence to access and use the site for lawful business or personal, non-commercial browsing. You may not copy, scrape, mirror, or frame substantial portions of the site; circumvent security or access controls; probe or test vulnerabilities without authorisation; or use the site in any way that could damage, disable, or overburden our systems.",
+    "restrictions": "4. Acceptable use",
+    "restrictionsDesc": "You will not: (a) violate any applicable law or regulation; (b) infringe intellectual property or privacy rights of others; (c) upload malware, spam, or harmful code; (d) impersonate any person or entity; (e) harvest data or accounts without consent; (f) use automated means in breach of these Terms or robots.txt (if any); (g) attempt unauthorised access to our networks, data, or integrations. We may suspend or terminate access for conduct we reasonably believe breaches these Terms or harms us or third parties.",
+    "ipTitle": "5. Intellectual property",
+    "ipDesc": "The site and its content (including text, graphics, logos, layouts, software, and trademarks) are owned by Doddapaneni Group or its licensors and are protected by intellectual property laws. Except for the limited licence above, no rights are granted. You must not remove proprietary notices or use our marks without prior written consent.",
+    "userContentTitle": "6. Information you provide",
+    "userContentDesc": "If you submit enquiries, feedback, or other materials through the site, you grant us a non-exclusive licence to use, reproduce, and process such information to operate the site, respond to you, and improve our services, subject to our Privacy Policy. You represent that your submissions do not violate third-party rights or law.",
+    "links": "7. Third-party links & integrations",
+    "linksDesc": "The site may link to third-party websites, tools, or embedded content. We do not control and are not responsible for third-party sites, their content, or their practices. Your use of third-party services is subject to their terms and policies.",
+    "disclaimer": "8. Disclaimers",
+    "disclaimerDesc": "The site and all content are provided “as is” and “as available”, without warranties of any kind, whether express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement, to the fullest extent permitted by applicable law. We do not warrant uninterrupted or error-free operation, that defects will be corrected, or that the site or servers are free of harmful components. Educational or sector-related information on the site is general in nature and not a substitute for professional, legal, medical, real-estate, financial, or other specialised advice.",
+    "limitations": "9. Limitation of liability",
+    "limitationsDesc": "To the fullest extent permitted by applicable law, Doddapaneni Group and its affiliates, directors, officers, employees, and agents shall not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for loss of profits, data, goodwill, or business opportunities, arising from or related to your use of or inability to use the site. Our aggregate liability for claims arising from the site shall not exceed the greater of (a) the amount you paid to us for the specific service giving rise to the claim in the twelve (12) months before the claim or (b) one hundred U.S. dollars (USD 100), if no fees were paid. Some jurisdictions do not allow certain limitations; in such cases, our liability is limited to the maximum permitted by law.",
+    "indemnityTitle": "10. Indemnity",
+    "indemnityDesc": "You agree to indemnify, defend, and hold harmless Doddapaneni Group and its affiliates from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys’ fees) arising out of your use of the site, your violation of these Terms, or your violation of any third-party rights or applicable law, except to the extent caused by our gross negligence or wilful misconduct.",
+    "governingLawTitle": "11. Governing law & disputes",
+    "governingLawDesc": "These Terms are governed by applicable laws, without regard to conflict-of-law rules that would require the application of another jurisdiction’s laws. Subject to mandatory consumer protections in your country, you agree that exclusive jurisdiction and venue for disputes arising from these Terms or the site shall lie with the courts of competent jurisdiction as determined by us, unless otherwise required by binding law. Nothing in this section limits either party’s right to seek injunctive or equitable relief.",
+    "revisions": "12. Changes",
+    "revisionsDesc": "We may modify these Terms by posting an updated version on the site and updating the “Last updated” date. Material changes may be highlighted where appropriate. Continued use after changes become effective constitutes acceptance unless applicable law requires additional consent.",
+    "contactClosingTitle": "13. Contact",
+    "contactClosingDesc": "For questions about these Terms, please contact us through the Contact page or the contact details published there."
+  },
+  "Disclaimer": {
+    "metaTitle": "Disclaimer | Doddapaneni Group",
+    "metaDescription": "Website disclaimer for Doddapaneni Group, including limitations on healthcare content, real estate information, liability, and third-party links.",
+    "metaKeywords": "disclaimer, Doddapaneni Group, healthcare disclaimer, real estate disclaimer, website legal",
+    "metaOgTitle": "Disclaimer — Doddapaneni Group",
+    "metaOgDescription": "Important limitations on website information, including healthcare and real estate content.",
+    "title": "Disclaimer",
+    "subtitle": "Important limitations on website information and your use of our online materials.",
+    "lastUpdated": "Last updated: 27 March 2026",
+    "notLegalAdvice": "This Disclaimer is provided for general information only and is not legal advice. Consult qualified professionals for advice tailored to your circumstances.",
+    "tocAriaLabel": "Disclaimer sections",
+    "tocIntro": "Sections",
+    "tocGeneral": "General",
+    "tocHealthcare": "Healthcare content",
+    "tocRealEstate": "Real estate information",
+    "tocNoWarranty": "No warranty",
+    "tocLiability": "Liability",
+    "tocLinks": "External links",
+    "tocBusiness": "Business information",
+    "tocJurisdiction": "Jurisdiction",
+    "contactPageLink": "Go to Contact",
+    "general": "1. General",
+    "generalDesc": "Information on this website is provided on an “as is” and “as available” basis. To the fullest extent permitted by applicable law, Doddapaneni Group (“we”, “us”, “our”) disclaims all representations and warranties, whether express, implied, or statutory, regarding the site, its content, and its operation. You use the site at your sole risk. We may change, suspend, or discontinue any part of the site without notice.",
+    "healthcareTitle": "2. Healthcare & medical content limitation",
+    "healthcareDesc": "Content that references healthcare, medical devices, wellness, billing, clinical, or related topics is provided for general informational purposes only. It does not constitute medical advice, diagnosis, treatment, or a recommendation to use any particular product or service. It is not a substitute for professional judgment by a qualified clinician, pharmacist, or other licensed healthcare provider. Never disregard professional medical advice or delay seeking it because of something you read on this site. If you think you may have a medical emergency, contact appropriate emergency services immediately. Any case studies, descriptions, or examples are illustrative only and do not guarantee outcomes for your situation.",
+    "realEstateTitle": "3. Real estate & construction information",
+    "realEstateDesc": "Content related to real estate, construction, architecture, development, leasing, investment, or property markets is for general information only. It does not constitute an offer, solicitation, or commitment to sell, lease, or finance property where such would require registration, licensing, or disclosure under applicable law. Maps, imagery, availability, pricing, specifications, timelines, and forward-looking statements may be approximate, subject to change, and not binding until confirmed in a written agreement signed by authorised parties. You must independently verify zoning, title, permits, taxes, environmental conditions, and all material facts with qualified professionals (including legal counsel, surveyors, and regulatory authorities) before relying on any information or making decisions. Past performance or descriptions of projects are not a guarantee of future results.",
+    "noWarranty": "4. No warranty",
+    "noWarrantyDesc": "We do not warrant that the website will be uninterrupted, secure, or error-free; that defects will be corrected; or that content is complete, accurate, timely, or suitable for any purpose. Technical and typographical errors may occur.",
+    "limitation": "5. Limitation of liability",
+    "limitationDesc": "To the fullest extent permitted by applicable law, Doddapaneni Group and its affiliates, directors, officers, employees, and agents shall not be liable for any direct, indirect, incidental, consequential, special, exemplary, or punitive damages, or any loss of profit, data, goodwill, or business opportunities, arising from your access to or use of (or inability to use) the site or reliance on its content—even if advised of the possibility of such damages.",
+    "externalLinks": "6. External links",
+    "externalLinksDesc": "Links to third-party websites or resources are provided for convenience. We do not endorse and are not responsible for the content, products, services, privacy practices, or availability of third-party sites. Accessing linked sites is at your own risk.",
+    "businessDisclaimer": "7. Business & forward-looking information",
+    "businessDisclaimerDesc": "Descriptions of businesses, divisions, services, capabilities, strategies, or growth plans may include forward-looking statements that involve risks and uncertainties. Actual results may differ materially. We undertake no obligation to update such information except as required by law.",
+    "jurisdiction": "8. Jurisdiction",
+    "jurisdictionDesc": "This Disclaimer is governed by applicable laws. Nothing herein limits non-waivable consumer rights under the law of your place of residence. For questions, contact us via our Contact page."
+  },
+  "FAQ": {
+    "title": "Frequently Asked Questions",
+    "sectionHeading": "Questions we receive most often",
+    "subtitle": "Practical answers about how the group is organised, where we are based, and how to reach the right team.",
+    "contactSupport": "Still have questions?",
+    "contactSupportDesc": "Use the Contact page for partnership enquiries, media requests, or vendor onboarding. We route messages to the correct division.",
+    "contactButton": "Go to Contact",
+    "questions": {
+      "q1": {
+        "question": "What does Doddapaneni Group actually do?",
+        "answer": "We are a parent organisation for twelve operating divisions. In practice that means software and IT work, digital marketing, healthcare-related products and back-office support, construction and real-estate activity, e-commerce platforms, media, staffing, food and manufacturing, logistics, education programmes, and import–export. The Services page summarises each area; division hubs and News publish more detail."
+      },
+      "q2": {
+        "question": "Where is Doddapaneni Group located?",
+        "answer": "Corporate addresses on file include India: Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, Telangana 500085; and USA: 5052 SW 40th PL, Ocala, Florida 34474. Individual brands may publish their own support channels."
+      },
+      "q3": {
+        "question": "How can I contact Doddapaneni Group?",
+        "answer": "Email info@doddapanenigroup.net, call +91 814 224 6666 (India) or +1 (352) 230-8586 (USA) during published office hours, or submit the enquiry form on the Contact page with your organisation name so we can reply accurately."
+      },
+      "q4": {
+        "question": "Do you work with clients outside India and the USA?",
+        "answer": "Yes, depending on the division. E-commerce, software, trade, and media properties may serve users or buyers in additional countries subject to law, payment rules, and product restrictions. State your country in any enquiry so compliance can be checked before work begins."
+      },
+      "q5": {
+        "question": "Which brands are part of the group?",
+        "answer": "This site highlights DealsMedi (USA-focused medical and health product sales), Dlsin (multivendor online commerce), and Janatha Mirror (digital news and related media). Other divisions operate under their own trade styles; the About page lists all twelve verticals."
+      },
+      "q6": {
+        "question": "Is there a newsletter?",
+        "answer": "If a subscription field appears in the site footer, you may join the mailing list there. We use email addresses only for the purpose stated beside the form; see the Privacy Policy for how we handle subscriber data."
+      }
+    }
+  },
+  "Blog": {
+    "title": "News",
+    "subtitle": "Articles from our divisions on commerce, healthcare operations, construction, logistics, and related topics—written for operators and decision-makers.",
+    "intro": "Browse updates by division or open the full news archive.",
+    "readMore": "Read more",
+    "backToBlog": "Back to News",
+    "relatedPosts": "Related news",
+    "categories": "Categories",
+    "recentPosts": "Recent news",
+    "emptySectorTitle": "No published news in this sector yet",
+    "emptySectorBody": "When posts are published under this division, they will appear here with links to each article.",
+    "browseAllNews": "Browse all news",
+    "newsHubCta": "Please click here to check news",
+    "newsHubComingSoon": "This division’s news hub will be available when the division is live on the main site.",
+    "backToSectorNews": "Back to sector news",
+    "sectorNewsSubtitle": "Posts published under this division.",
+    "sectorNewsNavHeading": "Sector news",
+    "sectorNewsNavAriaLabel": "Switch between sector news pages",
+    "sectorHeroDescriptionFallback": "Latest updates and focus areas in {name}.",
+    "focusAreasHeading": "Focus areas",
+    "topicDescriptionFallback": "Learn how we support {label} within {name}.",
+    "minReadMinutes": "{minutes} min read",
+    "paginationPrevious": "Previous",
+    "paginationNext": "Next",
+    "paginationPage": "Page {page} of {totalPages}",
+    "articlesCount": "{count, plural, one {# article} other {# articles}}",
+    "divisionTopicNavEyebrow": "In this division",
+    "divisionShellEyebrow": "Division",
+    "divisionOverview": "Overview",
+    "divisionNavAriaLabel": "Division sections",
+    "divisionTopicsAriaLabel": "Division topics",
+    "divisionSubpageAbout": "About",
+    "divisionSubpageServices": "Services",
+    "divisionSubpageContact": "Contact",
+    "engagementSectionEyebrow": "Connect",
+    "engagementSectionTitle": "Get in touch about this article",
+    "engagementLeadTitle": "Business inquiry",
+    "engagementLeadSubtitle": "Share your needs and we will route you to the right team.",
+    "engagementCommentTitle": "Leave a comment",
+    "engagementCommentSubtitle": "Comments are reviewed before publication.",
+    "engagementName": "Name",
+    "engagementEmail": "Email",
+    "engagementPhone": "Phone (optional)",
+    "engagementCompany": "Company (optional)",
+    "engagementInterest": "How can we help?",
+    "engagementCommentLabel": "Your comment",
+    "engagementSubmitLead": "Send inquiry",
+    "engagementSubmitComment": "Post comment",
+    "engagementSending": "Sending…",
+    "engagementSuccessLead": "Thank you — we have received your inquiry.",
+    "engagementSuccessComment": "Thank you — your comment was submitted for review.",
+    "engagementError": "Something went wrong. Please try again later.",
+    "engagementRequired": "Please check this field.",
+    "engagementPrivacyNote": "By submitting, you agree we may contact you about this request. See our Privacy Policy for how we handle your data.",
+    "posts": {}
+  },
+  "DivisionSubpage": {
+    "about": {
+      "heading": "About {sectorName}",
+      "p0": "This is placeholder content for the {sectorName} division. Replace it with your story, leadership notes, and credentials when ready.",
+      "p1": "Mission, history, and differentiators will live here. You can also publish rich HTML via the marketer dashboard using the matching content page key."
+    },
+    "services": {
+      "heading": "Services — {sectorName}",
+      "p0": "Outline priority offers, delivery models, and engagement types for {sectorName}. This block is stand-in text only.",
+      "p1": "Consider listing service lines, SLAs, and industries served. Structured content can later replace this section from the CMS."
+    },
+    "contact": {
+      "heading": "Contact {sectorName}",
+      "p0": "Placeholder contact guidance for the {sectorName} team. Add office details, routing rules, or a form embed in this area.",
+      "p1": "For site-wide contact, visitors can still use the main Contact page linked from the header."
+    },
+    "cmsKeyHint": "Content key for CMS:",
+    "cmsKeyNote": "Publish content for this key in the marketer dashboard to replace this placeholder for each language."
+  },
+  "SoftwareItAiSector": {
+    "metaTitle": "Software IT and AI Solutions | Doddapaneni Group Development Services",
+    "metaDescription": "Software IT and AI solutions Doddapaneni Group delivers custom software, AI development, and cloud solutions for digital transformation.",
+    "metaKeywords": "Software IT and AI Solutions, enterprise software, artificial intelligence, machine learning, IT consulting, cloud computing, intelligent automation, digital transformation",
+    "heroEyebrow": "Software IT and AI Solutions",
+    "heroTitle": "Software IT and AI Solutions for Digital Innovation",
+    "heroLead": "Software IT and AI solutions are transforming how businesses operate, innovate, and scale in today’s digital-first world. At Doddapaneni Group, we deliver advanced software development services and intelligent technologies that help organizations improve efficiency, automate processes, and achieve sustainable growth.",
+    "featuredProductsHeading": "Software, cloud, and AI brands in this division",
+    "featuredProductsLead": "Explore flagship digital products and platforms aligned with our Software IT and AI practice.",
+    "sectionComprehensiveTitle": "Comprehensive Software IT and AI Solutions",
+    "sectionComprehensiveP1": "Software IT and AI solutions at Doddapaneni Group are designed to provide end-to-end enterprise software solutions tailored to diverse business needs. Our expertise spans across software development, artificial intelligence, and IT consulting to ensure seamless digital transformation.",
+    "sectionComprehensiveP2": "Modern enterprises increasingly adopt AI across the entire software lifecycle—from planning to testing and deployment—to improve productivity and efficiency.",
+    "serviceCustomTitle": "Custom Software Development",
+    "serviceCustomBody": "Software IT and AI solutions include scalable custom software development designed to meet specific business requirements. We build secure, high-performance applications that enhance productivity and user experience.",
+    "serviceAiTitle": "Artificial Intelligence & Machine Learning",
+    "serviceAiBody": "Software IT and AI solutions leverage advanced artificial intelligence solutions and machine learning services to automate processes, analyze data, and generate actionable insights for smarter decision-making.",
+    "serviceConsultingTitle": "IT Consulting Services",
+    "serviceConsultingBody": "Software IT and AI solutions offer expert IT consulting services that help businesses choose the right technology stack, optimize infrastructure, and align IT strategies with business goals.",
+    "serviceCloudTitle": "Cloud Computing Solutions",
+    "serviceCloudBody": "Software IT and AI solutions include reliable cloud computing solutions that enable scalability, flexibility, and secure data management across platforms.",
+    "serviceAutomationTitle": "Intelligent Automation",
+    "serviceAutomationBody": "Software IT and AI solutions incorporate intelligent automation solutions to streamline workflows, reduce manual effort, and improve operational efficiency.",
+    "whyTitle": "Why Choose Our Software IT and AI Solutions",
+    "whyLead": "Software IT and AI solutions from Doddapaneni Group are built on innovation, performance, and scalability to deliver measurable business outcomes.",
+    "whyTechTitle": "Advanced Technology Expertise",
+    "whyTechBody": "Software IT and AI solutions leverage the latest tools, frameworks, and AI technologies to deliver cutting-edge results.",
+    "whyCustomTitle": "Customized Business Solutions",
+    "whyCustomBody": "Software IT and AI solutions are tailored to your specific industry requirements, ensuring maximum efficiency and ROI.",
+    "whyLifecycleTitle": "End-to-End Development",
+    "whyLifecycleBody": "Software IT and AI solutions provide complete lifecycle support—from planning and development to deployment and maintenance.",
+    "processTitle": "Our Software IT and AI Process",
+    "processLead": "Software IT and AI solutions follow a structured approach to ensure consistent delivery and high-quality outcomes.",
+    "processReqTitle": "Requirement Analysis",
+    "processReqBody": "Software IT and AI solutions begin with understanding business needs, technical requirements, and project goals.",
+    "processDevTitle": "Development and Integration",
+    "processDevBody": "Software IT and AI solutions involve building and integrating enterprise software solutions with advanced AI capabilities.",
+    "processTestTitle": "Testing and Deployment",
+    "processTestBody": "Software IT and AI solutions include rigorous testing and seamless deployment to ensure reliability and performance.",
+    "processMaintTitle": "Maintenance and Optimization",
+    "processMaintBody": "Software IT and AI solutions provide ongoing support and optimization to keep systems updated and efficient.",
+    "benefitsTitle": "Benefits of Software IT and AI Solutions",
+    "benefitsLead": "Software IT and AI solutions offer significant advantages for modern businesses:",
+    "benefit1": "Increased operational efficiency",
+    "benefit2": "Faster decision-making with AI insights",
+    "benefit3": "Improved scalability and flexibility",
+    "benefit4": "Enhanced customer experience",
+    "benefit5": "Reduced operational costs",
+    "ctaTitle": "Transform Your Business with Software IT and AI Solutions",
+    "ctaBody": "Software IT and AI solutions from Doddapaneni Group empower businesses with innovative digital transformation services and advanced technologies. Partner with us to build future-ready systems, automate processes, and achieve long-term success in a competitive digital landscape.",
+    "ctaButton": "Contact us",
+    "productsHeading": "Software IT and AI solutions across our companies",
+    "productsLead": "Explore operating units in this sector—profiles include capabilities, context, and ways to engage our teams."
+  },
+  "DigitalMarketingSector": {
+    "metaTitle": "Digital Marketing Services | Doddapaneni Group SEO & PPC Solutions",
+    "metaDescription": "Digital marketing services Doddapaneni Group provides SEO, PPC, and social media marketing to increase visibility and generate leads.",
+    "metaKeywords": "Digital Marketing Services, SEO, PPC, social media marketing, content marketing, email marketing, online marketing, growth marketing agency, internet marketing",
+    "heroEyebrow": "Digital Marketing Services",
+    "heroTitle": "Digital Marketing Services for Business Growth",
+    "heroLead": "Digital marketing services are essential for businesses looking to grow their online presence, attract quality leads, and increase revenue. At Doddapaneni Group, we combine online marketing services with innovative strategies to help brands succeed in a competitive digital world.",
+    "featuredProductsHeading": "Digital marketing brands and platforms in this division",
+    "featuredProductsLead": "Explore group offerings aligned with performance marketing, acquisition, and brand growth.",
+    "sectionComprehensiveTitle": "Result-Driven Digital Marketing Services",
+    "sectionComprehensiveP1": "Digital marketing services at our company focus on delivering measurable outcomes through internet marketing solutions tailored to your business needs. We integrate SEO, paid advertising, and content marketing solutions to ensure consistent growth and improved visibility.",
+    "sectionComprehensiveP2": "",
+    "serviceSeoTitle": "Search Engine Optimization (SEO)",
+    "serviceSeoBody": "Digital marketing services include advanced SEO and marketing services that improve your website’s ranking on search engines. Our team optimizes content, technical elements, and backlinks to drive organic traffic.",
+    "servicePpcTitle": "Pay-Per-Click (PPC) Advertising",
+    "servicePpcBody": "Digital marketing services offer high-converting PPC management services that generate instant traffic and leads. We create targeted campaigns that maximize ROI and reduce ad spend waste.",
+    "serviceSocialTitle": "Social Media Marketing",
+    "serviceSocialBody": "Digital marketing services also include social media marketing services that enhance brand visibility and engagement across platforms like Facebook, Instagram, and LinkedIn.",
+    "serviceContentTitle": "Content Marketing",
+    "serviceContentBody": "Digital marketing services leverage content marketing solutions to create valuable and engaging content that attracts and converts your target audience.",
+    "serviceEmailTitle": "Email Marketing & Automation",
+    "serviceEmailBody": "Digital marketing services utilize automated email campaigns to improve customer retention and support long-term growth through lead generation services.",
+    "whyTitle": "Why Choose Our Digital Marketing Solutions",
+    "whyLead": "Digital marketing services from Doddapaneni Group stand out because of our focus on performance, innovation, and scalability. As a trusted growth marketing agency, we deliver strategies that align with your business objectives.",
+    "whyDataTitle": "Data-Driven Approach",
+    "whyDataBody": "Digital marketing services are backed by analytics and insights to ensure campaigns perform efficiently and deliver measurable success.",
+    "whyCustomTitle": "Customized Strategies",
+    "whyCustomBody": "Digital marketing services are tailored using performance marketing services that match your industry, audience, and goals.",
+    "whyFullTitle": "Full-Service Expertise",
+    "whyFullBody": "Digital marketing services include end-to-end digital advertising services, from planning to execution and optimization.",
+    "processTitle": "Our Digital Marketing Process",
+    "processLead": "Digital marketing services follow a structured and proven methodology to ensure consistent results.",
+    "processResearchTitle": "Research & Planning",
+    "processResearchBody": "Digital marketing services begin with detailed research, competitor analysis, and identifying the right audience for effective targeting.",
+    "processExecTitle": "Execution & Management",
+    "processExecBody": "Digital marketing services include implementing internet marketing solutions such as SEO, PPC, and social media campaigns.",
+    "processOptTitle": "Optimization & Reporting",
+    "processOptBody": "Digital marketing services are continuously optimized to improve performance, increase conversions, and maximize ROI.",
+    "benefitsTitle": "Benefits of Digital Marketing Services",
+    "benefitsLead": "Digital marketing services help businesses achieve sustainable growth through:",
+    "benefit1": "Increased online visibility",
+    "benefit2": "Better lead generation",
+    "benefit3": "Higher conversion rates",
+    "benefit4": "Strong brand authority",
+    "benefit5": "Improved customer engagement",
+    "ctaTitle": "Grow with Digital Marketing Services",
+    "ctaBody": "Digital marketing services from Doddapaneni Group empower businesses with scalable online marketing services and innovative strategies. Partner with us to transform your digital presence and achieve long-term success.",
+    "ctaButton": "Contact us",
+    "productsHeading": "Digital marketing services across our companies",
+    "productsLead": "Explore operating units in this sector—profiles include capabilities, context, and ways to engage our teams."
+  },
+  "HealthcareMedicalSector": {
+    "metaTitle": "Healthcare and Medical Services | Doddapaneni Group Solutions",
+    "metaDescription": "Healthcare and medical services Doddapaneni Group offers medical support, digital healthcare, and patient care solutions for providers.",
+    "metaKeywords": "Healthcare and Medical Services, medical equipment, healthcare IT, digital healthcare, hospital support, patient care, clinical services, medical healthcare solutions",
+    "heroEyebrow": "Healthcare and Medical Services",
+    "heroTitle": "Healthcare and Medical Services for Advanced Patient Care",
+    "heroLead": "Healthcare and medical services play a critical role in improving patient outcomes, enhancing operational efficiency, and delivering quality care. At Doddapaneni Group, we provide comprehensive medical healthcare solutions designed to support hospitals, clinics, and healthcare organizations with innovative and reliable services.",
+    "featuredProductsHeading": "Healthcare and medical brands in this division",
+    "featuredProductsLead": "Explore group offerings aligned with patient care, health products, and provider support.",
+    "sectionComprehensiveTitle": "Comprehensive Healthcare and Medical Services",
+    "sectionComprehensiveP1": "Healthcare and medical services at Doddapaneni Group focus on delivering integrated healthcare services provider solutions that combine technology, expertise, and efficiency. Our services are designed to meet the evolving needs of the healthcare industry and ensure seamless patient care delivery.",
+    "sectionComprehensiveP2": "Modern healthcare systems rely on advanced tools, trained professionals, and streamlined processes to deliver effective care, including diagnostics, treatment, and ongoing patient management.",
+    "serviceEquipmentTitle": "Medical Equipment and Supply Solutions",
+    "serviceEquipmentBody": "Healthcare and medical services include reliable medical equipment solutions that ensure hospitals and clinics have access to high-quality devices and supplies. We help healthcare providers maintain efficiency and deliver accurate treatments.",
+    "serviceItTitle": "Healthcare IT and Digital Solutions",
+    "serviceItBody": "Healthcare and medical services incorporate digital healthcare solutions such as electronic records, telemedicine, and AI-based systems that improve patient care and operational efficiency.",
+    "serviceHospitalTitle": "Hospital and Clinical Support Services",
+    "serviceHospitalBody": "Healthcare and medical services offer complete hospital support services including administrative support, operational management, and clinical assistance to ensure smooth functioning of healthcare facilities.",
+    "servicePatientTitle": "Patient Care and Management",
+    "servicePatientBody": "Healthcare and medical services focus on delivering exceptional patient care services that enhance patient satisfaction, improve recovery outcomes, and ensure continuous monitoring. Healthcare platforms today also enable online consultations, digital records, and easy access to medical professionals, improving accessibility and convenience for patients.",
+    "whyTitle": "Why Choose Our Healthcare and Medical Services",
+    "whyLead": "Healthcare and medical services from Doddapaneni Group are designed to meet industry standards and deliver measurable results through innovation and expertise.",
+    "whyTechTitle": "Advanced Technology Integration",
+    "whyTechBody": "Healthcare and medical services leverage healthcare technology solutions to improve diagnostics, treatment, and patient engagement.",
+    "whyCustomTitle": "Customized Healthcare Solutions",
+    "whyCustomBody": "Healthcare and medical services are tailored to meet the unique needs of hospitals, clinics, and healthcare providers.",
+    "whyEndToEndTitle": "End-to-End Healthcare Support",
+    "whyEndToEndBody": "Healthcare and medical services include complete clinical support services from consultation to implementation and optimization.",
+    "processTitle": "Our Healthcare Service Process",
+    "processLead": "Healthcare and medical services follow a structured approach to ensure efficiency and quality care delivery.",
+    "processAssessTitle": "Assessment and Planning",
+    "processAssessBody": "Healthcare and medical services begin with understanding client requirements, healthcare challenges, and operational needs.",
+    "processImplTitle": "Implementation and Integration",
+    "processImplBody": "Healthcare and medical services involve deploying healthcare consulting services and solutions to enhance overall performance.",
+    "processMonitorTitle": "Monitoring and Optimization",
+    "processMonitorBody": "Healthcare and medical services include continuous monitoring and improvement to ensure high-quality outcomes.",
+    "benefitsTitle": "Benefits of Healthcare and Medical Services",
+    "benefitsLead": "Healthcare and medical services provide multiple advantages for healthcare providers and patients:",
+    "benefit1": "Improved patient care quality",
+    "benefit2": "Increased operational efficiency",
+    "benefit3": "Enhanced data management",
+    "benefit4": "Better healthcare accessibility",
+    "benefit5": "Cost-effective solutions",
+    "ctaTitle": "Transform Healthcare with Our Medical Services",
+    "ctaBody": "Healthcare and medical services from Doddapaneni Group empower healthcare organizations with innovative medical support services and advanced solutions. Partner with us to deliver high-quality care, improve efficiency, and stay ahead in the evolving healthcare industry.",
+    "ctaButton": "Contact us",
+    "productsHeading": "Healthcare and medical services across our companies",
+    "productsLead": "Explore operating units in this sector—profiles include capabilities, context, and ways to engage our teams."
+  },
+  "ConstructionRealestateSector": {
+    "metaTitle": "Construction and Real Estate Services | Doddapaneni Group Projects",
+    "metaDescription": "Construction and real estate services Doddapaneni Group delivers property development, infrastructure, and turnkey construction solutions.",
+    "metaKeywords": "Construction and Real Estate Services, real estate development, property development, infrastructure development, construction company, land development, property management, turnkey construction",
+    "heroEyebrow": "Construction and Real Estate Services",
+    "heroTitle": "Construction and Real Estate Services for Modern Infrastructure",
+    "heroLead": "Construction and real estate services are essential for developing high-quality residential, commercial, and infrastructure projects. At Doddapaneni Group, we provide end-to-end real estate development services that combine innovation, quality construction, and strategic planning to deliver exceptional results.",
+    "featuredProductsHeading": "Construction and real estate brands in this division",
+    "featuredProductsLead": "Explore group capabilities spanning projects, design, development, and related services.",
+    "sectionComprehensiveTitle": "Comprehensive Construction and Real Estate Services",
+    "sectionComprehensiveP1": "Construction and real estate services at Doddapaneni Group focus on delivering reliable and scalable property development solutions for businesses, investors, and individuals. Our expertise spans across residential, commercial, and industrial projects, ensuring high standards and timely delivery.",
+    "sectionComprehensiveP2": "Real estate development typically involves multiple stages such as land acquisition, planning, approvals, construction, and project handover, making professional expertise essential for success.",
+    "serviceResidentialTitle": "Residential and Commercial Construction",
+    "serviceResidentialBody": "Construction and real estate services include high-quality residential and commercial construction tailored to modern architectural standards. We build homes, office spaces, and commercial complexes that meet client expectations and market demands.",
+    "servicePropertyDevTitle": "Property Development and Land Solutions",
+    "servicePropertyDevBody": "Construction and real estate services offer comprehensive land development services and project planning to maximize property value and ensure sustainable growth.",
+    "serviceInfraTitle": "Infrastructure Development",
+    "serviceInfraBody": "Construction and real estate services also cover large-scale infrastructure development services, including roads, industrial structures, and urban development projects.",
+    "serviceConsultingTitle": "Real Estate Consulting",
+    "serviceConsultingBody": "Construction and real estate services include expert real estate consulting services to help clients make informed investment decisions and optimize project outcomes.",
+    "serviceMgmtTitle": "Property Management Services",
+    "serviceMgmtBody": "Construction and real estate services extend to property management services, ensuring efficient maintenance, operations, and long-term value of assets.",
+    "whyTitle": "Why Choose Our Construction and Real Estate Services",
+    "whyLead": "Construction and real estate services from Doddapaneni Group stand out due to our commitment to quality, innovation, and customer satisfaction.",
+    "whyQualityTitle": "Quality Construction Standards",
+    "whyQualityBody": "Construction and real estate services ensure the use of high-quality materials and modern construction techniques to deliver durable and reliable structures.",
+    "whyEndToEndTitle": "End-to-End Project Management",
+    "whyEndToEndBody": "Construction and real estate services provide complete turnkey construction solutions, from concept and design to execution and delivery.",
+    "whyTimelyTitle": "Timely Delivery",
+    "whyTimelyBody": "Construction and real estate services are executed with strict timelines and efficient project management to ensure on-time completion.",
+    "processTitle": "Our Construction and Real Estate Process",
+    "processLead": "Construction and real estate services follow a structured approach to ensure project success and client satisfaction.",
+    "processPlanTitle": "Planning and Design",
+    "processPlanBody": "Construction and real estate services begin with detailed planning, architectural design, and feasibility analysis.",
+    "processBuildTitle": "Development and Construction",
+    "processBuildBody": "Construction and real estate services involve executing building construction services with precision and adherence to industry standards.",
+    "processDeliveryTitle": "Delivery and Support",
+    "processDeliveryBody": "Construction and real estate services include project delivery, handover, and ongoing support to ensure long-term success.",
+    "benefitsTitle": "Benefits of Construction and Real Estate Services",
+    "benefitsLead": "Construction and real estate services provide numerous advantages for investors and property owners:",
+    "benefit1": "High-quality infrastructure development",
+    "benefit2": "Increased property value",
+    "benefit3": "Efficient project execution",
+    "benefit4": "Sustainable and modern designs",
+    "benefit5": "Strong return on investment",
+    "benefitsNote": "Well-developed projects with proper planning and infrastructure often lead to better connectivity and access to essential facilities like schools, hospitals, and commercial hubs.",
+    "ctaTitle": "Build Your Future with Construction and Real Estate Services",
+    "ctaBody": "Construction and real estate services from Doddapaneni Group help you transform ideas into reality with reliable construction company services and innovative solutions. Partner with us to develop world-class infrastructure and achieve long-term growth in the real estate market.",
+    "ctaButton": "Contact us",
+    "productsHeading": "Construction and real estate services across our companies",
+    "productsLead": "Explore operating units in this sector—profiles include capabilities, context, and ways to engage our teams."
+  },
+  "DivisionTopics": {
+    "software-it-ai": {
+      "topic-commerce": {
+        "label": "Commerce platforms",
+        "description": "Multivendor commerce—catalogue management, checkout, seller tooling, and secure settlements for independent merchants."
+      },
+      "topic-sellers": {
+        "label": "Seller tooling",
+        "description": "Fulfilment status, dispute workflows, and analytics so sellers can restock and price with evidence—not guesswork."
+      },
+      "topic-platform": {
+        "label": "Platform engineering",
+        "description": "Information technology and AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure."
+      }
+    },
+    "digital-marketing": {
+      "topic-seo": {
+        "label": "SEO",
+        "description": "Organic visibility, technical SEO, and content that ranks."
+      },
+      "topic-ads": {
+        "label": "Ads",
+        "description": "Paid acquisition and performance creative across channels."
+      },
+      "topic-social": {
+        "label": "Social",
+        "description": "Community, brand presence, and social campaigns that convert."
+      }
+    },
+    "healthcare-medical": {
+      "topic-clinical": {
+        "label": "Clinical",
+        "description": "Clinical workflows, compliance-aware tooling, and integrations."
+      },
+      "topic-billing": {
+        "label": "Billing",
+        "description": "Revenue cycle, coding, and payer operations support."
+      },
+      "topic-supplies": {
+        "label": "Supplies",
+        "description": "Medical supplies, devices, and distribution logistics."
+      }
+    },
+    "construction-realestate": {
+      "topic-projects": {
+        "label": "Projects",
+        "description": "End-to-end delivery from planning through commissioning."
+      },
+      "topic-design": {
+        "label": "Design",
+        "description": "Architecture, engineering coordination, and design quality."
+      },
+      "topic-realty": {
+        "label": "Realty",
+        "description": "Development, investment, and property advisory."
+      }
+    },
+    "ecommerce-marketplace": {
+      "topic-stores": {
+        "label": "Stores",
+        "description": "D2C and B2B storefronts engineered for conversion."
+      },
+      "topic-marketplaces": {
+        "label": "Marketplaces",
+        "description": "Multi-vendor platforms, catalog ops, and seller tooling."
+      },
+      "topic-fulfillment": {
+        "label": "Fulfillment",
+        "description": "Order, warehouse, and last-mile orchestration."
+      }
+    },
+    "media-news-entertainment": {
+      "topic-newsroom": {
+        "label": "Newsroom",
+        "description": "Digital-first reporting with verification and corrections—public policy, business, culture, and civic coverage optimised for web and social."
+      },
+      "topic-content": {
+        "label": "Editorial & multimedia",
+        "description": "Formats, production, and distribution at scale—video, interviews, and storytelling built for how audiences read and share today."
+      },
+      "topic-brand": {
+        "label": "Audience & partnerships",
+        "description": "Audience products, brand studios, and partnerships that extend reach while protecting editorial standards."
+      }
+    },
+    "staffing-consultancy": {
+      "topic-hiring": {
+        "label": "Hiring",
+        "description": "Recruitment pipelines and role-specific sourcing."
+      },
+      "topic-hr": {
+        "label": "HR",
+        "description": "Policies, people ops, and workforce planning."
+      },
+      "topic-talent": {
+        "label": "Talent",
+        "description": "Retention, upskilling, and leadership programmes."
+      }
+    },
+    "food-beverages": {
+      "topic-processing": {
+        "label": "Processing",
+        "description": "Safe, efficient processing and packaging lines."
+      },
+      "topic-supply": {
+        "label": "Supply",
+        "description": "Sourcing, cold chain, and supplier governance."
+      },
+      "topic-quality": {
+        "label": "Quality",
+        "description": "QA, traceability, and certification readiness."
+      }
+    },
+    "manufacturing-trading": {
+      "topic-plants": {
+        "label": "Plants",
+        "description": "Plant operations, throughput, and capex efficiency."
+      },
+      "topic-trading": {
+        "label": "Trading",
+        "description": "Wholesale, bulk, and cross-border trade desks."
+      },
+      "topic-industry": {
+        "label": "Industry 4.0",
+        "description": "Automation, data, and connected factory initiatives."
+      }
+    },
+    "logistics-warehousing": {
+      "topic-freight": {
+        "label": "Freight",
+        "description": "Air, ocean, and surface freight orchestration."
+      },
+      "topic-warehouse": {
+        "label": "Warehouse",
+        "description": "Storage, WMS, and inventory accuracy."
+      },
+      "topic-lastmile": {
+        "label": "Last mile",
+        "description": "Final delivery, routing, and customer experience."
+      }
+    },
+    "education-skill": {
+      "topic-training": {
+        "label": "Training",
+        "description": "Instructor-led and hybrid programmes for teams."
+      },
+      "topic-elearning": {
+        "label": "E-learning",
+        "description": "Platforms, cohorts, and measurable learning paths."
+      },
+      "topic-skills": {
+        "label": "Skills",
+        "description": "Vocational and industry certifications."
+      }
+    },
+    "import-export": {
+      "topic-trade": {
+        "label": "Trade",
+        "description": "Import/export desks, sourcing, and channel partners."
+      },
+      "topic-compliance": {
+        "label": "Compliance",
+        "description": "Documentation, customs, and regulatory alignment."
+      },
+      "topic-partners": {
+        "label": "Partners",
+        "description": "Global networks for reliable movement of goods."
+      }
+    }
+  },
+  "CompanyForms": {
+    "leadTitle": "Get a quote or callback",
+    "leadIntro": "Short, mobile-friendly form. Fields match this sector so we can route you faster.",
+    "trustLine": "We respect your inbox — no spam. We'll only use your details for this request.",
+    "privacyLinkText": "Privacy Policy",
+    "advancedToggle": "Additional preferences (optional)",
+    "submitLead": "Send request",
+    "submitting": "Sending…",
+    "leadSuccess": "Thank you — we received your request and will reach out soon.",
+    "leadError": "Could not send. Please try again or email us directly.",
+    "contactTitle": "Contact us",
+    "contactIntro": "General questions, partnerships, or anything else — send a message below.",
+    "fieldMessage": "Your message",
+    "contactMessageMin": "Please enter at least 10 characters.",
+    "contactSubmit": "Send message",
+    "contactSuccess": "Message sent. Thank you!",
+    "contactError": "Failed to send. Please try again.",
+    "fieldFullName": "Full name",
+    "fieldEmail": "Email address",
+    "fieldPhone": "Phone number",
+    "fieldPhoneOptional": "Phone (optional)",
+    "fieldZip": "ZIP / postal code",
+    "fieldZipCity": "ZIP code or city",
+    "fieldServiceType": "Service type",
+    "fieldTransactionType": "Buying / selling / renting",
+    "fieldBudgetRange": "Budget range",
+    "fieldPropertyType": "Property type",
+    "fieldTimeline": "Timeline",
+    "fieldLoanPreapproved": "Pre-approved for a loan?",
+    "fieldInsuranceType": "Insurance type",
+    "fieldAgeRange": "Age range",
+    "fieldCoverageAmount": "Coverage amount needed",
+    "fieldCurrentlyInsured": "Currently insured?",
+    "fieldConditionInterest": "Condition or area of interest",
+    "fieldPreferredSpecialist": "Preferred doctor or specialist",
+    "fieldAppointmentTimeframe": "Appointment timeframe",
+    "fieldInsuranceStatus": "Insurance status",
+    "fieldInterest": "What are you interested in?",
+    "fieldBudget": "Budget",
+    "fieldCompanyName": "Company name (optional)",
+    "fieldBestTimeToCall": "Best time to call",
+    "fieldPreferredContact": "Preferred contact method",
+    "fieldComments": "Comments or notes",
+    "fieldConsent": "I agree to be contacted about this request and I understand calls may be recorded for quality (TCPA-style consent for U.S. leads).",
+    "requiredHint": "Required",
+    "selectPlaceholder": "Select…",
+    "yes": "Yes",
+    "no": "No",
+    "contactMethodCall": "Phone call",
+    "contactMethodEmail": "Email",
+    "contactMethodWhatsapp": "WhatsApp",
+    "genOptEcommerce": "E-commerce / marketplace",
+    "genOptLogistics": "Logistics & fulfillment",
+    "genOptB2b": "B2B vendor / wholesale",
+    "genOptConsulting": "Strategy / consulting",
+    "genOptOther": "Other",
+    "reOptBuy": "Buying",
+    "reOptSell": "Selling",
+    "reOptRent": "Renting",
+    "reBudget0": "Below $100K",
+    "reBudget1": "$100K – $250K",
+    "reBudget2": "$250K – $500K",
+    "reBudget3": "$500K – $1M",
+    "reBudget4": "$1M+",
+    "reRentBudget1": "Below $999",
+    "reRentBudget2": "$1,000 to $1,999",
+    "reRentBudget3": "$2,000 to $2,999",
+    "reRentBudget4": "$3,000 to $3,999",
+    "reRentBudget5": "$4,000 to $4,999",
+    "reRentBudget6": "Above $5,000",
+    "rePropHouse": "House",
+    "rePropApt": "Apartment",
+    "rePropLand": "Land / lot",
+    "rePropCommercial": "Commercial",
+    "reTimeImmediate": "Immediate",
+    "reTime13": "1–3 months",
+    "reTime6": "3–6 months",
+    "insOptHealth": "Health",
+    "insOptAuto": "Auto",
+    "insOptLife": "Life",
+    "insOptHome": "Home / property",
+    "age18_30": "18–30",
+    "age31_45": "31–45",
+    "age46_60": "46–60",
+    "age60p": "60+",
+    "healthInsured": "Insured",
+    "healthUninsured": "Uninsured / unsure",
+    "healthMedicare": "Medicare / Medicaid",
+    "apptAsap": "As soon as possible",
+    "apptWeeks": "Within a few weeks",
+    "apptPlanning": "Planning ahead"
+  }
+}

@@ -1,4 +1,5 @@
-import { getTranslations } from 'next-intl/server';
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import { getDivisionTopicNavItems, type DivisionTopicNavRef } from '@/lib/company-division-nav';
 import type { CompanyDivisionSlug } from '@/lib/company-divisions';
 
@@ -18,7 +19,7 @@ export async function getTranslatedDivisionTopicNavItems(
   const refs = getDivisionTopicNavItems(slug);
   if (refs.length === 0) return [];
 
-  const t = await getTranslations({ locale, namespace: 'DivisionTopics' });
+  const t = createTranslator(getDictionary(locale), 'DivisionTopics');
   const divisionKey = slug as CompanyDivisionSlug;
 
   return refs.map((ref) => {

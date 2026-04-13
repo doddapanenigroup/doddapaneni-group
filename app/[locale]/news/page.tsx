@@ -1,6 +1,7 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { getSiteOrigin } from '@/lib/site-origin';
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = routing.locales.includes(paramLocale as (typeof routing.locales)[number])
     ? paramLocale
     : routing.defaultLocale;
-  const t = await getTranslations({ locale, namespace: 'Blog' });
+  const t = createTranslator(getDictionary(locale), 'Blog');
   const title = `${t('title')} | Doddapaneni Group`;
   const description = t('subtitle');
   const origin = getSiteOrigin();
@@ -61,10 +62,8 @@ export default async function NewsHubPage({ params }: Props) {
     notFound();
   }
 
-  const [t, sectorLiveMap] = await Promise.all([
-    getTranslations({ locale, namespace: 'Blog' }),
-    getSectorLiveMapFromDb(),
-  ]);
+  const t = createTranslator(getDictionary(locale), 'Blog');
+  const sectorLiveMap = await getSectorLiveMapFromDb();
 
   const sectors = COMPANY_DIVISION_SLUGS.map((slug) => ({
     slug,

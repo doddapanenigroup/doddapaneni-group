@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from '@/lib/dictionary-react';
 import {
   COMPANY_DIVISION_SLUGS,
   COMPANY_DIVISION_NAV_LABELS,

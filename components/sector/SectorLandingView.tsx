@@ -1,7 +1,8 @@
-import { Link } from '@/i18n/routing';
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 import { Calendar, ArrowRight } from 'lucide-react';
 import {
   estimateReadMinutesForCard,
@@ -19,6 +20,7 @@ import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
 import { newsArticlePath } from '@/lib/news-paths';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
+import { sectorHeroSubtitleForLocale, sectorPublicName } from '@/lib/sector-localized-copy';
 
 type Props = {
   locale: string;
@@ -40,7 +42,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   if (total > 0 && rows.length === 0) notFound();
 
   const sectorKey = sector.slug.trim().toLowerCase();
-  const tBlog = await getTranslations({ locale, namespace: 'Blog' });
+  const tBlog = createTranslator(getDictionary(locale), 'Blog');
   const isActiveSector = sector.isLive;
   const newsLabel = tBlog('title');
   const allNewsHref = '/news';
@@ -49,21 +51,25 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   );
   const contentOnly = isSectorLandingContentOnlySlug(sectorKey);
   const companies = await listCompaniesBySectorSlug(sector.slug);
-  const tHome = await getTranslations({ locale, namespace: 'Home' });
+  const tHome = createTranslator(getDictionary(locale), 'Home');
 
   const paginationHref = (p: number) =>
     p <= 1 ? `/${sector.slug}` : `/${sector.slug}?page=${p}`;
 
-  const heroDescription =
-    sector.description?.trim() ||
-    tBlog('sectorHeroDescriptionFallback', { name: sector.name });
+  const sectorTitle = sectorPublicName(locale, sectorKey, sector.name);
+  const heroDescription = sectorHeroSubtitleForLocale(
+    locale,
+    sectorKey,
+    sector.description,
+    sectorTitle,
+  );
 
   if (isActiveSector) {
     return (
       <div className="min-h-screen bg-white">
         <section className="bg-blue-900 px-4 py-12 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl text-center">
-            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sector.name}</h1>
+            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sectorTitle}</h1>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
           </div>
         </section>
@@ -128,7 +134,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
       <section className="bg-blue-900 px-4 py-12 md:py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl text-center">
           <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
-            {sector.name} — {newsLabel}
+            {sectorTitle} — {newsLabel}
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
         </div>
@@ -203,7 +209,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                   item.description?.trim() ||
                   tBlog('topicDescriptionFallback', {
                     label: item.label,
-                    name: sector.name,
+                    name: sectorTitle,
                   });
                 return (
                   <div
@@ -279,7 +285,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                         <div className="p-6">
                           <div className="mb-3 flex items-center gap-3">
                             <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                              {sector.name}
+                              {sectorTitle}
                             </span>
                             {post.publishedAt ? (
                               <div className="flex items-center text-xs text-slate-500">

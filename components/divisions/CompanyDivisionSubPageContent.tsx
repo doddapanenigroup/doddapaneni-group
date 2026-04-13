@@ -2,28 +2,24 @@
 
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import type { DivisionSubpage } from '@/lib/company-division-subpages';
-import {
-  divisionContentPageKey,
-  getDivisionSubpagePlaceholder,
-} from '@/lib/company-division-subpages';
+
+type Props = {
+  heading: string;
+  paragraphs: string[];
+  pageKey: string;
+  cmsKeyHint: string;
+  cmsKeyNote: string;
+};
 
 export default function CompanyDivisionSubPageContent({
-  sectorSlug,
-  subpage,
-  sectorName,
-  locale,
-}: {
-  sectorSlug: string;
-  subpage: DivisionSubpage;
-  sectorName: string;
-  locale: string;
-}) {
-  const pageKey = divisionContentPageKey(sectorSlug, subpage);
-  const { heading, paragraphs } = getDivisionSubpagePlaceholder(sectorName, subpage);
-
+  heading,
+  paragraphs,
+  pageKey,
+  cmsKeyHint,
+  cmsKeyNote,
+}: Props) {
   return (
-      <MotionLazy>
+    <MotionLazy>
       <section className="bg-blue-900 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <m.h1
@@ -50,10 +46,11 @@ export default function CompanyDivisionSubPageContent({
             </m.p>
           ))}
           <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500">
-            Content key for CMS: <span className="font-mono text-slate-700">{pageKey}</span>
+            {cmsKeyHint} <span className="font-mono text-slate-700">{pageKey}</span>
+            <span className="mt-2 block text-slate-500">{cmsKeyNote}</span>
           </p>
         </div>
       </section>
-      </MotionLazy>
+    </MotionLazy>
   );
 }

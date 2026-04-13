@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send, CheckCircle2, ExternalLink } from 'lucide-re
 import { useState } from 'react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';

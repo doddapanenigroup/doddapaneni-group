@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import { Send } from 'lucide-react';
 
 const inputClass =

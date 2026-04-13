@@ -1,16 +1,17 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
 
 export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
   const session = await auth();
-  const locale = await getLocale();
+  const { locale } = await params;
 
   if (!session?.user) {
     redirect(`/${locale}/login?callbackUrl=/${locale}/dashboard`);

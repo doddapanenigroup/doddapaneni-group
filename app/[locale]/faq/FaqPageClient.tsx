@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations, useAppLocale as useLocale } from '@/lib/dictionary-react';
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 

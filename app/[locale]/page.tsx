@@ -1,5 +1,6 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 import HomepageOrganizationJsonLd from '@/components/seo/HomepageOrganizationJsonLd';
 import { getBusinessDivisionsForHome } from '@/lib/business-divisions-home';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
@@ -22,9 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : routing.defaultLocale;
   const origin = getSiteOrigin();
   const canonical = absoluteUrlForLocale(origin, locale, '/');
-  const slug = locale === routing.defaultLocale ? 'home' : `${locale}/home`;
-  const seo = await getCachedLayoutPageSeo(slug, locale);
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const seo = await getCachedLayoutPageSeo('home', locale);
+  const t = createTranslator(getDictionary(locale), 'Metadata');
   const title = seo?.metaTitle?.trim() || seo?.title?.trim() || t('title');
   const description = seo?.metaDescription?.trim() || t('description');
 

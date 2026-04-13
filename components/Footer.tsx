@@ -1,7 +1,7 @@
 'use client';
 
-import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from '@/lib/dictionary-react';
 import Image from 'next/image';
 import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
 function PinterestIcon({ className }: { className?: string }) {

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useMessages, useTranslations } from 'next-intl';
+import { useMessages, useTranslations } from '@/lib/dictionary-react';
 import type { CompanyDivisionSlug } from '@/lib/company-divisions';
 import { newsSectorListPath } from '@/lib/news-paths';
 import {

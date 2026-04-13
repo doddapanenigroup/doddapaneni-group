@@ -1,6 +1,7 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
 import { fetchPublishedSectorBlogPost } from '@/lib/sector-blog-post';
@@ -75,7 +76,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
   const blog = getBlogMessages(locale);
   if (!blog) notFound();
 
-  const t = await getTranslations({ locale, namespace: 'Blog' });
+  const t = createTranslator(getDictionary(locale), 'Blog');
 
   const dbPost = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug, locale);
   if (!dbPost) notFound();

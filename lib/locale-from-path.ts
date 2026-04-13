@@ -1,6 +1,7 @@
 import { routing } from '@/i18n/routing';
+import type { AppLocale } from '@/i18n/locales';
 
-export type AppLocale = (typeof routing.locales)[number];
+export type { AppLocale };
 
 /**
  * Valid `[locale]` route segment, else default locale.

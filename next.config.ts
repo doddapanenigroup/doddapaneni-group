@@ -1,14 +1,12 @@
 import type { NextConfig } from "next";
 import path from "path";
 import { fileURLToPath } from "url";
-import createNextIntlPlugin from 'next-intl/plugin';
+import { APP_LOCALES, DEFAULT_LOCALE } from './i18n/locales';
 
 /** Stable Turbopack root (avoids picking a parent folder when multiple lockfiles exist). */
 const turbopackRoot = path.dirname(fileURLToPath(import.meta.url));
 
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
-const DEFAULT_LOCALE = 'en';
-const LOCALES = ['en', 'te', 'hi', 'es'] as const;
+const LOCALES = APP_LOCALES;
 
 /** Legacy favicon filenames (old metadata); browsers/clients may still request them. */
 const LEGACY_FAVICON_DG_SIZES = [16, 32, 48, 64, 180, 192, 512] as const;
@@ -25,7 +23,10 @@ function legacyFaviconRedirects(): NonNullable<
   ];
 }
 
-/** Old locale URL prefixes → strip and send to default-locale paths (English, no prefix). */
+/**
+ * Legacy URL prefixes from older builds (not in `routing.locales`).
+ * Permanent redirects into the default locale prefix (`/en/…`).
+ */
 const REMOVED_LOCALE_PREFIXES = [
   'bn',
   'mr',
@@ -46,8 +47,8 @@ function removedLocaleRedirects(): NonNullable<
   Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
 > {
   return REMOVED_LOCALE_PREFIXES.flatMap((loc) => [
-    { source: `/${loc}`, destination: '/', permanent: true as const },
-    { source: `/${loc}/:path*`, destination: '/:path*', permanent: true as const },
+    { source: `/${loc}`, destination: `/${DEFAULT_LOCALE}`, permanent: true as const },
+    { source: `/${loc}/:path*`, destination: `/${DEFAULT_LOCALE}/:path*`, permanent: true as const },
   ]);
 }
 
@@ -125,26 +126,24 @@ const nextConfig: NextConfig = {
       ...legacyFaviconRedirects(),
       ...hostCanonicalRedirects(),
       ...removedLocaleRedirects(),
-      { source: '/blog', destination: '/news', permanent: true },
-      { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
-      { source: '/terms-conditions', destination: '/terms', permanent: true },
-      { source: '/services', destination: '/', permanent: true },
-      ...LOCALES
-        .filter((loc) => loc !== DEFAULT_LOCALE)
-        .flatMap((loc) => [
-          { source: `/${loc}/blog`, destination: `/${loc}/news`, permanent: true as const },
-          {
-            source: `/${loc}/blog/:slug`,
-            destination: `/${loc}/news/:slug`,
-            permanent: true as const,
-          },
-          {
-            source: `/${loc}/terms-conditions`,
-            destination: `/${loc}/terms`,
-            permanent: true as const,
-          },
-          { source: `/${loc}/services`, destination: `/${loc}`, permanent: true as const },
-        ]),
+      { source: '/blog', destination: `/${DEFAULT_LOCALE}/news`, permanent: true },
+      { source: '/blog/:slug', destination: `/${DEFAULT_LOCALE}/news/:slug`, permanent: true },
+      { source: '/terms-conditions', destination: `/${DEFAULT_LOCALE}/terms`, permanent: true },
+      { source: '/services', destination: `/${DEFAULT_LOCALE}`, permanent: true },
+      ...LOCALES.flatMap((loc) => [
+        { source: `/${loc}/blog`, destination: `/${loc}/news`, permanent: true as const },
+        {
+          source: `/${loc}/blog/:slug`,
+          destination: `/${loc}/news/:slug`,
+          permanent: true as const,
+        },
+        {
+          source: `/${loc}/terms-conditions`,
+          destination: `/${loc}/terms`,
+          permanent: true as const,
+        },
+        { source: `/${loc}/services`, destination: `/${loc}`, permanent: true as const },
+      ]),
     ];
   },
   poweredByHeader: false,
@@ -180,7 +179,7 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'next-intl', 'recharts'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
     validateRSCRequestHeaders: true,
   },
   async headers() {
@@ -232,4 +231,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

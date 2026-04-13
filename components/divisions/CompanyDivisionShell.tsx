@@ -1,7 +1,8 @@
 'use client';
 
-import { Link, usePathname, routing } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { routing } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/navigation';
+import { useTranslations } from '@/lib/dictionary-react';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
 import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import CompanyDivisionTopicNav from '@/components/divisions/CompanyDivisionTopicNav';

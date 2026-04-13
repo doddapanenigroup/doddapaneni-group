@@ -1,10 +1,10 @@
 'use client';
 
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import MotionLazy from '@/components/motion/MotionLazy';
 import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
 import { newsArticlePath } from '@/lib/news-paths';

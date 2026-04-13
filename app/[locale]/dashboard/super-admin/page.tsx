@@ -1,15 +1,16 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { canAccessSuperAdminDashboard } from '@/lib/dashboard-access';
 import type { User as DbUser } from '@/lib/prisma-generated';
 import SuperAdminDashboard from '@/components/dashboard/SuperAdminDashboard';
 
-export default async function SuperAdminDashboardPage() {
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function SuperAdminDashboardPage({ params }: Props) {
   const session = await auth();
-  const locale = await getLocale();
+  const { locale } = await params;
 
   if (
     !session?.user ||

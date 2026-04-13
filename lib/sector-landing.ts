@@ -1,13 +1,12 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
 import { mediaUrl } from '@/lib/media';
 import { routing } from '@/i18n/routing';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
-import {
-  getDivisionSubpageLabel,
-  type DivisionSubpage,
-} from '@/lib/company-division-subpages';
+import type { DivisionSubpage } from '@/lib/company-division-subpages';
 import {
   getPublicSectorBySlug,
   type PublicSector,
@@ -182,14 +181,17 @@ export async function sectorLandingMetadata(
   };
 }
 
-function buildDivisionSubpageDescription(row: SectorLandingRow, sub: DivisionSubpage): string {
-  const subLabel = getDivisionSubpageLabel(sub);
+function buildDivisionSubpageDescription(
+  row: SectorLandingRow,
+  subLabel: string,
+  servicesWord: string,
+): string {
   const base = row.description?.trim();
   if (base) {
     const combined = `${subLabel} — ${base}`;
     return combined.length > 320 ? `${combined.slice(0, 317)}…` : combined;
   }
-  return `${subLabel} for ${formatDivisionNameForSeo(row.name)} at ${SITE_NAME}.`;
+  return `${subLabel} — ${formatDivisionNameForSeo(row.name)} ${servicesWord} | ${SITE_NAME}.`;
 }
 
 export async function sectorSubpageMetadata(
@@ -202,13 +204,20 @@ export async function sectorSubpageMetadata(
     : routing.defaultLocale;
   const row = await getPublicSectorBySlug(sectorSlug);
   if (!row) return {};
-  const subLabel = getDivisionSubpageLabel(sub);
+  const tBlog = createTranslator(getDictionary(locale), 'Blog');
+  const subLabel =
+    sub === 'about'
+      ? tBlog('divisionSubpageAbout')
+      : sub === 'services'
+        ? tBlog('divisionSubpageServices')
+        : tBlog('divisionSubpageContact');
+  const servicesWord = tBlog('divisionSubpageServices');
   const origin = getSiteOrigin();
   const pathRel = publicPathWithLocale(locale, row.slug, sub);
   const canonical = `${origin}${pathRel}`;
   const pathnameForHreflang = `/${row.slug}/${sub}`;
-  const title = `${subLabel} | ${formatDivisionNameForSeo(row.name)} Services | ${SITE_NAME}`;
-  const description = buildDivisionSubpageDescription(row, sub);
+  const title = `${subLabel} | ${formatDivisionNameForSeo(row.name)} ${servicesWord} | ${SITE_NAME}`;
+  const description = buildDivisionSubpageDescription(row, subLabel, servicesWord);
 
   return {
     title,

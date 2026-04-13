@@ -1,7 +1,7 @@
 'use client';
 
-import { Link, usePathname } from '@/i18n/routing';
-import { useLocale } from 'next-intl';
+import { Link, usePathname } from '@/i18n/navigation';
+import { useAppLocale as useLocale } from '@/lib/dictionary-react';
 import Image from 'next/image';
 
 export default function LeftSidebar() {

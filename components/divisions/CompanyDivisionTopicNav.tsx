@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Link, usePathname, routing } from '@/i18n/routing';
+import { useTranslations } from '@/lib/dictionary-react';
+import { routing } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/navigation';
 import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
 

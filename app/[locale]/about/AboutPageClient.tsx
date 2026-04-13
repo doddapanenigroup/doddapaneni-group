@@ -4,8 +4,8 @@ import { Target, Eye, Award, Building2, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { useTranslations } from '@/lib/dictionary-react';
+import { Link } from '@/i18n/navigation';
 import { mediaUrl } from '@/lib/media';
 import { getCompanyDivisionNavItems } from '@/lib/company-divisions';
 

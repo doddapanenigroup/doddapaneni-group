@@ -1,0 +1,1115 @@
+{
+  "Metadata": {
+    "title": "Doddapaneni Group - పరిశ్రమల అంతటా వ్యాపారాలను నిర్మించడం",
+    "description": "Doddapaneni Group అనేది టెక్నాలజీ, హెల్త్‌కేర్, నిర్మాణం మరియు మరెన్నో రంగాలలో వినూత్న, స్కేలబుల్ పరిష్కారాలను అందించే విభిన్న వ్యాపార సమ్మేళనం."
+  },
+  "Navbar": {
+    "home": "హోమ్",
+    "about": "మా గురించి",
+    "services": "సేవలు",
+    "ourCompanies": "మా సేవలు",
+    "sectorLiveLoading": "రంగాలు లోడ్ అవుతున్నాయి…",
+    "comingSoonNav": "త్వరలో",
+    "blog": "వార్తలు",
+    "contact": "మమ్మల్ని సంప్రదించండి",
+    "language": "భాష"
+  },
+  "Footer": {
+    "tagline": "పరిశ్రమల అంతటా వ్యాపారాలను నిర్మించడం",
+    "companyLegalNav": "కంపెనీ & చట్టపరమైన",
+    "companyLegalNavAria": "కంపెనీ మరియు చట్టపరమైన లింకులు",
+    "quickLinks": "త్వరిత లింకులు",
+    "contact": "సంప్రదించండి",
+    "rights": "అన్ని హక్కులూ ప్రత్యేకించబడ్డాయి.",
+    "phone": "ఫోన్",
+    "address": "చిరునామా",
+    "email": "ఇమెయిల్",
+    "newsletter": "న్యూస్ లెటర్",
+    "emailPlaceholder": "మీ ఇమెయిల్ నమోదు చేయండి",
+    "subscribe": "సభ్యత్వం పొందండి",
+    "subscribed": "సభ్యత్వం పొందినందుకు ధన్యవాదాలు!",
+    "legal": "చట్టపరమైన",
+    "privacyPolicy": "గోప్యతా విధానం",
+    "termsConditions": "నిబంధనలు మరియు షరతులు",
+    "termsShort": "నిబంధనలు",
+    "disclaimer": "నిరాకరణ",
+    "faq": "తరచుగా అడిగే ప్రశ్నలు / మద్దతు",
+    "sitemap": "సైట్ మ్యాప్",
+    "followUs": "మమ్మల్ని అనుసరించండి"
+  },
+  "DivisionLabels": {
+    "software-it-ai": "సమాచార సాంకేతికత & AI అభివృద్ధి",
+    "digital-marketing": "డిజిటల్ మార్కెటింగ్",
+    "healthcare-medical": "ఆరోగ్య సంరక్షణ & వైద్య",
+    "construction-realestate": "నిర్మాణం & రియల్ ఎస్టేట్",
+    "ecommerce-marketplace": "ఈ-కామర్స్ మార్కెట్‌ప్లేస్",
+    "media-news-entertainment": "మీడియా, వార్తలు & వినోదం",
+    "staffing-consultancy": "స్టాఫింగ్ & కన్సల్టెన్సీ",
+    "food-beverages": "ఆహారం & పానీయాలు",
+    "manufacturing-trading": "తయారీ & ట్రేడింగ్",
+    "logistics-warehousing": "లాజిస్టిక్స్ & వేర్‌హౌసింగ్",
+    "education-skill": "విద్య & నైపుణ్య అభివృద్ధి",
+    "import-export": "దిగుమతి & ఎగుమతి"
+  },
+  "Home": {
+    "innovating": "పరిశ్రమల అంతటా ఆవిష్కరణలు",
+    "heroImageAlt": "సాయంత్రం ఆధునిక కార్యాలయ నిర్మాణం, Doddapaneni Group కార్పొరేట్ ఉనికిని సూచిస్తుంది",
+    "homeSectionImageAlt": "వ్యాపార ప్రణాళికలు మరియు కార్యాచరణపై సహచరులు సహకరించడం",
+    "strengthsSectionHeading": "మేము క్లయింట్లు మరియు భాగస్వాములతో ఎలా పనిచేస్తాము",
+    "heroTitle": "<highlight>భవిష్యత్తుకు సిద్ధంగా ఉన్న</highlight> వ్యాపారాలను నిర్మించడం",
+    "heroTitleLine1": "<highlight>భవిష్యత్తుకు సిద్ధంగా ఉన్న</highlight>",
+    "heroTitleLine2": "వ్యాపారాలను నిర్మించడం",
+    "heroSubtitle": "పరిశ్రమల అంతటా వ్యాపారాలను నిర్మించడం. సంక్లిష్ట ప్రపంచం కోసం వినూత్న, స్కేలబుల్ మరియు స్థిరమైన పరిష్కారాలను అందించడం.",
+    "exploreServices": "మా సేవలను అన్వేషించండి",
+    "learnAboutUs": "మా గురించి తెలుసుకోండి",
+    "globalReach": "ప్రపంచవ్యాప్త విస్తరణ",
+    "globalReachDesc": "విజయవంతమైన వెంచర్ల విభిన్న పోర్ట్‌ఫోలియోతో బహుళ ఖండాలలో కార్యకలాపాలు.",
+    "sustainableGrowth": "స్థిరమైన వృద్ధి",
+    "sustainableGrowthDesc": "నైతిక మరియు స్కేలబుల్ వ్యాపార పద్ధతుల ద్వారా దీర్ఘకాలిక విలువ సృష్టిపై దృష్టి సారించడం.",
+    "trustedPartner": "విశ్వసనీయ భాగస్వామి",
+    "trustedPartnerDesc": "సమగ్రత, పారదర్శకత మరియు కార్యాచరణ శ్రేష్ఠత ఆధారంగా శాశ్వత సంబంధాలను నిర్మించడం.",
+    "whoWeAre": "మేము ఎవరు",
+    "buildingSustainable": "స్థిరమైన వ్యాపారాలను నిర్మించడం",
+    "description": "Doddapaneni Group బహుళ పరిశ్రమలలో వినూత్న, స్కేలబుల్ మరియు భవిష్యత్తుకు సిద్ధంగా ఉన్న పరిష్కారాలను అందించే విభిన్న వ్యాపార సమ్మేళనం. మా ఉనికి టెక్నాలజీ, హెల్త్‌కేర్, నిర్మాణం, గ్లోబల్ ట్రేడ్, లాజిస్టిక్స్, తయారీ, విద్య, మీడియా మరియు వర్క్‌ఫోర్స్ సొల్యూషన్స్‌లో విస్తరించి ఉంది. క్లయింట్లు, భాగస్వాములు మరియు కమ్యూనిటీల కోసం దీర్ఘకాలిక విలువను సృష్టించే స్థిరమైన వ్యాపారాలను నిర్మించడంపై మేము దృష్టి పెడతాము. సమగ్రత, కార్యాచరణ శ్రేష్ఠత మరియు ఆవిష్కరణలలో పాతుకుపోయిన బలమైన పునాదితో, Doddapaneni Group సంస్థలను స్వీకరించడానికి, స్కేల్ చేయడానికి మరియు పోటీ మార్కెట్లలో నడిపించడానికి అనుమతిస్తుంది. మా సమీకృత వ్యాపార నమూనా ఒక విశ్వసనీయ సమూహం క్రింద ఎండ్-టు-ఎండ్ పరిష్కారాలను అందించడానికి మాకు అనుమతిస్తుంది.",
+    "readStory": "మా పూర్తి కథనాన్ని చదవండి",
+    "ourGroupCompanies": "మా ఉత్పత్తులు",
+    "drivingExcellence": "కీలక రంగాలలో శ్రేష్ఠతను నడిపించడం.",
+    "ourServices": "మా సేవలు",
+    "diverseSolutions": "సంక్లిష్టమైన, అభివృద్ధి చెందుతున్న ప్రపంచం కోసం రూపొందించబడిన విభిన్న పరిష్కారాలు.",
+    "viewAllServices": "అన్ని సేవలను చూడండి",
+    "learnMore": "మరింత తెలుసుకోండి",
+    "readyToTransform": "మీ వ్యాపారాన్ని మార్చడానికి సిద్ధంగా ఉన్నారా?",
+    "partnerWithUs": "వినూత్న పరిష్కారాలు మరియు స్థిరమైన వృద్ధి కోసం Doddapaneni Group తో భాగస్వామి అవ్వండి.",
+    "getInTouch": "మమ్మల్ని సంప్రదించండి",
+    "servicesList": {
+      "ecommerce": {
+        "title": "ఇ-కామర్స్ & మార్కెట్‌ప్లేస్‌లు",
+        "description": "మేము ఆధునిక వ్యాపార నమూనాలకు మద్దతు ఇచ్చే స్కేలబుల్ ఇ-కామర్స్ పర్యావరణ వ్యవస్థలను రూపొందిస్తాము, అభివృద్ధి చేస్తాము మరియు నిర్వహిస్తాము."
+      },
+      "software": {
+        "title": "సాఫ్ట్‌వేర్, IT & AI టెక్నాలజీలు",
+        "description": "మేము వెబ్ మరియు మొబైల్ అప్లికేషన్ అభివృద్ధి, AI-ఆధారిత ఆటోమేషన్, చాట్‌బాట్‌లు, క్లౌడ్ సేవలు, SaaS ప్లాట్‌ఫారమ్‌లు మరియు IT కన్సల్టింగ్‌తో సహా ఎండ్-టు-ఎండ్ డిజిటల్ పరిష్కారాలను అందిస్తాము."
+      },
+      "digitalMarketing": {
+        "title": "డిజిటల్ మార్కెటింగ్ సేవలు",
+        "description": "మా డిజిటల్ మార్కెటింగ్ సేవలు బ్రాండ్ విజిబిలిటీని నిర్మించడం మరియు కొలవగల వృద్ధిని నడపడంపై దృష్టి పెడతాయి."
+      },
+      "healthcare": {
+        "title": "హెల్త్‌కేర్, మెడికల్ సప్లైస్ & మెడికల్ బిల్లింగ్",
+        "description": "మేము మెడికల్ ఎక్విప్‌మెంట్ ట్రేడింగ్ మరియు సమగ్ర బ్యాకెండ్ సేవలతో హెల్త్‌కేర్ ప్రొవైడర్లకు మద్దతు ఇస్తాము."
+      },
+      "construction": {
+        "title": "నిర్మాణం, ఆర్కిటెక్చర్ & రియల్ ఎస్టేట్",
+        "description": "మేము భవన నిర్మాణం, ఆర్కిటెక్చరల్ డిజైన్, రియల్ ఎస్టేట్ అభివృద్ధి మరియు ఆస్తి కన్సల్టింగ్‌ను కవర్ చేసే నిర్మాణం మరియు రియల్ ఎస్టేట్ పరిష్కారాలను అందిస్తాము."
+      },
+      "importExport": {
+        "title": "దిగుమతి & ఎగుమతి (అన్ని వస్తువులు)",
+        "description": "మేము గ్లోబల్ సోర్సింగ్, హోల్‌సేల్ ఎగుమతులు, అంతర్జాతీయ వాణిజ్యం మరియు క్రాస్-బోర్డర్ లాజిస్టిక్స్ ద్వారా అంతర్జాతీయ వాణిజ్యాన్ని సులభతరం చేస్తాము."
+      },
+      "food": {
+        "title": "ఫుడ్ ప్రాసెసింగ్ & పానీయాలు",
+        "description": "మా ఫుడ్ ప్రాసెసింగ్ మరియు పానీయాల విభాగం ప్యాకేజ్డ్ ఫుడ్ ఉత్పత్తి, పానీయాల తయారీ మరియు సమర్థవంతమైన ఆహార సరఫరా గొలుసు పంపిణీపై దృష్టి పెడుతుంది."
+      },
+      "education": {
+        "title": "విద్య & నైపుణ్య అభివృద్ధి",
+        "description": "మేము పరిశ్రమ-సంబంధిత నైపుణ్యాలు మరియు కెరీర్-రెడీ ప్రొఫెషనల్స్‌ను నిర్మించడానికి రూపొందించిన శిక్షణా కార్యక్రమాలు, వృత్తిపరమైన కోర్సులను అందిస్తాము."
+      },
+      "logistics": {
+        "title": "లాజిస్టిక్స్ & వేర్‌హౌసింగ్",
+        "description": "మేము సరుకు మరియు కార్గో హ్యాండ్లింగ్, నిల్వ మరియు గిడ్డంగులు, సరఫరా గొలుసు నిర్వహణ మరియు లాస్ట్-మైల్ డెలివరీ సేవలతో సహా ఎండ్-టు-ఎండ్ లాజిస్టిక్స్ పరిష్కారాలను అందిస్తాము."
+      },
+      "media": {
+        "title": "మీడియా, వార్తలు & వినోదం",
+        "description": "మా మీడియా విభాగం డిజిటల్ న్యూస్ పోర్టల్స్, మీడియా ప్రొడక్షన్, వీడియో మరియు కంటెంట్ క్రియేషన్ మరియు అడ్వర్టైజింగ్ నెట్‌వర్క్ మేనేజ్‌మెంట్‌ను నిర్వహిస్తుంది."
+      },
+      "manufacturing": {
+        "title": "తయారీ & హోల్‌సేల్ ట్రేడింగ్",
+        "description": "మేము విభిన్న పరిశ్రమ అవసరాలకు మద్దతు ఇవ్వడానికి పారిశ్రామిక తయారీ యూనిట్లు, కస్టమ్ ప్రొడక్షన్ సౌకర్యాలు మరియు బల్క్ హోల్‌సేల్ ట్రేడింగ్ కార్యకలాపాలను నిర్వహిస్తాము."
+      },
+      "staffing": {
+        "title": "ఎంప్లాయీ కన్సల్టెన్సీ & స్టాఫింగ్ సర్వీసెస్",
+        "description": "మేము రిక్రూట్‌మెంట్ మరియు స్టాఫింగ్, HR కన్సల్టింగ్ మరియు వర్క్‌ఫోర్స్ మేనేజ్‌మెంట్‌తో సంస్థలకు సహాయం చేస్తాము."
+      }
+    },
+    "businessDivisions": "వ్యాపార విభాగాలు",
+    "businessDivisionsSubtitle": "సమూహంలో పండ్రెండు విభిన్న రంగాలు—ప్రతి ఒక్కటి సమర్పిత సామర్థ్యాలు, రంగ అంతర్దృష్టులు మరియు ప్రచురించిన వ్యాసాలు.",
+    "hubHeroEyebrow": "కార్పొరేట్ హబ్",
+    "hubHeroTitle": "Doddapaneni Group",
+    "hubHeroSubtitle": "భారతదేశం & అమెరికా • వివిధ కార్యకలాపాలు",
+    "hubHeroLead": "ప్రత్యేక రంగాలు—సాంకేతికత, ఆరోగ్య సంరక్షణ, వాణిజ్యం, మౌలిక సదుపాయాలు మరియు మరిన్ని—ఒక విశిష్టమైన నిర్వహణ నమూనా కింద ఏకీకృతం.",
+    "divisionsSectionTitle": "వ్యాపార విభాగాలు",
+    "divisionsSectionSubtitle": "",
+    "viewCompany": "కంపెనీ చూడండి",
+    "launchingSoon": "త్వరలో ప్రారంభం",
+    "inactiveDivisionHint": "మేము ప్రత్యక్షం అయే కొద్దీ విభాగ హబ్, కార్యక్రమాలు మరియు ప్రచురించిన అంతర్దృష్టులు ఇక్కడ కనిపిస్తాయి.",
+    "divisionsFooterServices": "అన్ని సమూహ సేవలను చూడండి",
+    "leadershipTitle": "సమూహ నాయకత్వం",
+    "leadershipSubtitle": "కఠినమైన నిర్వహణ నమూనా ప్రకారం వ్యూహాత్మక దిశ: బోర్డు మరియు కార్యనిర్వహణ స్థాయిలో స్పష్టమైన బాధ్యత, ప్రతి విభాగానికి రంగ-కేంద్రీకృత జట్లు.",
+    "leadershipGovTitle": "బోర్డు & నిర్వహణ",
+    "leadershipGovBody": "మూలధనం, ప్రమాదం మరియు దీర్ఘకాల వ్యూహంపై పర్యవేక్షణ—ప్రతి కార్యకలాప యూనిట్‌లో పారదర్శకత మరియు సమలేఖనాన్ని నిర్ధారిస్తుంది.",
+    "leadershipExecTitle": "కార్యనిర్వహణ కార్యాలయం",
+    "leadershipExecBody": "సమూహ వ్యూహం ఇక్కడ కార్యాచరణ ప్రాధాన్యతలుగా మారుతుంది—విభాగాల మధ్య కార్యక్రమాలు, ప్రమాణాలు మరియు సమ్మతిని సమన్వయం చేస్తుంది.",
+    "leadershipDivTitle": "విభాగ నాయకత్వం",
+    "leadershipDivBody": "ప్రతి రంగానికి నియమించబడిన నాయకత్వం, P&L యాజమాన్యం, డాక్యుమెంట్ చేసిన ప్రమాణాలు మరియు క్లయింట్ ఫలితాలపై నైరూప్య బాధ్యత.",
+    "presenceTitle": "జాగతిక ఉనికి",
+    "presenceSubtitle": "దక్షిణ-మధ్య భారతదేశం మరియు యునైటెడ్ స్టేట్స్‌లో విస్తరించి—డిజిటల్ ఉత్పత్తులు మరియు వాణిజ్య సంబంధాలు మా విభాగాలు భాగస్వాములకు సేవ చేసే చోటు వరకు విస్తరించింది.",
+    "presenceIndiaLabel": "భారతదేశం",
+    "presenceIndiaLoc": "తెలంగాణ — హైదరాబాద్ ప్రాంతం",
+    "presenceIndiaDesc": "సాంకేతికత, ఆరోగ్య సంరక్షణ, నిర్మాణం, మీడియా మరియు షేర్డ్ సేవలలో నమోదు కార్యకలాపాలు మరియు జట్లు.",
+    "presenceUsLabel": "యునైటెడ్ స్టేట్స్",
+    "presenceUsLoc": "ఫ్లోరిడా — ఓకాలా",
+    "presenceUsDesc": "USA వాణిజ్యం, ఆరోగ్య మార్కెట్‌ప్లేస్ కార్యక్రమాలు మరియు ఉత్తర అమెరికా భాగస్వామ్య సమన్వయం.",
+    "presenceMapAria": "భారతదేశం మరియు యునైటెడ్ స్టేట్స్‌లో సమూహ కార్యాలయాలను హైలైట్ చేసే శైలీకృత పటం",
+    "hubTitle": "Doddapaneni Group – మా వ్యాపార విభాగాలు",
+    "hubSubtitle": "ప్రతి కార్డ్ ఆ హబ్ లైవ్‌గా ఉన్న చోట రంగ వార్తలు మరియు సందర్భానికి లింక్ అవుతుంది. ఇతర విభాగాలు పారదర్శకత కోసం జాబితా చేయబడ్డాయి; కంటెంట్ మరియు కార్యక్రమాలు పరిపక్వత చెందే కొద్దీ పూర్తి హబ్‌లు లభిస్తాయి.",
+    "comingSoonLabel": "త్వరలో",
+    "exploreDivision": "అన్వేషించండి",
+    "logoAltDlsin": "Dlsin బహుళ విక్రేత ఇ-కామర్స్ ప్లాట్‌ఫారమ్ లోగో",
+    "logoAltJanathaMirror": "జనతా మిర్రర్ డిజిటల్ వార్తల ప్రచురణ లోగో",
+    "logoAltDealsmedi": "DealsMedi ఆన్‌లైన్ వైద్య మరియు ఆరోగ్య ఉత్పత్తుల మార్కెట్‌ప్లేస్ లోగో",
+    "companyBrandDlsin": "Dlsin",
+    "companyBrandDealsmedi": "DealsMedi",
+    "companyBrandJanathaMirror": "జనతా మిరర్",
+    "sectorCompaniesListHeading": "ఈ రంగంలో మా ఉత్పత్తులు",
+    "sectorCompaniesListLead": "కంపెనీ పేజీని తెరవడానికి ఒకదాన్ని ఎంచుకోండి.",
+    "sectorCompaniesListRowHint": "కంపెనీ పేజీని తెరవండి",
+    "sectorCompaniesListEmptyTitle": "ఇప్పటికీ కంపెనీలు లిస్ట్ చేయలేదు",
+    "sectorCompaniesListEmptyBody": "ఈ రంగానికి కంపెనీ పేజీలను మేము సిద్ధం చేస్తున్నాం. దయచేసి త్వరలో మళ్లీ చూడండి."
+  },
+  "SectorLanding": {
+    "featuredProductsHeading": "ఈ రంగంలో మా ఉత్పత్తులు",
+    "featuredProductsLead": "మరింత వివరాల కోసం ఒక బ్రాండ్ పేజీని ఎంచుకోండి.",
+    "emptyTitle": "ఇప్పటికీ పబ్లిక్ బ్రాండ్స్ లిస్ట్ చేయలేదు",
+    "emptyBody": "ఈ రంగానికి బ్రాండ్ పేజీలను మేము సిద్ధం చేస్తున్నాం. దయచేసి త్వరలో మళ్లీ చూడండి."
+  },
+  "About": {
+    "metaTitle": "About Doddapaneni Group | Vision, Mission & Business Divisions",
+    "metaDescription": "Learn about Doddapaneni Group: our corporate vision, mission, and business divisions spanning Information Technology & AI Development, Digital Marketing, Healthcare & Medical, Construction & Real Estate, E-commerce Marketplace, Media, News & Entertainment, Human Resources & Consultancy, Food & Baverages, Manufacturing & Trading, Logistics & Warehousing, Education & Skill Development, and Import & Export.",
+    "metaKeywords": "Doddapaneni Group, diversified conglomerate, corporate vision, business divisions, technology, healthcare, construction, digital marketing, import export, corporate profile",
+    "metaOgTitle": "About Doddapaneni Group",
+    "metaOgDescription": "A corporate portfolio across twelve industries—built on integrity, innovation, and long-term value for partners and communities.",
+    "headerTitle": "మా గురించి",
+    "headerSubtitle": "విభిన్న పరిశ్రమలలో శ్రేష్ఠతకు కట్టుబడిన బహుళ-డొమైన్ సంస్థ.",
+    "introTitle": "మా కథ",
+    "introImageAlt": "Corporate leadership and strategy discussion representing Doddapaneni Group",
+    "introText": "Doddapaneni Group విభిన్న పరిశ్రమలలో శ్రేష్ఠతకు కట్టుబడిన బహుళ-డొమైన్ సంస్థ. సాంకేతికత, వ్యూహం మరియు అమలును మిళితం చేసే భవిష్యత్తు-కేంద్రీకృత వ్యాపారాలను నిర్మించడానికి మేము స్పష్టమైన దృష్టితో పని చేస్తాము. మా నైపుణ్యం IT & AI సాంకేతికతలు, ఆరోగ్య సంరక్షణ పరిష్కారాలు, నిర్మాణం మరియు రియల్ ఎస్టేట్, దిగుమతి-ఎగుమతి, తయారీ, లాజిస్టిక్స్, విద్య, మీడియా మరియు వృత్తిపరమైన స్టాఫింగ్ సేవలను విస్తరించింది. మార్కెట్ అవసరాలను అర్థం చేసుకోవడం మరియు సామర్థ్యం, వృద్ధి మరియు స్థిరత్వాన్ని నడిపించే అనుకూలీకరించిన పరిష్కారాలను అందించడంలో మా బలం ఉంది. ఆవిష్కరణలు, నైపుణ్యం కలిగిన నిపుణులు మరియు బలమైన భాగస్వామ్యాలను ఉపయోగించుకోవడం ద్వారా, మేము వ్యాపారాలకు సంక్లిష్టతను నావిగేట్ చేయడానికి మరియు కొలవగల ఫలితాలను సాధించడానికి సహాయం చేస్తాము.",
+    "visionTitle": "మా విజన్",
+    "visionText": "ఆవిష్కరణ, విశ్వసనీయత మరియు క్రాస్-ఇండస్ట్రీ నాయకత్వానికి గుర్తింపు పొందిన ప్రపంచవ్యాప్తంగా గౌరవనీయమైన వ్యాపార సమూహంగా మారడం.",
+    "missionTitle": "మా మిషన్",
+    "missionText": "దీర్ఘకాలిక భాగస్వామ్యాలను పెంపొందించడం, ఆవిష్కరణలను స్వీకరించడం మరియు నైతిక వ్యాపార పద్ధతులను కొనసాగించడం ద్వారా పరిశ్రమలలో అధిక-నాణ్యత, స్కేలబుల్ పరిష్కారాలను అందించడం.",
+    "companiesTitle": "మా గ్రూప్ కంపెనీలు",
+    "companiesSubtitle": "ప్రత్యేక వ్యాపారాల ఏకీకృత పర్యావరణ వ్యవస్థ.",
+    "divisionsTitle": "Our business divisions",
+    "divisionsSubtitle": "A single group structure with dedicated sector leadership and shared standards of governance.",
+    "divisionsLead": "Each division contributes distinct expertise while aligning to group principles: clear accountability, disciplined risk management, and relentless focus on outcomes for stakeholders.",
+    "exploreHub": "View division",
+    "comingSoonBadge": "Coming soon",
+    "divisionsCta": "Explore group services and capabilities across sectors.",
+    "divisionsCtaLink": "Our services",
+    "valuesTitle": "ప్రధాన విలువలు",
+    "valuesSubtitle": "మా ప్రతి చర్య మరియు నిర్ణయానికి మార్గనిర్దేశం చేసే సూత్రాలు.",
+    "valuesList": {
+      "integrity": "సమగ్రత",
+      "transparency": "పారదర్శకత",
+      "customerFocus": "కస్టమర్ ఫోకస్",
+      "innovation": "ఆవిష్కరణ",
+      "operationalExcellence": "కార్యాచరణ శ్రేష్ఠత",
+      "sustainableGrowth": "స్థిరమైన వృద్ధి"
+    },
+    "divisionBlurbs": {
+      "software-it-ai": "ఆపరేషన్లను ఆధునీకరించే, భద్రతను బలోపేతం చేసే, డేటా-ఆధారిత నిర్ణయాలకు మద్దతిచ్చే ఎంటర్ప్రైజ్ సాఫ్ట్‌వేర్, క్లౌడ్ మరియు AI సామర్థ్యాలు.",
+      "digital-marketing": "కొలవగల రీచ్, ప్రతిష్ఠ మరియు ఎంగేజ్‌మెంట్ కోసం రూపొందించిన బ్రాండ్, అక్విజిషన్ మరియు పనితీరు మార్కెటింగ్ ప్రోగ్రామ్‌లు.",
+      "healthcare-medical": "నాణ్యత, కంప్లయన్స్ మరియు విశ్వసనీయ డెలివరీపై దృష్టితో ప్రొవైడర్లు, పేయర్స్ మరియు హెల్త్-టెక్ వెంచర్లకు మద్దతు.",
+      "construction-realestate": "ప్లానింగ్, డిజైన్ నుంచి డెలివరీ మరియు స్టీవర్డ్‌షిప్ వరకు—ప్రాజెక్ట్ ఎగ్జిక్యూషన్, ప్రాపర్టీ మరియు ఇన్‌ఫ్రాస్ట్రక్చర్ కార్యక్రమాలు.",
+      "ecommerce-marketplace": "కామర్స్ ప్లాట్‌ఫారమ్‌లు, క్యాటలాగ్ & ఫుల్‌ఫిల్మెంట్ ఇంటిగ్రేషన్, మరియు మల్టీ-రిజన్ స్కేల్ కోసం మార్కెట్‌ప్లేస్ మోడల్స్.",
+      "media-news-entertainment": "పబ్లిషర్లు మరియు ఎంటర్‌టైన్‌మెంట్ బ్రాండ్స్ కోసం కంటెంట్, ఆడియన్స్ ప్రొడక్ట్స్ మరియు డిజిటల్ అనుభవాలు.",
+      "staffing-consultancy": "ఇండస్ట్రీ సందర్భం మరియు గ్రోత్ దశకు అనుగుణంగా టాలెంట్, వర్క్‌ఫోర్స్ ప్రోగ్రామ్స్ మరియు సలహా సేవలు.",
+      "food-beverages": "ప్రాంతీయ మరియు గ్లోబల్ డిమాండ్‌ను సేవ చేసే ఫుడ్ & బేవరేజ్ బ్రాండ్స్ కోసం సరఫరా, నాణ్యత మరియు పంపిణీ సామర్థ్యాలు.",
+      "manufacturing-trading": "థ్రూపుట్ మరియు విజిబిలిటిని మెరుగుపరచే ఇండస్ట్రియల్ ఆపరేషన్స్, ట్రేడింగ్ నెట్‌వర్క్స్ మరియు ప్రోడక్టివిటీ కార్యక్రమాలు.",
+      "logistics-warehousing": "విశ్వసనీయత, ఖర్చు క్రమశిక్షణ మరియు ట్రేసబిలిటీపై దృష్టితో డిస్ట్రిబ్యూషన్, స్టోరేజ్ మరియు లాస్ట్-మైల్ పరిష్కారాలు.",
+      "education-skill": "నాణ్యత మరియు ఫలితాలను కాపాడుతూ శిక్షణను స్కేల్ చేసే లెర్నింగ్, స్కిల్లింగ్ మరియు EdTech భాగస్వామ్యాలు.",
+      "import-export": "సరిహద్దు వాణిజ్యం, కంప్లయన్స్ మరియు భాగస్వామ్య నెట్‌వర్క్స్—సరుకు మరియు డాక్యుమెంటేషన్‌ను సమర్థవంతంగా కదిలించడానికి."
+    },
+    "industries": {
+      "it": "IT & AI",
+      "construction": "నిర్మాణం",
+      "importExport": "దిగుమతి/ఎగుమతి",
+      "healthcare": "ఆరోగ్య సంరక్షణ",
+      "logistics": "లాజిస్టిక్స్",
+      "manufacturing": "తయారీ"
+    }
+  },
+  "ServicesPage": {
+    "title": "మా సేవలు",
+    "description": "ఆధునిక వ్యాపారాల మారుతున్న అవసరాలను తీర్చడానికి రూపొందించబడిన సమగ్ర పరిష్కారాలు. మేము పరిశ్రమల అంతటా శ్రేష్ఠతను అందిస్తాము.",
+    "listHeading": "ఒక చూపులో విభాగ సామర్థ్యాలు",
+    "diverseVentures": "డొడ్డాపానేని గ్రూప్ ఈ రంగంలో పనిచేస్తుంది.",
+    "companyDesc": {
+      "dealsmedi": "USAలో మెడికల్ మరియు హెల్త్ ఉత్పత్తులకు నమ్మకమైన ఆన్లైన్ మార్కెట్—CPAP, BiPAP, మొబిలిటీ ఎయిడ్స్ మరియు మరింత.",
+      "dlsin": "సురక్షిత చెల్లింపులు మరియు వేగవంతమైన లాజిస్టిక్స్తో ప్రపంచవ్యాప్తంగా కొనుగోలుదారులు మరియు విక్రేతలను కలుపుతున్న మల్టీవెండర్ ఇ-కామర్స్ ప్లాట్‌ఫారమ్.",
+      "janathaMirror": "జర్నలిస్టిక్ సమగ్రతతో నమ్మకమైన వార్తలు మరియు ఆకర్షణీయ కంటెంట్ అందించే డిజిటల్-ఫస్ట్ మీడియా ఎంటర్ప్రైజ్."
+    }
+  },
+  "ContactPage": {
+    "metaTitle": "Contact Doddapaneni Group | Reach Our Team",
+    "metaDescription": "Contact Doddapaneni Group by email, phone, or our enquiry form. India and USA offices. We reply to business inquiries promptly.",
+    "metaKeywords": "contact Doddapaneni Group, business inquiry, corporate office, India, USA, email",
+    "metaOgTitle": "Contact Doddapaneni Group",
+    "metaOgDescription": "Reach our team for partnerships, services, and general enquiries—professional response within one business day.",
+    "headerTitle": "మమ్మల్ని సంప్రదించండి",
+    "headerIntro": "కార్పొరేట్ అభ్యర్థనలు, మీడియా, వెండర్ ఓన్‌బోర్డింగ్ మరియు భాగస్వామ్యాల కోసం ఈ పేజీని ఉపయోగించండి. మీ సంస్థ, దేశం మరియు ఏ విభాగం లేదా బ్రాండ్ కావాలో పేర్కొనండి, మేము సందేశాన్ని సరైన జట్టుకు పంపుతాము.",
+    "headerSubtitle": "మీ వ్యాపారం వృద్ధి చెందడానికి మేము ఎలా సహాయపడగలమో చర్చించడానికి మా బృందంతో సంప్రదించండి.",
+    "getInTouch": "సంప్రదించండి",
+    "emailTitle": "ఇమెయిల్",
+    "emailAddress": "info@doddapanenigroup.net",
+    "emailResponse": "మేము 24 గంటల్లో స్పందిస్తాము.",
+    "phoneTitle": "ఫోన్",
+    "phoneIndia": "+91 814 224 6666",
+    "phoneIndiaLabel": "India",
+    "phoneUSA": "+1 (352) 230-8586",
+    "phoneUSALabel": "United States",
+    "phoneAvailability": "సోమ-శుక్ర ఉదయం 9 నుండి సాయంత్రం 6 వరకు.",
+    "locationsTitle": "స్థానాలు",
+    "locationIndia": "భారతదేశం (ప్రధాన)",
+    "addressIndia": "ప్లాట్ నెం 22,23,41,42 & 43, శ్రీ కృష్ణ అవెన్యూ, వెంకటరమణ కాలనీ, గోకుల్ ప్లాట్స్, వసంత్ నగర్, రంగారెడ్డి జిల్లా, 500085",
+    "locationUSA": "USA",
+    "addressUSA": "5052 SW 40వ PL, ఓకాల, ఫ్లోరిడా, 34474",
+    "mapTitle": "Map — India office vicinity",
+    "mapCaption": "Location reference: Hyderabad region, Telangana, India. For exact directions, use the address above.",
+    "formTitle": "మాకు సందేశం పంపండి",
+    "formSubtitle": "Please include your organisation and how we can assist.",
+    "successTitle": "సందేశం పంపబడింది!",
+    "successMessage": "మమ్మల్ని సంప్రదించినందుకు ధన్యవాదాలు. మేము త్వరలో సంప్రదిస్తాము.",
+    "formName": "పూర్తి పేరు",
+    "formNamePlaceholder": "మీ పేరు నమోదు చేయండి",
+    "formEmail": "ఇమెయిల్ చిరునామా",
+    "formEmailPlaceholder": "మీ ఇమెయిల్ నమోదు చేయండి",
+    "formMessage": "సందేశం",
+    "formMessagePlaceholder": "మేము మీకు ఎలా సహాయపడగలము?",
+    "sendButton": "సందేశం పంపండి",
+    "sendingButton": "పంపుతోంది...",
+    "nameRequired": "పేరు అవసరం",
+    "emailRequired": "ఇమెయిల్ అవసరం",
+    "emailInvalid": "దయచేసి సరైన ఇమెయిల్ చిరునామాను నమోదు చేయండి",
+    "messageRequired": "సందేశం అవసరం",
+    "messageMinLength": "సందేశం కనీసం 10 అక్షరాలు ఉండాలి"
+  },
+  "Dlsin": {
+    "partOf": "దొడ్డపనేని గ్రూప్‌లో భాగం",
+    "subtitle": "ప్రపంచాన్ని కలిపే మల్టీవెండర్ ఈ-కామర్స్ ప్లాట్‌ఫారమ్.",
+    "sectionTitle": "గ్లోబల్ ట్రేడ్‌ను పునర్నిర్వచించడం",
+    "p1": "Dlsin అనేది వ్యాపారాలను శక్తివంతం చేయడానికి మరియు వినియోగదారులను ఆనందపరచడానికి రూపొందించబడిన అత్యాధునిక మల్టీవెండర్ ఈ-కామర్స్ పర్యావరణ వ్యవస్థ. మేము స్థానిక విక్రేతలు మరియు గ్లోబల్ మార్కెట్ల మధ్య అంతరాన్ని తగ్గిస్తాము, బలమైన సాంకేతికతతో కూడిన అతుకులు లేని షాపింగ్ అనుభవాన్ని అందిస్తాము.",
+    "p2": "రిటైల్ నుండి హోల్‌సేల్ వరకు, డిజిటల్ వాణిజ్యం వృద్ధి చెందడానికి అవసరమైన మౌలిక సదుపాయాలను Dlsin అందిస్తుంది. మా ప్లాట్‌ఫారమ్ విభిన్న వర్గాలకు మద్దతు ఇస్తుంది, వినియోగదారులు ఎక్కడ ఉన్నా నాణ్యమైన ఉత్పత్తులు వారికి సమర్థవంతంగా చేరేలా చూస్తుంది.",
+    "features": {
+      "globalMarketplace": {
+        "title": "గ్లోబల్ మార్కెట్‌ప్లేస్",
+        "description": "ఒకే, ఏకీకృత ప్లాట్‌ఫారమ్‌లో ప్రపంచవ్యాప్తంగా ఉన్న కొనుగోలుదారులు మరియు విక్రేతలను కనెక్ట్ చేయడం."
+      },
+      "securePayments": {
+        "title": "సురక్షిత చెల్లింపులు",
+        "description": "అధునాతన ఎన్‌క్రిప్షన్ మరియు సురక్షిత చెల్లింపు గేట్‌వేలు వినియోగదారులందరికీ సురక్షితమైన లావాదేవీలను నిర్ధారిస్తాయి."
+      },
+      "fastLogistics": {
+        "title": "ఫాస్ట్ లాజిస్టిక్స్",
+        "description": "సరిహద్దుల గుండా సకాలంలో డెలివరీల కోసం ఇంటిగ్రేటెడ్ లాజిస్టిక్స్ నెట్‌వర్క్."
+      },
+      "vendorTools": {
+        "title": "వెండర్ టూల్స్",
+        "description": "విక్రేతలు తమ వ్యాపారాన్ని నిర్వహించడానికి మరియు వృద్ధి చేసుకోవడానికి సమగ్ర డాష్‌బోర్డ్ మరియు విశ్లేషణలు."
+      }
+    }
+  },
+  "JanathaMirror": {
+    "partOf": "Doddapaneni Group లో భాగం",
+    "subtitle": "నిజం, దృక్పథం మరియు సమాచార శక్తి.",
+    "followUs": "మమ్మల్ని ఫాలో చేయండి",
+    "sectionTitle": "ప్రజల గొంతుక",
+    "p1": "Janatha Mirror అనేది జర్నలిస్టిక్ సమగ్రత మరియు ప్రజా అవగాహన కోసం కట్టుబడి ఉన్న ఒక డైనమిక్ మీడియా సంస్థ. సమాచార ఓవర్‌లోడ్ యుగంలో, మేము ముఖ్యమైన కథనాలకు స్పష్టత, లోతు మరియు సందర్భాన్ని అందించడానికి ప్రయత్నిస్తాము.",
+    "p2": "రాజకీయం, వ్యాపారం, వినోదం మరియు సామాజిక సమస్యలను కవర్ చేస్తూ, Janatha Mirror విశ్వసనీయ వార్తలు మరియు ఆకర్షణీయమైన కంటెంట్ ద్వారా కమ్యూనిటీలను కలుపుతుంది. మా డిజిటల్-ఫస్ట్ విధానం సమాచారం అందుబాటులో, సమయానుకూలంగా మరియు ప్రభావవంతంగా ఉండేలా చేస్తుంది.",
+    "features": {
+      "unbiasedReporting": {
+        "title": "పక్షపాతరహిత రిపోర్టింగ్",
+        "description": "వాస్తవాలను వక్రీకరణ లేకుండా ఉన్నది ఉన్నట్లుగా అందించడం."
+      },
+      "digitalFirst": {
+        "title": "డిజిటల్ ఫస్ట్",
+        "description": "ఆధునిక వెబ్, మొబైల్ మరియు సోషల్ ప్లాట్‌ఫారమ్‌ల కోసం ఆప్టిమైజ్ చేయబడింది."
+      },
+      "multimediaContent": {
+        "title": "మల్టీమీడియా కంటెంట్",
+        "description": "రిచ్ వీడియో కంటెంట్, ఇంటర్వ్యూలు మరియు డాక్యుమెంటరీలు."
+      },
+      "globalPerspective": {
+        "title": "గ్లోబల్ పర్స్పెక్టివ్",
+        "description": "ప్రపంచ ప్రాముఖ్యత మరియు అంతర్జాతీయ కవరేజీతో స్థానిక కథనాలు."
+      }
+    }
+  },
+  "DealsMedi": {
+    "partOf": "Doddapaneni Group లో భాగం",
+    "subtitle": "USAలో మెడికల్ మరియు హెల్త్ ఉత్పత్తుల కోసం మీ విశ్వసనీయ ఓన్లైన్ మార్కెట్.",
+    "followUs": "మమ్మల్ని ఫాలో చేయండి",
+    "sectionTitle": "USAకు మెడికల్ మరియు హెల్త్ ఉత్పత్తులు",
+    "p1": "DealsMedi USAలో మాత్రమే మెడికల్ ఉత్పత్తులను విక్రయించే వెబ్‌సైట్, ప్రిస్క్రిప్షన్ అవసరమైన మరియు ప్రిస్క్రిప్షన్ లేని ఉత్పత్తులతో సహా. CPAP, BiPAP, ఆక్సిజన్ కాన్సెంట్రేటర్లు, హాస్పిటల్ బెడ్లు, మొబిలిటీ చెయిర్లు మరియు అన్నీ మా ప్లాట్‌ఫారమ్ ద్వారా అందుబాటులో ఉన్నాయి.",
+    "p2": "శ్వాసకోశ సంరక్షణ మరియు నిద్ర చికిత్స నుండి మొబిలిటీ ఎయిడ్స్, బాత్రూమ్ భద్రత, ఆర్థోపెడిక్ సపోర్ట్లు మరియు మెడికల్ సప్లైలు వరకు—DealsMedi హెల్త్‌కేర్ మరియు వెల్‌నెస్ ఉత్పత్తుల కోసం ఒక విశ్వసనీయ మార్కెట్‌ను అందిస్తుంది. dealsmedi.comలో నమ్మకంతో షాపింగ్ చేయండి.",
+    "websiteUrl": "https://dealsmedi.com/",
+    "visitWebsite": "DealsMedi సందర్శించండి",
+    "features": {
+      "respiratory": {
+        "title": "శ్వాసకోశ మరియు నిద్ర చికిత్స",
+        "description": "CPAP, BiPAP మెషీన్లు, ఆక్సిజన్ కాన్సెంట్రేటర్లు, మాస్క్‌లు మరియు స్లీప్ అప్నియా థెరపీ ఉత్పత్తులు."
+      },
+      "mobility": {
+        "title": "మొబిలిటీ మరియు రోజువారీ జీవితం",
+        "description": "మొబిలిటీ స్కూటర్లు, వీల్‌చెయిర్లు, రోలేటర్లు, బాత్రూమ్ భద్రత మరియు రోజువారీ జీవిత సహాయాలు."
+      },
+      "bedsAndChairs": {
+        "title": "హాస్పిటల్ బెడ్లు మరియు చెయిర్లు",
+        "description": "హాస్పిటల్ బెడ్లు, ఎలక్ట్రిక్ బెడ్లు, మొబిలిటీ చెయిర్లు మరియు Home‌కేర్ ఉపకరణాలు."
+      },
+      "prescriptionAndOTC": {
+        "title": "ప్రిస్క్రిప్షన్ మరియు OTC",
+        "description": "ప్రిస్క్రిప్షన్ అవసరమైన మరియు ఓవర్-ది-కౌంటర్ మెడికల్ మరియు హెల్త్ ఉత్పత్తులు."
+      }
+    }
+  },
+  "NotFound": {
+    "title": "పేజీ కనుగొనబడలేదు",
+    "description": "మీరు వెతుకుతున్న పేజీ తీసివేయబడి ఉండవచ్చు, దాని పేరు మార్చబడి ఉండవచ్చు లేదా తాత్కాలికంగా అందుబాటులో ఉండకపోవచ్చు.",
+    "homeButton": "Home‌కి వెళ్లండి"
+  },
+  "Error": {
+    "title": "ఏదో తప్పు జరిగింది!",
+    "description": "అసౌకర్యానికి చింతిస్తున్నాము. ఊహించని లోపం సంభవించింది.",
+    "retry": "మళ్ళీ ప్రయత్నించండి"
+  },
+  "PrivacyPolicy": {
+    "metaTitle": "Privacy Policy | Doddapaneni Group",
+    "metaDescription": "Privacy Policy for Doddapaneni Group: data collection, cookies, advertising (including Google AdSense), third-party services, and your choices.",
+    "metaKeywords": "privacy policy, Doddapaneni Group, cookies, personal data, Google AdSense, advertising, third-party services",
+    "metaOgTitle": "Privacy Policy — Doddapaneni Group",
+    "metaOgDescription": "How we collect, use, and protect your information—including cookies and third-party advertising technologies.",
+    "title": "గోప్యతా విధానం",
+    "subtitle": "మేము మీ వ్యక్తిగత సమాచారాన్ని ఎలా సేకరిస్తాము, ఉపయోగిస్తాము మరియు రక్షిస్తాము.",
+    "lastUpdated": "చివరి నవీకరణ: ఫిబ్రవరి 2026",
+    "introduction": "Doddapaneni Group లో, మేము మీ గోప్యతను రక్షించడానికి కట్టుబడి ఉన్నాము. మీరు మా వెబ్‌సైట్‌ను సందర్శించినప్పుడు మేము మీ సమాచారాన్ని ఎలా సేకరిస్తాము, ఉపయోగిస్తాము, బహిర్గతం చేస్తాము మరియు రక్షిస్తాము అనేది ఈ గోప్యతా విధానం వివరిస్తుంది.",
+    "tocAriaLabel": "Privacy policy sections",
+    "tocIntro": "This policy covers:",
+    "tocData": "Data collection",
+    "tocCookies": "Cookies & similar technologies",
+    "tocThirdParty": "Third-party services & advertising",
+    "tocUse": "How we use information",
+    "tocSecurity": "Security & retention",
+    "tocRights": "Your rights & contact",
+    "tocChanges": "Changes",
+    "informationWeCollect": "మేము సేకరించే సమాచారం",
+    "informationWeCollectLead": "We collect information in the following ways:",
+    "informationWeCollectDesc": "మీరు మాకు నేరుగా అందించే సమాచారాన్ని మేము సేకరించవచ్చు, దీనిలో మీ పేరు, ఇమెయిల్ చిరునామా, ఫోన్ నంబర్ మరియు మీరు మాకు సంప్రదించినప్పుడు లేదా మా న్యూస్‌లెటర్‌కు సభ్యత్వం పొందినప్పుడు అందించడానికి ఎంచుకునే ఏదైనా ఇతర సమాచారం ఉంటుంది.",
+    "informationWeCollectYouProvideTitle": "Information you provide",
+    "informationWeCollectYouProvideDesc": "When you contact us, subscribe to updates, submit forms, or otherwise communicate with us, you may provide identifiers such as your name, email address, phone number, organisation, and the content of your message. We use this to respond, provide services, and meet our contractual and legal obligations.",
+    "informationWeCollectAutoTitle": "Information collected automatically",
+    "informationWeCollectAutoDesc": "When you visit our website, our servers and partners may automatically receive technical data such as IP address, approximate location derived from IP, browser type and version, device type, operating system, referring URLs, pages viewed, and timestamps. This helps us secure the site, measure performance, debug issues, and understand aggregate usage.",
+    "informationWeCollectSensitiveTitle": "Sensitive categories",
+    "informationWeCollectSensitiveDesc": "We do not intentionally solicit special categories of personal data (such as health data) through general website forms. Please do not submit sensitive information unless a specific form clearly requires it for a stated purpose.",
+    "cookies": "కుకీలు",
+    "cookiesDesc": "మీ బ్రౌజింగ్ అనుభవాన్ని మెరుగుపరచడానికి మా వెబ్‌సైట్ కుకీలను ఉపయోగించవచ్చు. మీరు మీ బ్రౌజర్ సెట్టింగ్‌ల ద్వారా కుకీ ప్రాధాన్యతలను నియంత్రించవచ్చు.",
+    "cookiesLead": "Cookies are small text files stored on your device. We and our partners may also use pixels, local storage, and similar technologies for the purposes described below.",
+    "cookiesEssentialTitle": "Essential & functional",
+    "cookiesEssentialDesc": "Some cookies are necessary for security, load balancing, language or locale preferences, and core site functionality. These may be set without consent where permitted by law.",
+    "cookiesAnalyticsTitle": "Analytics & performance",
+    "cookiesAnalyticsDesc": "We may use analytics tools to collect aggregated statistics about traffic and navigation. Where required, we rely on your consent or legitimate interests to improve our content and user experience.",
+    "cookiesAdvertisingTitle": "Advertising & personalised content",
+    "cookiesAdvertisingDesc": "We may use third-party advertising services (such as Google AdSense) that set cookies or use advertising identifiers to show ads on our site, measure ad delivery, and—depending on your settings and applicable law—personalise ads based on your visits to this and other websites. These partners may combine data from our site with data from other sites and apps.",
+    "cookiesChoicesTitle": "Your choices",
+    "cookiesChoicesDesc": "You can control cookies through your browser settings (including blocking or deleting cookies). You can also visit Google’s Ads Settings and the NAI / DAA opt-out resources to learn more about personalised ads and limit certain uses. Note that disabling cookies may affect site features.",
+    "thirdParty": "మూడవ పక్ష సేవలు",
+    "thirdPartyDesc": "మా వెబ్‌సైట్ మరియు సేవలను మెరుగుపరచడంలో సహాయపడే సమాచారాన్ని సేకరించడానికి, పర్యవేక్షించడానికి మరియు విశ్లేషించడానికి మేము మూడవ పక్ష సేవలను ఉపయోగించవచ్చు.",
+    "thirdPartyLead": "We may integrate services provided by third parties. These providers process data under their own policies and may act as independent controllers or processors.",
+    "thirdPartyGoogleTitle": "Google services",
+    "thirdPartyGoogleDesc": "Our site may use Google services such as Google AdSense (advertising) and, where implemented, Google Analytics or related measurement tools. Google’s use of advertising cookies enables it and its partners to serve ads based on users’ visits to our site and/or other sites on the Internet. You can review how Google uses information from sites that use its services at the link below, and read Google’s Privacy Policy for more detail.",
+    "thirdPartyOtherTitle": "Other providers",
+    "thirdPartyOtherDesc": "We may use additional providers for hosting, email delivery, content delivery, security, or embedded media. Each processes only the data needed to perform its role.",
+    "thirdPartyLiabilityTitle": "External sites",
+    "thirdPartyLiabilityDesc": "Our website may link to external sites. We are not responsible for their privacy practices. Please read the policies of any site you visit.",
+    "adsenseNoticeTitle": "Advertising disclosure (AdSense & similar programmes)",
+    "adsenseNoticeDesc": "Where we display third-party ads, those ads may be personalised using cookies or mobile identifiers, subject to your choices and applicable regulations. Third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to our website or other websites. Users may opt out of personalised advertising by adjusting ad settings in their Google Account or using industry opt-out tools where available. EU / UK / similar users may see consent mechanisms as required by law.",
+    "howWeUse": "మేము మీ సమాచారాన్ని ఎలా ఉపయోగిస్తాము",
+    "howWeUseDesc": "మా సేవలను అందించడానికి, నిర్వహించడానికి మరియు మెరుగుపరచడానికి, మీ ప్రశ్నలకు సమాధానం ఇవ్వడానికి, మీకు న్యూస్‌లెటర్‌లు మరియు నవీకరణలను పంపడానికి మరియు చట్టపరమైన బాధ్యతలను పాటించడానికి మేము సేకరించే సమాచారాన్ని ఉపయోగిస్తాము.",
+    "dataProtection": "డేటా రక్షణ",
+    "dataProtectionDesc": "అనధికార ప్రాప్యత, మార్పు, బహిర్గతం లేదా నాశనం నుండి మీ వ్యక్తిగత సమాచారాన్ని రక్షించడానికి మేము తగిన సాంకేతిక మరియు సంస్థాగత చర్యలను అమలు చేస్తాము.",
+    "yourRights": "మీ హక్కులు",
+    "yourRightsDesc": "మీ వ్యక్తిగత సమాచారాన్ని యాక్సెస్ చేయడానికి, నవీకరించడానికి లేదా తొలగించడానికి మీకు హక్కు ఉంది. ఈ హక్కులను వినియోగించడానికి, దయచేసి మా సంప్రదింపు పేజీలో అందించిన సమాచారాన్ని ఉపయోగించి మాకు సంప్రదించండి.",
+    "childrenTitle": "Children",
+    "childrenDesc": "Our website is not directed at children under 16 (or the age required in your jurisdiction). We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us so we can delete it.",
+    "internationalTitle": "International transfers",
+    "internationalDesc": "We may process data in India, the United States, the European Economic Area, or other regions where we or our providers operate. We use appropriate safeguards as required by applicable law when data crosses borders.",
+    "changes": "ఈ విధానంలో మార్పులు",
+    "changesDesc": "మేము ఈ గోప్యతా విధానాన్ని సమయానుసారం నవీకరించవచ్చు. ఈ పేజీలో కొత్త గోప్యతా విధానాన్ని పోస్ట్ చేయడం ద్వారా మేము మీకు ఏవైనా మార్పులను తెలియజేస్తాము.",
+    "partnerSitesLinkLabel": "How Google uses data from sites that use its services",
+    "googlePrivacyLinkLabel": "Google Privacy Policy",
+    "googleAdsSettingsLabel": "Google Ads Settings",
+    "naIResourceLabel": "Network Advertising Initiative — consumer opt-out",
+    "externalLinkTitle": "Opens in a new tab",
+    "contactPageLink": "Go to Contact"
+  },
+  "TermsConditions": {
+    "metaTitle": "Terms of Service | Doddapaneni Group",
+    "metaDescription": "Terms of Service for Doddapaneni Group websites: acceptable use, intellectual property, disclaimers, limitation of liability, and governing terms.",
+    "metaKeywords": "terms of service, terms of use, Doddapaneni Group, website legal, user agreement",
+    "metaOgTitle": "Terms of Service — Doddapaneni Group",
+    "metaOgDescription": "Rules and conditions for using Doddapaneni Group’s websites and online materials.",
+    "title": "నిబంధనలు మరియు షరతులు",
+    "subtitle": "వెబ్‌సైట్ ఉపయోగ నియమాలు మరియు సేవా నిబంధనలు.",
+    "lastUpdated": "చివరి నవీకరణ: ఫిబ్రవరి 2026",
+    "notLegalAdvice": "This document is provided for general information. It does not constitute legal advice. If you require advice about your specific situation, consult a qualified professional.",
+    "tocAriaLabel": "Terms sections",
+    "tocIntro": "Sections",
+    "tocAcceptance": "Agreement to terms",
+    "tocLicense": "Access & acceptable use",
+    "tocIp": "Intellectual property",
+    "tocDisclaimer": "Disclaimers & liability",
+    "tocLaw": "Governing law & disputes",
+    "tocChanges": "Changes & contact",
+    "contactPageLink": "Go to Contact",
+    "acceptance": "నిబంధనల అంగీకారం",
+    "acceptanceDesc": "ఈ వెబ్‌సైట్‌ను యాక్సెస్ చేయడం మరియు ఉపయోగించడం ద్వారా, మీరు ఈ ఒప్పందం యొక్క నిబంధనలు మరియు నిబంధనలకు బద్ధులవుతారని అంగీకరిస్తారు మరియు అంగీకరిస్తారు.",
+    "eligibilityTitle": "2. Eligibility",
+    "eligibilityDesc": "You represent that you have the legal capacity to enter into these terms in your jurisdiction and, where you act on behalf of an organisation, that you are authorised to bind that organisation. You must not use the site in any country or manner prohibited by applicable sanctions, export controls, or law.",
+    "useLicense": "ఉపయోగ లైసెన్స్",
+    "useLicenseDesc": "వ్యక్తిగత, వాణిజ్యేతర తాత్కాలిక వీక్షణ కోసం Doddapaneni Group వెబ్‌సైట్‌లోని పదార్థాల యొక్క ఒక కాపీని తాత్కాలికంగా డౌన్‌లోడ్ చేయడానికి అనుమతి ఇవ్వబడింది.",
+    "restrictions": "నిర్బంధాలు",
+    "restrictionsDesc": "పదార్థాలను సవరించడం లేదా కాపీ చేయడం, ఏదైనా వాణిజ్య ప్రయోజనం కోసం పదార్థాలను ఉపయోగించడం, లేదా పదార్థాల నుండి ఏదైనా కాపీరైట్ లేదా ఇతర స్వంత సంజ్ఞలను తీసివేయడం నుండి మీరు ప్రత్యేకంగా నిర్బంధించబడ్డారు.",
+    "ipTitle": "5. Intellectual property",
+    "ipDesc": "The site and its content (including text, graphics, logos, layouts, software, and trademarks) are owned by Doddapaneni Group or its licensors and are protected by intellectual property laws. Except for the limited licence above, no rights are granted. You must not remove proprietary notices or use our marks without prior written consent.",
+    "userContentTitle": "6. Information you provide",
+    "userContentDesc": "If you submit enquiries, feedback, or other materials through the site, you grant us a non-exclusive licence to use, reproduce, and process such information to operate the site, respond to you, and improve our services, subject to our Privacy Policy. You represent that your submissions do not violate third-party rights or law.",
+    "links": "లింకులు",
+    "linksDesc": "Doddapaneni Group తన వెబ్‌సైట్‌కు లింక్ చేయబడిన అన్ని సైట్‌లను సమీక్షించలేదు మరియు అటువంటి లింక్ చేయబడిన సైట్ యొక్క కంటెంట్‌కు బాధ్యత వహించదు.",
+    "disclaimer": "నిరాకరణ",
+    "disclaimerDesc": "Doddapaneni Group వెబ్‌సైట్‌లోని పదార్థాలు 'అలాగే' ఆధారంగా అందించబడతాయి. Doddapaneni Group ఎలాంటి వారంటీలను ఇవ్వదు, వ్యక్తం చేయబడినవి లేదా సూచించబడినవి, మరియు ఇక్కడ అన్ని ఇతర వారంటీలను తిరస్కరిస్తుంది మరియు తిరస్కరిస్తుంది.",
+    "limitations": "పరిమితులు",
+    "limitationsDesc": "ఈ వెబ్‌సైట్‌లోని పదార్థాలను ఉపయోగించడం లేదా ఉపయోగించలేకపోవడం నుండి ఏర్పడే ఏదైనా నష్టాలకు Doddapaneni Group లేదా దాని సరఫరాదారులు బాధ్యత వహించరు.",
+    "indemnityTitle": "10. Indemnity",
+    "indemnityDesc": "You agree to indemnify, defend, and hold harmless Doddapaneni Group and its affiliates from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys’ fees) arising out of your use of the site, your violation of these Terms, or your violation of any third-party rights or applicable law, except to the extent caused by our gross negligence or wilful misconduct.",
+    "governingLawTitle": "11. Governing law & disputes",
+    "governingLawDesc": "These Terms are governed by applicable laws, without regard to conflict-of-law rules that would require the application of another jurisdiction’s laws. Subject to mandatory consumer protections in your country, you agree that exclusive jurisdiction and venue for disputes arising from these Terms or the site shall lie with the courts of competent jurisdiction as determined by us, unless otherwise required by binding law. Nothing in this section limits either party’s right to seek injunctive or equitable relief.",
+    "revisions": "సవరణలు మరియు తప్పులు",
+    "revisionsDesc": "Doddapaneni Group వెబ్‌సైట్‌లో కనిపించే పదార్థాలలో సాంకేతిక, టైపోగ్రాఫికల్ లేదా ఫోటోగ్రాఫిక్ లోపాలు ఉండవచ్చు. ఏ పదార్థాలు ఖచ్చితమైనవి, పూర్తిగా ఉన్నవి లేదా ప్రస్తుతమైనవి అని మేము వారంటీ ఇవ్వము.",
+    "contactClosingTitle": "13. Contact",
+    "contactClosingDesc": "For questions about these Terms, please contact us through the Contact page or the contact details published there."
+  },
+  "Disclaimer": {
+    "metaTitle": "Disclaimer | Doddapaneni Group",
+    "metaDescription": "Website disclaimer for Doddapaneni Group, including limitations on healthcare content, real estate information, liability, and third-party links.",
+    "metaKeywords": "disclaimer, Doddapaneni Group, healthcare disclaimer, real estate disclaimer, website legal",
+    "metaOgTitle": "Disclaimer — Doddapaneni Group",
+    "metaOgDescription": "Important limitations on website information, including healthcare and real estate content.",
+    "title": "నిరాకరణ",
+    "subtitle": "సాధారణ చట్టపరమైన భద్రత మరియు వెబ్‌సైట్ నిరాకరణ.",
+    "lastUpdated": "చివరి నవీకరణ: ఫిబ్రవరి 2026",
+    "notLegalAdvice": "This Disclaimer is provided for general information only and is not legal advice. Consult qualified professionals for advice tailored to your circumstances.",
+    "tocAriaLabel": "Disclaimer sections",
+    "tocIntro": "Sections",
+    "tocGeneral": "General",
+    "tocHealthcare": "Healthcare content",
+    "tocRealEstate": "Real estate information",
+    "tocNoWarranty": "No warranty",
+    "tocLiability": "Liability",
+    "tocLinks": "External links",
+    "tocBusiness": "Business information",
+    "tocJurisdiction": "Jurisdiction",
+    "contactPageLink": "Go to Contact",
+    "general": "సాధారణ నిరాకరణ",
+    "generalDesc": "ఈ వెబ్‌సైట్‌లోని సమాచారం 'అలాగే' ఆధారంగా అందించబడుతుంది. చట్టం ద్వారా అనుమతించబడిన పూర్తి స్థాయికి, Doddapaneni Group మా వెబ్‌సైట్ మరియు ఈ వెబ్‌సైట్ యొక్క ఉపయోగంతో సంబంధించిన అన్ని ప్రాతినిధ్యాలు, వారంటీలు మరియు షరతులను మినహాయిస్తుంది.",
+    "healthcareTitle": "2. Healthcare & medical content limitation",
+    "healthcareDesc": "Content that references healthcare, medical devices, wellness, billing, clinical, or related topics is provided for general informational purposes only. It does not constitute medical advice, diagnosis, treatment, or a recommendation to use any particular product or service. It is not a substitute for professional judgment by a qualified clinician, pharmacist, or other licensed healthcare provider. Never disregard professional medical advice or delay seeking it because of something you read on this site. If you think you may have a medical emergency, contact appropriate emergency services immediately. Any case studies, descriptions, or examples are illustrative only and do not guarantee outcomes for your situation.",
+    "realEstateTitle": "3. Real estate & construction information",
+    "realEstateDesc": "Content related to real estate, construction, architecture, development, leasing, investment, or property markets is for general information only. It does not constitute an offer, solicitation, or commitment to sell, lease, or finance property where such would require registration, licensing, or disclosure under applicable law. Maps, imagery, availability, pricing, specifications, timelines, and forward-looking statements may be approximate, subject to change, and not binding until confirmed in a written agreement signed by authorised parties. You must independently verify zoning, title, permits, taxes, environmental conditions, and all material facts with qualified professionals (including legal counsel, surveyors, and regulatory authorities) before relying on any information or making decisions. Past performance or descriptions of projects are not a guarantee of future results.",
+    "noWarranty": "వారంటీ లేదు",
+    "noWarrantyDesc": "వెబ్‌సైట్ అన్ని సమయాలలో అందుబాటులో ఉంటుందని లేదా వెబ్‌సైట్‌లోని సమాచారం పూర్తిగా, ఖచ్చితమైనది లేదా తాజాగా ఉందని Doddapaneni Group వారంటీ ఇవ్వదు.",
+    "limitation": "బాధ్యత పరిమితి",
+    "limitationDesc": "ఈ వెబ్‌సైట్‌ను యాక్సెస్ చేయడం లేదా ఉపయోగించడం నుండి ఏర్పడే ఏదైనా ప్రత్యక్ష, పరోక్ష, ప్రాసంగిక, పరిణామక, లేదా శిక్షాత్మక నష్టాలకు Doddapaneni Group బాధ్యత వహించదు.",
+    "externalLinks": "బాహ్య లింకులు",
+    "externalLinksDesc": "మా వెబ్‌సైట్ బాహ్య వెబ్‌సైట్‌లకు లింకులు కలిగి ఉండవచ్చు. ఈ బాహ్య సైట్‌ల కంటెంట్ లేదా గోప్యతా పద్ధతులకు మేము బాధ్యత వహించము.",
+    "businessDisclaimer": "వ్యాపార నిరాకరణ",
+    "businessDisclaimerDesc": "మా సేవలు మరియు వ్యాపారాల గురించి ఖచ్చితమైన సమాచారాన్ని అందించడానికి మేము ప్రయత్నిస్తున్నప్పటికీ, ఏదైనా నిర్దిష్ట ప్రయోజనం కోసం సమాచారం యొక్క ఖచ్చితత్వం, పూర్తిగా లేదా ఉపయుక్తత గురించి మేము ఎలాంటి ప్రాతినిధ్యాలు లేదా వారంటీలను ఇవ్వము.",
+    "jurisdiction": "అధికార పరిధి",
+    "jurisdictionDesc": "ఈ నిరాకరణ వర్తించే చట్టాల ప్రకారం పాలించబడుతుంది మరియు నిర్మించబడుతుంది. ఈ నిరాకరణకు సంబంధించిన ఏదైనా వివాదాలు కోర్టుల ప్రత్యేక అధికార పరిధికి లోబడి ఉంటాయి."
+  },
+  "FAQ": {
+    "title": "తరచుగా అడిగే ప్రశ్నలు",
+    "sectionHeading": "మేము తరచుగా అందుకునే ప్రశ్నలు",
+    "subtitle": "Doddapaneni Group గురించి సాధారణ ప్రశ్నలకు సమాధానాలను కనుగొనండి.",
+    "contactSupport": "ఇంకా ప్రశ్నలు ఉన్నాయా?",
+    "contactSupportDesc": "మీరు వెతుకుతున్న సమాధానాన్ని మీరు కనుగొనలేకపోతే, దయచేసి మా మద్దతు బృందాన్ని సంప్రదించండి.",
+    "contactButton": "మద్దతును సంప్రదించండి",
+    "questions": {
+      "q1": {
+        "question": "Doddapaneni Group ఏ సేవలను అందిస్తుంది?",
+        "answer": "Doddapaneni Group అనేక పరిశ్రమలలో విస్తృతమైన సేవలను అందిస్తుంది, వీటిలో IT & AI సాంకేతికతలు, ఆరోగ్య సంరక్షణ పరిష్కారాలు, నిర్మాణం మరియు రియల్ ఎస్టేట్, దిగుమతి-ఎగుమతి, తయారీ, లాజిస్టిక్స్, విద్య, మీడియా మరియు ప్రొఫెషనల్ స్టాఫింగ్ సేవలు ఉన్నాయి."
+      },
+      "q2": {
+        "question": "Doddapaneni Group ఎక్కడ ఉంది?",
+        "answer": "మాకు భారతదేశంలో (Plot No 22,23,41,42 & 43, Sri Krishna Avenue, Venkataramana Colony, Gokul Plots, Vasanth Nagar, Ranga Reddy District, 500085) మరియు USA (5052 SW 40th PL, Ocala, Florida, 34474) లో కార్యాలయాలు ఉన్నాయి."
+      },
+      "q3": {
+        "question": "నేను Doddapaneni Group ను ఎలా సంప్రదించగలను?",
+        "answer": "మీరు info@doddapanenigroup.net వద్ద ఇమెయిల్ ద్వారా, +91 814 224 6666 (భారతదేశం) లేదా +1 (352)230-8586 (USA) వద్ద ఫోన్ ద్వారా, లేదా మా వెబ్‌సైట్‌లోని సంప్రదింపు ఫారమ్‌ను పూరించడం ద్వారా మాకు సంప్రదించవచ్చు."
+      },
+      "q4": {
+        "question": "Doddapaneni Group అంతర్జాతీయంగా పనిచేస్తుందా?",
+        "answer": "అవును, Doddapaneni Group విజయవంతమైన వ్యాపారాల వివిధ పోర్ట్‌ఫోలియోతో అనేక ఖండాలలో పనిచేస్తుంది, ప్రపంచవ్యాప్త పరిధి మరియు అంతర్జాతీయ వ్యాపార పరిష్కారాలను అందిస్తుంది."
+      },
+      "q5": {
+        "question": "Doddapaneni Group కింద సమూహ కంపెనీలు ఏమిటి?",
+        "answer": "మా సమూహంలో DealsMedi (వైద్య ఉత్పత్తుల మార్కెట్‌ప్లేస్), Dlsin (మల్టీవెండర్ ఇ-కామర్స్ ప్లాట్‌ఫారమ్), మరియు Janatha Mirror (డిజిటల్ మీడియా ఎంటర్‌ప్రైజ్) వంటి కంపెనీలు ఉన్నాయి, మరితరులతో పాటు."
+      },
+      "q6": {
+        "question": "నేను మీ న్యూస్‌లెటర్‌కు ఎలా సభ్యత్వం పొందగలను?",
+        "answer": "మా వెబ్‌సైట్ ఫుటర్‌లో ఉన్న సభ్యత్వ ఫారమ్‌లో మీ ఇమెయిల్ చిరునామాను నమోదు చేయడం ద్వారా మీరు మా న్యూస్‌లెటర్‌కు సభ్యత్వం పొందవచ్చు."
+      }
+    }
+  },
+  "Blog": {
+    "title": "బ్లాగ్",
+    "subtitle": "Doddapaneni Group నుండి అంతర్దృష్టులు, ధోరణులు మరియు నవీకరణలు",
+    "intro": "విభాగం వారీగా నవీకరణలను చూడండి లేదా పూర్తి వార్తా ఆర్కైవ్‌ను తెరవండి.",
+    "readMore": "మరింత చదవండి",
+    "backToBlog": "బ్లాగ్‌కు తిరిగి వెళ్లండి",
+    "relatedPosts": "సంబంధిత పోస్ట్‌లు",
+    "categories": "వర్గాలు",
+    "recentPosts": "ఇటీవలి పోస్ట్‌లు",
+    "emptySectorTitle": "ఈ రంగంలో ఇంకా ప్రచురించిన వార్తలు లేవు",
+    "emptySectorBody": "ఈ విభాగంలో పోస్ట్‌లు ప్రచురించబడినప్పుడు, అవి ఇక్కడ ప్రతి వ్యాసానికి లింక్‌లతో కనిపిస్తాయి.",
+    "browseAllNews": "అన్ని వార్తలను వీక్షించండి",
+    "newsHubCta": "వార్తల కోసం ఇక్కడ క్లిక్ చేయండి",
+    "newsHubComingSoon": "ఈ విభాగం ప్రధాన సైట్‌లో లైవ్‌గా ఉన్నప్పుడు దాని వార్తల హబ్ ఇక్కడ అందుబాటులో ఉంటుంది.",
+    "backToSectorNews": "రంగ వార్తలకు తిరిగి వెళ్లండి",
+    "sectorNewsSubtitle": "ఈ విభాగంలో ప్రచురించబడిన పోస్ట్‌లు.",
+    "sectorNewsNavHeading": "సెక్టార్ వార్తలు",
+    "sectorNewsNavAriaLabel": "ఇతర సెక్టార్ వార్తా పేజీల మధ్య మారండి",
+    "sectorHeroDescriptionFallback": "{name}లో తాజా నవీకరణలు మరియు దృష్టి ప్రాంతాలు.",
+    "focusAreasHeading": "దృష్టి ప్రాంతాలు",
+    "topicDescriptionFallback": "{name}లో {label}కు మేము ఎలా మద్దతు ఇస్తామో తెలుసుకోండి.",
+    "minReadMinutes": "{minutes} నిమి. చదవండి",
+    "paginationPrevious": "మునుపటి",
+    "paginationNext": "తరువాత",
+    "paginationPage": "{totalPages}లో {page}వ పేజీ",
+    "articlesCount": "{count, plural, one {# వ్యాసం} other {# వ్యాసాలు}}",
+    "divisionTopicNavEyebrow": "ఈ విభాగంలో",
+    "divisionShellEyebrow": "విభాగం",
+    "divisionOverview": "అవలోకనం",
+    "divisionNavAriaLabel": "విభాగ విభాగాలు",
+    "divisionTopicsAriaLabel": "విభాగ అంశాలు",
+    "divisionSubpageAbout": "గురించి",
+    "divisionSubpageServices": "సేవలు",
+    "divisionSubpageContact": "సంప్రదించండి",
+    "engagementSectionEyebrow": "Connect",
+    "engagementSectionTitle": "Get in touch about this article",
+    "engagementLeadTitle": "Business inquiry",
+    "engagementLeadSubtitle": "Share your needs and we will route you to the right team.",
+    "engagementCommentTitle": "Leave a comment",
+    "engagementCommentSubtitle": "Comments are reviewed before publication.",
+    "engagementName": "Name",
+    "engagementEmail": "Email",
+    "engagementPhone": "Phone (optional)",
+    "engagementCompany": "Company (optional)",
+    "engagementInterest": "How can we help?",
+    "engagementCommentLabel": "Your comment",
+    "engagementSubmitLead": "Send inquiry",
+    "engagementSubmitComment": "Post comment",
+    "engagementSending": "Sending…",
+    "engagementSuccessLead": "Thank you — we have received your inquiry.",
+    "engagementSuccessComment": "Thank you — your comment was submitted for review.",
+    "engagementError": "Something went wrong. Please try again later.",
+    "engagementRequired": "Please check this field.",
+    "engagementPrivacyNote": "By submitting, you agree we may contact you about this request. See our Privacy Policy for how we handle your data.",
+    "posts": {}
+  },
+  "DivisionSubpage": {
+    "about": {
+      "heading": "{sectorName} గురించి",
+      "p0": "ఇది {sectorName} డివిజన్ కోసం ప్లేస్‌హోల్డర్ కంటెంట్. సిద్ధంగా ఉన్నప్పుడు మీ కథనం, నాయకత్వ గమనికలు మరియు ఆధారాలతో దాన్ని భర్తీ చేయండి.",
+      "p1": "మిషన్, చరిత్ర మరియు భేదాభిప్రాయాలు ఇక్కడ నివసిస్తాయి. మీరు సరిపోలే కంటెంట్ పేజీ కీని ఉపయోగించి మార్కెటర్ డాష్‌బోర్డ్ ద్వారా రిచ్ HTMLని కూడా ప్రచురించవచ్చు."
+    },
+    "services": {
+      "heading": "సేవలు — {sectorName}",
+      "p0": "{sectorName} కోసం ప్రాధాన్యత ఆఫర్‌లు, డెలివరీ మోడల్‌లు మరియు ఎంగేజ్‌మెంట్ రకాలను రూపుమాపండి. ఈ బ్లాక్ స్టాండ్-ఇన్ టెక్స్ట్ మాత్రమే.",
+      "p1": "సర్వీస్ లైన్లు, SLAలు మరియు పరిశ్రమల జాబితాను పరిగణించండి. నిర్మాణాత్మక కంటెంట్ తర్వాత CMS నుండి ఈ విభాగాన్ని భర్తీ చేయగలదు."
+    },
+    "contact": {
+      "heading": "{sectorName}ని సంప్రదించండి",
+      "p0": "{sectorName} బృందం కోసం ప్లేస్‌హోల్డర్ సంప్రదింపు మార్గదర్శకం. కార్యాలయ వివరాలు, రూటింగ్ నియమాలు లేదా ఈ ప్రాంతంలో పొందుపరిచిన ఫారమ్‌ను జోడించండి.",
+      "p1": "సైట్-వ్యాప్త పరిచయం కోసం, సందర్శకులు ఇప్పటికీ హెడర్ నుండి లింక్ చేయబడిన ప్రధాన సంప్రదింపు పేజీని ఉపయోగించవచ్చు."
+    },
+    "cmsKeyHint": "CMS కోసం కంటెంట్ కీ:",
+    "cmsKeyNote": "ప్రతి భాష కోసం ఈ ప్లేస్‌హోల్డర్‌ను భర్తీ చేయడానికి మార్కెటర్ డాష్‌బోర్డ్‌లో ఈ కీ కోసం కంటెంట్‌ను ప్రచురించండి."
+  },
+  "SoftwareItAiSector": {
+    "metaTitle": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్ | దొడ్డపనేని గ్రూప్ డెవలప్‌మెంట్ సర్వీసెస్",
+    "metaDescription": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్ దొడ్డపనేని గ్రూప్ కస్టమ్ సాఫ్ట్‌వేర్, AI డెవలప్‌మెంట్ మరియు డిజిటల్ ట్రాన్స్‌ఫర్మేషన్ కోసం క్లౌడ్ సొల్యూషన్‌లను అందిస్తుంది.",
+    "metaKeywords": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్, ఎంటర్‌ప్రైజ్ సాఫ్ట్‌వేర్, ఆర్టిఫిషియల్ ఇంటెలిజెన్స్, మెషిన్ లెర్నింగ్, IT కన్సల్టింగ్, క్లౌడ్ కంప్యూటింగ్, ఇంటెలిజెంట్ ఆటోమేషన్, డిజిటల్ ట్రాన్స్‌ఫర్మేషన్",
+    "heroEyebrow": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్",
+    "heroTitle": "డిజిటల్ ఇన్నోవేషన్ కోసం సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్",
+    "heroLead": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు నేటి డిజిటల్-ఫస్ట్ ప్రపంచంలో వ్యాపారాలు ఎలా పనిచేస్తాయి, ఆవిష్కరిస్తాయి మరియు స్థాయిని మారుస్తున్నాయి. దొడ్డపనేని గ్రూప్‌లో, మేము అధునాతన సాఫ్ట్‌వేర్ డెవలప్‌మెంట్ సేవలు మరియు ఇంటెలిజెంట్ టెక్నాలజీలను అందజేస్తాము, ఇవి సంస్థలకు సామర్థ్యాన్ని మెరుగుపరచడంలో, ప్రక్రియలను ఆటోమేట్ చేయడంలో మరియు స్థిరమైన వృద్ధిని సాధించడంలో సహాయపడతాయి.",
+    "featuredProductsHeading": "ఈ విభాగంలో సాఫ్ట్‌వేర్, క్లౌడ్ మరియు AI బ్రాండ్‌లు",
+    "featuredProductsLead": "మా సాఫ్ట్‌వేర్ IT మరియు AI అభ్యాసంతో సమలేఖనం చేయబడిన ఫ్లాగ్‌షిప్ డిజిటల్ ఉత్పత్తులు మరియు ప్లాట్‌ఫారమ్‌లను అన్వేషించండి.",
+    "sectionComprehensiveTitle": "సమగ్ర సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్",
+    "sectionComprehensiveP1": "దొడ్డపనేని గ్రూప్‌లోని సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు విభిన్న వ్యాపార అవసరాలకు అనుగుణంగా ఎండ్-టు-ఎండ్ ఎంటర్‌ప్రైజ్ సాఫ్ట్‌వేర్ సొల్యూషన్‌లను అందించడానికి రూపొందించబడ్డాయి. అతుకులు లేని డిజిటల్ పరివర్తనను నిర్ధారించడానికి సాఫ్ట్‌వేర్ డెవలప్‌మెంట్, ఆర్టిఫిషియల్ ఇంటెలిజెన్స్ మరియు IT కన్సల్టింగ్‌లో మా నైపుణ్యం విస్తరించింది.",
+    "sectionComprehensiveP2": "ఆధునిక సంస్థలు ఉత్పాదకత మరియు సామర్థ్యాన్ని మెరుగుపరచడానికి-ప్లానింగ్ నుండి టెస్టింగ్ మరియు డిప్లాయ్‌మెంట్ వరకు మొత్తం సాఫ్ట్‌వేర్ జీవితచక్రం అంతటా AIని ఎక్కువగా స్వీకరిస్తాయి.",
+    "serviceCustomTitle": "కస్టమ్ సాఫ్ట్‌వేర్ డెవలప్‌మెంట్",
+    "serviceCustomBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లలో నిర్దిష్ట వ్యాపార అవసరాలకు అనుగుణంగా రూపొందించబడిన స్కేలబుల్ అనుకూల సాఫ్ట్‌వేర్ డెవలప్‌మెంట్ ఉంటుంది. మేము ఉత్పాదకత మరియు వినియోగదారు అనుభవాన్ని మెరుగుపరిచే సురక్షితమైన, అధిక-పనితీరు గల అప్లికేషన్‌లను రూపొందిస్తాము.",
+    "serviceAiTitle": "ఆర్టిఫిషియల్ ఇంటెలిజెన్స్ & మెషిన్ లెర్నింగ్",
+    "serviceAiBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు ప్రోసెస్‌లను ఆటోమేట్ చేయడానికి, డేటాను విశ్లేషించడానికి మరియు తెలివిగా నిర్ణయం తీసుకోవడానికి చర్య తీసుకోగల అంతర్దృష్టులను రూపొందించడానికి అధునాతన కృత్రిమ మేధస్సు పరిష్కారాలు మరియు యంత్ర అభ్యాస సేవలను ప్రభావితం చేస్తాయి.",
+    "serviceConsultingTitle": "IT కన్సల్టింగ్ సర్వీసెస్",
+    "serviceConsultingBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు నిపుణులైన IT కన్సల్టింగ్ సేవలను అందిస్తాయి, ఇవి వ్యాపారాలు సరైన టెక్నాలజీ స్టాక్‌ను ఎంచుకోవడానికి, మౌలిక సదుపాయాలను ఆప్టిమైజ్ చేయడానికి మరియు వ్యాపార లక్ష్యాలతో IT వ్యూహాలను సమలేఖనం చేయడానికి సహాయపడతాయి.",
+    "serviceCloudTitle": "క్లౌడ్ కంప్యూటింగ్ సొల్యూషన్స్",
+    "serviceCloudBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లలో విశ్వసనీయమైన క్లౌడ్ కంప్యూటింగ్ సొల్యూషన్‌లు ఉన్నాయి, ఇవి ప్లాట్‌ఫారమ్‌లలో స్కేలబిలిటీ, ఫ్లెక్సిబిలిటీ మరియు సురక్షిత డేటా మేనేజ్‌మెంట్‌ను ఎనేబుల్ చేస్తాయి.",
+    "serviceAutomationTitle": "ఇంటెలిజెంట్ ఆటోమేషన్",
+    "serviceAutomationBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు వర్క్‌ఫ్లోలను క్రమబద్ధీకరించడానికి, మాన్యువల్ ప్రయత్నాన్ని తగ్గించడానికి మరియు కార్యాచరణ సామర్థ్యాన్ని మెరుగుపరచడానికి ఇంటెలిజెంట్ ఆటోమేషన్ సొల్యూషన్‌లను కలిగి ఉంటాయి.",
+    "whyTitle": "మా సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లను ఎందుకు ఎంచుకోవాలి",
+    "whyLead": "దొడ్డపనేని గ్రూప్ నుండి సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు కొలవగల వ్యాపార ఫలితాలను అందించడానికి ఆవిష్కరణ, పనితీరు మరియు స్కేలబిలిటీపై నిర్మించబడ్డాయి.",
+    "whyTechTitle": "అధునాతన సాంకేతిక నైపుణ్యం",
+    "whyTechBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు అత్యాధునిక ఫలితాలను అందించడానికి తాజా సాధనాలు, ఫ్రేమ్‌వర్క్‌లు మరియు AI సాంకేతికతలను ప్రభావితం చేస్తాయి.",
+    "whyCustomTitle": "అనుకూలీకరించిన వ్యాపార పరిష్కారాలు",
+    "whyCustomBody": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు మీ నిర్దిష్ట పరిశ్రమ అవసరాలకు అనుగుణంగా ఉంటాయి, గరిష్ట సామర్థ్యం మరియు ROIని నిర్ధారిస్తాయి.",
+    "whyLifecycleTitle": "ఎండ్-టు-ఎండ్ డెవలప్‌మెంట్",
+    "whyLifecycleBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు పూర్తి జీవితచక్ర మద్దతును అందిస్తాయి—ప్లానింగ్ మరియు డెవలప్‌మెంట్ నుండి విస్తరణ మరియు నిర్వహణ వరకు.",
+    "processTitle": "మా సాఫ్ట్‌వేర్ IT మరియు AI ప్రక్రియ",
+    "processLead": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు స్థిరమైన డెలివరీ మరియు అధిక-నాణ్యత ఫలితాలను నిర్ధారించడానికి నిర్మాణాత్మక విధానాన్ని అనుసరిస్తాయి.",
+    "processReqTitle": "అవసరాల విశ్లేషణ",
+    "processReqBody": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు వ్యాపార అవసరాలు, సాంకేతిక అవసరాలు మరియు ప్రాజెక్ట్ లక్ష్యాలను అర్థం చేసుకోవడంతో ప్రారంభమవుతాయి.",
+    "processDevTitle": "అభివృద్ధి మరియు ఇంటిగ్రేషన్",
+    "processDevBody": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లలో అధునాతన AI సామర్థ్యాలతో ఎంటర్‌ప్రైజ్ సాఫ్ట్‌వేర్ సొల్యూషన్‌లను నిర్మించడం మరియు సమగ్రపరచడం ఉంటాయి.",
+    "processTestTitle": "పరీక్ష మరియు విస్తరణ",
+    "processTestBody": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలలో విశ్వసనీయత మరియు పనితీరును నిర్ధారించడానికి కఠినమైన పరీక్ష మరియు అతుకులు లేని విస్తరణ ఉన్నాయి.",
+    "processMaintTitle": "నిర్వహణ మరియు ఆప్టిమైజేషన్",
+    "processMaintBody": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు సిస్టమ్‌లను నవీకరించడానికి మరియు సమర్థవంతంగా ఉంచడానికి కొనసాగుతున్న మద్దతు మరియు ఆప్టిమైజేషన్‌ను అందిస్తాయి.",
+    "benefitsTitle": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్స్ యొక్క ప్రయోజనాలు",
+    "benefitsLead": "సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు ఆధునిక వ్యాపారాలకు గణనీయమైన ప్రయోజనాలను అందిస్తాయి:",
+    "benefit1": "పెరిగిన కార్యాచరణ సామర్థ్యం",
+    "benefit2": "AI అంతర్దృష్టులతో వేగంగా నిర్ణయం తీసుకోవడం",
+    "benefit3": "మెరుగైన స్కేలబిలిటీ మరియు వశ్యత",
+    "benefit4": "మెరుగైన కస్టమర్ అనుభవం",
+    "benefit5": "తగ్గిన కార్యాచరణ ఖర్చులు",
+    "ctaTitle": "సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లతో మీ వ్యాపారాన్ని మార్చుకోండి",
+    "ctaBody": "దొడ్డపనేని గ్రూప్ నుండి సాఫ్ట్‌వేర్ IT మరియు AI సొల్యూషన్‌లు వినూత్న డిజిటల్ ట్రాన్స్‌ఫర్మేషన్ సేవలు మరియు అధునాతన సాంకేతికతలతో వ్యాపారాలను శక్తివంతం చేస్తాయి. భవిష్యత్-సిద్ధమైన సిస్టమ్‌లను రూపొందించడానికి, ప్రక్రియలను ఆటోమేట్ చేయడానికి మరియు పోటీ డిజిటల్ ల్యాండ్‌స్కేప్‌లో దీర్ఘకాలిక విజయాన్ని సాధించడానికి మాతో భాగస్వామిగా ఉండండి.",
+    "ctaButton": "మమ్మల్ని సంప్రదించండి",
+    "productsHeading": "మా కంపెనీల్లో సాఫ్ట్‌వేర్ IT మరియు AI పరిష్కారాలు",
+    "productsLead": "ఈ విభాగంలోని ఆపరేటింగ్ యూనిట్‌లను అన్వేషించండి—ప్రొఫైల్స్‌లో సామర్థ్యాలు, సందర్భం మరియు మా బృందాలను ఎంగేజ్ చేసే మార్గాలు ఉంటాయి."
+  },
+  "DigitalMarketingSector": {
+    "metaTitle": "డిజిటల్ మార్కెటింగ్ సేవలు | దొడ్డపనేని గ్రూప్ SEO & PPC సొల్యూషన్స్",
+    "metaDescription": "డిజిటల్ మార్కెటింగ్ సేవలు దొడ్డపనేని గ్రూప్ దృశ్యమానతను పెంచడానికి మరియు లీడ్‌లను రూపొందించడానికి SEO, PPC మరియు సోషల్ మీడియా మార్కెటింగ్‌ను అందిస్తుంది.",
+    "metaKeywords": "డిజిటల్ మార్కెటింగ్ సేవలు, SEO, PPC, సోషల్ మీడియా మార్కెటింగ్, కంటెంట్ మార్కెటింగ్, ఇమెయిల్ మార్కెటింగ్, ఆన్‌లైన్ మార్కెటింగ్, గ్రోత్ మార్కెటింగ్ ఏజెన్సీ, ఇంటర్నెట్ మార్కెటింగ్",
+    "heroEyebrow": "డిజిటల్ మార్కెటింగ్ సేవలు",
+    "heroTitle": "వ్యాపార వృద్ధి కోసం డిజిటల్ మార్కెటింగ్ సేవలు",
+    "heroLead": "తమ ఆన్‌లైన్ ఉనికిని పెంచుకోవడానికి, నాణ్యమైన లీడ్‌లను ఆకర్షించడానికి మరియు ఆదాయాన్ని పెంచుకోవడానికి చూస్తున్న వ్యాపారాలకు డిజిటల్ మార్కెటింగ్ సేవలు చాలా అవసరం. దొడ్డపనేని గ్రూప్‌లో, పోటీ డిజిటల్ ప్రపంచంలో బ్రాండ్‌లు విజయవంతం కావడానికి మేము ఆన్‌లైన్ మార్కెటింగ్ సేవలను వినూత్న వ్యూహాలతో కలుపుతాము.",
+    "featuredProductsHeading": "ఈ విభాగంలో డిజిటల్ మార్కెటింగ్ బ్రాండ్‌లు మరియు ప్లాట్‌ఫారమ్‌లు",
+    "featuredProductsLead": "పనితీరు మార్కెటింగ్, సముపార్జన మరియు బ్రాండ్ వృద్ధికి అనుగుణంగా సమూహ సమర్పణలను అన్వేషించండి.",
+    "sectionComprehensiveTitle": "ఫలితాలతో నడిచే డిజిటల్ మార్కెటింగ్ సేవలు",
+    "sectionComprehensiveP1": "మా కంపెనీలో డిజిటల్ మార్కెటింగ్ సేవలు మీ వ్యాపార అవసరాలకు అనుగుణంగా ఇంటర్నెట్ మార్కెటింగ్ సొల్యూషన్స్ ద్వారా కొలవదగిన ఫలితాలను అందించడంపై దృష్టి సారిస్తాయి. స్థిరమైన వృద్ధిని మరియు మెరుగైన దృశ్యమానతను నిర్ధారించడానికి మేము SEO, చెల్లింపు ప్రకటనలు మరియు కంటెంట్ మార్కెటింగ్ పరిష్కారాలను ఏకీకృతం చేస్తాము.",
+    "sectionComprehensiveP2": "",
+    "serviceSeoTitle": "శోధన ఇంజిన్ ఆప్టిమైజేషన్ (SEO)",
+    "serviceSeoBody": "సెర్చ్ ఇంజన్‌లలో మీ వెబ్‌సైట్ ర్యాంకింగ్‌ను మెరుగుపరిచే అధునాతన SEO మరియు మార్కెటింగ్ సేవలు డిజిటల్ మార్కెటింగ్ సేవల్లో ఉన్నాయి. ఆర్గానిక్ ట్రాఫిక్‌ను నడపడానికి మా బృందం కంటెంట్, సాంకేతిక అంశాలు మరియు బ్యాక్‌లింక్‌లను ఆప్టిమైజ్ చేస్తుంది.",
+    "servicePpcTitle": "పే-పర్-క్లిక్ (PPC) అడ్వర్టైజింగ్",
+    "servicePpcBody": "డిజిటల్ మార్కెటింగ్ సేవలు తక్షణ ట్రాఫిక్ మరియు లీడ్‌లను ఉత్పత్తి చేసే అధిక-కన్వర్టింగ్ PPC నిర్వహణ సేవలను అందిస్తాయి. మేము ROIని పెంచే మరియు ప్రకటన వ్యర్థాలను తగ్గించే లక్ష్య ప్రచారాలను సృష్టిస్తాము.",
+    "serviceSocialTitle": "సోషల్ మీడియా మార్కెటింగ్",
+    "serviceSocialBody": "Facebook, Instagram మరియు LinkedIn వంటి ప్లాట్‌ఫారమ్‌లలో బ్రాండ్ విజిబిలిటీ మరియు ఎంగేజ్‌మెంట్‌ను మెరుగుపరిచే సోషల్ మీడియా మార్కెటింగ్ సేవలు కూడా డిజిటల్ మార్కెటింగ్ సర్వీస్‌లలో ఉన్నాయి.",
+    "serviceContentTitle": "కంటెంట్ మార్కెటింగ్",
+    "serviceContentBody": "డిజిటల్ మార్కెటింగ్ సేవలు మీ లక్ష్య ప్రేక్షకులను ఆకర్షించే మరియు మార్చే విలువైన మరియు ఆకర్షణీయమైన కంటెంట్‌ను సృష్టించడానికి కంటెంట్ మార్కెటింగ్ పరిష్కారాలను ప్రభావితం చేస్తాయి.",
+    "serviceEmailTitle": "ఇమెయిల్ మార్కెటింగ్ & ఆటోమేషన్",
+    "serviceEmailBody": "డిజిటల్ మార్కెటింగ్ సేవలు కస్టమర్ నిలుపుదల మెరుగుపరచడానికి మరియు లీడ్ జనరేషన్ సేవల ద్వారా దీర్ఘకాలిక వృద్ధికి మద్దతు ఇవ్వడానికి ఆటోమేటెడ్ ఇమెయిల్ ప్రచారాలను ఉపయోగించుకుంటాయి.",
+    "whyTitle": "మా డిజిటల్ మార్కెటింగ్ సొల్యూషన్స్ ఎందుకు ఎంచుకోవాలి",
+    "whyLead": "పనితీరు, ఆవిష్కరణ మరియు స్కేలబిలిటీపై మా దృష్టి కారణంగా దొడ్డపనేని గ్రూప్ నుండి డిజిటల్ మార్కెటింగ్ సేవలు ప్రత్యేకంగా నిలుస్తాయి. విశ్వసనీయ వృద్ధి మార్కెటింగ్ ఏజెన్సీగా, మేము మీ వ్యాపార లక్ష్యాలకు అనుగుణంగా వ్యూహాలను అందిస్తాము.",
+    "whyDataTitle": "డేటా-డ్రైవెన్ అప్రోచ్",
+    "whyDataBody": "ప్రచారాలు సమర్ధవంతంగా నిర్వహించేందుకు మరియు కొలవగల విజయాన్ని అందించడానికి డిజిటల్ మార్కెటింగ్ సేవలు విశ్లేషణలు మరియు అంతర్దృష్టుల ద్వారా మద్దతునిస్తాయి.",
+    "whyCustomTitle": "అనుకూలీకరించిన వ్యూహాలు",
+    "whyCustomBody": "మీ పరిశ్రమ, ప్రేక్షకులు మరియు లక్ష్యాలకు సరిపోయే పనితీరు మార్కెటింగ్ సేవలను ఉపయోగించి డిజిటల్ మార్కెటింగ్ సేవలు రూపొందించబడ్డాయి.",
+    "whyFullTitle": "పూర్తి-సేవా నైపుణ్యం",
+    "whyFullBody": "డిజిటల్ మార్కెటింగ్ సేవల్లో ఎండ్-టు-ఎండ్ డిజిటల్ అడ్వర్టైజింగ్ సేవలు, ప్రణాళిక నుండి అమలు మరియు ఆప్టిమైజేషన్ వరకు ఉంటాయి.",
+    "processTitle": "మా డిజిటల్ మార్కెటింగ్ ప్రక్రియ",
+    "processLead": "డిజిటల్ మార్కెటింగ్ సేవలు స్థిరమైన ఫలితాలను నిర్ధారించడానికి నిర్మాణాత్మక మరియు నిరూపితమైన పద్ధతిని అనుసరిస్తాయి.",
+    "processResearchTitle": "పరిశోధన & ప్రణాళిక",
+    "processResearchBody": "డిజిటల్ మార్కెటింగ్ సేవలు వివరణాత్మక పరిశోధన, పోటీదారుల విశ్లేషణ మరియు సమర్థవంతమైన లక్ష్యం కోసం సరైన ప్రేక్షకులను గుర్తించడంతో ప్రారంభమవుతాయి.",
+    "processExecTitle": "అమలు & నిర్వహణ",
+    "processExecBody": "డిజిటల్ మార్కెటింగ్ సేవలు SEO, PPC మరియు సోషల్ మీడియా ప్రచారాల వంటి ఇంటర్నెట్ మార్కెటింగ్ పరిష్కారాలను అమలు చేయడం.",
+    "processOptTitle": "ఆప్టిమైజేషన్ & రిపోర్టింగ్",
+    "processOptBody": "పనితీరును మెరుగుపరచడానికి, మార్పిడులను పెంచడానికి మరియు ROIని పెంచడానికి డిజిటల్ మార్కెటింగ్ సేవలు నిరంతరం ఆప్టిమైజ్ చేయబడతాయి.",
+    "benefitsTitle": "డిజిటల్ మార్కెటింగ్ సేవల ప్రయోజనాలు",
+    "benefitsLead": "డిజిటల్ మార్కెటింగ్ సేవలు వ్యాపారాలు స్థిరమైన వృద్ధిని సాధించడంలో సహాయపడతాయి:",
+    "benefit1": "ఆన్‌లైన్ విజిబిలిటీ పెరిగింది",
+    "benefit2": "మెరుగైన లీడ్ జనరేషన్",
+    "benefit3": "అధిక మార్పిడి రేట్లు",
+    "benefit4": "బలమైన బ్రాండ్ అధికారం",
+    "benefit5": "మెరుగైన కస్టమర్ ఎంగేజ్‌మెంట్",
+    "ctaTitle": "డిజిటల్ మార్కెటింగ్ సేవలతో వృద్ధి చెందండి",
+    "ctaBody": "దొడ్డపనేని గ్రూప్ నుండి డిజిటల్ మార్కెటింగ్ సేవలు స్కేలబుల్ ఆన్‌లైన్ మార్కెటింగ్ సేవలు మరియు వినూత్న వ్యూహాలతో వ్యాపారాలను శక్తివంతం చేస్తాయి. మీ డిజిటల్ ఉనికిని మార్చడానికి మరియు దీర్ఘకాలిక విజయాన్ని సాధించడానికి మాతో భాగస్వామిగా ఉండండి.",
+    "ctaButton": "మమ్మల్ని సంప్రదించండి",
+    "productsHeading": "మా కంపెనీల అంతటా డిజిటల్ మార్కెటింగ్ సేవలు",
+    "productsLead": "ఈ విభాగంలోని ఆపరేటింగ్ యూనిట్‌లను అన్వేషించండి—ప్రొఫైల్స్‌లో సామర్థ్యాలు, సందర్భం మరియు మా బృందాలను ఎంగేజ్ చేసే మార్గాలు ఉంటాయి."
+  },
+  "HealthcareMedicalSector": {
+    "metaTitle": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు | దొడ్డపనేని గ్రూప్ సొల్యూషన్స్",
+    "metaDescription": "హెల్త్‌కేర్ మరియు మెడికల్ సర్వీసెస్ దొడ్డపనేని గ్రూప్ ప్రొవైడర్ల కోసం మెడికల్ సపోర్ట్, డిజిటల్ హెల్త్‌కేర్ మరియు పేషెంట్ కేర్ సొల్యూషన్‌లను అందిస్తుంది.",
+    "metaKeywords": "హెల్త్‌కేర్ అండ్ మెడికల్ సర్వీసెస్, మెడికల్ ఎక్విప్‌మెంట్, హెల్త్‌కేర్ ఐటి, డిజిటల్ హెల్త్‌కేర్, హాస్పిటల్ సపోర్ట్, పేషెంట్ కేర్, క్లినికల్ సర్వీసెస్, మెడికల్ హెల్త్‌కేర్ సొల్యూషన్స్",
+    "heroEyebrow": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు",
+    "heroTitle": "అధునాతన పేషెంట్ కేర్ కోసం ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు",
+    "heroLead": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు రోగి ఫలితాలను మెరుగుపరచడంలో, కార్యాచరణ సామర్థ్యాన్ని పెంచడంలో మరియు నాణ్యమైన సంరక్షణను అందించడంలో కీలక పాత్ర పోషిస్తాయి. దొడ్డపనేని గ్రూప్‌లో, మేము వినూత్నమైన మరియు నమ్మదగిన సేవలతో ఆసుపత్రులు, క్లినిక్‌లు మరియు ఆరోగ్య సంరక్షణ సంస్థలకు మద్దతుగా రూపొందించిన సమగ్ర వైద్య ఆరోగ్య సంరక్షణ పరిష్కారాలను అందిస్తాము.",
+    "featuredProductsHeading": "ఈ విభాగంలో హెల్త్‌కేర్ మరియు మెడికల్ బ్రాండ్‌లు",
+    "featuredProductsLead": "పేషెంట్ కేర్, హెల్త్ ప్రోడక్ట్స్ మరియు ప్రొవైడర్ సపోర్ట్‌తో సమలేఖనం చేయబడిన సమూహ సమర్పణలను అన్వేషించండి.",
+    "sectionComprehensiveTitle": "సమగ్ర ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు",
+    "sectionComprehensiveP1": "దొడ్డపనేని గ్రూప్‌లోని హెల్త్‌కేర్ మరియు మెడికల్ సర్వీసెస్ టెక్నాలజీ, నైపుణ్యం మరియు సమర్థతను మిళితం చేసే ఇంటిగ్రేటెడ్ హెల్త్‌కేర్ సర్వీస్ ప్రొవైడర్ సొల్యూషన్‌లను అందించడంపై దృష్టి సారిస్తుంది. మా సేవలు ఆరోగ్య సంరక్షణ పరిశ్రమ యొక్క అభివృద్ధి చెందుతున్న అవసరాలను తీర్చడానికి మరియు అతుకులు లేని పేషెంట్ కేర్ డెలివరీని నిర్ధారించడానికి రూపొందించబడ్డాయి.",
+    "sectionComprehensiveP2": "ఆధునిక ఆరోగ్య సంరక్షణ వ్యవస్థలు రోగనిర్ధారణ, చికిత్స మరియు కొనసాగుతున్న రోగి నిర్వహణతో సహా సమర్థవంతమైన సంరక్షణను అందించడానికి అధునాతన సాధనాలు, శిక్షణ పొందిన నిపుణులు మరియు క్రమబద్ధీకరించబడిన ప్రక్రియలపై ఆధారపడతాయి.",
+    "serviceEquipmentTitle": "వైద్య పరికరాలు మరియు సరఫరా పరిష్కారాలు",
+    "serviceEquipmentBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవల్లో ఆసుపత్రులు మరియు క్లినిక్‌లు అధిక-నాణ్యత పరికరాలు మరియు సామాగ్రి యాక్సెస్‌ను కలిగి ఉండేలా విశ్వసనీయమైన వైద్య పరికరాల పరిష్కారాలను కలిగి ఉంటాయి. మేము ఆరోగ్య సంరక్షణ ప్రదాతలకు సామర్థ్యాన్ని నిర్వహించడానికి మరియు ఖచ్చితమైన చికిత్సలను అందించడంలో సహాయం చేస్తాము.",
+    "serviceItTitle": "హెల్త్‌కేర్ IT మరియు డిజిటల్ సొల్యూషన్స్",
+    "serviceItBody": "హెల్త్‌కేర్ మరియు మెడికల్ సర్వీసెస్‌లో ఎలక్ట్రానిక్ రికార్డ్‌లు, టెలిమెడిసిన్ మరియు AI-ఆధారిత సిస్టమ్‌లు వంటి డిజిటల్ హెల్త్‌కేర్ సొల్యూషన్‌లు రోగి సంరక్షణ మరియు కార్యాచరణ సామర్థ్యాన్ని మెరుగుపరుస్తాయి.",
+    "serviceHospitalTitle": "హాస్పిటల్ మరియు క్లినికల్ సపోర్ట్ సర్వీసెస్",
+    "serviceHospitalBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు ఆరోగ్య సంరక్షణ సౌకర్యాల సజావుగా పనిచేసేందుకు అడ్మినిస్ట్రేటివ్ సపోర్ట్, ఆపరేషనల్ మేనేజ్‌మెంట్ మరియు క్లినికల్ సహాయంతో సహా పూర్తి హాస్పిటల్ సపోర్ట్ సేవలను అందిస్తాయి.",
+    "servicePatientTitle": "రోగి సంరక్షణ మరియు నిర్వహణ",
+    "servicePatientBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు రోగి సంతృప్తిని పెంపొందించే, రికవరీ ఫలితాలను మెరుగుపరిచే మరియు నిరంతరాయంగా ఉండేలా అసాధారణమైన రోగి సంరక్షణ సేవలను అందించడంపై దృష్టి పెడతాయి పర్యవేక్షణ. ఈ రోజు హెల్త్‌కేర్ ప్లాట్‌ఫారమ్‌లు ఆన్‌లైన్ సంప్రదింపులు, డిజిటల్ రికార్డ్‌లు మరియు వైద్య నిపుణులకు సులువుగా యాక్సెస్, రోగులకు ప్రాప్యత మరియు సౌకర్యాన్ని మెరుగుపరుస్తాయి.",
+    "whyTitle": "మా ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలను ఎందుకు ఎంచుకోవాలి",
+    "whyLead": "దొడ్డపనేని గ్రూప్ నుండి ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు పరిశ్రమ ప్రమాణాలకు అనుగుణంగా మరియు ఆవిష్కరణ మరియు నైపుణ్యం ద్వారా కొలవదగిన ఫలితాలను అందించడానికి రూపొందించబడ్డాయి.",
+    "whyTechTitle": "అధునాతన టెక్నాలజీ ఇంటిగ్రేషన్",
+    "whyTechBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు రోగనిర్ధారణ, చికిత్స మరియు రోగి నిశ్చితార్థాన్ని మెరుగుపరచడానికి ఆరోగ్య సంరక్షణ సాంకేతిక పరిష్కారాలను ప్రభావితం చేస్తాయి.",
+    "whyCustomTitle": "కస్టమైజ్డ్ హెల్త్‌కేర్ సొల్యూషన్స్",
+    "whyCustomBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు ఆసుపత్రులు, క్లినిక్‌లు మరియు ఆరోగ్య సంరక్షణ ప్రదాతల ప్రత్యేక అవసరాలకు అనుగుణంగా రూపొందించబడ్డాయి.",
+    "whyEndToEndTitle": "ఎండ్-టు-ఎండ్ హెల్త్‌కేర్ సపోర్ట్",
+    "whyEndToEndBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవల్లో సంప్రదింపుల నుండి అమలు మరియు ఆప్టిమైజేషన్ వరకు పూర్తి క్లినికల్ సపోర్ట్ సేవలు ఉంటాయి.",
+    "processTitle": "మా హెల్త్‌కేర్ సర్వీస్ ప్రాసెస్",
+    "processLead": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు సమర్థత మరియు నాణ్యమైన సంరక్షణ డెలివరీని నిర్ధారించడానికి నిర్మాణాత్మక విధానాన్ని అనుసరిస్తాయి.",
+    "processAssessTitle": "అంచనా మరియు ప్రణాళిక",
+    "processAssessBody": "క్లయింట్ అవసరాలు, ఆరోగ్య సంరక్షణ సవాళ్లు మరియు కార్యాచరణ అవసరాలను అర్థం చేసుకోవడంతో ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు ప్రారంభమవుతాయి.",
+    "processImplTitle": "అమలు మరియు ఇంటిగ్రేషన్",
+    "processImplBody": "హెల్త్‌కేర్ మరియు మెడికల్ సర్వీసెస్‌లో మొత్తం పనితీరును మెరుగుపరచడానికి హెల్త్‌కేర్ కన్సల్టింగ్ సేవలు మరియు సొల్యూషన్‌లు ఉంటాయి.",
+    "processMonitorTitle": "పర్యవేక్షణ మరియు ఆప్టిమైజేషన్",
+    "processMonitorBody": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు అధిక-నాణ్యత ఫలితాలను నిర్ధారించడానికి నిరంతర పర్యవేక్షణ మరియు మెరుగుదలలను కలిగి ఉంటాయి.",
+    "benefitsTitle": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవల ప్రయోజనాలు",
+    "benefitsLead": "ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు ఆరోగ్య సంరక్షణ ప్రదాతలు మరియు రోగులకు బహుళ ప్రయోజనాలను అందిస్తాయి:",
+    "benefit1": "మెరుగైన రోగుల సంరక్షణ నాణ్యత",
+    "benefit2": "పెరిగిన కార్యాచరణ సామర్థ్యం",
+    "benefit3": "మెరుగైన డేటా నిర్వహణ",
+    "benefit4": "మెరుగైన ఆరోగ్య సంరక్షణ సౌలభ్యం",
+    "benefit5": "ఖర్చుతో కూడుకున్న పరిష్కారాలు",
+    "ctaTitle": "మా వైద్య సేవలతో ఆరోగ్య సంరక్షణను మార్చండి",
+    "ctaBody": "దొడ్డపనేని గ్రూప్ నుండి ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు వినూత్నమైన వైద్య సహాయ సేవలు మరియు అధునాతన పరిష్కారాలతో ఆరోగ్య సంరక్షణ సంస్థలను శక్తివంతం చేస్తాయి. అధిక-నాణ్యత సంరక్షణను అందించడానికి, సామర్థ్యాన్ని మెరుగుపరచడానికి మరియు అభివృద్ధి చెందుతున్న ఆరోగ్య సంరక్షణ పరిశ్రమలో ముందుకు సాగడానికి మాతో భాగస్వామిగా ఉండండి.",
+    "ctaButton": "మమ్మల్ని సంప్రదించండి",
+    "productsHeading": "మా కంపెనీల్లో ఆరోగ్య సంరక్షణ మరియు వైద్య సేవలు",
+    "productsLead": "ఈ విభాగంలోని ఆపరేటింగ్ యూనిట్‌లను అన్వేషించండి—ప్రొఫైల్స్‌లో సామర్థ్యాలు, సందర్భం మరియు మా బృందాలను ఎంగేజ్ చేసే మార్గాలు ఉంటాయి."
+  },
+  "ConstructionRealestateSector": {
+    "metaTitle": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు | దొడ్డపనేని గ్రూప్ ప్రాజెక్ట్స్",
+    "metaDescription": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు దొడ్డపనేని గ్రూప్ ప్రాపర్టీ డెవలప్‌మెంట్, ఇన్‌ఫ్రాస్ట్రక్చర్ మరియు టర్న్‌కీ నిర్మాణ పరిష్కారాలను అందిస్తుంది.",
+    "metaKeywords": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు, రియల్ ఎస్టేట్ అభివృద్ధి, ఆస్తి అభివృద్ధి, మౌలిక సదుపాయాల అభివృద్ధి, నిర్మాణ సంస్థ, భూమి అభివృద్ధి, ఆస్తి నిర్వహణ, చెరశాల కావలివాడు నిర్మాణం",
+    "heroEyebrow": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు",
+    "heroTitle": "ఆధునిక మౌలిక సదుపాయాల కోసం నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు",
+    "heroLead": "అధిక-నాణ్యత నివాస, వాణిజ్య మరియు మౌలిక సదుపాయాల ప్రాజెక్టులను అభివృద్ధి చేయడానికి నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు అవసరం. దొడ్డపనేని గ్రూప్‌లో, మేము ఎండ్-టు-ఎండ్ రియల్ ఎస్టేట్ డెవలప్‌మెంట్ సేవలను అందిస్తాము, ఇవి అసాధారణమైన ఫలితాలను అందించడానికి ఆవిష్కరణ, నాణ్యమైన నిర్మాణం మరియు వ్యూహాత్మక ప్రణాళికలను మిళితం చేస్తాయి.",
+    "featuredProductsHeading": "ఈ విభాగంలో నిర్మాణం మరియు రియల్ ఎస్టేట్ బ్రాండ్లు",
+    "featuredProductsLead": "ప్రాజెక్ట్‌లు, డిజైన్, డెవలప్‌మెంట్ మరియు సంబంధిత సేవలను విస్తరించి ఉన్న సమూహ సామర్థ్యాలను అన్వేషించండి.",
+    "sectionComprehensiveTitle": "సమగ్ర నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు",
+    "sectionComprehensiveP1": "దొడ్డపనేని గ్రూప్‌లోని నిర్మాణ మరియు రియల్ ఎస్టేట్ సేవలు వ్యాపారాలు, పెట్టుబడిదారులు మరియు వ్యక్తుల కోసం నమ్మకమైన మరియు స్కేలబుల్ ప్రాపర్టీ డెవలప్‌మెంట్ సొల్యూషన్‌లను అందించడంపై దృష్టి సారించాయి. మా నైపుణ్యం నివాస, వాణిజ్య మరియు పారిశ్రామిక ప్రాజెక్ట్‌లలో విస్తరించి, అధిక ప్రమాణాలు మరియు సకాలంలో డెలివరీని నిర్ధారిస్తుంది.",
+    "sectionComprehensiveP2": "రియల్ ఎస్టేట్ అభివృద్ధి సాధారణంగా భూ సేకరణ, ప్రణాళిక, ఆమోదాలు, నిర్మాణం మరియు ప్రాజెక్ట్ అప్పగింత వంటి బహుళ దశలను కలిగి ఉంటుంది, విజయానికి వృత్తిపరమైన నైపుణ్యం అవసరం.",
+    "serviceResidentialTitle": "నివాస మరియు వాణిజ్య నిర్మాణం",
+    "serviceResidentialBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు ఆధునిక నిర్మాణ ప్రమాణాలకు అనుగుణంగా అధిక-నాణ్యత నివాస మరియు వాణిజ్య నిర్మాణాలను కలిగి ఉంటాయి. మేము క్లయింట్ అంచనాలు మరియు మార్కెట్ డిమాండ్‌లకు అనుగుణంగా గృహాలు, కార్యాలయ స్థలాలు మరియు వాణిజ్య సముదాయాలను నిర్మిస్తాము.",
+    "servicePropertyDevTitle": "ఆస్తి అభివృద్ధి మరియు భూమి పరిష్కారాలు",
+    "servicePropertyDevBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు ఆస్తి విలువను పెంచడానికి మరియు స్థిరమైన వృద్ధిని నిర్ధారించడానికి సమగ్ర భూ అభివృద్ధి సేవలను మరియు ప్రాజెక్ట్ ప్రణాళికను అందిస్తాయి.",
+    "serviceInfraTitle": "మౌలిక సదుపాయాల అభివృద్ధి",
+    "serviceInfraBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు రోడ్లు, పారిశ్రామిక నిర్మాణాలు మరియు పట్టణ అభివృద్ధి ప్రాజెక్టులతో సహా పెద్ద ఎత్తున మౌలిక సదుపాయాల అభివృద్ధి సేవలను కూడా కవర్ చేస్తాయి.",
+    "serviceConsultingTitle": "రియల్ ఎస్టేట్ కన్సల్టింగ్",
+    "serviceConsultingBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు క్లయింట్‌లకు సమాచారంతో పెట్టుబడి నిర్ణయాలు తీసుకోవడంలో మరియు ప్రాజెక్ట్ ఫలితాలను ఆప్టిమైజ్ చేయడంలో సహాయపడటానికి నిపుణులైన రియల్ ఎస్టేట్ కన్సల్టింగ్ సేవలను కలిగి ఉంటాయి.",
+    "serviceMgmtTitle": "ఆస్తి నిర్వహణ సేవలు",
+    "serviceMgmtBody": "నిర్మాణ మరియు రియల్ ఎస్టేట్ సేవలు ప్రాపర్టీ మేనేజ్‌మెంట్ సేవలకు విస్తరించి, సమర్థవంతమైన నిర్వహణ, కార్యకలాపాలు మరియు ఆస్తుల దీర్ఘకాలిక విలువను నిర్ధారిస్తాయి.",
+    "whyTitle": "మా నిర్మాణ మరియు రియల్ ఎస్టేట్ సేవలను ఎందుకు ఎంచుకోవాలి",
+    "whyLead": "నాణ్యత, ఆవిష్కరణలు మరియు కస్టమర్ సంతృప్తికి మా నిబద్ధత కారణంగా దొడ్డపనేని గ్రూప్ నుండి నిర్మాణ మరియు రియల్ ఎస్టేట్ సేవలు ప్రత్యేకంగా నిలుస్తాయి.",
+    "whyQualityTitle": "నాణ్యత నిర్మాణ ప్రమాణాలు",
+    "whyQualityBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు మన్నికైన మరియు నమ్మదగిన నిర్మాణాలను అందించడానికి అధిక-నాణ్యత పదార్థాలు మరియు ఆధునిక నిర్మాణ సాంకేతికతలను ఉపయోగించడాన్ని నిర్ధారిస్తాయి.",
+    "whyEndToEndTitle": "ఎండ్-టు-ఎండ్ ప్రాజెక్ట్ మేనేజ్‌మెంట్",
+    "whyEndToEndBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు కాన్సెప్ట్ మరియు డిజైన్ నుండి ఎగ్జిక్యూషన్ మరియు డెలివరీ వరకు పూర్తి టర్న్‌కీ నిర్మాణ పరిష్కారాలను అందిస్తాయి.",
+    "whyTimelyTitle": "సకాలంలో డెలివరీ",
+    "whyTimelyBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు నిర్ణీత సమయపాలనతో మరియు సకాలంలో పూర్తి అయ్యేలా సమర్థవంతమైన ప్రాజెక్ట్ నిర్వహణతో అమలు చేయబడతాయి.",
+    "processTitle": "మా నిర్మాణం మరియు రియల్ ఎస్టేట్ ప్రక్రియ",
+    "processLead": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు ప్రాజెక్ట్ విజయం మరియు క్లయింట్ సంతృప్తిని నిర్ధారించడానికి నిర్మాణాత్మక విధానాన్ని అనుసరిస్తాయి.",
+    "processPlanTitle": "ప్రణాళిక మరియు రూపకల్పన",
+    "processPlanBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు వివరణాత్మక ప్రణాళిక, నిర్మాణ రూపకల్పన మరియు సాధ్యత విశ్లేషణతో ప్రారంభమవుతాయి.",
+    "processBuildTitle": "అభివృద్ధి మరియు నిర్మాణం",
+    "processBuildBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలలో భవన నిర్మాణ సేవలను ఖచ్చితత్వంతో మరియు పరిశ్రమ ప్రమాణాలకు కట్టుబడి ఉంటాయి.",
+    "processDeliveryTitle": "డెలివరీ మరియు మద్దతు",
+    "processDeliveryBody": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవల్లో ప్రాజెక్ట్ డెలివరీ, హ్యాండ్‌ఓవర్ మరియు దీర్ఘకాలిక విజయాన్ని నిర్ధారించడానికి కొనసాగుతున్న మద్దతు ఉన్నాయి.",
+    "benefitsTitle": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవల ప్రయోజనాలు",
+    "benefitsLead": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు పెట్టుబడిదారులు మరియు ఆస్తి యజమానులకు అనేక ప్రయోజనాలను అందిస్తాయి:",
+    "benefit1": "అధిక-నాణ్యత మౌలిక సదుపాయాల అభివృద్ధి",
+    "benefit2": "పెరిగిన ఆస్తి విలువ",
+    "benefit3": "సమర్థవంతమైన ప్రాజెక్ట్ అమలు",
+    "benefit4": "స్థిరమైన మరియు ఆధునిక నమూనాలు",
+    "benefit5": "పెట్టుబడిపై బలమైన రాబడి",
+    "benefitsNote": "సరైన ప్రణాళిక మరియు అవస్థాపనతో బాగా అభివృద్ధి చెందిన ప్రాజెక్ట్‌లు తరచుగా మెరుగైన కనెక్టివిటీకి దారి తీస్తాయి మరియు పాఠశాలలు, ఆసుపత్రులు మరియు వాణిజ్య కేంద్రాల వంటి అవసరమైన సౌకర్యాలకు ప్రాప్తి చేస్తాయి.",
+    "ctaTitle": "నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలతో మీ భవిష్యత్తును నిర్మించుకోండి",
+    "ctaBody": "దొడ్డపనేని గ్రూప్ నుండి నిర్మాణ మరియు రియల్ ఎస్టేట్ సేవలు నమ్మకమైన నిర్మాణ సంస్థ సేవలు మరియు వినూత్న పరిష్కారాలతో ఆలోచనలను వాస్తవంగా మార్చడంలో మీకు సహాయపడతాయి. ప్రపంచ స్థాయి మౌలిక సదుపాయాలను అభివృద్ధి చేయడానికి మరియు రియల్ ఎస్టేట్ మార్కెట్‌లో దీర్ఘకాలిక వృద్ధిని సాధించడానికి మాతో భాగస్వామిగా ఉండండి.",
+    "ctaButton": "మమ్మల్ని సంప్రదించండి",
+    "productsHeading": "మా కంపెనీల అంతటా నిర్మాణం మరియు రియల్ ఎస్టేట్ సేవలు",
+    "productsLead": "ఈ విభాగంలోని ఆపరేటింగ్ యూనిట్‌లను అన్వేషించండి—ప్రొఫైల్స్‌లో సామర్థ్యాలు, సందర్భం మరియు మా బృందాలను ఎంగేజ్ చేసే మార్గాలు ఉంటాయి."
+  },
+  "DivisionTopics": {
+    "software-it-ai": {
+      "topic-commerce": {
+        "label": "Commerce platforms",
+        "description": "Multivendor commerce—catalogue management, checkout, seller tooling, and secure settlements for independent merchants."
+      },
+      "topic-sellers": {
+        "label": "Seller tooling",
+        "description": "Fulfilment status, dispute workflows, and analytics so sellers can restock and price with evidence—not guesswork."
+      },
+      "topic-platform": {
+        "label": "Platform engineering",
+        "description": "Information technology and AI capacity behind reliable storefronts, integrations, payments, and scalable infrastructure."
+      }
+    },
+    "digital-marketing": {
+      "topic-seo": {
+        "label": "SEO",
+        "description": "Organic visibility, technical SEO, and content that ranks."
+      },
+      "topic-ads": {
+        "label": "Ads",
+        "description": "Paid acquisition and performance creative across channels."
+      },
+      "topic-social": {
+        "label": "Social",
+        "description": "Community, brand presence, and social campaigns that convert."
+      }
+    },
+    "healthcare-medical": {
+      "topic-clinical": {
+        "label": "Clinical",
+        "description": "Clinical workflows, compliance-aware tooling, and integrations."
+      },
+      "topic-billing": {
+        "label": "Billing",
+        "description": "Revenue cycle, coding, and payer operations support."
+      },
+      "topic-supplies": {
+        "label": "Supplies",
+        "description": "Medical supplies, devices, and distribution logistics."
+      }
+    },
+    "construction-realestate": {
+      "topic-projects": {
+        "label": "Projects",
+        "description": "End-to-end delivery from planning through commissioning."
+      },
+      "topic-design": {
+        "label": "Design",
+        "description": "Architecture, engineering coordination, and design quality."
+      },
+      "topic-realty": {
+        "label": "Realty",
+        "description": "Development, investment, and property advisory."
+      }
+    },
+    "ecommerce-marketplace": {
+      "topic-stores": {
+        "label": "Stores",
+        "description": "D2C and B2B storefronts engineered for conversion."
+      },
+      "topic-marketplaces": {
+        "label": "Marketplaces",
+        "description": "Multi-vendor platforms, catalog ops, and seller tooling."
+      },
+      "topic-fulfillment": {
+        "label": "Fulfillment",
+        "description": "Order, warehouse, and last-mile orchestration."
+      }
+    },
+    "media-news-entertainment": {
+      "topic-newsroom": {
+        "label": "Newsroom",
+        "description": "Digital-first reporting with verification and corrections—public policy, business, culture, and civic coverage optimised for web and social."
+      },
+      "topic-content": {
+        "label": "Editorial & multimedia",
+        "description": "Formats, production, and distribution at scale—video, interviews, and storytelling built for how audiences read and share today."
+      },
+      "topic-brand": {
+        "label": "Audience & partnerships",
+        "description": "Audience products, brand studios, and partnerships that extend reach while protecting editorial standards."
+      }
+    },
+    "staffing-consultancy": {
+      "topic-hiring": {
+        "label": "Hiring",
+        "description": "Recruitment pipelines and role-specific sourcing."
+      },
+      "topic-hr": {
+        "label": "HR",
+        "description": "Policies, people ops, and workforce planning."
+      },
+      "topic-talent": {
+        "label": "Talent",
+        "description": "Retention, upskilling, and leadership programmes."
+      }
+    },
+    "food-beverages": {
+      "topic-processing": {
+        "label": "Processing",
+        "description": "Safe, efficient processing and packaging lines."
+      },
+      "topic-supply": {
+        "label": "Supply",
+        "description": "Sourcing, cold chain, and supplier governance."
+      },
+      "topic-quality": {
+        "label": "Quality",
+        "description": "QA, traceability, and certification readiness."
+      }
+    },
+    "manufacturing-trading": {
+      "topic-plants": {
+        "label": "Plants",
+        "description": "Plant operations, throughput, and capex efficiency."
+      },
+      "topic-trading": {
+        "label": "Trading",
+        "description": "Wholesale, bulk, and cross-border trade desks."
+      },
+      "topic-industry": {
+        "label": "Industry 4.0",
+        "description": "Automation, data, and connected factory initiatives."
+      }
+    },
+    "logistics-warehousing": {
+      "topic-freight": {
+        "label": "Freight",
+        "description": "Air, ocean, and surface freight orchestration."
+      },
+      "topic-warehouse": {
+        "label": "Warehouse",
+        "description": "Storage, WMS, and inventory accuracy."
+      },
+      "topic-lastmile": {
+        "label": "Last mile",
+        "description": "Final delivery, routing, and customer experience."
+      }
+    },
+    "education-skill": {
+      "topic-training": {
+        "label": "Training",
+        "description": "Instructor-led and hybrid programmes for teams."
+      },
+      "topic-elearning": {
+        "label": "E-learning",
+        "description": "Platforms, cohorts, and measurable learning paths."
+      },
+      "topic-skills": {
+        "label": "Skills",
+        "description": "Vocational and industry certifications."
+      }
+    },
+    "import-export": {
+      "topic-trade": {
+        "label": "Trade",
+        "description": "Import/export desks, sourcing, and channel partners."
+      },
+      "topic-compliance": {
+        "label": "Compliance",
+        "description": "Documentation, customs, and regulatory alignment."
+      },
+      "topic-partners": {
+        "label": "Partners",
+        "description": "Global networks for reliable movement of goods."
+      }
+    }
+  },
+  "CompanyForms": {
+    "leadTitle": "Get a quote or callback",
+    "leadIntro": "Short, mobile-friendly form. Fields match this sector so we can route you faster.",
+    "trustLine": "We respect your inbox — no spam. We'll only use your details for this request.",
+    "privacyLinkText": "Privacy Policy",
+    "advancedToggle": "Additional preferences (optional)",
+    "submitLead": "Send request",
+    "submitting": "Sending…",
+    "leadSuccess": "Thank you — we received your request and will reach out soon.",
+    "leadError": "Could not send. Please try again or email us directly.",
+    "contactTitle": "Contact us",
+    "contactIntro": "General questions, partnerships, or anything else — send a message below.",
+    "fieldMessage": "Your message",
+    "contactMessageMin": "Please enter at least 10 characters.",
+    "contactSubmit": "Send message",
+    "contactSuccess": "Message sent. Thank you!",
+    "contactError": "Failed to send. Please try again.",
+    "fieldFullName": "Full name",
+    "fieldEmail": "Email address",
+    "fieldPhone": "Phone number",
+    "fieldPhoneOptional": "Phone (optional)",
+    "fieldZip": "ZIP / postal code",
+    "fieldZipCity": "ZIP code or city",
+    "fieldServiceType": "Service type",
+    "fieldTransactionType": "Buying / selling / renting",
+    "fieldBudgetRange": "Budget range",
+    "fieldPropertyType": "Property type",
+    "fieldTimeline": "Timeline",
+    "fieldLoanPreapproved": "Pre-approved for a loan?",
+    "fieldInsuranceType": "Insurance type",
+    "fieldAgeRange": "Age range",
+    "fieldCoverageAmount": "Coverage amount needed",
+    "fieldCurrentlyInsured": "Currently insured?",
+    "fieldConditionInterest": "Condition or area of interest",
+    "fieldPreferredSpecialist": "Preferred doctor or specialist",
+    "fieldAppointmentTimeframe": "Appointment timeframe",
+    "fieldInsuranceStatus": "Insurance status",
+    "fieldInterest": "What are you interested in?",
+    "fieldBudget": "Budget",
+    "fieldCompanyName": "Company name (optional)",
+    "fieldBestTimeToCall": "Best time to call",
+    "fieldPreferredContact": "Preferred contact method",
+    "fieldComments": "Comments or notes",
+    "fieldConsent": "I agree to be contacted about this request and I understand calls may be recorded for quality (TCPA-style consent for U.S. leads).",
+    "requiredHint": "Required",
+    "selectPlaceholder": "Select…",
+    "yes": "Yes",
+    "no": "No",
+    "contactMethodCall": "Phone call",
+    "contactMethodEmail": "Email",
+    "contactMethodWhatsapp": "WhatsApp",
+    "genOptEcommerce": "E-commerce / marketplace",
+    "genOptLogistics": "Logistics & fulfillment",
+    "genOptB2b": "B2B vendor / wholesale",
+    "genOptConsulting": "Strategy / consulting",
+    "genOptOther": "Other",
+    "reOptBuy": "Buying",
+    "reOptSell": "Selling",
+    "reOptRent": "Renting",
+    "reBudget0": "Below $100K",
+    "reBudget1": "$100K – $250K",
+    "reBudget2": "$250K – $500K",
+    "reBudget3": "$500K – $1M",
+    "reBudget4": "$1M+",
+    "reRentBudget1": "Below $999",
+    "reRentBudget2": "$1,000 to $1,999",
+    "reRentBudget3": "$2,000 to $2,999",
+    "reRentBudget4": "$3,000 to $3,999",
+    "reRentBudget5": "$4,000 to $4,999",
+    "reRentBudget6": "Above $5,000",
+    "rePropHouse": "House",
+    "rePropApt": "Apartment",
+    "rePropLand": "Land / lot",
+    "rePropCommercial": "Commercial",
+    "reTimeImmediate": "Immediate",
+    "reTime13": "1–3 months",
+    "reTime6": "3–6 months",
+    "insOptHealth": "Health",
+    "insOptAuto": "Auto",
+    "insOptLife": "Life",
+    "insOptHome": "Home / property",
+    "age18_30": "18–30",
+    "age31_45": "31–45",
+    "age46_60": "46–60",
+    "age60p": "60+",
+    "healthInsured": "Insured",
+    "healthUninsured": "Uninsured / unsure",
+    "healthMedicare": "Medicare / Medicaid",
+    "apptAsap": "As soon as possible",
+    "apptWeeks": "Within a few weeks",
+    "apptPlanning": "Planning ahead"
+  }
+}

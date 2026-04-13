@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useAppLocale as useLocale } from '@/lib/dictionary-react';
 
 export default function InviteClient() {
   const params = useSearchParams();

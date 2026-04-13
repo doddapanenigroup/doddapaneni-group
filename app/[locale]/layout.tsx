@@ -1,6 +1,6 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
-import type { AbstractIntlMessages } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import CorporateHubShell from '@/components/corporate/CorporateHubShell';
 import { routing } from '@/i18n/routing';
@@ -21,7 +21,7 @@ export async function generateMetadata({
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const t = createTranslator(getDictionary(locale), 'Metadata');
   const title = t('title');
   const description = t('description');
 
@@ -60,9 +60,8 @@ export default async function LocaleLayout({
     notFound();
   }
   const locale = localeFromRouteParam(paramLocale);
-  setRequestLocale(locale);
 
-  const initialMessages = getMessagesForLocale(locale) as AbstractIntlMessages;
+  const initialMessages = getMessagesForLocale(locale) as Record<string, unknown>;
 
   return (
     <CorporateHubShell

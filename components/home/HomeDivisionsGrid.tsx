@@ -1,10 +1,10 @@
 'use client';
 
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import { ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import type { HomeDivision } from '@/lib/business-divisions-home';
 
 type Props = { divisions: HomeDivision[] };

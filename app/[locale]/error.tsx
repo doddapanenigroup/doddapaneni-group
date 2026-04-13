@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 

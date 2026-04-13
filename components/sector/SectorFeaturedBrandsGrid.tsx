@@ -1,6 +1,7 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import { getFeaturedBrandsForSector } from '@/lib/sector-featured-companies';
 
 type Props = {
@@ -8,16 +9,26 @@ type Props = {
   sectorSlug: string;
   /** When true, use compact top border (e.g. under hero on full hub pages). */
   bordered?: boolean;
+  /** When set, overrides the default “Our products in this sector” heading. */
+  headingOverride?: string;
+  /** When set, overrides the default lead under the heading. */
+  leadOverride?: string;
 };
 
-export default async function SectorFeaturedBrandsGrid({ locale, sectorSlug, bordered }: Props) {
+export default async function SectorFeaturedBrandsGrid({
+  locale,
+  sectorSlug,
+  bordered,
+  headingOverride,
+  leadOverride,
+}: Props) {
   const featuredBrands = getFeaturedBrandsForSector(sectorSlug);
   if (featuredBrands.length === 0) {
     return null;
   }
 
-  const tHome = await getTranslations({ locale, namespace: 'Home' });
-  const tSectorBrands = await getTranslations({ locale, namespace: 'SectorLanding' });
+  const tHome = createTranslator(getDictionary(locale), 'Home');
+  const tSectorBrands = createTranslator(getDictionary(locale), 'SectorLanding');
 
   return (
     <section
@@ -29,10 +40,10 @@ export default async function SectorFeaturedBrandsGrid({ locale, sectorSlug, bor
           id="sector-featured-brands-heading"
           className="mb-2 text-center font-serif text-2xl font-bold text-slate-900 sm:text-left sm:text-3xl"
         >
-          {tSectorBrands('featuredProductsHeading')}
+          {headingOverride ?? tSectorBrands('featuredProductsHeading')}
         </h2>
         <p className="mb-8 text-center text-sm text-slate-600 sm:text-left sm:text-base">
-          {tSectorBrands('featuredProductsLead')}
+          {leadOverride ?? tSectorBrands('featuredProductsLead')}
         </p>
 
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">

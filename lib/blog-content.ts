@@ -1,11 +1,10 @@
 /**
- * Raw blog content by locale and slug. Used to avoid passing HTML through next-intl
- * formatter (which treats <p> etc. as rich text placeholders).
+ * Raw blog content by locale and slug (static JSON under `/content/translations`).
  */
-import en from '@/messages/en.json';
-import te from '@/messages/te.json';
-import hi from '@/messages/hi.json';
-import es from '@/messages/es.json';
+import en from '@/content/translations/en.json';
+import te from '@/content/translations/te.json';
+import hi from '@/content/translations/hi.json';
+import es from '@/content/translations/es.json';
 
 type Messages = {
   Blog?: { posts?: Record<string, { content?: string }> };

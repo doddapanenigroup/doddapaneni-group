@@ -1,5 +1,6 @@
+import { createTranslator } from '@/lib/translation-format';
+import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
@@ -16,7 +17,7 @@ export async function generateMetadata({
     notFound();
   }
   const locale = paramLocale;
-  const t = await getTranslations({ locale, namespace: 'Disclaimer' });
+  const t = createTranslator(getDictionary(locale), 'Disclaimer');
   const title = t('metaTitle');
   const description = t('metaDescription');
   const ogTitle = t('metaOgTitle');

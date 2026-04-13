@@ -1,10 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Link } from '@/i18n/routing';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/dictionary-react';
 import { mediaUrl } from '@/lib/media';
 import type { HomeDivision } from '@/lib/business-divisions-home';
 

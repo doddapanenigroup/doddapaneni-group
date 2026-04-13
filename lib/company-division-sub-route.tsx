@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
-import CompanyDivisionSubPageContent from '@/components/divisions/CompanyDivisionSubPageContent';
+import DivisionSubpageFallback from '@/components/divisions/DivisionSubpageFallback';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { divisionContentPageKey, type DivisionSubpage } from '@/lib/company-division-subpages';
@@ -34,7 +34,7 @@ export function divisionSubPage(sub: DivisionSubpage) {
     const pageKey = divisionContentPageKey(slug, sub);
     return (
       <ContentPageBoundary pageKey={pageKey} locale={locale}>
-        <CompanyDivisionSubPageContent
+        <DivisionSubpageFallback
           sectorSlug={slug}
           subpage={sub}
           sectorName={sector.name}
