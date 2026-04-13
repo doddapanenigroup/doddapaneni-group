@@ -5,14 +5,16 @@ import { Inter, Merriweather } from 'next/font/google';
  * @see https://nextjs.org/docs/app/building-your-application/optimizing/fonts
  */
 
-/** Primary UI — Latin + extended Latin (e.g. `es`) via a single next/font pipeline. */
+/**
+ * Primary UI — variable Inter = one woff2 instead of multiple static weights (smaller total transfer,
+ * fewer render-blocking requests vs loading 400/500/600/700 separately).
+ */
 export const inter = Inter({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
   preload: true,
   variable: '--font-inter',
   adjustFontFallback: true,
-  weight: ['400', '500', '600', '700'],
 });
 
 /**

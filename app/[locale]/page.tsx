@@ -5,6 +5,7 @@ import HomepageOrganizationJsonLd from '@/components/seo/HomepageOrganizationJso
 import { getBusinessDivisionsForHome } from '@/lib/business-divisions-home';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
 import HomePage from '@/components/home/HomePage';
+import { findPublishedPageContent } from '@/lib/public-page-content';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { getCachedLayoutPageSeo } from '@/lib/cached-layout-seo';
@@ -54,12 +55,15 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  const divisions = await getBusinessDivisionsForHome(locale);
+  const [divisions, cms] = await Promise.all([
+    getBusinessDivisionsForHome(locale),
+    findPublishedPageContent('home', locale),
+  ]);
 
   return (
     <>
       <HomepageOrganizationJsonLd locale={locale} />
-      <ContentPageBoundary pageKey="home" locale={locale}>
+      <ContentPageBoundary pageKey="home" locale={locale} cms={cms}>
         <HomePage divisions={divisions} />
       </ContentPageBoundary>
     </>

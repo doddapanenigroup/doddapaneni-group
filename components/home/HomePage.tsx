@@ -5,10 +5,10 @@ import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from '@/lib/dictionary-react';
-import { mediaUrl } from '@/lib/media';
 import type { HomeDivision } from '@/lib/business-divisions-home';
 
-const BANNER_IMAGE = mediaUrl('image.webp');
+/** Static `public/` path: avoids `/api/media` hop so the image optimizer reads from disk in one step. */
+const BANNER_IMAGE = '/image.webp';
 
 const HomeDivisionsGrid = dynamic(() => import('./HomeDivisionsGrid'), {
   loading: () => (
@@ -52,8 +52,8 @@ export default function HomePage({ divisions }: Props) {
             src={BANNER_IMAGE}
             alt={t('heroImageAlt')}
             fill
-            sizes="(max-width: 1920px) 100vw, 1920px"
-            quality={72}
+            sizes="100vw"
+            quality={68}
             className="object-cover opacity-45"
             priority
             fetchPriority="high"
@@ -61,7 +61,7 @@ export default function HomePage({ divisions }: Props) {
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/95 to-blue-950/90" />
           <div
             className="absolute inset-0 opacity-[0.07]"
-            style={{ backgroundImage: `url(${mediaUrl('grid.svg')})` }}
+            style={{ backgroundImage: 'url(/grid.svg)' }}
           />
           <div className="absolute -right-24 top-1/4 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl" />
           <div className="absolute -left-32 bottom-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />

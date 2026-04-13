@@ -1,14 +1,18 @@
 import type { ReactNode } from 'react';
 import { findPublishedPageContent } from '@/lib/public-page-content';
 
+export type PublishedPageSnapshot = Awaited<ReturnType<typeof findPublishedPageContent>>;
+
 type Props = {
   pageKey: string;
   locale: string;
   children: ReactNode;
+  /** When provided (including `null`), skips a duplicate CMS lookup — use after parallel fetch on hot paths. */
+  cms?: PublishedPageSnapshot;
 };
 
-export default async function ContentPageBoundary({ pageKey, locale, children }: Props) {
-  const content = await findPublishedPageContent(pageKey, locale);
+export default async function ContentPageBoundary({ pageKey, locale, children, cms }: Props) {
+  const content = cms !== undefined ? cms : await findPublishedPageContent(pageKey, locale);
   if (content && (content.title || content.body)) {
     return (
       <div className="min-h-screen bg-slate-50">

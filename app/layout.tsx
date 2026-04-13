@@ -51,6 +51,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13';
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
+      <head>
+        <link
+          rel="preload"
+          href="/image.webp"
+          as="image"
+          type="image/webp"
+          fetchPriority="high"
+        />
+      </head>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
         <GoogleAnalytics measurementId={gaId} />
         {children}
