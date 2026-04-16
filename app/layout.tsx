@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     site: '@DoddapanenGroup',
   },
   verification: {
-    google: 'hz1gnEwKPg6vepXcHuuze94PQ1z2V22paJkCNYdy3xY',
+    google: "hz1gnEwKPg6vepXcHuuze94PQ1z2V22paJkCNYdy3xY",
   },
 };
 
