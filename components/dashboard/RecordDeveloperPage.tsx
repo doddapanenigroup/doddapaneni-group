@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { isDeveloper } from '@/lib/role-utils';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export default function RecordDeveloperPage({ locale }: { locale: string }) {
   const { data: session, status } = useSession();
@@ -16,7 +17,7 @@ export default function RecordDeveloperPage({ locale }: { locale: string }) {
     fetch('/api/developer-activity', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: `/${locale}/dashboard/developer` }),
+      body: JSON.stringify({ path: publicPathForLocale(locale, '/dashboard/developer') }),
     }).catch(() => {});
   }, [locale, session?.user?.role, status]);
 

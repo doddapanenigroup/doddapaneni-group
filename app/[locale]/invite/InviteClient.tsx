@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppLocale as useLocale } from '@/lib/dictionary-react';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export default function InviteClient() {
   const params = useSearchParams();
@@ -42,7 +43,7 @@ export default function InviteClient() {
       });
       const data = (await r.json().catch(() => ({}))) as { message?: string };
       if (!r.ok) throw new Error(data.message || 'Invite failed');
-      router.replace(`/${locale}/login?invited=1`);
+      router.replace(`${publicPathForLocale(locale, '/login')}?invited=1`);
     } catch (e) {
       setMsg(e instanceof Error ? e.message : 'Invite failed');
     } finally {

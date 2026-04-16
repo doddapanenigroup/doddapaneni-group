@@ -6,6 +6,7 @@ import { isLoginEmailDeliveryConfigured, sendUserInviteEmail } from '@/lib/email
 import { generateInviteToken, hashInviteToken, inviteExpiresAt } from '@/lib/user-invite-token';
 import * as z from 'zod';
 import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 const bodySchema = z.object({
   email: z.string().email(),
   role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']),
@@ -92,8 +93,9 @@ export async function POST(request: Request) {
 
     const baseUrl =
       process.env.NEXTAUTH_URL?.trim() || process.env.AUTH_URL?.trim() || 'http://localhost:3000';
-    const inviteUrl = `${baseUrl}/${encodeURIComponent(locale)}/invite?email=${encodeURIComponent(
-      email
+    const invitePath = publicPathForLocale(locale, '/invite');
+    const inviteUrl = `${baseUrl.replace(/\/$/, '')}${invitePath}?email=${encodeURIComponent(
+      email,
     )}&token=${encodeURIComponent(token)}`;
 
     const roleLabel = ROLE_LABEL[invite.role] ?? String(invite.role);

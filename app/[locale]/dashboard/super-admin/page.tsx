@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { canAccessSuperAdminDashboard } from '@/lib/dashboard-access';
@@ -16,7 +17,7 @@ export default async function SuperAdminDashboardPage({ params }: Props) {
     !session?.user ||
     !canAccessSuperAdminDashboard(session.user.role as Role | null | undefined)
   ) {
-    redirect(`/${locale}/dashboard`);
+    redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
   await connectDb();

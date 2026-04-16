@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';
 import { canAccessMarketerDashboard } from '@/lib/dashboard-access';
 
@@ -24,7 +25,7 @@ export default async function AnalyticsPage({ params }: Props) {
 
   const role = session?.user?.role;
   if (!session?.user || !canAccessMarketerDashboard(role as Role | null | undefined)) {
-    redirect(`/${locale}/dashboard`);
+    redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
   return <AnalyticsDashboard locale={locale} viewerRole={role as Role} />;

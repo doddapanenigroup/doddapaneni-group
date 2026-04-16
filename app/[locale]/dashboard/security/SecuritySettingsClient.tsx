@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowLeft, Shield, KeyRound } from 'lucide-react';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export default function SecuritySettingsClient({ locale }: { locale: string }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -11,7 +12,7 @@ export default function SecuritySettingsClient({ locale }: { locale: string }) {
   const [pwMsg, setPwMsg] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
 
-  const backHref = `/${locale}/dashboard`;
+  const backHref = publicPathForLocale(locale, '/dashboard');
 
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { AppLocale } from '@/i18n/locales';
+import { publicPathWithLocale } from '@/lib/public-path-with-locale';
 
 /** Static asset in `public/` — plain `img` avoids `/_next/image` so the browser can fetch LCP bytes immediately. */
 const BANNER_IMAGE = '/image.webp';
@@ -22,7 +23,7 @@ type Props = {
 
 /**
  * Server-rendered hero so LCP paints without waiting for the home client bundle.
- * Links use `next/link` with explicit `/${locale}/…` paths (same as localized `Link`).
+ * Links use `next/link` with locale-aware public paths (English has no `/en` prefix).
  */
 export default function HomeHero({ locale, copy }: Props) {
   const {
@@ -58,7 +59,7 @@ export default function HomeHero({ locale, copy }: Props) {
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="home-hero-enter max-w-4xl">
-          <h1 className="mb-4 font-sans text-4xl font-bold tracking-tight text-white sm:mb-5 sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-white sm:mb-5 sm:text-5xl md:text-6xl lg:text-7xl">
             {hubHeroTitle}
           </h1>
           <p className="mb-3 text-lg font-medium tracking-wide text-blue-200/95 sm:text-xl md:text-2xl">{hubHeroSubtitle}</p>
@@ -72,13 +73,13 @@ export default function HomeHero({ locale, copy }: Props) {
               <ArrowRight className="ml-2 h-4 w-4 shrink-0" aria-hidden />
             </a>
             <Link
-              href={`/${locale}/about`}
+              href={publicPathWithLocale(locale, 'about')}
               className="inline-flex items-center rounded-xl border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 sm:px-8 sm:text-base"
             >
               {learnAboutUs}
             </Link>
             <Link
-              href={`/${locale}/contact`}
+              href={publicPathWithLocale(locale, 'contact')}
               className="inline-flex items-center rounded-xl border border-white/20 px-5 py-3 text-sm font-semibold text-white/95 transition hover:border-white/40 sm:px-8 sm:text-base"
             >
               {getInTouch}

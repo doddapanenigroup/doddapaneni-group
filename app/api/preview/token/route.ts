@@ -4,6 +4,7 @@ import { connectDb, prisma } from "@/lib/db";
 import { createPreviewToken, PreviewTokenKind } from "@/lib/preview-token";
 import { hasMarketerAccess } from "@/lib/role-utils";
 import { isFeatureEnabled } from "@/lib/features";
+import { publicPathForLocale } from "@/lib/public-path-with-locale";
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   return hasMarketerAccess(session?.user?.role as any);
@@ -77,7 +78,10 @@ export async function POST(request: Request) {
       });
 
       const origin = new URL(request.url).origin;
-      return NextResponse.json({ url: `${origin}/${locale}/preview/${token}`, token });
+      return NextResponse.json({
+        url: `${origin}${publicPathForLocale(locale, `/preview/${token}`)}`,
+        token,
+      });
     }
 
     // blog
@@ -102,7 +106,10 @@ export async function POST(request: Request) {
     // Locale-aware preview route uses current locale for rendering.
     // If caller didn't provide locale, default to 'en'.
     const previewLocale = locale ?? "en";
-    return NextResponse.json({ url: `${origin}/${previewLocale}/preview/${token}`, token });
+    return NextResponse.json({
+      url: `${origin}${publicPathForLocale(previewLocale, `/preview/${token}`)}`,
+      token,
+    });
   } catch (error) {
     console.error("preview token error:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });

@@ -1,5 +1,6 @@
 import { routing } from '@/i18n/routing';
 import type { AppLocale } from '@/i18n/locales';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 
 export type { AppLocale };
 
@@ -14,10 +15,15 @@ export function localeFromRouteParam(paramLocale: string): AppLocale {
   return routing.defaultLocale;
 }
 
-/** Resolve next-intl locale from the browser URL pathname (includes locale prefix when present). */
+/** Locales that appear as the first URL segment (excludes prefixless default `en`). */
+const PREFIX_LOCALES_IN_URL: Set<string> = new Set(
+  routing.locales.filter((l) => l !== DEFAULT_LOCALE),
+);
+
+/** Resolve locale from the browser URL: `/te/…` → `te`; unprefixed paths → default (English). */
 export function resolveAppLocaleFromPathname(pathname: string): AppLocale {
   const seg = pathname.split('/').filter(Boolean)[0];
-  if (seg && routing.locales.includes(seg as AppLocale)) {
+  if (seg && PREFIX_LOCALES_IN_URL.has(seg)) {
     return seg as AppLocale;
   }
   return routing.defaultLocale;
@@ -31,7 +37,8 @@ export function stripLocalePrefixFromPathname(fullPathname: string): string {
   const normalized = fullPathname.startsWith('/') ? fullPathname : `/${fullPathname}`;
   const segments = normalized.split('/').filter(Boolean);
   if (segments.length === 0) return '/';
-  if (routing.locales.includes(segments[0] as AppLocale)) {
+  const head = segments[0];
+  if (head === DEFAULT_LOCALE || (head && PREFIX_LOCALES_IN_URL.has(head))) {
     const rest = segments.slice(1);
     return rest.length ? `/${rest.join('/')}` : '/';
   }

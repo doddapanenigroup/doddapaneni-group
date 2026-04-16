@@ -27,6 +27,8 @@ import { getDashboardTitle } from '@/lib/dashboard-title';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
+import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
+import { getSiteOrigin } from '@/lib/site-origin';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -506,7 +508,7 @@ export default function MarketerDashboard({
   locale: string;
   viewerRole: Role;
 }) {
-  const base = `/${locale}`;
+  const base = publicPathForLocale(locale, '/');
   const { data: sessionData } = useSession();
   const { pushSaveLayer } = useDashboardShortcuts();
   const authorLabel = sessionData?.user?.email ?? sessionData?.user?.name ?? '—';
@@ -1222,7 +1224,7 @@ export default function MarketerDashboard({
             <span className="font-medium text-slate-800 dark:text-slate-100">View site</span>
           </Link>
           <Link
-            href={`${base}/contact`}
+            href={publicPathWithLocale(locale, 'contact')}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
@@ -1231,7 +1233,7 @@ export default function MarketerDashboard({
             <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
           </Link>
           <Link
-            href={`${base}/dashboard/analytics`}
+            href={publicPathForLocale(locale, '/dashboard/analytics')}
             className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-violet-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-violet-500/40"
           >
             <BarChart3 size={22} className="shrink-0 text-violet-600 dark:text-violet-400" />
@@ -1402,7 +1404,10 @@ export default function MarketerDashboard({
               <GoogleSnippetPreview
                 title={pageForm.metaTitle || pageForm.title}
                 description={pageForm.metaDescription}
-                url={pageForm.canonicalUrl || `https://doddapanenigroup.net/${locale}/${selectedPageSlug || ''}`}
+                url={
+                  pageForm.canonicalUrl ||
+                  `${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, selectedPageSlug || '')}`
+                }
                 ogImage={pageForm.ogImage}
               />
               <FeatureGate feature="seoScore">
@@ -1649,7 +1654,7 @@ export default function MarketerDashboard({
               <GoogleSnippetPreview
                 title={blogForm.metaTitle || blogForm.title}
                 description={blogForm.metaDescription}
-                url={`https://doddapanenigroup.net/${locale === 'en' ? '' : `${locale}/`}news/${blogForm.slug || 'sample-post'}`}
+                url={`${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
                 ogImage={blogForm.ogImage || blogForm.featuredImage}
               />
               <FeatureGate feature="seoScore">

@@ -1,12 +1,19 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 
 /** Path from site root, always starting with `/` (e.g. `/`, `/about`, `/software-it-ai/services`). */
 export type SitemapPathname = string;
 
 export function pathWithLocale(locale: string, pathname: string): string {
-  const p = pathname === '/' ? '' : pathname;
-  return p === '' ? `/${locale}` : `/${locale}${pathname}`;
+  const fixed = fixPathname(pathname);
+  if (fixed === '/') {
+    return locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
+  }
+  if (locale === DEFAULT_LOCALE) {
+    return fixed;
+  }
+  return `/${locale}${fixed}`;
 }
 
 function fixPathname(pathname: string): SitemapPathname {

@@ -14,6 +14,7 @@ import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import DashboardPageHeader from './DashboardPageHeader';
 import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type UserRow = {
   id: string;
@@ -77,15 +78,24 @@ export default function AdminDashboard({
               <UserCog size={18} />
               Manage employees
             </button>
-            <Link href={`/${locale}/dashboard/employees`} className={dashboardHeaderActionSecondary}>
+            <Link
+              href={publicPathForLocale(locale, '/dashboard/employees')}
+              className={dashboardHeaderActionSecondary}
+            >
               <UserCircle size={18} />
               Employees
             </Link>
-            <Link href={`/${locale}/dashboard/marketer`} className={dashboardHeaderActionSecondary}>
+            <Link
+              href={publicPathForLocale(locale, '/dashboard/marketer')}
+              className={dashboardHeaderActionSecondary}
+            >
               <Pencil size={18} />
               Blogs &amp; SEO
             </Link>
-            <Link href={`/${locale}/dashboard/analytics`} className={dashboardHeaderActionSecondary}>
+            <Link
+              href={publicPathForLocale(locale, '/dashboard/analytics')}
+              className={dashboardHeaderActionSecondary}
+            >
               <BarChart3 size={18} />
               Analytics
             </Link>

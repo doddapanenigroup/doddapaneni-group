@@ -12,6 +12,7 @@ import type {
 } from '@/lib/prisma-generated';
 import { getRoleOrder } from '@/lib/constants';
 import EmployeesPageView from '../../../../components/dashboard/EmployeesPageView';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type EmployeeSession = {
   logId: string;
@@ -39,7 +40,7 @@ export default async function EmployeesPage({ params }: Props) {
 
   const role = session?.user?.role;
   if (!session?.user || !canAccessEmployeesDashboard(role as Role | null | undefined)) {
-    redirect(`/${locale}/dashboard`);
+    redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
   const employeeRoles: Role[] =
@@ -126,8 +127,9 @@ export default async function EmployeesPage({ params }: Props) {
         (a.name || a.email).localeCompare(b.name || b.email)
     );
 
-  const dashboardHref =
-    isSuperAdmin(role as any) ? `/${locale}/dashboard/super-admin` : `/${locale}/dashboard/admin`;
+  const dashboardHref = isSuperAdmin(role as any)
+    ? publicPathForLocale(locale, '/dashboard/super-admin')
+    : publicPathForLocale(locale, '/dashboard/admin');
 
   return (
     <EmployeesPageView

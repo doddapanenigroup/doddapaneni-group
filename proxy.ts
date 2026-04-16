@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { routing } from '@/i18n/routing';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 
-const LOCALE_SET = new Set<string>(routing.locales);
+/** Locales that appear in the visible URL (`en` is prefixless). */
+const PREFIX_LOCALE_SET: Set<string> = new Set(
+  routing.locales.filter((l) => l !== DEFAULT_LOCALE),
+);
 
 /** Match `next.config.ts`: bfcache-friendly document policy; edge still skips caching HTML. */
 const DOCUMENT_CACHE_CONTROL = 'private, max-age=0, must-revalidate';
@@ -13,39 +17,49 @@ function applyDocumentCacheHeaders(res: NextResponse) {
 }
 
 /**
- * Locale guard: every public page lives under `/{en|te|hi|es}/…`.
- * `/` redirects to `/en` (default). Paths missing a locale prefix get `/en` prepended.
- *
- * Next.js 16+ `proxy` convention (formerly `middleware`). Response headers only — safe for RSC.
+ * Locale routing: English URLs have no `/en` prefix (`/`, `/about`, `/login`, …).
+ * Telugu, Hindi, Spanish use `/te`, `/hi`, `/es` prefixes.
+ * Unprefixed paths rewrite internally to `/{DEFAULT_LOCALE}/…` for `app/[locale]/…`.
+ * Legacy `/en/…` redirects to the same path without `/en` (308).
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const segments = pathname.split('/').filter(Boolean);
   const first = segments[0];
 
+  if (first === DEFAULT_LOCALE) {
+    const rest = segments.slice(1);
+    const targetPath = rest.length ? `/${rest.join('/')}` : '/';
+    const url = request.nextUrl.clone();
+    url.pathname = targetPath;
+    const res = NextResponse.redirect(url, 308);
+    applyDocumentCacheHeaders(res);
+    return res;
+  }
+
   if (pathname === '/') {
     const url = request.nextUrl.clone();
-    url.pathname = `/${routing.defaultLocale}`;
-    const res = NextResponse.redirect(url);
+    url.pathname = `/${DEFAULT_LOCALE}`;
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', '/');
+    const res = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
     applyDocumentCacheHeaders(res);
     return res;
   }
 
-  if (first && !LOCALE_SET.has(first)) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${routing.defaultLocale}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
-    const res = NextResponse.redirect(url);
+  if (first && PREFIX_LOCALE_SET.has(first)) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', pathname);
+    const res = NextResponse.next({ request: { headers: requestHeaders } });
     applyDocumentCacheHeaders(res);
     return res;
   }
 
+  const url = request.nextUrl.clone();
+  url.pathname = `/${DEFAULT_LOCALE}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-pathname', pathname);
-  const res = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const res = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   applyDocumentCacheHeaders(res);
   return res;
 }

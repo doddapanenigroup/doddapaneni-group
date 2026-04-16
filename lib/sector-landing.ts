@@ -13,6 +13,8 @@ import {
 } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
+import { isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { DIVISION_SERVICES_KEYWORDS_BLOG_KEYS } from '@/lib/division-services-meta-keywords';
 
 export { publicPathWithLocale };
 
@@ -181,6 +183,16 @@ export async function sectorLandingMetadata(
   };
 }
 
+function keywordsForDivisionServicesPage(locale: string, sectorSlug: string): string[] | undefined {
+  if (!isCompanyDivisionSlug(sectorSlug)) return undefined;
+  const i18nKey = DIVISION_SERVICES_KEYWORDS_BLOG_KEYS[sectorSlug];
+  const blog = getDictionary(locale).Blog as Record<string, unknown>;
+  const raw = blog[i18nKey];
+  if (typeof raw !== 'string' || !raw.trim()) return undefined;
+  const list = raw.split(',').map((k) => k.trim()).filter(Boolean);
+  return list.length > 0 ? list : undefined;
+}
+
 function buildDivisionSubpageDescription(
   row: SectorLandingRow,
   subLabel: string,
@@ -218,10 +230,13 @@ export async function sectorSubpageMetadata(
   const pathnameForHreflang = `/${row.slug}/${sub}`;
   const title = `${subLabel} | ${formatDivisionNameForSeo(row.name)} ${servicesWord} | ${SITE_NAME}`;
   const description = buildDivisionSubpageDescription(row, subLabel, servicesWord);
+  const keywords =
+    sub === 'services' ? keywordsForDivisionServicesPage(locale, sectorSlug) : undefined;
 
   return {
     title,
     description,
+    ...(keywords?.length ? { keywords } : {}),
     robots: { index: true, follow: true },
     alternates: {
       canonical,

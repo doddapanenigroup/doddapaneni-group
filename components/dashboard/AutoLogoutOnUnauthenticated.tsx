@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 /**
  * Auto-redirect dashboards when the user session becomes unauthenticated
@@ -18,7 +19,7 @@ export default function AutoLogoutOnUnauthenticated({ locale }: { locale: string
     // Best-effort clear cookies/token state.
     signOut({ redirect: false }).catch(() => {});
 
-    const to = locale ? `/${locale}/login` : '/login';
+    const to = locale ? publicPathForLocale(locale, '/login') : '/login';
     router.replace(to);
   }, [status, locale, router]);
 

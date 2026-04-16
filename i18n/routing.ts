@@ -1,7 +1,7 @@
 import { APP_LOCALES, DEFAULT_LOCALE } from './locales';
 
 /**
- * Path-based locales for SEO (`/en/...`, `/te/...`, …). English always uses the `/en/` prefix.
+ * Path-based locales: English has no URL prefix (`/about`); others use `/te`, `/hi`, `/es`.
  */
 export const routing = {
   locales: [...APP_LOCALES],

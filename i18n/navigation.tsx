@@ -6,15 +6,15 @@ import { forwardRef } from 'react';
 import type { AppLocale } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { stripLocalePrefixFromPathname } from '@/lib/locale-from-path';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 function withLocalePrefix(locale: string, href: string): string {
-  if (!href) return `/${locale}`;
+  if (!href) return publicPathForLocale(locale, '/');
   if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('tel:')) {
     return href;
   }
   const path = href.startsWith('/') ? href : `/${href}`;
-  if (path === '/') return `/${locale}`;
-  return `/${locale}${path}`;
+  return publicPathForLocale(locale, path);
 }
 
 type LinkProps = Omit<React.ComponentProps<typeof NextLink>, 'href'> & {

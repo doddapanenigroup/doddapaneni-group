@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';
 import { canAccessMarketerDashboard } from '@/lib/dashboard-access';
 import MarketerDashboard from '@/components/dashboard/MarketerDashboard';
@@ -13,14 +14,14 @@ export default async function MarketerDashboardPage({ params }: Props) {
 
   const role = session?.user?.role;
   if (!session?.user || !canAccessMarketerDashboard(role as Role | null | undefined)) {
-    redirect(`/${locale}/dashboard`);
+    redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
   // Overlay module permission: if both pages+blogs are denied, block the dashboard.
   const canPages = await isModuleAllowedForRole(role as any, 'pages');
   const canBlogs = await isModuleAllowedForRole(role as any, 'blogs');
   if (!canPages && !canBlogs) {
-    redirect(`/${locale}/dashboard`);
+    redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
   return <MarketerDashboard locale={locale} viewerRole={role as Role} />;

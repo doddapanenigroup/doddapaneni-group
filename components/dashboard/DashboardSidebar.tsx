@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Shield, Users, Code2, Megaphone } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type DashboardMenuItem = {
   href: string;
@@ -16,25 +17,25 @@ type DashboardMenuItem = {
 function dashboardItems(locale: string): DashboardMenuItem[] {
   return [
     {
-      href: `/${locale}/dashboard/super-admin`,
+      href: publicPathForLocale(locale, '/dashboard/super-admin'),
       label: getDashboardTitle('SUPER_ADMIN'),
       icon: Shield,
       roles: ['SUPER_ADMIN'],
     },
     {
-      href: `/${locale}/dashboard/admin`,
+      href: publicPathForLocale(locale, '/dashboard/admin'),
       label: getDashboardTitle('ADMIN'),
       icon: Users,
       roles: ['SUPER_ADMIN'],
     },
     {
-      href: `/${locale}/dashboard/developer`,
+      href: publicPathForLocale(locale, '/dashboard/developer'),
       label: getDashboardTitle('DEVELOPER'),
       icon: Code2,
       roles: ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER'],
     },
     {
-      href: `/${locale}/dashboard/marketer`,
+      href: publicPathForLocale(locale, '/dashboard/marketer'),
       label: getDashboardTitle('DIGITAL_MARKETER'),
       icon: Megaphone,
       roles: ['SUPER_ADMIN', 'ADMIN', 'DIGITAL_MARKETER'],
@@ -81,7 +82,7 @@ export default function DashboardSidebar({
             );
           })}
           <Link
-            href={`/${locale}/dashboard`}
+            href={publicPathForLocale(locale, '/dashboard')}
             className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <LayoutDashboard size={16} className="shrink-0 opacity-80" />

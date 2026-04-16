@@ -17,6 +17,7 @@ import DeveloperTimelinePanel from './DeveloperTimelinePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
+import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 
 type SitePage = {
   href: string;
@@ -37,13 +38,13 @@ export default function DeveloperDashboard({
   const [translateLoading, setTranslateLoading] = useState(false);
   const [translateResult, setTranslateResult] = useState<{ results: { locale: string; translated: number; skipped: number }[] } | null>(null);
   const [translateError, setTranslateError] = useState<string | null>(null);
-  const base = `/${locale}`;
+  const home = publicPathForLocale(locale, '/');
   const staticPages: SitePage[] = [
-    { href: `${base}`, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
-    { href: `${base}/about`, label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
-    { href: `${base}/contact`, label: 'Contact', pageKey: 'contact', editFile: 'app/[locale]/contact/page.tsx', icon: <Mail size={20} /> },
-    { href: `${base}/news`, label: 'News — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
-    { href: base, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
+    { href: home, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
+    { href: publicPathWithLocale(locale, 'about'), label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
+    { href: publicPathWithLocale(locale, 'contact'), label: 'Contact', pageKey: 'contact', editFile: 'app/[locale]/contact/page.tsx', icon: <Mail size={20} /> },
+    { href: publicPathWithLocale(locale, 'news'), label: 'News — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
+    { href: home, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
   const sitePages = staticPages;
 

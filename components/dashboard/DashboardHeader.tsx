@@ -8,6 +8,7 @@ import { getDashboardTitle, getRoleLabel } from '@/lib/dashboard-title';
 import DashboardNotificationsMenu from '@/components/dashboard/DashboardNotificationsMenu';
 import DashboardThemeToggle from '@/components/dashboard/DashboardThemeToggle';
 import GlobalSearchPalette from '@/components/dashboard/GlobalSearchPalette';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 const iconActionClass =
   'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
@@ -55,14 +56,19 @@ export default function DashboardHeader({
           <DashboardNotificationsMenu locale={locale} role={user.role} />
 
           <Link
-            href={`/${locale}/dashboard/security`}
+            href={publicPathForLocale(locale, '/dashboard/security')}
             className={iconActionClass}
             title="Password & security"
             aria-label="Password and security"
           >
             <Shield size={18} className="opacity-85" />
           </Link>
-          <Link href={`/${locale}`} className={iconActionClass} title="Public site" aria-label="Public site">
+          <Link
+            href={publicPathForLocale(locale, '/')}
+            className={iconActionClass}
+            title="Public site"
+            aria-label="Public site"
+          >
             <LayoutDashboard size={18} className="opacity-85" />
           </Link>
           <button
@@ -73,7 +79,7 @@ export default function DashboardHeader({
               } catch {
                 // ignore
               }
-              signOut({ callbackUrl: `/${locale}/login` });
+              signOut({ callbackUrl: publicPathForLocale(locale, '/login') });
             }}
             className={iconActionClass}
             title="Sign out"

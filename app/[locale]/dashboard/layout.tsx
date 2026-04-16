@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export default async function DashboardLayout({
   children,
@@ -14,7 +15,9 @@ export default async function DashboardLayout({
   const { locale } = await params;
 
   if (!session?.user) {
-    redirect(`/${locale}/login?callbackUrl=/${locale}/dashboard`);
+    const login = publicPathForLocale(locale, '/login');
+    const dash = publicPathForLocale(locale, '/dashboard');
+    redirect(`${login}?callbackUrl=${encodeURIComponent(dash)}`);
   }
 
   // Enforce admin "force logout" by comparing JWT issue time against DB revocation time.
@@ -29,7 +32,9 @@ export default async function DashboardLayout({
       typeof session.user.sessionIssuedAt === 'number' ? session.user.sessionIssuedAt * 1000 : null;
     const revokedAtMs = dbUser?.sessionRevokedAt ? dbUser.sessionRevokedAt.getTime() : null;
     if (issuedAtMs != null && revokedAtMs != null && revokedAtMs > issuedAtMs) {
-      redirect(`/${locale}/login?reason=revoked&callbackUrl=/${locale}/dashboard`);
+      const login = publicPathForLocale(locale, '/login');
+      const dash = publicPathForLocale(locale, '/dashboard');
+      redirect(`${login}?reason=revoked&callbackUrl=${encodeURIComponent(dash)}`);
     }
   } catch {
     // Best-effort: if DB is temporarily unavailable, do not block dashboard rendering here.

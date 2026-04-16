@@ -8,6 +8,7 @@ import {
   canAccessMarketerDashboard,
   canAccessSuperAdminDashboard,
 } from '@/lib/dashboard-access';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export type DashboardNavSearchHit = {
   id: string;
@@ -20,7 +21,7 @@ export type DashboardNavSearchHit = {
 
 function dash(locale: string, path: string) {
   const p = path.startsWith('/') ? path : `/${path}`;
-  return `/${locale}${p}`;
+  return publicPathForLocale(locale, p);
 }
 
 /** All dashboard routes the signed-in role may open — used for ⌘K search. */

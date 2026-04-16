@@ -14,6 +14,7 @@ import {
 import { DASHBOARD_CHART_HEIGHT } from '@/components/dashboard/SafeResponsiveChart';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export type AnalyticsPayload = {
   rangeDays: number;
@@ -122,7 +123,7 @@ export default function AnalyticsDashboard({
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Link
-            href={`/${locale}/dashboard`}
+            href={publicPathForLocale(locale, '/dashboard')}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 mb-2"
           >
             <ArrowLeft size={16} />

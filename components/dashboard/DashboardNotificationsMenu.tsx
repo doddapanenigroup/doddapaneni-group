@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Bell, Loader2 } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type NotificationRow = {
   id: string;
@@ -240,7 +241,7 @@ export default function DashboardNotificationsMenu({
 
           <div className="shrink-0 border-t border-slate-100 px-4 py-2 dark:border-slate-800">
             <Link
-              href={`/${locale}/dashboard`}
+              href={publicPathForLocale(locale, '/dashboard')}
               className="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               onClick={() => setOpen(false)}
             >

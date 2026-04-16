@@ -25,7 +25,7 @@ function legacyFaviconRedirects(): NonNullable<
 
 /**
  * Legacy URL prefixes from older builds (not in `routing.locales`).
- * Permanent redirects into the default locale prefix (`/en/…`).
+ * Permanent redirects: legacy locale segment removed (English is prefixless).
  */
 const REMOVED_LOCALE_PREFIXES = [
   'bn',
@@ -47,8 +47,8 @@ function removedLocaleRedirects(): NonNullable<
   Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
 > {
   return REMOVED_LOCALE_PREFIXES.flatMap((loc) => [
-    { source: `/${loc}`, destination: `/${DEFAULT_LOCALE}`, permanent: true as const },
-    { source: `/${loc}/:path*`, destination: `/${DEFAULT_LOCALE}/:path*`, permanent: true as const },
+    { source: `/${loc}`, destination: '/', permanent: true as const },
+    { source: `/${loc}/:path*`, destination: '/:path*', permanent: true as const },
   ]);
 }
 
@@ -131,23 +131,31 @@ const nextConfig: NextConfig = {
       ...legacyFaviconRedirects(),
       ...hostCanonicalRedirects(),
       ...removedLocaleRedirects(),
-      { source: '/blog', destination: `/${DEFAULT_LOCALE}/news`, permanent: true },
-      { source: '/blog/:slug', destination: `/${DEFAULT_LOCALE}/news/:slug`, permanent: true },
-      { source: '/terms-conditions', destination: `/${DEFAULT_LOCALE}/terms`, permanent: true },
-      { source: '/services', destination: `/${DEFAULT_LOCALE}`, permanent: true },
+      { source: '/blog', destination: '/news', permanent: true },
+      { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
+      { source: '/terms-conditions', destination: '/terms', permanent: true },
+      { source: '/services', destination: '/', permanent: true },
       ...LOCALES.flatMap((loc) => [
-        { source: `/${loc}/blog`, destination: `/${loc}/news`, permanent: true as const },
+        {
+          source: `/${loc}/blog`,
+          destination: loc === DEFAULT_LOCALE ? '/news' : `/${loc}/news`,
+          permanent: true as const,
+        },
         {
           source: `/${loc}/blog/:slug`,
-          destination: `/${loc}/news/:slug`,
+          destination: loc === DEFAULT_LOCALE ? '/news/:slug' : `/${loc}/news/:slug`,
           permanent: true as const,
         },
         {
           source: `/${loc}/terms-conditions`,
-          destination: `/${loc}/terms`,
+          destination: loc === DEFAULT_LOCALE ? '/terms' : `/${loc}/terms`,
           permanent: true as const,
         },
-        { source: `/${loc}/services`, destination: `/${loc}`, permanent: true as const },
+        {
+          source: `/${loc}/services`,
+          destination: loc === DEFAULT_LOCALE ? '/' : `/${loc}`,
+          permanent: true as const,
+        },
       ]),
     ];
   },

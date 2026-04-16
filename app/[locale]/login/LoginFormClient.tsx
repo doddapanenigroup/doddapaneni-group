@@ -9,6 +9,9 @@ import { signIn, useSession } from 'next-auth/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
+import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/locales';
+import { routing } from '@/i18n/routing';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 const AUTH_DEBUG =
   process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' || process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true';
@@ -19,11 +22,25 @@ function authDebug(...args: unknown[]) {
   console.debug('[auth-debug]', ...args);
 }
 
+const NON_DEFAULT_PREFIX_LOCALES = new Set(
+  routing.locales.filter((l) => l !== DEFAULT_LOCALE),
+);
+
 function safeCallbackUrl(locale: string, raw: string | undefined): string {
-  const fallback = `/${locale}/dashboard`;
+  const fallback = publicPathForLocale(locale, '/dashboard');
   if (!raw || typeof raw !== 'string') return fallback;
-  const t = raw.trim();
+  let t = raw.trim();
   if (!t.startsWith('/') || t.startsWith('//')) return fallback;
+
+  if (locale === DEFAULT_LOCALE) {
+    if (t === '/en' || t.startsWith('/en/')) {
+      t = t === '/en' ? '/' : t.slice(3) || '/';
+    }
+    const seg = t.split('/').filter(Boolean)[0];
+    if (seg && NON_DEFAULT_PREFIX_LOCALES.has(seg as AppLocale)) return fallback;
+    return t;
+  }
+
   if (t !== `/${locale}` && !t.startsWith(`/${locale}/`)) return fallback;
   return t;
 }
@@ -100,8 +117,8 @@ export default function LoginFormClient({
     if (!pathname?.endsWith('/login')) return;
     if (hasNavigatedRef.current) return;
     hasNavigatedRef.current = true;
-    authDebug('auto-redirect-authenticated', { to: `/${locale}/dashboard` });
-    router.replace(`/${locale}/dashboard`);
+    authDebug('auto-redirect-authenticated', { to: publicPathForLocale(locale, '/dashboard') });
+    router.replace(publicPathForLocale(locale, '/dashboard'));
   }, [status, locale, router, pathname, stayOnLogin]);
 
   const [step, setStep] = useState<Step>('credentials');
@@ -244,8 +261,8 @@ export default function LoginFormClient({
       authDebug('post-login session check', { ready });
 
       // Do not rely on `useSession` for redirect. Navigate explicitly after success.
-      authDebug('redirect-after-login', { to: `/${locale}/dashboard` });
-      window.location.href = `${window.location.origin}/${locale}/dashboard`;
+      authDebug('redirect-after-login', { to: publicPathForLocale(locale, '/dashboard') });
+      window.location.href = `${window.location.origin}${publicPathForLocale(locale, '/dashboard')}`;
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {

@@ -1,33 +1,28 @@
-import { Inter, Merriweather } from 'next/font/google';
+import { Open_Sans, Poppins } from 'next/font/google';
 
 /**
- * All UI fonts are self-hosted by Next.js (no runtime requests to fonts.googleapis.com).
+ * Self-hosted via Next.js (no runtime requests to fonts.googleapis.com in the browser).
+ * Heading: Poppins · Body: Open Sans (corporate / readable).
  * @see https://nextjs.org/docs/app/building-your-application/optimizing/fonts
  */
 
-/**
- * Primary UI — variable Inter = one woff2. `latin` only keeps the file smaller than `latin+latin-ext`
- * (helps GTmetrix “critical request chain” / font bytes). Indic copy uses system UI fonts via CSS fallbacks.
- * Re-add `latin-ext` if you need Polish/Czech/etc. in Latin script.
- */
-export const inter = Inter({
-  subsets: ['latin'],
+export const poppins = Poppins({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
-  preload: true,
-  variable: '--font-inter',
-  adjustFontFallback: true,
-});
-
-/**
- * Display / headings (`font-serif`). `preload: false` avoids competing with Inter on first paint.
- */
-export const merriweather = Merriweather({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  display: 'swap',
-  variable: '--font-merriweather',
+  variable: '--font-poppins',
   adjustFontFallback: true,
   preload: false,
 });
 
-export const fontBodyClassNames = `${inter.className} ${inter.variable} ${merriweather.variable}`;
+export const openSans = Open_Sans({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-open-sans',
+  adjustFontFallback: true,
+  preload: true,
+});
+
+/** Applied on `<html>` / `<body>`: body face + CSS variables for Tailwind `font-sans` / `font-serif`. */
+export const fontBodyClassNames = `${openSans.className} ${openSans.variable} ${poppins.variable}`;
