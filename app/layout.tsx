@@ -4,6 +4,7 @@ import './globals.css';
 import { fontBodyClassNames } from '@/app/fonts';
 import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
+import { GOOGLE_SITE_VERIFICATION } from '@/lib/google-site-verification';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 
 const siteOrigin = getSiteOrigin();
@@ -36,9 +37,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@DoddapanenGroup',
   },
-  verification: {
-    google: "hz1gnEwKPg6vepXcHuuze94PQ1z2V22paJkCNYdy3xY",
-  },
 };
 
 export const viewport: Viewport = {
@@ -55,6 +53,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     : (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || 'G-H4S3KYSL13');
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
+      <head>
+        <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+      </head>
       <body className={`${fontBodyClassNames} flex min-h-screen flex-col antialiased`}>
         {gaId ? <GoogleAnalytics measurementId={gaId} /> : null}
         {children}
