@@ -8,6 +8,7 @@
     "about": "మా గురించి",
     "services": "సేవలు",
     "blog": "వార్తలు",
+    "careers": "కెరీర్లు",
     "contact": "మమ్మల్ని సంప్రదించండి",
     "language": "భాష",
     "ourCompanies": "మా సేవలు",
@@ -256,7 +257,7 @@
     "headerSubtitle": "మీ వ్యాపారం వృద్ధి చెందడానికి మేము ఎలా సహాయపడగలమో చర్చించడానికి మా బృందంతో సంప్రదించండి.",
     "getInTouch": "సంప్రదించండి",
     "emailTitle": "ఇమెయిల్",
-    "emailAddress": "info@doddapanenigroup.net",
+    "emailAddress": "doddapanenigroup@yahoo.com",
     "emailResponse": "మేము 24 గంటల్లో స్పందిస్తాము.",
     "phoneTitle": "ఫోన్",
     "phoneAvailability": "సోమ-శుక్ర ఉదయం 9 నుండి సాయంత్రం 6 వరకు.",
@@ -536,6 +537,23 @@
     "realEstateTitle": "3. Real estate & construction information",
     "realEstateDesc": "Content related to real estate, construction, architecture, development, leasing, investment, or property markets is for general information only. It does not constitute an offer, solicitation, or commitment to sell, lease, or finance property where such would require registration, licensing, or disclosure under applicable law. Maps, imagery, availability, pricing, specifications, timelines, and forward-looking statements may be approximate, subject to change, and not binding until confirmed in a written agreement signed by authorised parties. You must independently verify zoning, title, permits, taxes, environmental conditions, and all material facts with qualified professionals (including legal counsel, surveyors, and regulatory authorities) before relying on any information or making decisions. Past performance or descriptions of projects are not a guarantee of future results."
   },
+  "CareersPage": {
+    "metaTitle": "కెరీర్లు | Doddapaneni Group",
+    "metaDescription": "Doddapaneni Groupలో చేరండి: టెక్నాలజీ, డిజైన్ మరియు వృద్ధిలో తెరిచి ఉన్న పాత్రలు. చిన్న బృందాలు, ఎక్కువ నమ్మకం, ఎంటర్‌ప్రైజ్-గ్రేడ్ డెలివరీ.",
+    "metaKeywords": "కెరీర్లు, ఉద్యోగాలు, నియామకం, Doddapaneni Group, డెవలపర్, డిజైనర్, మార్కెటింగ్",
+    "metaOgTitle": "కెరీర్లు | Doddapaneni Group",
+    "metaOgDescription": "మేము నాణ్యత, కమ్యూనికేషన్ మరియు ఫలితాల గురించి శ్రద్ధ వహించే వ్యక్తులను నియమిస్తాము. తెరిచి ఉన్న పాత్రలను చూడండి మరియు దరఖాస్తు చేయండి.",
+    "heroTitle": "కెరీర్లు",
+    "heroSubtitle": "మేము నాణ్యత, కమ్యూనికేషన్ మరియు ఫలితాల గురించి శ్రద్ధ వహించే వ్యక్తులను నియమిస్తాము. చిన్న బృందాలు, ఎక్కువ నమ్మకం, ఎంటర్‌ప్రైజ్-గ్రేడ్ డెలివరీ.",
+    "cultureTitle": "సంస్కృతి",
+    "cultureP1": "మేము స్పష్టత వైపు వాలుతాము: డాక్యుమెంట్ చేసిన నిర్ణయాలు, అంచనా వేసిన లయాలు మరియు లోతైన పనికి స్థలం. మీరు వ్యూహకర్తలు మరియు ఇంజనీర్లతో సహకరిస్తారు—వారు యాక్సెసిబిలిటీ, పనితీరు మరియు SEOని ఉత్పత్తి అవసరాలుగా చూస్తారు.",
+    "cultureP2": "మీరు ఇంటర్‌ఫేస్‌లు, ప్రచారాలు లేదా ప్లాట్‌ఫారమ్‌లను అందించినా, ట్రేడ్-ఆఫ్‌లను స్పష్టంగా తెలియజేయడం, నిర్ణయించినది డాక్యుమెంట్ చేయడం మరియు సిస్టమ్‌లను నిర్వహించడం సులభం చేయడం అంటే ఆశించబడుతుంది.",
+    "rolesTitle": "తెరిచి ఉన్న పాత్రలు",
+    "rolesEmpty": "ప్రస్తుతం ప్రచురించిన ఖాళీలు లేవు. త్వరలో మళ్లీ చూడండి—లేదా క్రింది లింక్ ద్వారా మీ పరిచయం పంపండి.",
+    "ctaTitle": "సరిపోయే పాత్ర కనిపించలేదా?",
+    "ctaBody": "మేము ఎప్పుడూ అసాధారణ నిర్మాతలు మరియు వ్యూహకర్తలపై ఆసక్తి కలిగి ఉంటాము. మీరు ఏమి అందించారు మరియు తర్వాత ఏమి కావాలో చిన్న గమనిక పంపండి.",
+    "ctaButton": "మీ పరిచయం తెలపండి"
+  },
   "FAQ": {
     "title": "తరచుగా అడిగే ప్రశ్నలు",
     "sectionHeading": "మేము తరచుగా అందుకునే ప్రశ్నలు",
@@ -554,7 +572,7 @@
       },
       "q3": {
         "question": "నేను Doddapaneni Group ను ఎలా సంప్రదించగలను?",
-        "answer": "మీరు info@doddapanenigroup.net వద్ద ఇమెయిల్ ద్వారా, +91 814 224 6666 (భారతదేశం) లేదా +1 (352)230-8586 (USA) వద్ద ఫోన్ ద్వారా, లేదా మా వెబ్‌సైట్‌లోని సంప్రదింపు ఫారమ్‌ను పూరించడం ద్వారా మాకు సంప్రదించవచ్చు."
+        "answer": "మీరు doddapanenigroup@yahoo.com వద్ద ఇమెయిల్ ద్వారా, +91 814 224 6666 (భారతదేశం) లేదా +1 (352)230-8586 (USA) వద్ద ఫోన్ ద్వారా, లేదా మా వెబ్‌సైట్‌లోని సంప్రదింపు ఫారమ్‌ను పూరించడం ద్వారా మాకు సంప్రదించవచ్చు."
       },
       "q4": {
         "question": "Doddapaneni Group అంతర్జాతీయంగా పనిచేస్తుందా?",

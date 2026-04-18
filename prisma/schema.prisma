@@ -227,6 +227,36 @@ model PageContent {
   @@unique([pageKey, locale])
 }
 
+/// Public careers listings (`/careers`). Managed from Developer / Admin / Marketer dashboards.
+model CareerJob {
+  id        String     @id @default(cuid())
+  slug      String     @unique
+  sortOrder Int        @default(0) @map("sort_order")
+  status    PageStatus @default(published)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  translations CareerJobTranslation[]
+
+  @@map("career_job")
+}
+
+model CareerJobTranslation {
+  id          String    @id @default(cuid())
+  jobId       String    @map("job_id")
+  job         CareerJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  locale      String
+  title       String
+  subtitle    String
+  description String    @db.Text
+  applyLabel  String    @default("Apply") @map("apply_label")
+  applyUrl    String    @map("apply_url")
+
+  @@unique([jobId, locale])
+  @@index([locale])
+  @@map("career_job_translation")
+}
+
 enum PageStatus {
   draft
   published

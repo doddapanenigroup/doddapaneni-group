@@ -27,6 +27,7 @@ import { getDashboardTitle } from '@/lib/dashboard-title';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
+import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
 
@@ -1233,6 +1234,15 @@ export default function MarketerDashboard({
             <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
           </Link>
           <Link
+            href={publicPathWithLocale(locale, 'careers')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+          >
+            <Target size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <span className="font-medium text-slate-800 dark:text-slate-100">Careers page</span>
+          </Link>
+          <Link
             href={publicPathForLocale(locale, '/dashboard/analytics')}
             className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-violet-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-violet-500/40"
           >
@@ -1243,6 +1253,8 @@ export default function MarketerDashboard({
       </section>
 
       <VisitStatsLazy />
+
+      {canPages ? <CareersJobsPanel locale={locale} /> : null}
 
       <section className="rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <div className="flex flex-wrap gap-1 sm:gap-1.5">

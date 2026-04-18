@@ -76,6 +76,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         await tx.roleModulePermission.deleteMany({});
         await tx.featureToggle.deleteMany({});
         await tx.news.deleteMany({});
+        await tx.careerJob.deleteMany({});
         await tx.pageContent.deleteMany({});
         // StoredImage: do not delete by default to avoid large binary loss; restore will upsert metadata.
       }
@@ -171,6 +172,57 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             ogImage: b.ogImage ?? null,
           },
         });
+      }
+
+      for (const j of (t.CareerJob ?? []) as any[]) {
+        if (!j?.slug) continue;
+        const translations = Array.isArray(j.translations) ? j.translations : [];
+        const slug = String(j.slug);
+        const sortOrder = Number(j.sortOrder) || 0;
+        const status = j.status === 'draft' ? 'draft' : 'published';
+        const existing = await tx.careerJob.findUnique({ where: { slug } });
+        if (existing) {
+          await tx.careerJob.update({
+            where: { id: existing.id },
+            data: { sortOrder, status },
+          });
+          await tx.careerJobTranslation.deleteMany({ where: { jobId: existing.id } });
+          if (translations.length) {
+            await tx.careerJobTranslation.createMany({
+              data: translations
+                .filter((tr: any) => tr?.locale && tr?.title && tr?.description && tr?.applyUrl)
+                .map((tr: any) => ({
+                  jobId: existing.id,
+                  locale: String(tr.locale),
+                  title: String(tr.title),
+                  subtitle: String(tr.subtitle ?? ''),
+                  description: String(tr.description ?? ''),
+                  applyLabel: String(tr.applyLabel ?? 'Apply'),
+                  applyUrl: String(tr.applyUrl ?? ''),
+                })),
+            });
+          }
+        } else {
+          await tx.careerJob.create({
+            data: {
+              slug,
+              sortOrder,
+              status,
+              translations: {
+                create: translations
+                  .filter((tr: any) => tr?.locale && tr?.title && tr?.description && tr?.applyUrl)
+                  .map((tr: any) => ({
+                    locale: String(tr.locale),
+                    title: String(tr.title),
+                    subtitle: String(tr.subtitle ?? ''),
+                    description: String(tr.description ?? ''),
+                    applyLabel: String(tr.applyLabel ?? 'Apply'),
+                    applyUrl: String(tr.applyUrl ?? ''),
+                  })),
+              },
+            },
+          });
+        }
       }
 
       // Media metadata/binary (optional)

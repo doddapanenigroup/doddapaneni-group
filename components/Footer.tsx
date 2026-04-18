@@ -26,7 +26,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const contact = {
-    email: 'info@doddapanenigroup.net',
+    email: 'doddapanenigroup@yahoo.com',
     locations: [
       {
         phone: '+91 814 224 6666',
@@ -70,6 +70,11 @@ export default function Footer() {
             <li>
               <Link href="/contact" className={legalLinkClass}>
                 {navT('contact')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/careers" className={legalLinkClass}>
+                {navT('careers')}
               </Link>
             </li>
             <li>
@@ -117,6 +122,11 @@ export default function Footer() {
               <li>
                 <Link href="/news" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
                   {navT('blog')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/careers" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
+                  {navT('careers')}
                 </Link>
               </li>
               <li>
@@ -235,6 +245,12 @@ export default function Footer() {
             <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-blue-300 sm:text-sm md:justify-end">
               <Link href="/about" className="hover:text-white transition-colors">
                 {navT('about')}
+              </Link>
+              <span className="text-blue-600" aria-hidden>
+                |
+              </span>
+              <Link href="/careers" className="hover:text-white transition-colors">
+                {navT('careers')}
               </Link>
               <span className="text-blue-600" aria-hidden>
                 |

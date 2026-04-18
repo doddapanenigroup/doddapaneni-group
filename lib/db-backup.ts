@@ -42,6 +42,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     loginEmailOtps,
     adminEmployeeCreateOtps,
     userInvites,
+    careerJobs,
   ] = await Promise.all([
     prisma.user.findMany(),
     prisma.pageContent.findMany(),
@@ -73,6 +74,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     prisma.loginEmailOtp.findMany(),
     prisma.adminEmployeeCreateOtp.findMany(),
     prisma.userInvite.findMany(),
+    prisma.careerJob.findMany({ include: { translations: true } }) as Promise<unknown[]>,
   ]);
 
   return {
@@ -99,6 +101,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
       LoginEmailOtp: loginEmailOtps,
       AdminEmployeeCreateOtp: adminEmployeeCreateOtps,
       UserInvite: userInvites,
+      CareerJob: careerJobs,
     },
   };
 }

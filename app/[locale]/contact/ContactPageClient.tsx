@@ -13,7 +13,7 @@ import * as z from 'zod';
 const PHONE_HREF = { india: 'tel:+918142246666', usa: 'tel:+13522308586' } as const;
 
 /** Canonical inbox; used if a locale leaves `ContactPage.emailAddress` empty */
-const CONTACT_EMAIL_FALLBACK = 'info@doddapanenigroup.net';
+const CONTACT_EMAIL_FALLBACK = 'doddapanenigroup@yahoo.com';
 
 export default function ContactPageClient() {
   const t = useTranslations('ContactPage');

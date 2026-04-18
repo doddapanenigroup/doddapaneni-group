@@ -11,6 +11,7 @@
     "sectorLiveLoading": "Loading sectors…",
     "comingSoonNav": "Coming soon",
     "blog": "News",
+    "careers": "Careers",
     "contact": "Contact Us",
     "language": "Language"
   },
@@ -261,7 +262,7 @@
     "headerSubtitle": "Partnerships, services, and general enquiries—our team will respond with clarity and care.",
     "getInTouch": "How to reach us",
     "emailTitle": "Email",
-    "emailAddress": "info@doddapanenigroup.net",
+    "emailAddress": "doddapanenigroup@yahoo.com",
     "emailResponse": "We aim to respond within one business day.",
     "phoneTitle": "Phone",
     "phoneIndia": "+91 814 224 6666",
@@ -438,7 +439,7 @@
     "dataProtection": "5. Security & retention",
     "dataProtectionDesc": "We implement appropriate technical and organisational measures designed to protect personal information. No method of transmission over the Internet is completely secure. We retain information only as long as necessary for the purposes above, unless a longer period is required by law or legitimate business needs (such as resolving disputes).",
     "yourRights": "6. Your rights & contact",
-    "yourRightsDesc": "Depending on your location, you may have rights to access, rectify, delete, restrict, or object to certain processing, or to data portability. You may also withdraw consent where processing is consent-based. To exercise rights or ask questions about this Policy, contact us via the details on our Contact page (for example info [at] doddapanenigroup.net). We may need to verify your identity before fulfilling certain requests.",
+    "yourRightsDesc": "Depending on your location, you may have rights to access, rectify, delete, restrict, or object to certain processing, or to data portability. You may also withdraw consent where processing is consent-based. To exercise rights or ask questions about this Policy, contact us via the details on our Contact page (for example doddapanenigroup [at] yahoo.com). We may need to verify your identity before fulfilling certain requests.",
     "childrenTitle": "Children",
     "childrenDesc": "Our website is not directed at children under 16 (or the age required in your jurisdiction). We do not knowingly collect personal information from children. If you believe we have collected such data, please contact us so we can delete it.",
     "internationalTitle": "International transfers",
@@ -536,6 +537,23 @@
     "jurisdiction": "8. Jurisdiction",
     "jurisdictionDesc": "This Disclaimer is governed by applicable laws. Nothing herein limits non-waivable consumer rights under the law of your place of residence. For questions, contact us via our Contact page."
   },
+  "CareersPage": {
+    "metaTitle": "Careers | Doddapaneni Group",
+    "metaDescription": "Join Doddapaneni Group: open roles across technology, design, and growth. Small teams, high trust, and enterprise-grade delivery.",
+    "metaKeywords": "careers, jobs, hiring, Doddapaneni Group, developer, designer, marketing",
+    "metaOgTitle": "Careers | Doddapaneni Group",
+    "metaOgDescription": "We hire people who care about quality, communication, and outcomes. See open roles and apply.",
+    "heroTitle": "Careers",
+    "heroSubtitle": "We hire people who care about quality, communication, and outcomes. Small teams, high trust, enterprise-grade delivery.",
+    "cultureTitle": "Culture",
+    "cultureP1": "We bias toward clarity: documented decisions, predictable cadences, and room for deep work. You will collaborate with strategists and engineers who treat accessibility, performance, and SEO as product requirements—not afterthoughts.",
+    "cultureP2": "Whether you ship interfaces, campaigns, or platforms, you will be expected to communicate trade-offs clearly, document what you decide, and leave systems easier to maintain than you found them.",
+    "rolesTitle": "Open roles",
+    "rolesEmpty": "There are no published openings right now. Please check back soon—or introduce yourself using the link below.",
+    "ctaTitle": "Don’t see a perfect fit?",
+    "ctaBody": "We are always interested in exceptional builders and strategists. Send a short note with what you have shipped and what you want next.",
+    "ctaButton": "Introduce yourself"
+  },
   "FAQ": {
     "title": "Frequently Asked Questions",
     "sectionHeading": "Questions we receive most often",
@@ -554,7 +572,7 @@
       },
       "q3": {
         "question": "How can I contact Doddapaneni Group?",
-        "answer": "Email info@doddapanenigroup.net, call +91 814 224 6666 (India) or +1 (352) 230-8586 (USA) during published office hours, or submit the enquiry form on the Contact page with your organisation name so we can reply accurately."
+        "answer": "Email doddapanenigroup@yahoo.com, call +91 814 224 6666 (India) or +1 (352) 230-8586 (USA) during published office hours, or submit the enquiry form on the Contact page with your organisation name so we can reply accurately."
       },
       "q4": {
         "question": "Do you work with clients outside India and the USA?",

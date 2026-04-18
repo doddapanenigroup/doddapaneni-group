@@ -8,6 +8,7 @@
     "about": "हमारे बारे में",
     "services": "सेवाएं",
     "blog": "समाचार",
+    "careers": "करियर",
     "contact": "संपर्क करें",
     "language": "भाषा",
     "ourCompanies": "हमारी सेवाएँ",
@@ -256,7 +257,7 @@
     "headerSubtitle": "हम आपके व्यवसाय को बढ़ाने में कैसे मदद कर सकते हैं, इस पर चर्चा करने के लिए हमारी टीम से संपर्क करें।",
     "getInTouch": "संपर्क करें",
     "emailTitle": "ईमेल",
-    "emailAddress": "info@doddapanenigroup.net",
+    "emailAddress": "doddapanenigroup@yahoo.com",
     "emailResponse": "हम 24 घंटे के भीतर जवाब देंगे।",
     "phoneTitle": "फ़ोन",
     "phoneAvailability": "सोम-शुक्र सुबह 9 बजे से शाम 6 बजे तक।",
@@ -536,6 +537,23 @@
     "realEstateTitle": "3. Real estate & construction information",
     "realEstateDesc": "Content related to real estate, construction, architecture, development, leasing, investment, or property markets is for general information only. It does not constitute an offer, solicitation, or commitment to sell, lease, or finance property where such would require registration, licensing, or disclosure under applicable law. Maps, imagery, availability, pricing, specifications, timelines, and forward-looking statements may be approximate, subject to change, and not binding until confirmed in a written agreement signed by authorised parties. You must independently verify zoning, title, permits, taxes, environmental conditions, and all material facts with qualified professionals (including legal counsel, surveyors, and regulatory authorities) before relying on any information or making decisions. Past performance or descriptions of projects are not a guarantee of future results."
   },
+  "CareersPage": {
+    "metaTitle": "करियर | Doddapaneni Group",
+    "metaDescription": "Doddapaneni Group में शामिल हों: प्रौद्योगिकी, डिज़ाइन और विकास में खुली भूमिकाएँ। छोटी टीमें, उच्च विश्वास और उद्यम-स्तरीय डिलीवरी।",
+    "metaKeywords": "करियर, नौकरियाँ, भर्ती, Doddapaneni Group, डेवलपर, डिज़ाइनर, मार्केटिंग",
+    "metaOgTitle": "करियर | Doddapaneni Group",
+    "metaOgDescription": "हम उन लोगों को नियुक्त करते हैं जो गुणवत्ता, संचार और परिणामों की परवाह करते हैं। खुली भूमिकाएँ देखें और आवेदन करें।",
+    "heroTitle": "करियर",
+    "heroSubtitle": "हम उन लोगों को नियुक्त करते हैं जो गुणवत्ता, संचार और परिणामों की परवाह करते हैं। छोटी टीमें, उच्च विश्वास, उद्यम-स्तरीय डिलीवरी।",
+    "cultureTitle": "संस्कृति",
+    "cultureP1": "हम स्पष्टता की ओर झुकाव रखते हैं: दस्तावेज़ित निर्णय, पूर्वानुमेय लय, और गहरे काम के लिए स्थान। आप रणनीतिकारों और इंजीनियरों के साथ मिलकर काम करेंगे जो पहुँच, प्रदर्शन और SEO को उत्पाद आवश्यकताओं के रूप में देखते हैं।",
+    "cultureP2": "चाहे आप इंटरफ़ेस, अभियान या प्लेटफ़ॉर्म वितरित करें, यह अपेक्षित है कि आप ट्रेड-ऑफ़ स्पष्ट रूप से संवाद करें, जो तय किया गया है उसे दस्तावेज़ करें, और सिस्टम को पहले से अधिक आसान बनाए रखें।",
+    "rolesTitle": "खुली भूमिकाएँ",
+    "rolesEmpty": "अभी कोई प्रकाशित रिक्ति नहीं है। जल्द ही फिर से देखें—या नीचे दिए लिंक से परिचय भेजें।",
+    "ctaTitle": "उपयुक्त भूमिका नहीं मिली?",
+    "ctaBody": "हम हमेशा असाधारण निर्माताओं और रणनीतिकारों में रुचि रखते हैं। एक संक्षिप्त नोट भेजें जिसमें आपने क्या वितरित किया है और आगे क्या चाहते हैं।",
+    "ctaButton": "अपना परिचय दें"
+  },
   "FAQ": {
     "title": "अक्सर पूछे जाने वाले प्रश्न",
     "sectionHeading": "सबसे अधिक पूछे जाने वाले प्रश्न",
@@ -554,7 +572,7 @@
       },
       "q3": {
         "question": "मैं Doddapaneni Group से कैसे संपर्क कर सकता हूं?",
-        "answer": "आप हमसे ईमेल के माध्यम से info@doddapanenigroup.net पर, फोन द्वारा +91 814 224 6666 (भारत) या +1 (352)230-8586 (यूएसए) पर, या हमारी वेबसाइट पर संपर्क फॉर्म भरकर संपर्क कर सकते हैं।"
+        "answer": "आप हमसे ईमेल के माध्यम से doddapanenigroup@yahoo.com पर, फोन द्वारा +91 814 224 6666 (भारत) या +1 (352)230-8586 (यूएसए) पर, या हमारी वेबसाइट पर संपर्क फॉर्म भरकर संपर्क कर सकते हैं।"
       },
       "q4": {
         "question": "क्या Doddapaneni Group अंतरराष्ट्रीय स्तर पर काम करता है?",

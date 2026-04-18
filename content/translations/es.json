@@ -11,6 +11,7 @@
     "sectorLiveLoading": "Cargando sectores…",
     "comingSoonNav": "Próximamente",
     "blog": "Noticias",
+    "careers": "Carreras",
     "contact": "Contáctenos",
     "language": "Idioma"
   },
@@ -261,7 +262,7 @@
     "headerSubtitle": "Póngase en contacto con nuestro equipo para discutir cómo podemos ayudar a que su negocio crezca.",
     "getInTouch": "Ponte en Contacto",
     "emailTitle": "Correo Electrónico",
-    "emailAddress": "info@doddapanenigroup.net",
+    "emailAddress": "doddapanenigroup@yahoo.com",
     "emailResponse": "Responderemos dentro de las 24 horas.",
     "phoneTitle": "Teléfono",
     "phoneIndia": "+91 814 224 6666",
@@ -536,6 +537,23 @@
     "jurisdiction": "Jurisdicción",
     "jurisdictionDesc": "Este descargo de responsabilidad se rige e interpreta de acuerdo con las leyes aplicables. Cualquier disputa relacionada con este descargo de responsabilidad estará sujeta a la jurisdicción exclusiva de los tribunales."
   },
+  "CareersPage": {
+    "metaTitle": "Carreras | Doddapaneni Group",
+    "metaDescription": "Únase a Doddapaneni Group: vacantes en tecnología, diseño y crecimiento. Equipos pequeños, alta confianza y entrega de nivel empresarial.",
+    "metaKeywords": "carreras, empleo, contratación, Doddapaneni Group, desarrollador, diseñador, marketing",
+    "metaOgTitle": "Carreras | Doddapaneni Group",
+    "metaOgDescription": "Buscamos personas que se preocupen por la calidad, la comunicación y los resultados. Vea las vacantes y aplique.",
+    "heroTitle": "Carreras",
+    "heroSubtitle": "Contratamos a personas que se preocupan por la calidad, la comunicación y los resultados. Equipos pequeños, alta confianza y entrega de nivel empresarial.",
+    "cultureTitle": "Cultura",
+    "cultureP1": "Priorizamos la claridad: decisiones documentadas, ritmos predecibles y espacio para el trabajo profundo. Colaborará con estrategas e ingenieros que tratan la accesibilidad, el rendimiento y el SEO como requisitos del producto.",
+    "cultureP2": "Ya sea que entregue interfaces, campañas o plataformas, se espera que comunique con claridad los compromisos, documente lo decidido y deje los sistemas más fáciles de mantener.",
+    "rolesTitle": "Vacantes abiertas",
+    "rolesEmpty": "No hay vacantes publicadas en este momento. Vuelva pronto o preséntese con el enlace de abajo.",
+    "ctaTitle": "¿No encuentra el puesto ideal?",
+    "ctaBody": "Siempre nos interesan constructores y estrategas excepcionales. Envíe una nota breve con lo que ha entregado y lo que busca a continuación.",
+    "ctaButton": "Preséntese"
+  },
   "FAQ": {
     "title": "Preguntas Frecuentes",
     "sectionHeading": "Preguntas que recibimos con más frecuencia",
@@ -554,7 +572,7 @@
       },
       "q3": {
         "question": "¿Cómo puedo contactar a Doddapaneni Group?",
-        "answer": "Puede contactarnos por correo electrónico a info@doddapanenigroup.net, por teléfono al +91 814 224 6666 (India) o +1 (352)230-8586 (EE. UU.), o completando el formulario de contacto en nuestro sitio web."
+        "answer": "Puede contactarnos por correo electrónico a doddapanenigroup@yahoo.com, por teléfono al +91 814 224 6666 (India) o +1 (352)230-8586 (EE. UU.), o completando el formulario de contacto en nuestro sitio web."
       },
       "q4": {
         "question": "¿Doddapaneni Group opera internacionalmente?",

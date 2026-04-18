@@ -13,6 +13,7 @@ import AdminBackupsPanel from './AdminBackupsPanel';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import DashboardPageHeader from './DashboardPageHeader';
+import CareersJobsPanel from './CareersJobsPanel';
 import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
@@ -117,6 +118,8 @@ export default function AdminDashboard({
           onClose={() => setShowManageModal(false)}
         />
       )}
+
+      <CareersJobsPanel locale={locale} />
 
       <AdminOpsInsights />
 

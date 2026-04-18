@@ -93,6 +93,84 @@ async function main() {
     console.log('Upserted sector:', row.name, `(${row.slug})`);
   }
 
+  try {
+    const careerCount = await prisma.careerJob.count();
+    if (careerCount === 0) {
+      const locales = ['en', 'te', 'hi', 'es'];
+      const mailto = (title) =>
+        `mailto:doddapanenigroup@yahoo.com?subject=${encodeURIComponent(`Application: ${title}`)}`;
+
+      const seeds = [
+        {
+          slug: 'full-stack-developer-next-node',
+          sortOrder: 0,
+          en: {
+            title: 'Full Stack Developer (Next.js, Node.js)',
+            subtitle: 'Work from office (US/EU overlap) · Full-time',
+            description:
+              'Own premium UI systems in Next.js, partner with design on motion and accessibility, and help set performance budgets.',
+          },
+        },
+        {
+          slug: 'graphic-designer',
+          sortOrder: 1,
+          en: {
+            title: 'Graphic Designer',
+            subtitle: 'Work from office (US/EU overlap) · Full-time',
+            description:
+              'Create distinctive brand graphics, logos, and layouts that express identity clearly across digital, print, and social.',
+          },
+        },
+        {
+          slug: 'digital-marketing-intern',
+          sortOrder: 2,
+          en: {
+            title: 'Digital Marketing Intern',
+            subtitle: 'Work from office (US/EU overlap) · Internship',
+            description:
+              'Assist with campaigns, SEO, social media, analytics, and online brand growth.',
+          },
+        },
+      ];
+
+      for (const row of seeds) {
+        const { en } = row;
+        await prisma.careerJob.create({
+          data: {
+            slug: row.slug,
+            sortOrder: row.sortOrder,
+            status: 'published',
+            translations: {
+              create: locales.map((locale) => ({
+                locale,
+                title: en.title,
+                subtitle: en.subtitle,
+                description: en.description,
+                applyLabel: 'Apply',
+                applyUrl: mailto(en.title),
+              })),
+            },
+          },
+        });
+        console.log('Seeded career job:', row.slug);
+      }
+    } else {
+      console.log('Career jobs already present; skip careers seed');
+    }
+  } catch (e) {
+    if (e && e.code === 'P2021') {
+      console.warn(
+        [
+          'Careers tables are missing (migrations not applied yet).',
+          'Run: npx prisma migrate deploy',
+          'Then run: npm run db:seed   (to add default job listings)',
+        ].join('\n'),
+      );
+    } else {
+      throw e;
+    }
+  }
+
   console.log(
    (
       'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.\n' +

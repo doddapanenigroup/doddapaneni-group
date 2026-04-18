@@ -10,6 +10,7 @@ const STATIC_PAGE_KEY_TO_PATH: Record<string, string> = {
   'privacy-policy': '/privacy-policy',
   terms: '/terms',
   disclaimer: '/disclaimer',
+  careers: '/careers',
 };
 
 /** Returns a root-relative path or `null` if the key does not correspond to a public URL. */

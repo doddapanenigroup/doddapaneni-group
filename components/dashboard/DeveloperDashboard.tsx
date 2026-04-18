@@ -17,6 +17,7 @@ import DeveloperTimelinePanel from './DeveloperTimelinePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
+import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 
 type SitePage = {
@@ -43,6 +44,7 @@ export default function DeveloperDashboard({
     { href: home, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
     { href: publicPathWithLocale(locale, 'about'), label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
     { href: publicPathWithLocale(locale, 'contact'), label: 'Contact', pageKey: 'contact', editFile: 'app/[locale]/contact/page.tsx', icon: <Mail size={20} /> },
+    { href: publicPathWithLocale(locale, 'careers'), label: 'Careers', pageKey: 'careers', editFile: 'app/[locale]/careers/page.tsx', icon: <Globe size={20} /> },
     { href: publicPathWithLocale(locale, 'news'), label: 'News — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
     { href: home, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
@@ -75,6 +77,8 @@ export default function DeveloperDashboard({
           )
         }
       />
+
+      <CareersJobsPanel locale={locale} />
 
       <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
