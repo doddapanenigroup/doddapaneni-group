@@ -83,6 +83,23 @@ export function isSectorLandingContentOnlySlug(slug: string): boolean {
 /**
  * Display names for header/footer (aligned with `scripts/sector-seeds.mjs` Sector.name).
  */
+/**
+ * Section order on `/news` (hub): matches common “blogs by category” layouts
+ * (e.g. Digital Marketing first, then IT & AI, healthcare, construction, then the rest).
+ */
+const BLOG_HUB_SECTION_PRIORITY = [
+  'digital-marketing',
+  'software-it-ai',
+  'healthcare-medical',
+  'construction-realestate',
+] as const satisfies readonly CompanyDivisionSlug[];
+
+export function orderedCompanyDivisionSlugsForBlogHub(): CompanyDivisionSlug[] {
+  const prioritySet = new Set<string>(BLOG_HUB_SECTION_PRIORITY);
+  const rest = COMPANY_DIVISION_SLUGS.filter((s) => !prioritySet.has(s));
+  return [...BLOG_HUB_SECTION_PRIORITY, ...rest];
+}
+
 export const COMPANY_DIVISION_NAV_LABELS: Record<CompanyDivisionSlug, string> = {
   'software-it-ai': 'Information Technology & AI Development',
   'digital-marketing': 'Digital Marketing',

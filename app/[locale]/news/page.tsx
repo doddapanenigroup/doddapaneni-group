@@ -5,15 +5,16 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { getSiteOrigin } from '@/lib/site-origin';
-import { publicPathWithLocale } from '@/lib/sector-landing';
+import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
-import {
-  COMPANY_DIVISION_NAV_LABELS,
-  COMPANY_DIVISION_SLUGS,
-  type CompanyDivisionSlug,
-} from '@/lib/company-divisions';
-import { getSectorLiveMapFromDb } from '@/lib/data/sector-repository';
-import NewsSectorsHub from '@/components/news/NewsSectorsHub';
+import { canonicalDivisionDisplayName, orderedCompanyDivisionSlugsForBlogHub } from '@/lib/company-divisions';
+import { getCompanyDivisionSectorsMap } from '@/lib/data/sector-repository';
+import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
+import { connectDb } from '@/lib/db';
+import { publishScheduledContent } from '@/lib/publish-scheduled';
+import NewsBlogsHubSections from '@/components/news/NewsBlogsHubSections';
+import type { NewsHubSectionPayload } from '@/components/news/NewsBlogsHubSections';
+import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
 export const revalidate = 120;
 
@@ -63,17 +64,51 @@ export default async function NewsHubPage({ params }: Props) {
   }
 
   const t = createTranslator(getDictionary(locale), 'Blog');
-  const sectorLiveMap = await getSectorLiveMapFromDb();
 
-  const sectors = COMPANY_DIVISION_SLUGS.map((slug) => ({
-    slug,
-    label: COMPANY_DIVISION_NAV_LABELS[slug as CompanyDivisionSlug],
-    isLive: sectorLiveMap[slug] ?? false,
-  }));
+  await connectDb();
+  const now = new Date();
+  if (process.env.NODE_ENV === 'production') {
+    await publishScheduledContent(now);
+  }
+
+  const bySlug = await getCompanyDivisionSectorsMap();
+  const ordered = orderedCompanyDivisionSlugsForBlogHub();
+
+  const sections: NewsHubSectionPayload[] = [];
+
+  for (const slug of ordered) {
+    const sector = bySlug.get(slug);
+    if (!sector?.isLive) continue;
+
+    const label = canonicalDivisionDisplayName(sector.slug, sector.name);
+    const { rows } = await listPublishedBlogsForSectorPage({
+      sector,
+      page: 1,
+      pageSize: 4,
+      now,
+      locale,
+    });
+
+    const posts: NewsSectorPostItem[] = rows.map((r) => {
+      const raw = (r.metaDescription?.trim() || r.ogDescription?.trim()) ?? '';
+      const excerpt = raw.length > 200 ? `${raw.slice(0, 200)}…` : raw || r.title;
+      const readMinutes = Math.max(1, Math.ceil(excerpt.split(/\s+/).filter(Boolean).length / 220));
+      return {
+        slug: r.slug,
+        title: r.title,
+        excerpt,
+        image: normalizeStoredImage(r.featuredImage),
+        publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+        readTime: t('minReadMinutes', { minutes: readMinutes }),
+      };
+    });
+
+    sections.push({ slug, label, posts });
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative overflow-hidden bg-blue-900 px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+      <header className="relative overflow-hidden border-b border-blue-950/20 bg-blue-900 px-4 py-9 sm:px-6 sm:py-11 md:py-12 lg:px-8">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
@@ -82,19 +117,14 @@ export default async function NewsHubPage({ params }: Props) {
           aria-hidden
         />
         <div className="relative mx-auto max-w-4xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-[2.75rem] lg:leading-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
             {t('title')}
           </h1>
-          <div className="mx-auto mt-5 h-1 w-16 rounded-full bg-white/90" aria-hidden />
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/95 md:text-xl">{t('subtitle')}</p>
-          {t('intro') ? (
-            <p className="mx-auto mt-8 max-w-3xl text-left text-sm leading-relaxed text-white/90 sm:text-base md:text-center">
-              {t('intro')}
-            </p>
-          ) : null}
+          <div className="mx-auto mt-3 h-0.5 w-12 rounded-full bg-white/90" aria-hidden />
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base">{t('newsHubIntro')}</p>
         </div>
-      </section>
-      <NewsSectorsHub locale={locale} sectors={sectors} />
+      </header>
+      <NewsBlogsHubSections locale={locale} sections={sections} t={t} />
     </div>
   );
 }

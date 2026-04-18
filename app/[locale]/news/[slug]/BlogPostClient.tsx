@@ -92,7 +92,7 @@ export default function BlogPostClient({
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-20">
       <section className="bg-blue-900 px-4 py-6 sm:px-6 sm:py-8 md:py-9 lg:py-10">
         <div className="mx-auto max-w-4xl">
           <Link

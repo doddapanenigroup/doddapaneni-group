@@ -590,7 +590,8 @@
     }
   },
   "Blog": {
-    "title": "Blog",
+    "title": "Noticias",
+    "newsHubIntro": "Explore las últimas noticias por división: estrategia, tecnología, salud, inmuebles y más.",
     "subtitle": "Perspectivas, tendencias y actualizaciones de Doddapaneni Group",
     "intro": "Explore las novedades por división o abra el archivo completo de noticias.",
     "readMore": "Leer Más",

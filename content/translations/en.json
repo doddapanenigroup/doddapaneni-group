@@ -644,6 +644,10 @@
   },
   "Blog": {
     "title": "News",
+    "newsHubIntro": "Browse the latest news by division — strategy, technology, healthcare, property, and more.",
+    "hubReadMore": "Read More »",
+    "hubViewAll": "View All {label} →",
+    "hubNoComments": "No comments",
     "subtitle": "Articles from our divisions on commerce, healthcare operations, construction, logistics, and related topics—written for operators and decision-makers.",
     "intro": "Browse updates by division or open the full news archive.",
     "readMore": "Read more",

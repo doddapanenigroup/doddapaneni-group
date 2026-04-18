@@ -643,7 +643,11 @@
     }
   },
   "Blog": {
-    "title": "ब्लॉग",
+    "title": "समाचार",
+    "newsHubIntro": "विभाग के अनुसार नवीनतम समाचार देखें — रणनीति, प्रौद्योगिकी, स्वास्थ्य, संपत्ति और बहुत कुछ।",
+    "hubReadMore": "Read More »",
+    "hubViewAll": "View All {label} →",
+    "hubNoComments": "No comments",
     "subtitle": "Doddapaneni Group से अंतर्दृष्टि, रुझान और अपडेट",
     "intro": "विभाग के अनुसार अपडेट देखें या पूर्ण समाचार संग्रह खोलें।",
     "readMore": "और पढ़ें",
