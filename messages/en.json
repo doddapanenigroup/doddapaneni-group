@@ -11,6 +11,7 @@
     "sectorLiveLoading": "Loading sectors…",
     "comingSoonNav": "Coming soon",
     "blog": "News",
+    "team": "Our Team",
     "careers": "Careers",
     "contact": "Contact Us",
     "language": "Language"
@@ -553,6 +554,59 @@
     "ctaTitle": "Don’t see a perfect fit?",
     "ctaBody": "We are always interested in exceptional builders and strategists. Send a short note with what you have shipped and what you want next.",
     "ctaButton": "Introduce yourself"
+  },
+  "TeamPage": {
+    "metaTitle": "Our Team | Doddapaneni Group",
+    "metaDescription": "Meet the Doddapaneni Group leadership, developers, and digital marketers driving web, SEO, and growth delivery.",
+    "metaKeywords": "Doddapaneni Group team, leadership, developers, digital marketing, Lakshmi S Doddapaneni",
+    "metaOgTitle": "Our Team | Doddapaneni Group",
+    "metaOgDescription": "Meet our founder, developers, and digital marketing executives.",
+    "heroTitle": "MEET OUR TEAM – DODDAPANENI GROUP",
+    "developersTitle": "Meet Our Developers",
+    "marketersTitle": "Meet Our Digital Marketers",
+    "founder": {
+      "role": "Founder & Digital Strategist",
+      "name": "Lakshmi S Doddapaneni",
+      "bio1": "Lakshmi S Doddapaneni is the visionary behind Doddapaneni Group, with extensive experience in SEO, AI tools, web development, and online business growth. He has successfully worked across industries including digital marketing, real estate, and healthcare in India and the United States.",
+      "bio2": "With nearly three years of professional experience in the U.S. healthcare sector (Durable Medical Equipment), he brings a unique combination of digital expertise and practical industry knowledge. His leadership focuses on delivering data-driven strategies and long-term success for clients.",
+      "imageAlt": "Lakshmi S Doddapaneni"
+    },
+    "lokesh": {
+      "name": "K Lokesh Reddy",
+      "role": "Full Stack Developer",
+      "bio": "Java Developer with 1.2 years of experience in SQL and React, web applications with HeroUI and delivering efficient, scalable, user-friendly solutions.",
+      "imageAlt": "K Lokesh Reddy"
+    },
+    "nikitha": {
+      "name": "P. Nikitha Petcy",
+      "role": "Web Developer",
+      "bio": "Web Developer with 2+ years of experience in WordPress, Elementor and WooCommerce. Skilled in PHP, SEO and high-performance websites.",
+      "imageAlt": "P. Nikitha Petcy"
+    },
+    "richa": {
+      "name": "Richa Rani",
+      "role": "Web Developer",
+      "bio": "Web Developer with 6+ years of experience creating user-friendly, high-performing websites, with expertise in UI/UX and eCommerce.",
+      "imageAlt": "Richa Rani"
+    },
+    "snigdha": {
+      "name": "Snigdha Tatikonda",
+      "role": "Full Stack Developer",
+      "bio": "Java Developer experienced in React, SQL, and API integration, focused on building responsive, user-friendly web applications.",
+      "imageAlt": "Snigdha Tatikonda"
+    },
+    "rajitha": {
+      "name": "Bollam Rajitha",
+      "role": "Digital Marketing Executive",
+      "bio": "Digital Marketing Executive with 2.5 years of experience driving brand growth through social media, SEO, content, and paid campaigns to deliver results.",
+      "imageAlt": "Bollam Rajitha"
+    },
+    "vijay": {
+      "name": "Vijay Indhuri",
+      "role": "Digital Marketing Executive",
+      "bio": "Digital Marketing Executive with 2.5 years of experience in SEO, social media, and online campaigns, focused on delivering measurable growth.",
+      "imageAlt": "Vijay Indhuri"
+    }
   },
   "FAQ": {
     "title": "Frequently Asked Questions",

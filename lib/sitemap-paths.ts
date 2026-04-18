@@ -11,6 +11,7 @@ const STATIC_PAGE_KEY_TO_PATH: Record<string, string> = {
   terms: '/terms',
   disclaimer: '/disclaimer',
   careers: '/careers',
+  team: '/team',
 };
 
 /** Returns a root-relative path or `null` if the key does not correspond to a public URL. */

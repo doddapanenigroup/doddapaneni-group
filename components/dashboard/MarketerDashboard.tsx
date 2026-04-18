@@ -18,6 +18,7 @@ import {
   Image as ImageIcon,
   Search,
   BarChart3,
+  Users,
 } from 'lucide-react';
 import VisitStatsLazy from './VisitStatsLazy';
 import MyActivityPanel from './MyActivityPanel';
@@ -1232,6 +1233,15 @@ export default function MarketerDashboard({
           >
             <Mail size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
+          </Link>
+          <Link
+            href={publicPathWithLocale(locale, 'team')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+          >
+            <Users size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <span className="font-medium text-slate-800 dark:text-slate-100">Team page</span>
           </Link>
           <Link
             href={publicPathWithLocale(locale, 'careers')}

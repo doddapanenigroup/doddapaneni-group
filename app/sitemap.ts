@@ -24,6 +24,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/about', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/news', priority: 0.9, changeFrequency: 'daily' },
   { path: '/contact', priority: 0.85, changeFrequency: 'monthly' },
+  { path: '/team', priority: 0.83, changeFrequency: 'monthly' },
   { path: '/careers', priority: 0.82, changeFrequency: 'monthly' },
   { path: '/privacy-policy', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/terms', priority: 0.5, changeFrequency: 'yearly' },

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Pencil, Languages } from 'lucide-react';
+import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Pencil, Languages, Users } from 'lucide-react';
 import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
@@ -44,6 +44,7 @@ export default function DeveloperDashboard({
     { href: home, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
     { href: publicPathWithLocale(locale, 'about'), label: 'About', pageKey: 'about', editFile: 'app/[locale]/about/page.tsx', icon: <FileText size={20} /> },
     { href: publicPathWithLocale(locale, 'contact'), label: 'Contact', pageKey: 'contact', editFile: 'app/[locale]/contact/page.tsx', icon: <Mail size={20} /> },
+    { href: publicPathWithLocale(locale, 'team'), label: 'Team', pageKey: 'team', editFile: 'app/[locale]/team/page.tsx', icon: <Users size={20} /> },
     { href: publicPathWithLocale(locale, 'careers'), label: 'Careers', pageKey: 'careers', editFile: 'app/[locale]/careers/page.tsx', icon: <Globe size={20} /> },
     { href: publicPathWithLocale(locale, 'news'), label: 'News — listing page', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <BookOpen size={20} /> },
     { href: home, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
