@@ -1,9 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect } from 'react';
+import type { ComponentProps } from 'react';
 import { useTranslations } from '@/lib/dictionary-react';
 
 const FOUNDER_IMAGE = '/founder.png';
+
+/** Deters casual save/drag on images; cannot block OS screenshots or screen recording (browser limitation). */
+const TEAM_IMG_CLASS = 'select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]';
 
 const DEVELOPERS = [
   { id: 'lokesh', image: '/lokesh.jpeg' },
@@ -16,6 +21,26 @@ const MARKETERS = [
   { id: 'rajitha', image: '/rajitha.jpeg' },
   { id: 'vijay', image: '/vijay.jpeg' },
 ] as const;
+
+function blockImageDragStart(e: React.DragEvent) {
+  if (e.target instanceof HTMLImageElement) e.preventDefault();
+}
+
+function TeamImage(props: ComponentProps<typeof Image>) {
+  const { className, onContextMenu, ...rest } = props;
+  return (
+    <Image
+      {...rest}
+      draggable={false}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onContextMenu?.(e);
+      }}
+      onDragStart={blockImageDragStart}
+      className={[TEAM_IMG_CLASS, className].filter(Boolean).join(' ')}
+    />
+  );
+}
 
 function MemberCard({
   memberId,
@@ -34,7 +59,7 @@ function MemberCard({
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="relative aspect-[4/3] w-full bg-slate-100">
-        <Image
+        <TeamImage
           src={imageSrc}
           alt={alt}
           fill
@@ -54,8 +79,26 @@ function MemberCard({
 export default function TeamPageClient() {
   const t = useTranslations('TeamPage');
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const key = e.key?.toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && key === 's') e.preventDefault();
+      if (key === 'printscreen') e.preventDefault();
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white">
+    <div
+      className="min-h-screen bg-white pt-20"
+      onContextMenu={(e) => {
+        if (e.target instanceof HTMLImageElement) e.preventDefault();
+      }}
+      onDragStartCapture={(e) => {
+        if (e.target instanceof HTMLImageElement) e.preventDefault();
+      }}
+    >
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-2xl font-bold uppercase tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
@@ -66,18 +109,18 @@ export default function TeamPageClient() {
 
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
-            <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-md lg:col-span-5">
-              <Image
+          <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-10 lg:gap-12">
+            <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-2 ring-slate-200/90 sm:h-32 sm:w-32 md:h-36 md:w-36">
+              <TeamImage
                 src={FOUNDER_IMAGE}
                 alt={t('founder.imageAlt')}
                 fill
                 className="object-cover object-top"
-                sizes="(max-width: 1024px) 100vw, 40vw"
+                sizes="144px"
                 priority
               />
             </div>
-            <div className="lg:col-span-7">
+            <div className="min-w-0 flex-1 text-center md:text-left">
               <p className="text-sm font-semibold uppercase tracking-wide text-blue-800">{t('founder.role')}</p>
               <h2 className="mt-2 text-3xl font-bold text-slate-900 md:text-4xl">{t('founder.name')}</h2>
               <p className="mt-6 text-slate-600 leading-relaxed md:text-lg">{t('founder.bio1')}</p>
