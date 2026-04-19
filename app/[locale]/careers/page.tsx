@@ -13,5 +13,5 @@ export default async function CareersPage({ params }: Props) {
   }
   const locale = localeFromRouteParam(paramLocale);
   const jobs = await getPublishedCareerJobsCached(locale);
-  return <CareersPageClient jobs={jobs} />;
+  return <CareersPageClient jobs={jobs} locale={locale} />;
 }

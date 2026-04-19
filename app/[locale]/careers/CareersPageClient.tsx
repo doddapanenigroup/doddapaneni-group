@@ -1,15 +1,18 @@
 'use client';
 
-import { Briefcase, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Briefcase } from 'lucide-react';
 import { useTranslations } from '@/lib/dictionary-react';
 import { Link } from '@/i18n/navigation';
 import type { PublicCareerJob } from '@/lib/data/careers-public';
+import CareersApplyModal from './CareersApplyModal';
 
-export default function CareersPageClient({ jobs }: { jobs: PublicCareerJob[] }) {
+export default function CareersPageClient({ jobs, locale }: { jobs: PublicCareerJob[]; locale: string }) {
   const t = useTranslations('CareersPage');
+  const [applyJob, setApplyJob] = useState<PublicCareerJob | null>(null);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-20">
       <section className="bg-blue-900 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-5 flex justify-center">
@@ -47,15 +50,25 @@ export default function CareersPageClient({ jobs }: { jobs: PublicCareerJob[] })
                   <h3 className="text-xl font-semibold text-slate-900">{job.title}</h3>
                   <p className="mt-1 text-sm font-medium text-blue-800">{job.subtitle}</p>
                   <p className="mt-4 whitespace-pre-line text-slate-600 leading-relaxed">{job.description}</p>
-                  <a
-                    href={job.applyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-                  >
-                    {job.applyLabel}
-                    <ExternalLink size={16} aria-hidden />
-                  </a>
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setApplyJob(job)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                    >
+                      {job.applyLabel}
+                    </button>
+                    {job.applyUrl?.trim() ? (
+                      <a
+                        href={job.applyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-semibold text-blue-800 underline-offset-2 hover:underline"
+                      >
+                        {t('applyExternalLink')}
+                      </a>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -75,6 +88,8 @@ export default function CareersPageClient({ jobs }: { jobs: PublicCareerJob[] })
           </Link>
         </div>
       </section>
+
+      <CareersApplyModal job={applyJob} locale={locale} onClose={() => setApplyJob(null)} />
     </div>
   );
 }
