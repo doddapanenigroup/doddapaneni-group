@@ -3,8 +3,9 @@ import { ArrowRight } from 'lucide-react';
 import type { AppLocale } from '@/i18n/locales';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
 
-/** Static asset in `public/` — plain `img` avoids `/_next/image` so the browser can fetch LCP bytes immediately. */
-const BANNER_IMAGE = '/image.webp';
+/** Plain `img` + `srcSet` avoids `/_next/image` so the browser can fetch LCP bytes immediately at an appropriate width. */
+const HERO_SRC_DEFAULT = '/image-hero-960.webp';
+const HERO_SRC_SET = '/image-hero-480.webp 480w, /image-hero-960.webp 960w, /image.webp 1500w';
 
 export type HomeHeroCopy = {
   heroImageAlt: string;
@@ -40,10 +41,12 @@ export default function HomeHero({ locale, copy }: Props) {
     <section className="relative min-h-[22rem] overflow-hidden px-4 pt-20 pb-14 text-white sm:min-h-[26rem] sm:px-6 sm:pt-24 sm:pb-16 md:min-h-[28rem] md:pt-28 md:pb-20 lg:px-8">
       <div className="absolute inset-0 z-0 bg-slate-900">
         <img
-          src={BANNER_IMAGE}
+          src={HERO_SRC_DEFAULT}
+          srcSet={HERO_SRC_SET}
+          sizes="100vw"
           alt={heroImageAlt}
-          width={1920}
-          height={1080}
+          width={960}
+          height={640}
           decoding="async"
           fetchPriority="high"
           className="h-full w-full object-cover opacity-45"

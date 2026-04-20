@@ -65,9 +65,8 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  /** CMS lookup runs in parallel with LCP hero preload so slow DB/IO does not defer the image request. */
   const cmsPromise = findPublishedPageContent('home', locale);
-  preload('/image.webp', { as: 'image', type: 'image/webp', fetchPriority: 'high' });
+  preload('/image-hero-960.webp', { as: 'image', type: 'image/webp', fetchPriority: 'high' });
   const cms = await cmsPromise;
 
   if (cms && (cms.title || cms.body)) {

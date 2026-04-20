@@ -184,7 +184,11 @@ export default function Navbar() {
   const updateMegaMenuPosition = useCallback(() => {
     const btn = companiesButtonRef.current;
     if (!btn) return;
-    setMegaMenuBox(megaMenuPositionFromButton(btn));
+    requestAnimationFrame(() => {
+      const current = companiesButtonRef.current;
+      if (!current) return;
+      setMegaMenuBox(megaMenuPositionFromButton(current));
+    });
   }, []);
 
   useLayoutEffect(() => {
@@ -329,7 +333,7 @@ export default function Navbar() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; `h-14`–`h-20` by breakpoint (see HomeHero). */}
             <img
-              src={brandLogoSrc(640)}
+              src={brandLogoSrc(480)}
               srcSet={brandLogoSrcSet}
               sizes="(max-width: 768px) min(calc(100vw - 8rem), 220px), 360px"
               alt={companyName}
@@ -411,7 +415,7 @@ export default function Navbar() {
                 return !open;
               });
             }}
-            className={`inline-flex items-center justify-center rounded-md p-1.5 transition-colors focus:outline-none sm:p-2 ${mobileButtonClass}`}
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md transition-colors focus:outline-none ${mobileButtonClass}`}
             aria-expanded={isOpen}
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
           >

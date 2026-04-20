@@ -71,7 +71,7 @@ export default function Footer() {
             <Link href="/" className="mb-1.5 block shrink-0 sm:mb-2 md:mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element -- same public brandmark as `Navbar`. */}
               <img
-                src={brandLogoSrc(640)}
+                src={brandLogoSrc(480)}
                 srcSet={brandLogoSrcSet}
                 sizes="(max-width: 768px) min(80vw, 200px), 260px"
                 alt={COMPANY_NAME}

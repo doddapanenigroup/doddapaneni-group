@@ -1,9 +1,11 @@
 /** Responsive WebP brandmarks (tight crop). Bump `LOGO_ASSET_VERSION` after changing files. */
-export const LOGO_ASSET_VERSION = '8';
+export const LOGO_ASSET_VERSION = '9';
 
-export const brandLogoSrc = (w: 320 | 640) => `/doddapaneni-logo-${w}.webp?v=${LOGO_ASSET_VERSION}`;
+export type BrandLogoWidth = 320 | 480 | 640;
 
-export const brandLogoSrcSet = `${brandLogoSrc(320)} 320w, ${brandLogoSrc(640)} 640w`;
+export const brandLogoSrc = (w: BrandLogoWidth) => `/doddapaneni-logo-${w}.webp?v=${LOGO_ASSET_VERSION}`;
 
-/** Layout box matches Navbar (`h-20`); intrinsic 640px file for aspect ratio / CLS. */
-export const BRAND_LOGO_INTRINSIC = { width: 640, height: 161 } as const;
+export const brandLogoSrcSet = `${brandLogoSrc(320)} 320w, ${brandLogoSrc(480)} 480w, ${brandLogoSrc(640)} 640w`;
+
+/** Matches default `src` (`480w`) for aspect ratio / CLS. */
+export const BRAND_LOGO_INTRINSIC = { width: 480, height: 121 } as const;
