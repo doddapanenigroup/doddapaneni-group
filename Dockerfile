@@ -1,5 +1,9 @@
 # Production image (Node 20 + Next.js standalone). Prisma client is generated at build time (Linux engine).
 #
+# If you deploy without Docker (e.g. Kubernetes / buildpacks) and the platform runs `npm start`, it must
+# match `output: "standalone"` — see package.json `"start"` (runs `node .next/standalone/server.js`).
+# Do not use bare `next start` unless the full `next` CLI is installed in the runtime image.
+#
 # Prisma requires DATABASE_URL + DIRECT_DATABASE_URL in the environment for:
 #   - `npm ci` (postinstall: prisma generate)
 #   - `npm run build` (prebuild + Next SSG, which runs real DB queries)
