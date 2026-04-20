@@ -12,8 +12,8 @@ export default function CareersPageClient({ jobs, locale }: { jobs: PublicCareer
   const [applyJob, setApplyJob] = useState<PublicCareerJob | null>(null);
 
   return (
-    <div className="min-h-screen bg-white pt-20">
-      <section className="bg-blue-900 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <div className="min-h-screen bg-white">
+      <section className="bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-5 flex justify-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15">

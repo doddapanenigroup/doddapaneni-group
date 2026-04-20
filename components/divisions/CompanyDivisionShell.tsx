@@ -49,7 +49,7 @@ export default function CompanyDivisionShell({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-24">
       <div className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
           <div>

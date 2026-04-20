@@ -91,7 +91,7 @@ export default function TeamPageClient() {
 
   return (
     <div
-      className="min-h-screen bg-white pt-20"
+      className="min-h-screen bg-white"
       onContextMenu={(e) => {
         if (e.target instanceof HTMLImageElement) e.preventDefault();
       }}
@@ -99,7 +99,7 @@ export default function TeamPageClient() {
         if (e.target instanceof HTMLImageElement) e.preventDefault();
       }}
     >
-      <section className="border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <section className="border-b border-slate-200 bg-slate-50 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-2xl font-bold uppercase tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
             {t('heroTitle')}

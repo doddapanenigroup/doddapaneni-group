@@ -214,7 +214,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
 
     return (
       <div className="min-h-screen bg-white">
-        <section className="relative overflow-hidden bg-blue-900 px-4 py-10 sm:px-6 md:py-12 lg:px-8">
+        <section className="relative overflow-hidden bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-12 md:pt-28 md:pb-12 lg:px-8">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.07]"
             style={{
@@ -229,14 +229,16 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
             <div className="mx-auto mt-3 h-1.5 w-20 rounded-full bg-white/90" aria-hidden />
           </div>
         </section>
-        <NewsSectorBlogList
-          locale={locale}
-          sectorSlug={trimmed}
-          sectorLabel={label}
-          readMoreLabel={t('readMore')}
-          posts={posts}
-          initialSectorLiveMap={initialSectorLiveMap}
-        />
+        <div className="mt-6 sm:mt-8">
+          <NewsSectorBlogList
+            locale={locale}
+            sectorSlug={trimmed}
+            sectorLabel={label}
+            readMoreLabel={t('readMore')}
+            posts={posts}
+            initialSectorLiveMap={initialSectorLiveMap}
+          />
+        </div>
       </div>
     );
   }

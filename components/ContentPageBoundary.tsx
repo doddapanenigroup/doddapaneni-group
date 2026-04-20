@@ -16,7 +16,7 @@ export default async function ContentPageBoundary({ pageKey, locale, children, c
   if (content && (content.title || content.body)) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <article className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+        <article className="mx-auto max-w-4xl px-4 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-12 lg:px-8 lg:pb-16 lg:pt-28">
           {content.title ? (
             <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:mb-6 sm:text-3xl lg:text-4xl">
               {content.title}

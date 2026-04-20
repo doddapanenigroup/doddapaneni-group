@@ -2,7 +2,6 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from '@/lib/dictionary-react';
-import Image from 'next/image';
 import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
 function PinterestIcon({ className }: { className?: string }) {
   return (
@@ -102,16 +101,18 @@ export default function Footer() {
 
         <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-10">
           <div className="lg:max-w-md">
-            <div className="relative mb-3 h-16 w-[160px] md:mb-4 md:h-20 md:w-[200px]">
-              <Image
-                src="/logo.webp"
+            <Link href="/" className="mb-3 block shrink-0 md:mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element -- same public brandmark as `Navbar`. */}
+              <img
+                src="/doddapaneni-logo.webp?v=6"
                 alt={COMPANY_NAME}
-                fill
-                className="object-contain object-left"
-                sizes="(max-width: 768px) 160px, 200px"
+                width={1007}
+                height={254}
+                decoding="async"
                 loading="lazy"
+                className="block h-16 w-auto max-w-full object-contain object-left md:h-20"
               />
-            </div>
+            </Link>
             <p className="text-base font-semibold text-white">{COMPANY_NAME}</p>
             <p className="mt-2 text-xs leading-relaxed text-blue-300 md:text-sm">{t('tagline')}</p>
           </div>

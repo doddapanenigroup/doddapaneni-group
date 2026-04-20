@@ -12,13 +12,13 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { useTranslations } from '@/lib/dictionary-react';
-import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 import {
   COMPANY_DIVISION_SLUGS,
   activeCompanyDivisionSlugFromPathname,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
+import { stripLocalePrefixFromPathname } from '@/lib/locale-from-path';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
 
 /** Align with `/api/public/sectors` short HTTP cache — avoids hammering the origin and inflating “fully loaded” metrics. */
@@ -77,6 +77,12 @@ export default function Navbar() {
   const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
+  /**
+   * Routes whose first hero band is light (not dark blue) under the fixed bar — white “transparent”
+   * nav text would disappear. `/careers` uses a dark blue hero to the top; keep default transparent nav.
+   */
+  const strippedPath = stripLocalePrefixFromPathname(pathname);
+  const lightHeroUnderNav = strippedPath === '/team';
 
   const activeDivisionSlug = useMemo(
     () => activeCompanyDivisionSlugFromPathname(pathname),
@@ -195,7 +201,7 @@ export default function Navbar() {
     };
   }, [companiesOpen, updateMegaMenuPosition]);
 
-  const isTransparent = !scrolled;
+  const isTransparent = !scrolled && !lightHeroUnderNav;
   const navbarClasses = isTransparent ? 'bg-transparent border-transparent' : 'bg-transparent backdrop-blur-xl shadow-none';
 
   const mobileButtonClass = isTransparent
@@ -309,21 +315,22 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 overflow-visible transition-all duration-300 ${navbarClasses}`}>
-      <div className={`flex h-20 w-full items-center justify-between ${inset}`}>
-        <div className="flex min-w-0 items-center">
+      <div className={`flex h-20 w-full items-center justify-between gap-3 ${inset}`}>
+        <div className="flex shrink-0 items-center">
           <Link
             href="/"
             className="group flex h-20 shrink-0 items-center"
             onClick={handleLogoClick}
           >
-            <Image
-              src="/logo.webp"
+            {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; fixed `h-20` box (see HomeHero). */}
+            <img
+              src="/doddapaneni-logo.webp?v=6"
               alt={companyName}
-              width={256}
-              height={256}
-              priority
-              sizes="(max-width: 640px) 140px, 200px"
-              className="block h-14 w-auto max-w-[200px] object-contain object-left sm:h-16"
+              width={1007}
+              height={254}
+              decoding="async"
+              fetchPriority="high"
+              className="block h-20 w-auto max-w-[calc(100vw-9.5rem)] shrink-0 object-contain object-left sm:max-w-[min(92vw,42rem)] lg:max-w-[52rem]"
             />
           </Link>
         </div>

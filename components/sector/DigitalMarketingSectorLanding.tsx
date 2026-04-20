@@ -67,7 +67,7 @@ export default async function DigitalMarketingSectorLanding({ locale }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-violet-950 to-fuchsia-950 px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-violet-950 to-fuchsia-950 px-4 pt-24 pb-14 sm:px-6 sm:pt-28 sm:pb-16 lg:px-8 lg:pt-28 lg:pb-20">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{

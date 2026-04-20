@@ -9,6 +9,8 @@ type Props = {
   pageKey: string;
   cmsKeyHint: string;
   cmsKeyNote: string;
+  /** True when rendered under `CompanyDivisionShell` (nav offset handled there). */
+  embeddedInDivisionShell?: boolean;
 };
 
 export default function CompanyDivisionSubPageContent({
@@ -17,10 +19,16 @@ export default function CompanyDivisionSubPageContent({
   pageKey,
   cmsKeyHint,
   cmsKeyNote,
+  embeddedInDivisionShell = false,
 }: Props) {
+  const heroVertical =
+    embeddedInDivisionShell === true
+      ? 'pt-8 pb-8 sm:pt-10 sm:pb-10'
+      : 'pt-24 pb-8 sm:pt-28 sm:pb-10';
+
   return (
     <MotionLazy>
-      <section className="bg-blue-900 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <section className={`bg-blue-900 px-4 sm:px-6 lg:px-8 ${heroVertical}`}>
         <div className="mx-auto max-w-3xl text-center">
           <m.h1
             initial={{ opacity: 0, y: 10 }}

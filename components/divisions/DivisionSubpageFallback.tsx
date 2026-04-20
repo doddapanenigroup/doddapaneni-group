@@ -11,6 +11,8 @@ type Props = {
   subpage: DivisionSubpage;
   sectorName: string;
   locale: string;
+  /** When true, `CompanyDivisionShell` sits above — hero only needs a modest gap under the division band. */
+  embeddedInDivisionShell?: boolean;
 };
 
 export default async function DivisionSubpageFallback({
@@ -18,6 +20,7 @@ export default async function DivisionSubpageFallback({
   subpage,
   sectorName,
   locale,
+  embeddedInDivisionShell = false,
 }: Props) {
   const t = createTranslator(getDictionary(locale), 'DivisionSubpage');
   const pageKey = divisionContentPageKey(sectorSlug, subpage);
@@ -36,6 +39,7 @@ export default async function DivisionSubpageFallback({
       pageKey={pageKey}
       cmsKeyHint={t('cmsKeyHint')}
       cmsKeyNote={t('cmsKeyNote')}
+      embeddedInDivisionShell={embeddedInDivisionShell}
     />
   );
 }

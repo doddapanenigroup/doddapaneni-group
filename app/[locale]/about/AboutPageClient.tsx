@@ -26,7 +26,7 @@ export default function About() {
   return (
       <MotionLazy>
       <div className="min-h-screen bg-white">
-        <section className="bg-blue-900 px-4 py-6 sm:px-6 md:py-10 lg:px-8">
+        <section className="bg-blue-900 px-4 pt-24 pb-6 sm:px-6 sm:pt-28 sm:pb-8 md:pt-28 md:pb-10 lg:px-8">
           <div className="mx-auto max-w-6xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300 sm:text-xs">
               Doddapaneni Group
@@ -40,7 +40,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="bg-white px-4 py-8 sm:px-6 md:py-16 lg:px-8">
+        <section className="mt-6 border-t border-blue-100/80 bg-white px-4 py-8 sm:mt-8 sm:px-6 md:py-16 lg:px-8">
           <div className="mx-auto max-w-6xl">
             <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
               <m.div

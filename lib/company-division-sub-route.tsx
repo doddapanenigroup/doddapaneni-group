@@ -39,6 +39,7 @@ export function divisionSubPage(sub: DivisionSubpage) {
           subpage={sub}
           sectorName={sector.name}
           locale={locale}
+          embeddedInDivisionShell={!sector.isLive}
         />
       </ContentPageBoundary>
     );

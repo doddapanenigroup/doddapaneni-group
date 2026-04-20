@@ -63,7 +63,7 @@ export default function ContactPageClient() {
   return (
       <MotionLazy>
       <div className="min-h-screen bg-white">
-        <section className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+        <section className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-12 md:pt-28 md:pb-14 lg:px-8">
           <div className="mx-auto max-w-6xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300 sm:text-xs">
               Doddapaneni Group
@@ -80,7 +80,7 @@ export default function ContactPageClient() {
           </div>
         </section>
 
-        <section className="border-t border-blue-100/80 bg-slate-50 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <section className="mt-6 border-t border-blue-100/80 bg-slate-50 px-4 py-12 sm:mt-8 sm:px-6 md:py-16 lg:px-8">
           <div className="mx-auto max-w-6xl">
             <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 xl:gap-16">
               <m.div
