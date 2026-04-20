@@ -3,7 +3,6 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import { sendRoleCreatedEmailToCreator, sendRoleCreatedEmailToNewUser } from '@/lib/email';
-import { verifyAdminEmployeeCreateOtp } from '@/lib/admin-employee-create-otp';
 import bcrypt from 'bcryptjs';
 import * as z from 'zod';
 import type { Role } from '@/lib/constants';
@@ -18,18 +17,12 @@ const usernameSchema = z
   .regex(/^[a-zA-Z0-9._-]+$/, 'Username: use letters, numbers, dot, underscore, hyphen only')
   .transform((s) => s.trim().toLowerCase());
 
-const createOtpField = z
-  .string()
-  .transform((s) => s.replace(/\s/g, ''))
-  .pipe(z.string().min(6, 'Enter the verification code').max(12));
-
 const createUserSchemaAdmin = z.object({
   email: z.string().email(),
   username: usernameSchema,
   password: z.string().min(6),
   name: z.string().optional(),
   role: z.enum(['DEVELOPER', 'DIGITAL_MARKETER']),
-  createOtp: createOtpField,
 });
 
 const createUserSchemaSuperAdmin = z.object({
@@ -38,7 +31,6 @@ const createUserSchemaSuperAdmin = z.object({
   password: z.string().min(6),
   name: z.string().optional(),
   role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']),
-  createOtp: createOtpField,
 });
 
 export async function POST(request: Request) {
@@ -61,50 +53,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, username, password, name, role: newUserRole, createOtp } = parsed.data;
+    const { email, username, password, name, role: newUserRole } = parsed.data;
     const emailLower = email.trim().toLowerCase();
     const nameNorm = name?.trim() || null;
 
     await connectDb();
-    const now = new Date();
-    const pending = await prisma.adminEmployeeCreateOtp.findFirst({
-      where: {
-        adminUserId: session.user.id,
-        expiresAt: { gt: now },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (!pending || !verifyAdminEmployeeCreateOtp(pending.codeHash, session.user.id, createOtp)) {
-      return NextResponse.json(
-        { message: 'Invalid or expired verification code. Go back and request a new code.' },
-        { status: 401 }
-      );
-    }
-
-    if (
-      pending.email !== emailLower ||
-      pending.username !== username ||
-      pending.role !== newUserRole ||
-      (pending.name?.trim() || null) !== nameNorm ||
-      !(await bcrypt.compare(password, pending.passwordHash))
-    ) {
-      return NextResponse.json(
-        {
-          message:
-            'Details changed since the code was sent. Enter the same fields or request a new verification code.',
-        },
-        { status: 400 }
-      );
-    }
 
     const existingEmail = await prisma.user.findUnique({ where: { email: emailLower } });
     if (existingEmail) {
       return NextResponse.json(
-        {
-          message:
-            'This email is already in use. Each account needs a different email.',
-        },
+        { message: 'This email is already in use. Each account needs a different email.' },
         { status: 400 }
       );
     }
@@ -116,21 +74,20 @@ export async function POST(request: Request) {
       );
     }
 
+    const passwordHash = await bcrypt.hash(password, 10);
     const createdAt = new Date();
-    const doc = await prisma.$transaction(async (tx) => {
-      await tx.adminEmployeeCreateOtp.deleteMany({ where: { id: pending.id } });
-      return tx.user.create({
-        data: {
-          email: pending.email,
-          username: pending.username,
-          passwordHash: pending.passwordHash,
-          name: pending.name,
-          role: pending.role as DbRole,
-          createdById: session.user.id,
-          createdAtIST: formatInIST(createdAt),
-          createdAtET: formatInET(createdAt),
-        },
-      });
+
+    const doc = await prisma.user.create({
+      data: {
+        email: emailLower,
+        username,
+        passwordHash,
+        name: nameNorm,
+        role: newUserRole as DbRole,
+        createdById: session.user.id,
+        createdAtIST: formatInIST(createdAt),
+        createdAtET: formatInET(createdAt),
+      },
     });
 
     const user = {

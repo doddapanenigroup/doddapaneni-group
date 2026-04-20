@@ -41,7 +41,6 @@ export default function ManageEmployeesModal({
   currentUserId: string;
   /** Roles whose password the current user is allowed to change (e.g. Admin: Developer, Digital Marketer) */
   allowedRolesForPasswordChange?: Role[];
-  /** Called after employee is created (OTP verified). */
   onEmployeeCreated: (user: UserRow) => void;
   onDelete: (id: string) => Promise<void>;
   onChangePassword?: (id: string, newPassword: string) => Promise<void>;
@@ -73,19 +72,13 @@ export default function ManageEmployeesModal({
   const [name, setName] = useState('');
   const [role, setRole] = useState<Role>(() => sortedAllowedRoles[0] ?? allowedRoles[0]);
   const [message, setMessage] = useState('');
-  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
-  const [createStep, setCreateStep] = useState<'details' | 'otp'>('details');
-  const [createOtp, setCreateOtp] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [changePasswordUserId, setChangePasswordUserId] = useState<string | null>(null);
   const [changePasswordValue, setChangePasswordValue] = useState('');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
   function resetAddForm() {
-    setCreateStep('details');
-    setCreateOtp('');
-    setInfo('');
     setMessage('');
     setEmail('');
     setUsername('');
@@ -94,44 +87,7 @@ export default function ManageEmployeesModal({
     setRole(sortedAllowedRoles[0]);
   }
 
-  async function handleSendCreateOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setMessage('');
-    setInfo('');
-    setLoading(true);
-    try {
-      const res = await fetch('/api/users/create-employee-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          username: username.trim(),
-          password: password.trim(),
-          name: name.trim() || undefined,
-          role,
-        }),
-      });
-      const json = (await res.json().catch(() => ({}))) as {
-        message?: string;
-        codeSentTo?: string;
-        devOtp?: string;
-      };
-      if (!res.ok) {
-        setMessage(typeof json.message === 'string' ? json.message : 'Could not send verification code.');
-        return;
-      }
-      setCreateStep('otp');
-      setCreateOtp(typeof json.devOtp === 'string' ? json.devOtp : '');
-      const dest = json.codeSentTo ?? 'your email';
-      setInfo(`Enter the 6-digit code sent to ${dest} to create this employee.`);
-    } catch {
-      setMessage('Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleCreateEmployeeWithOtp(e: React.FormEvent) {
+  async function handleCreateEmployee(e: React.FormEvent) {
     e.preventDefault();
     setMessage('');
     setLoading(true);
@@ -145,7 +101,6 @@ export default function ManageEmployeesModal({
           password: password.trim(),
           name: name.trim() || undefined,
           role,
-          createOtp: createOtp.replace(/\s/g, ''),
         }),
       });
       const json = (await res.json().catch(() => ({}))) as {
@@ -242,11 +197,9 @@ export default function ManageEmployeesModal({
 
           {showForm && (
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-              {createStep === 'details' ? (
-                <form onSubmit={handleSendCreateOtp} className="space-y-3">
+                <form onSubmit={handleCreateEmployee} className="space-y-3">
                   <p className="text-sm text-slate-600">
-                    We email a one-time code to <strong>your</strong> account email. Enter it on the next step to
-                    create the employee.
+                    Create a dashboard user with email, username, and password. They can sign in on the same login page.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
@@ -328,7 +281,7 @@ export default function ManageEmployeesModal({
                       disabled={loading}
                       className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
                     >
-                      {loading ? 'Sending…' : 'Send verification code'}
+                      {loading ? 'Creating…' : 'Create employee'}
                     </button>
                     <button
                       type="button"
@@ -342,53 +295,6 @@ export default function ManageEmployeesModal({
                     </button>
                   </div>
                 </form>
-              ) : (
-                <form onSubmit={handleCreateEmployeeWithOtp} className="space-y-3">
-                  {info && <p className="text-sm text-slate-700 bg-slate-100 px-3 py-2 rounded-lg">{info}</p>}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Verification code</label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={createOtp}
-                      onChange={(e) => setCreateOtp(e.target.value)}
-                      required
-                      minLength={6}
-                      maxLength={12}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm tracking-widest text-center text-lg max-w-xs"
-                      placeholder="000000"
-                    />
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    New account: {email.trim().toLowerCase()} · @{username.trim().toLowerCase()} ·{' '}
-                    {getRoleLabel(role)}
-                  </p>
-                  {message && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{message}</p>}
-                  <div className="flex gap-2 flex-wrap">
-                    <button
-                      type="submit"
-                      disabled={loading || createOtp.replace(/\s/g, '').length < 6}
-                      className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
-                    >
-                      {loading ? 'Creating…' : 'Create employee'}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={loading}
-                      onClick={() => {
-                        setCreateStep('details');
-                        setCreateOtp('');
-                        setInfo('');
-                        setMessage('');
-                      }}
-                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
-                    >
-                      Back
-                    </button>
-                  </div>
-                </form>
-              )}
             </div>
           )}
 

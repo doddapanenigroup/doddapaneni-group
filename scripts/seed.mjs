@@ -175,7 +175,6 @@ async function main() {
     [
       'Seed done. Sign in at /en/login with email or username + password (same DATABASE_URL as the app).',
       'Optional: `npm run media:seed` and/or `npm run db:seed:blogs` (division posts).',
-      'Local dev without SMTP: set SKIP_EMPLOYEE_CREATE_OTP=1 to create employees from the dashboard.',
     ].join('\n'),
   );
 }

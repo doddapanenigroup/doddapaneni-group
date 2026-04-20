@@ -184,42 +184,6 @@ export async function sendLoginSuccessEmail(
   });
 }
 
-/**
- * OTP emailed to Super Admin / Admin to confirm creating an employee account.
- */
-export async function sendAdminEmployeeCreateOtpEmail(
-  adminEmail: string,
-  adminName: string | null,
-  newEmployeeEmail: string,
-  newUsername: string,
-  roleLabel: string,
-  code: string
-): Promise<void> {
-  const transporter = getTransporter();
-  if (!transporter) {
-    throw new Error('Email is not configured (set EMAIL_USER + EMAIL_PASS, or SMTP_USER + SMTP_PASS, or SMTP_HOST + SMTP_USER + SMTP_PASS)');
-  }
-  const displayName = adminName?.trim() || adminEmail;
-
-  await transporter.sendMail({
-    from: mailFromHeader(),
-    to: adminEmail,
-    subject: 'Verify new employee account – Doddapaneni Group',
-    text: `Hello ${displayName},\n\nUse this code to finish creating the employee account:\n\n${code}\n\nNew user: ${newEmployeeEmail} (@${newUsername}, ${roleLabel})\n\nThis code expires in 15 minutes. If you did not start this, change your password and contact support.\n\nDoddapaneni Group`,
-    html: `
-      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
-        <h2 style="color: #1e3a8a;">Verify new employee</h2>
-        <p>Hello <strong>${displayName}</strong>,</p>
-        <p>Enter this code in the dashboard to finish creating the account:</p>
-        <p style="font-size: 28px; letter-spacing: 0.2em; font-weight: bold; color: #1e3a8a;">${code}</p>
-        <p><strong>New employee:</strong> ${newEmployeeEmail}<br/><strong>Username:</strong> ${newUsername}<br/><strong>Role:</strong> ${roleLabel}</p>
-        <p style="font-size: 14px; color: #666;">This code expires in 15 minutes. If you did not request this, secure your account and contact support.</p>
-        <p style="margin-top: 24px; font-size: 14px; color: #1e3a8a; font-weight: bold;">Doddapaneni Group</p>
-      </div>
-    `,
-  });
-}
-
 export async function sendUserInviteEmail(args: {
   to: string;
   invitedByEmail: string;
