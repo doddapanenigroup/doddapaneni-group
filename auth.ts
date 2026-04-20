@@ -112,12 +112,5 @@ const nextAuth = NextAuth({
   secret: process.env.AUTH_SECRET,
 });
 
+/** Use `await auth()` in Server Components, Route Handlers, and server actions. */
 export const { handlers, signIn, signOut, auth } = nextAuth;
-
-/**
- * Server-side session for Route Handlers and Server Components.
- * Auth.js v5 uses `auth()` under the hood (replaces NextAuth v4 `getServerSession`).
- */
-export async function getServerSession() {
-  return auth();
-}

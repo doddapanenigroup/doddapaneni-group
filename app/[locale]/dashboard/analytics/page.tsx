@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';
-import { canAccessMarketerDashboard } from '@/lib/dashboard-access';
+import { hasMarketerAccess } from '@/lib/role-utils';
 
 const AnalyticsDashboard = dynamic(() => import('@/components/dashboard/AnalyticsDashboard'), {
   loading: () => (
@@ -24,7 +24,7 @@ export default async function AnalyticsPage({ params }: Props) {
   const { locale } = await params;
 
   const role = session?.user?.role;
-  if (!session?.user || !canAccessMarketerDashboard(role as Role | null | undefined)) {
+  if (!session?.user || !hasMarketerAccess(role as Role | null | undefined)) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
 

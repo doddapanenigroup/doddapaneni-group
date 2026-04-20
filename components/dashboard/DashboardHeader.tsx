@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { LayoutDashboard, LogOut } from 'lucide-react';
+import { KeyRound, LayoutDashboard, LogOut } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle, getRoleLabel } from '@/lib/dashboard-title';
 import DashboardThemeToggle from '@/components/dashboard/DashboardThemeToggle';
+import DashboardNotificationBell from '@/components/dashboard/DashboardNotificationBell';
 import GlobalSearchPalette from '@/components/dashboard/GlobalSearchPalette';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
@@ -51,6 +52,8 @@ export default function DashboardHeader({
             {user.email}
           </span>
 
+          <DashboardNotificationBell />
+
           <DashboardThemeToggle />
 
           <Link
@@ -61,15 +64,26 @@ export default function DashboardHeader({
           >
             <LayoutDashboard size={18} className="opacity-85" />
           </Link>
+          <Link
+            href={publicPathForLocale(locale, '/dashboard/security')}
+            className={iconActionClass}
+            title="Change your password (current password required; no email code)"
+            aria-label="Change password"
+          >
+            <KeyRound size={18} className="opacity-85" />
+          </Link>
           <button
             type="button"
             onClick={async () => {
               try {
-                await fetch('/api/session/logout', { method: 'POST' });
+                await fetch('/api/session/logout', {
+                  method: 'POST',
+                  credentials: 'include',
+                });
               } catch {
                 // ignore
               }
-              signOut({ callbackUrl: publicPathForLocale(locale, '/login') });
+              await signOut({ callbackUrl: publicPathForLocale(locale, '/login') });
             }}
             className={iconActionClass}
             title="Sign out"

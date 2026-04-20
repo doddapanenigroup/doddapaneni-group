@@ -32,8 +32,8 @@ type UserRow = {
   createdBy?: { email: string; name: string | null } | null;
 };
 
-const EMPLOYEE_ROLES_SUPER: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
-const EMPLOYEE_ROLES_ADMIN: Role[] = ['DEVELOPER', 'DIGITAL_MARKETER'];
+const EMPLOYEE_ROLES_SUPER: Role[] = ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+const EMPLOYEE_ROLES_ADMIN: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 
 export default function AdminDashboard({
   users: initialUsers,
@@ -51,8 +51,8 @@ export default function AdminDashboard({
   const superViewer = isSuperAdmin(viewerRole);
   const employeeRoles = superViewer ? EMPLOYEE_ROLES_SUPER : EMPLOYEE_ROLES_ADMIN;
   const allowedRolesForPasswordChange: Role[] = superViewer
-    ? ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
-    : ['DEVELOPER', 'DIGITAL_MARKETER'];
+    ? ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
+    : ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 
   const employees = users
     .filter((u) => employeeRoles.includes(u.role))

@@ -190,7 +190,8 @@ export default function LoginFormClient({
 
         <h1 className="text-slate-600 text-center text-sm mb-2">Sign in</h1>
         <p className="text-slate-500 text-center text-xs mb-6 leading-relaxed">
-          Enter your email <strong>or</strong> username and password, then continue to your dashboard.
+          Enter your email <strong>or</strong> username and password. No email codes or extra steps — sign in with your
+          password only.
         </p>
         <form onSubmit={handleSignIn} className="space-y-4">
           <div>

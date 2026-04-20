@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from '@/auth';
+import { auth } from '@/auth';
+import { hasMarketerAccess } from '@/lib/role-utils';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
-import { isDashboardRole } from '@/lib/role-utils';
 export const dynamic = 'force-dynamic';
 
 const MAX_DAYS = 90;
 const DEFAULT_DAYS = 30;
+const MAX_RANGE_DAYS = 90; /* inclusive; matches longest preset and caps custom range */
 
 function isBlogPath(path: string | null): boolean {
   if (!path) return false;
@@ -20,10 +21,39 @@ function clampDays(raw: string | null): number {
   return Math.min(MAX_DAYS, Math.floor(n));
 }
 
+/** Parse `YYYY-MM-DD` as UTC midnight. */
+function parseYmdUtcStart(value: string | null): Date | null {
+  if (value == null || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const t = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(t.getTime())) return null;
+  return t;
+}
+
+function endOfUtcDay(startOfDayUtc: Date): Date {
+  return new Date(
+    Date.UTC(
+      startOfDayUtc.getUTCFullYear(),
+      startOfDayUtc.getUTCMonth(),
+      startOfDayUtc.getUTCDate(),
+      23,
+      59,
+      59,
+      999,
+    ),
+  );
+}
+
+/** Inclusive number of calendar days from start to end (UTC dates). */
+function inclusiveUtcRangeDays(sinceStart: Date, untilStart: Date): number {
+  const ms = untilStart.getTime() - sinceStart.getTime();
+  if (ms < 0) return 0;
+  return Math.floor(ms / 86_400_000) + 1;
+}
+
 export async function GET(request: Request) {
-  const session = await getServerSession();
+  const session = await auth();
   const role = session?.user?.role;
-  const allowed = isDashboardRole(role as any);
+  const allowed = hasMarketerAccess(role as any);
 
   console.info('[dashboard/analytics] auth check', {
     hasSession: Boolean(session?.user?.id),
@@ -39,16 +69,47 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const days = clampDays(url.searchParams.get('days'));
   const now = new Date();
   const startOfTodayUtc = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0)
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0),
   );
-  const untilDay = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999)
+  const endOfTodayUtc = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999),
   );
-  const since = new Date(startOfTodayUtc);
-  since.setUTCDate(since.getUTCDate() - (days - 1));
+
+  const sinceYmd = url.searchParams.get('since');
+  const untilYmd = url.searchParams.get('until');
+  const customSince = parseYmdUtcStart(sinceYmd);
+  const customUntilStart = parseYmdUtcStart(untilYmd);
+
+  let since: Date;
+  let untilDay: Date;
+  let rangeDays: number;
+
+  if (customSince && customUntilStart) {
+    if (customSince.getTime() > customUntilStart.getTime()) {
+      return NextResponse.json({ message: 'Invalid range: since must be on or before until' }, { status: 400 });
+    }
+    const span = inclusiveUtcRangeDays(customSince, customUntilStart);
+    if (span > MAX_RANGE_DAYS) {
+      return NextResponse.json(
+        { message: `Date range must be at most ${MAX_RANGE_DAYS} days` },
+        { status: 400 },
+      );
+    }
+    if (customUntilStart.getTime() > endOfTodayUtc.getTime()) {
+      return NextResponse.json({ message: 'End date cannot be in the future' }, { status: 400 });
+    }
+    since = new Date(customSince);
+    untilDay = endOfUtcDay(customUntilStart);
+    rangeDays = span;
+  } else {
+    const days = clampDays(url.searchParams.get('days'));
+    since = new Date(startOfTodayUtc);
+    since.setUTCDate(since.getUTCDate() - (days - 1));
+    untilDay = endOfTodayUtc;
+    rangeDays = days;
+  }
 
   try {
     await connectDb();
@@ -122,8 +183,29 @@ export async function GET(request: Request) {
     }
 
     const series: { date: string; views: number }[] = [];
-    const cursor = new Date(since);
-    while (cursor <= startOfTodayUtc) {
+    const seriesEndDayStart = new Date(
+      Date.UTC(
+        untilDay.getUTCFullYear(),
+        untilDay.getUTCMonth(),
+        untilDay.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
+    const cursor = new Date(
+      Date.UTC(
+        since.getUTCFullYear(),
+        since.getUTCMonth(),
+        since.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
+    while (cursor.getTime() <= seriesEndDayStart.getTime()) {
       const key = cursor.toISOString().slice(0, 10);
       series.push({ date: key, views: dailyMap.get(key) ?? 0 });
       cursor.setUTCDate(cursor.getUTCDate() + 1);
@@ -139,7 +221,7 @@ export async function GET(request: Request) {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     return NextResponse.json({
-      rangeDays: days,
+      rangeDays: rangeDays,
       since: since.toISOString(),
       until: untilDay.toISOString(),
       productionTrafficOnly: process.env.NODE_ENV !== 'production',

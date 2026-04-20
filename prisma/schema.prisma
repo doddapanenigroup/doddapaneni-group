@@ -26,6 +26,7 @@ model User {
   username          String?   @unique @map("username")
   passwordHash      String    @map("password_hash")
   name              String?
+  /// All dashboard and API access; enforced in application code. PostgreSQL `Role` enum in DB.
   role              Role      @default(DEVELOPER)
   createdById       String?   @map("created_by_id")
   createdAtIST      String?   @map("created_at_ist")
@@ -41,6 +42,11 @@ model User {
   newsPosts                  News[]
   invitesCreated             UserInvite[]             @relation("InviteCreator")
   notifications              Notification[]
+  dashboardVisits            DashboardVisit[]
+  contentEditLogs            ContentEditLog[]
+  marketingActivityLogs      MarketingActivityLog[]
+  errorLogs                  ErrorLog[]
+  webVitalReports            WebVitalReport[]
 }
 
 model UserInvite {
@@ -59,7 +65,8 @@ model UserInvite {
   @@map("user_invite")
 }
 
-/// In-app notifications (per user). Types: page_published | error | user_action
+/// In-app notifications (per user). `type` / `title` / `body` are legacy; `message` is optional one-line text.
+/// `read` is the boolean flag; `readAt` is optional timestamp of when it was read.
 model Notification {
   id        String    @id @default(cuid())
   userId    String    @map("user_id")
@@ -67,12 +74,16 @@ model Notification {
   type      String
   title     String
   body      String?   @db.Text
+  /// Optional short line (e.g. push-style); if null, clients may use `title` and `body`.
+  message   String?   @db.Text
   linkHref  String?   @map("link_href")
+  read      Boolean   @default(false) @map("read")
   readAt    DateTime? @map("read_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, readAt])
+  @@index([userId, read])
   @@map("notification")
 }
 
@@ -173,12 +184,15 @@ model Visit {
 model DashboardVisit {
   id           String   @id @default(cuid())
   userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   path         String
   role         Role
   visitedAt    DateTime @map("visited_at")
   visitedAtIST String   @map("visited_at_ist")
   visitedAtET  String   @map("visited_at_et")
   userAgent    String?  @map("user_agent")
+
+  @@index([userId, visitedAt])
 }
 
 model DeveloperPageView {
@@ -441,6 +455,7 @@ model MarketingLink {
 model ContentEditLog {
   id         String   @id @default(cuid())
   userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userEmail  String   @map("user_email")
   userRole   String   @map("user_role")
   kind       String   @map("kind")
@@ -452,6 +467,7 @@ model ContentEditLog {
 model MarketingActivityLog {
   id          String   @id @default(cuid())
   userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userEmail   String   @map("user_email")
   userRole    String   @map("user_role")
   entity      String   @map("entity")
@@ -472,6 +488,7 @@ model WebVitalReport {
   navigationType String?  @map("navigation_type")
   pagePath       String?  @map("page_path")
   userId         String?  @map("user_id")
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   userAgent      String?  @map("user_agent")
   createdAt      DateTime @default(now()) @map("created_at")
 
@@ -483,6 +500,7 @@ model ErrorLog {
   id String @id @default(cuid())
 
   userId    String? @map("user_id")
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   userEmail String? @map("user_email")
   userRole  String? @map("user_role")
 
@@ -499,19 +517,16 @@ model ErrorLog {
   @@index([createdAt])
 }
 
-model TaskExecutionLog {
-  id        String   @id @default(cuid())
-  taskName  String   @map("task_name")
-  status    String   @map("status") // started | success | error | skipped
-  startedAt DateTime @default(now()) @map("started_at")
-  finishedAt DateTime? @map("finished_at")
-  durationMs Int?     @map("duration_ms")
-  message   String?   @db.Text
-  detailsJson String? @map("details_json") @db.Text
+/// Build / deploy triggers from the developer dashboard (audit log only).
+/// `id` is a string UUID for new rows (v4) when created via Prisma; legacy rows may be cuid.
+model Deployment {
+  id        String   @id @default(uuid())
+  status    String   @map("status")
+  logs      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([taskName, startedAt])
-  @@index([startedAt])
-  @@map("task_execution_log")
+  @@index([createdAt(sort: Desc)])
+  @@map("deployment")
 }
 
 /// Binary image assets served via GET /api/media/{key} (key = path relative to /public, POSIX slashes).

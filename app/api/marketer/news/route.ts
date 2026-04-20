@@ -14,6 +14,7 @@ import {
   parseContentType,
   parseNewsStatus,
 } from '@/lib/marketer-news-fields';
+import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -234,6 +235,12 @@ export async function POST(request: Request) {
         actorUserId: session.user.id,
       }).catch(() => {});
     }
+
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: doc.sector?.slug ?? null,
+      articleSlug: doc.slug,
+    });
 
     return NextResponse.json({ item: doc });
   } catch (error) {

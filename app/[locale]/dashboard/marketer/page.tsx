@@ -20,8 +20,7 @@ export default async function MarketerDashboardPage({ params }: Props) {
   // Overlay module permission: if both pages+blogs are denied, block the dashboard.
   const modulePagesAllowed = await isModuleAllowedForRole(role as any, 'pages');
   const moduleBlogsAllowed = await isModuleAllowedForRole(role as any, 'blogs');
-  const isDigitalMarketer = role === 'DIGITAL_MARKETER';
-  const canPages = !isDigitalMarketer && modulePagesAllowed;
+  const canPages = modulePagesAllowed;
   const canBlogs = moduleBlogsAllowed;
   if (!canPages && !canBlogs) {
     redirect(publicPathForLocale(locale, '/dashboard'));

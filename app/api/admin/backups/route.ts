@@ -4,6 +4,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { buildBackupJson, backupDigest, saveBackupToDb } from '@/lib/db-backup';
 import { hasAdminAccess } from '@/lib/role-utils';
+import { notifyAdminsBackupCreated } from '@/lib/notify';
 
 function isAdminRole(role: unknown) {
   return hasAdminAccess(role as any);
@@ -77,6 +78,11 @@ export async function POST(request: Request) {
       dataJson,
       sha256,
       sizeBytes,
+    });
+
+    void notifyAdminsBackupCreated({
+      label,
+      createdByEmail: session.user.email ?? null,
     });
 
     return NextResponse.json({ ok: true, backup: { ...row, createdAt: row.createdAt.toISOString() } });

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from '@/auth';
+import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
-import { isDashboardRole } from '@/lib/role-utils';
+import { hasAdminAccess } from '@/lib/role-utils';
 import type {
   ContentEditLog,
   MarketingActivityLog,
@@ -26,7 +26,7 @@ type WebVitalGroupRow = {
 };
 
 export async function GET() {
-  const session = await getServerSession();
+  const session = await auth();
   const role = session?.user?.role;
 
   console.info('[dashboard/admin-insights] auth check', {
@@ -38,7 +38,7 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
-  if (!isDashboardRole(role as any)) {
+  if (!hasAdminAccess(role as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 

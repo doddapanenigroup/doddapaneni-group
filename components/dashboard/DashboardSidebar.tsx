@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, Code2, Megaphone } from 'lucide-react';
 import type { Role } from '@/lib/constants';
-import { getDashboardTitle } from '@/lib/dashboard-title';
+import { getDashboardTitle, MARKETING_DASHBOARD_NAV_LABEL } from '@/lib/dashboard-title';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type DashboardMenuItem = {
@@ -30,7 +30,7 @@ function dashboardItems(locale: string): DashboardMenuItem[] {
     },
     {
       href: publicPathForLocale(locale, '/dashboard/marketer'),
-      label: getDashboardTitle('DIGITAL_MARKETER'),
+      label: MARKETING_DASHBOARD_NAV_LABEL,
       icon: Megaphone,
       roles: ['SUPER_ADMIN', 'ADMIN', 'DIGITAL_MARKETER'],
     },

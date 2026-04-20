@@ -38,6 +38,7 @@ import {
 import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
+import { hasDeveloperAccess } from '@/lib/role-utils';
 
 type CampaignStatus = 'draft' | 'active' | 'paused' | 'ended';
 type Campaign = {
@@ -510,6 +511,16 @@ export default function MarketerDashboard({
     canPages ? 'pages' : canBlogs ? 'blogs' : 'campaigns',
   );
 
+  useEffect(() => {
+    if (canPages) return;
+    setActiveTab((t) => (t === 'pages' ? (canBlogs ? 'blogs' : 'campaigns') : t));
+  }, [canPages, canBlogs]);
+
+  useEffect(() => {
+    if (canBlogs) return;
+    setActiveTab((t) => (t === 'blogs' ? (canPages ? 'pages' : 'campaigns') : t));
+  }, [canBlogs, canPages]);
+
   const [previewLink, setPreviewLink] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
@@ -764,6 +775,11 @@ export default function MarketerDashboard({
   }, [locale, canPages]);
 
   useEffect(() => {
+    if (!canBlogs) {
+      setBlogs([]);
+      setBlogsLoading(false);
+      return;
+    }
     const qs = blogSectorFilter
       ? `?sectorId=${encodeURIComponent(blogSectorFilter)}`
       : '';
@@ -781,7 +797,7 @@ export default function MarketerDashboard({
       })
       .catch(() => setBlogs([]))
       .finally(() => setBlogsLoading(false));
-  }, [blogSectorFilter]);
+  }, [blogSectorFilter, canBlogs]);
 
   useEffect(() => {
     fetch('/api/marketer/sectors')
@@ -1139,10 +1155,10 @@ export default function MarketerDashboard({
 
   const marketerSaveRef = useRef<() => void>(() => {});
   marketerSaveRef.current = () => {
-    if (activeTab === 'pages') {
+    if (activeTab === 'pages' && canPages) {
       if (creatingPage) void createPage();
       else if (selectedPageSlug) void savePageSeo();
-    } else if (activeTab === 'blogs') {
+    } else if (activeTab === 'blogs' && canBlogs) {
       if (selectedBlogSlug) void saveBlogSeo();
     } else if (activeTab === 'campaigns' && showCampaignForm) {
       void handleSaveCampaign();
@@ -1162,7 +1178,7 @@ export default function MarketerDashboard({
       <DashboardPageHeader
         icon={Megaphone}
         title={getDashboardTitle(viewerRole)}
-        description="Analytics, campaigns, and marketing tools. All data is stored in the database."
+        description="Pages, blogs, campaigns, and media for your locale. Admins and digital marketers use this area; all data is stored in the database."
       />
 
       <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
@@ -1221,7 +1237,7 @@ export default function MarketerDashboard({
 
       <VisitStatsLazy />
 
-      {canPages ? <CareersJobsPanel locale={locale} /> : null}
+      {canPages && hasDeveloperAccess(viewerRole) ? <CareersJobsPanel locale={locale} /> : null}
 
       <section className="rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <div className="flex flex-wrap gap-1 sm:gap-1.5">
@@ -1247,7 +1263,7 @@ export default function MarketerDashboard({
         </div>
       </section>
 
-      {activeTab === 'pages' && (
+      {activeTab === 'pages' && canPages && (
         <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
             <div>
@@ -1481,7 +1497,7 @@ export default function MarketerDashboard({
         </section>
       )}
 
-      {activeTab === 'blogs' && (
+      {activeTab === 'blogs' && canBlogs && (
         <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
             <h2 className="text-lg font-semibold text-slate-800">Blog management + SEO</h2>
@@ -1672,7 +1688,7 @@ export default function MarketerDashboard({
         </section>
       )}
 
-      {(activeTab === 'pages' || activeTab === 'blogs') && (
+      {((activeTab === 'pages' && canPages) || (activeTab === 'blogs' && canBlogs)) && (
         <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
           <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
             <ImageIcon size={18} className="text-slate-600" />
@@ -1714,7 +1730,7 @@ export default function MarketerDashboard({
                     tabIndex={0}
                     className="text-left rounded-lg border border-slate-200 p-2 hover:border-slate-400"
                     onClick={() => {
-                      if (activeTab === 'pages') {
+                      if (activeTab === 'pages' && canPages) {
                         setPageForm((f) => ({ ...f, ogImage: img.url }));
                       } else {
                         setBlogForm((f) => ({ ...f, featuredImage: img.url, ogImage: img.url }));

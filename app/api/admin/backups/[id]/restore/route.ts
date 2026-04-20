@@ -68,7 +68,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         await tx.contentEditLog.deleteMany({});
         await tx.marketingActivityLog.deleteMany({});
         await tx.errorLog.deleteMany({});
-        await tx.taskExecutionLog.deleteMany({});
+        await tx.deployment.deleteMany({});
         // audit_log is immutable; we do NOT delete/restore it in replace mode.
         await tx.userInvite.deleteMany({});
         await tx.adminEmployeeCreateOtp.deleteMany({});

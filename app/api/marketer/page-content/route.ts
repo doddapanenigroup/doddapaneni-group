@@ -7,6 +7,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
+import { revalidateCmsPublicSurfaces } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -158,6 +159,8 @@ export async function POST(request: Request) {
         actorUserId: session.user.id,
       }).catch(() => {});
     }
+
+    revalidateCmsPublicSurfaces();
 
     return NextResponse.json({
       item: {

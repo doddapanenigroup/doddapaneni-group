@@ -6,15 +6,8 @@ import { sendRoleDeletedEmailToDeleter, sendRoleDeletedEmailToDeletedUser } from
 import bcrypt from 'bcryptjs';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { writeAuditLog } from '@/lib/audit';
-import { hasAdminAccess, isAdmin, isSuperAdmin } from '@/lib/role-utils';
-
-const ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES = ['DEVELOPER', 'DIGITAL_MARKETER'] as const;
-type AdminAllowedPasswordChangeRole = (typeof ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES)[number];
-function isAdminAllowedPasswordChangeRole(
-  role: string
-): role is AdminAllowedPasswordChangeRole {
-  return ADMIN_ALLOWED_PASSWORD_CHANGE_ROLES.includes(role as AdminAllowedPasswordChangeRole);
-}
+import { canSetPasswordForTarget, hasAdminAccess, isAdmin, isSuperAdmin } from '@/lib/role-utils';
+import type { Role } from '@/lib/constants';
 
 export async function PATCH(
   request: Request,
@@ -22,9 +15,8 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    const role = session?.user?.role;
+    const role = session?.user?.role as Role | undefined;
     const currentUserId = session?.user?.id;
-    const isAdminUser = isAdmin(role as any);
 
     if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
@@ -37,7 +29,7 @@ export async function PATCH(
 
     if (id === currentUserId) {
       return NextResponse.json(
-        { message: 'Cannot change your own password here. Use profile/settings if available.' },
+        { message: 'To change your own password, use Security in the dashboard (current password required).' },
         { status: 400 }
       );
     }
@@ -62,19 +54,21 @@ export async function PATCH(
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const targetRole = user.role as string;
-    if (isAdminUser && !isAdminAllowedPasswordChangeRole(targetRole)) {
-      return NextResponse.json(
-        { message: 'Admin can only change password for Developer or Digital Marketer' },
-        { status: 403 }
-      );
+    const targetRole = user.role as Role;
+    if (!role) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+    const perm = canSetPasswordForTarget(role, targetRole);
+    if (!perm.ok) {
+      return NextResponse.json({ message: perm.message }, { status: 403 });
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
     const passwordChangedAt = new Date();
+    // Invalidate the target’s JWTs so the new password is the only one that can sign in fresh.
     await prisma.user.update({
       where: { id },
-      data: { passwordHash, passwordChangedAt },
+      data: { passwordHash, passwordChangedAt, sessionRevokedAt: passwordChangedAt },
     });
 
     if (currentUserId) {

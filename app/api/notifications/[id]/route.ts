@@ -37,17 +37,23 @@ export async function PATCH(
       return NextResponse.json({ message: 'Not found' }, { status: 404 });
     }
 
+    const now = new Date();
     const updated = await prisma.notification.update({
       where: { id: row.id },
-      data: { readAt: read ? new Date() : null },
+      data: {
+        read: !!read,
+        readAt: read ? now : null,
+      },
       select: {
         id: true,
+        read: true,
         readAt: true,
       },
     });
 
     return NextResponse.json({
       ok: true,
+      read: updated.read,
       readAt: updated.readAt ? updated.readAt.toISOString() : null,
     });
   } catch (error) {

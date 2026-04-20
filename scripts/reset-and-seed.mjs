@@ -120,7 +120,7 @@ async function main() {
     SUPER_ADMIN_EMAIL,
     '/',
     SUPER_ADMIN_USERNAME,
-    '+ password from SUPER_ADMIN_PASSWORD (default Lokesh@0317), then enter the email OTP.'
+    '+ password from SUPER_ADMIN_PASSWORD (default Lokesh@0317).'
   );
   console.log('Go to /en/login (or your locale) to sign in.');
 }

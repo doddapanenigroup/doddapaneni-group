@@ -19,7 +19,12 @@ export const FEATURE_FLAG_DEFINITIONS: ReadonlyArray<{
   { name: 'seoScore', label: 'SEO score', description: 'SEO score and suggestions in marketer dashboard' },
   { name: 'previewSharing', label: 'Preview sharing', description: 'Token-based draft preview links' },
   { name: 'errorMonitoring', label: 'Error monitoring', description: 'Developer error log panel' },
-  { name: 'analyticsDashboard', label: 'Analytics dashboard', description: 'Developer observability / analytics panel' },
+  {
+    name: 'analyticsDashboard',
+    label: 'Developer request & observability',
+    description:
+      'Request monitor and Observability panels on the developer dashboard. (Public traffic / charts: /dashboard/analytics — not this flag.)',
+  },
 ];
 
 type FeatureCacheEntry = { enabled: boolean; fetchedAt: number };

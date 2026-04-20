@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Trash2, RefreshCw } from 'lucide-react';
+import { routing } from '@/i18n/routing';
 
 export default function DeveloperCachePanel() {
   const [pathsText, setPathsText] = useState('/en\n/en/news\n/en/about');
   const [tagsText, setTagsText] = useState('');
+  const [pathScope, setPathScope] = useState<'page' | 'layout'>('page');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; results?: unknown; message?: string } | null>(null);
 
@@ -27,10 +29,25 @@ export default function DeveloperCachePanel() {
       const res = await fetch('/api/developer/cache/revalidate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paths, tags }),
+        body: JSON.stringify({ paths, tags, pathScope }),
       });
       const json = (await res.json().catch(() => null)) as { ok?: boolean; results?: unknown; message?: string } | null;
       setResult(res.ok ? { ok: true, results: json?.results } : { ok: false, message: json?.message ?? `HTTP ${res.status}` });
+      if (res.ok) {
+        const devPath = `/${routing.defaultLocale}/dashboard/developer`;
+        void fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            type: 'user_action',
+            title: 'Cache revalidation completed',
+            message: 'On-demand ISR revalidation finished',
+            body: `Paths: ${paths.length}, tags: ${tags.length}, scope: ${pathScope}`,
+            linkHref: devPath,
+          }),
+        }).catch(() => {});
+      }
     } catch (e) {
       setResult({ ok: false, message: e instanceof Error ? e.message : 'Request failed' });
     } finally {
@@ -47,8 +64,31 @@ export default function DeveloperCachePanel() {
 
       <div className="p-5 space-y-3">
         <p className="text-sm text-slate-600">
-          This triggers Next.js on-demand revalidation. It does not expose secrets and does not cause downtime.
+          On-demand ISR: revalidate <strong>page</strong> (this route) or <strong>layout</strong> (this segment and below). Does
+          not purge external CDNs.
         </p>
+
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-slate-700">Path revalidation scope:</span>
+          <label className="inline-flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="pathScope"
+              checked={pathScope === 'page'}
+              onChange={() => setPathScope('page')}
+            />
+            Page
+          </label>
+          <label className="inline-flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="pathScope"
+              checked={pathScope === 'layout'}
+              onChange={() => setPathScope('layout')}
+            />
+            Layout
+          </label>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-3">
           <div>

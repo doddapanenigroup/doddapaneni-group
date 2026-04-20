@@ -35,16 +35,22 @@ export default function ManageEmployeesModal({
   onDelete,
   onChangePassword,
   onClose,
+  showAddEmployee = true,
+  showDelete = true,
+  modalTitle = 'Manage employees',
 }: {
   employees: UserRow[];
   allowedRoles: Role[];
   currentUserId: string;
   /** Roles whose password the current user is allowed to change (e.g. Admin: Developer, Digital Marketer) */
   allowedRolesForPasswordChange?: Role[];
-  onEmployeeCreated: (user: UserRow) => void;
-  onDelete: (id: string) => Promise<void>;
+  onEmployeeCreated?: (user: UserRow) => void;
+  onDelete?: (id: string) => Promise<void>;
   onChangePassword?: (id: string, newPassword: string) => Promise<void>;
   onClose: () => void;
+  showAddEmployee?: boolean;
+  showDelete?: boolean;
+  modalTitle?: string;
 }) {
   const { pushEscLayer } = useDashboardShortcuts();
   useEffect(() => {
@@ -55,6 +61,7 @@ export default function ManageEmployeesModal({
     () => [...allowedRoles].sort((a, b) => getRoleOrder(a) - getRoleOrder(b)),
     [allowedRoles]
   );
+  const canAdd = Boolean(showAddEmployee && onEmployeeCreated && sortedAllowedRoles.length > 0);
   const sortedEmployees = useMemo(
     () =>
       [...employees].sort(
@@ -84,7 +91,7 @@ export default function ManageEmployeesModal({
     setUsername('');
     setPassword('');
     setName('');
-    setRole(sortedAllowedRoles[0]);
+    setRole(sortedAllowedRoles[0] ?? allowedRoles[0]);
   }
 
   async function handleCreateEmployee(e: React.FormEvent) {
@@ -112,7 +119,7 @@ export default function ManageEmployeesModal({
         return;
       }
       if (json.user) {
-        onEmployeeCreated({
+        onEmployeeCreated?.({
           ...json.user,
           createdAt: json.user.createdAt ? new Date(json.user.createdAt as unknown as string) : new Date(),
         });
@@ -127,6 +134,7 @@ export default function ManageEmployeesModal({
   }
 
   async function handleDelete(id: string) {
+    if (!onDelete) return;
     if (id === currentUserId) return;
     setDeletingId(id);
     try {
@@ -162,7 +170,7 @@ export default function ManageEmployeesModal({
       <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 bg-slate-50 shrink-0">
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Users size={24} className="text-slate-600" />
-          Manage employees
+          {modalTitle}
         </h2>
         <button
           type="button"
@@ -177,6 +185,7 @@ export default function ManageEmployeesModal({
       <div className="flex-1 overflow-auto p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-slate-600">{sortedEmployees.length} employee(s)</p>
+            {canAdd ? (
             <button
               type="button"
               onClick={() => {
@@ -193,9 +202,10 @@ export default function ManageEmployeesModal({
               <Plus size={18} />
               Add employee
             </button>
+            ) : null}
           </div>
 
-          {showForm && (
+          {showForm && canAdd && (
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
                 <form onSubmit={handleCreateEmployee} className="space-y-3">
                   <p className="text-sm text-slate-600">
@@ -398,6 +408,7 @@ export default function ManageEmployeesModal({
                                 <KeyRound size={18} />
                               </button>
                             )}
+                            {showDelete && onDelete && (
                             <button
                               type="button"
                               onClick={() => handleDelete(u.id)}
@@ -407,6 +418,7 @@ export default function ManageEmployeesModal({
                             >
                               <Trash2 size={18} />
                             </button>
+                            )}
                           </div>
                         ) : (
                           <span className="text-slate-400 text-xs">(you)</span>

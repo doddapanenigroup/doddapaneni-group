@@ -11,10 +11,13 @@ type EnvCheck = {
   hint?: string;
 };
 
+type SafeEnvRow = { key: string; value: string; sensitive: boolean };
+
 type Payload = {
   ok: boolean;
   checks: EnvCheck[];
   summary: { requiredInvalid: number; recommendedInvalid: number };
+  safeEnv?: SafeEnvRow[];
 };
 
 export default function DeveloperEnvPanel() {
@@ -41,7 +44,9 @@ export default function DeveloperEnvPanel() {
       </h2>
 
       <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
-        <p className="text-sm text-slate-600">Shows missing/invalid env configuration (secrets not displayed).</p>
+        <p className="text-sm text-slate-600">
+          Required/recommended checks and a safe preview of non-secret values (sensitive keys are masked).
+        </p>
         <button
           type="button"
           onClick={() => load()}
@@ -96,6 +101,24 @@ export default function DeveloperEnvPanel() {
                 ))}
               </ul>
             </div>
+
+            {data.safeEnv && data.safeEnv.length > 0 ? (
+              <div className="rounded-xl border border-slate-200 overflow-hidden mt-4">
+                <div className="bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">Safe environment preview</div>
+                <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-80 overflow-auto">
+                  {data.safeEnv.map((row) => (
+                    <li key={row.key} className="px-4 py-2.5 grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-2 text-sm">
+                      <span className="font-mono text-xs text-slate-600 break-all">{row.key}</span>
+                      <span
+                        className={`text-xs break-all ${row.sensitive ? 'text-amber-800 dark:text-amber-200' : 'text-slate-800 dark:text-slate-200'}`}
+                      >
+                        {row.value}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

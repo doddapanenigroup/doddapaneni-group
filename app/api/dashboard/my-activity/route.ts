@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from '@/auth';
+import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import type {
   ContentEditLog,
@@ -11,7 +11,7 @@ import type { Role } from '@/lib/constants';
 import { isDashboardRole } from '@/lib/role-utils';
 
 export async function GET() {
-  const session = await getServerSession();
+  const session = await auth();
   const role = session?.user?.role as Role | undefined;
 
   console.info('[dashboard/my-activity] auth check', {

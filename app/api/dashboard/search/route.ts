@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from '@/auth';
+import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { recordApiRequest } from '@/lib/request-monitor';
@@ -18,7 +18,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const session = await getServerSession();
+  const session = await auth();
   recordApiRequest({ request, userId: session?.user?.id ?? null });
   const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
 

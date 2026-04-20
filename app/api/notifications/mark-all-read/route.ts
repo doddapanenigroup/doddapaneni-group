@@ -15,8 +15,8 @@ export async function POST(request: Request) {
     await connectDb();
     const now = new Date();
     const r = await prisma.notification.updateMany({
-      where: { userId: session.user.id, readAt: null },
-      data: { readAt: now },
+      where: { userId: session.user.id, read: false },
+      data: { read: true, readAt: now },
     });
     return NextResponse.json({ ok: true, updated: r.count });
   } catch (error) {

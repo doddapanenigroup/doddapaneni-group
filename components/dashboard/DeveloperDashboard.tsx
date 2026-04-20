@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Pencil, Languages, Users } from 'lucide-react';
+import { ChevronDown, Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Pencil, Languages, Users } from 'lucide-react';
 import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
@@ -10,10 +10,9 @@ import { getDashboardTitle } from '@/lib/dashboard-title';
 import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
 import DeveloperErrorsPanel from './DeveloperErrorsPanel';
 import DeveloperRequestMonitorPanel from './DeveloperRequestMonitorPanel';
-import DeveloperTasksPanel from './DeveloperTasksPanel';
+import DeveloperBuildDeploymentsPanel from './DeveloperBuildDeploymentsPanel';
 import DeveloperEnvPanel from './DeveloperEnvPanel';
 import DeveloperCachePanel from './DeveloperCachePanel';
-import DeveloperTimelinePanel from './DeveloperTimelinePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
@@ -28,6 +27,9 @@ type SitePage = {
   icon: React.ReactNode;
 };
 
+const panelClass =
+  'overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900/95';
+
 export default function DeveloperDashboard({
   locale,
   viewerRole = 'DEVELOPER',
@@ -37,8 +39,12 @@ export default function DeveloperDashboard({
 }) {
   const [editingPage, setEditingPage] = useState<SitePage | null>(null);
   const [translateLoading, setTranslateLoading] = useState(false);
-  const [translateResult, setTranslateResult] = useState<{ results: { locale: string; translated: number; skipped: number }[] } | null>(null);
+  const [translateResult, setTranslateResult] = useState<{
+    results: { locale: string; translated: number; skipped: number }[];
+  } | null>(null);
   const [translateError, setTranslateError] = useState<string | null>(null);
+  const [careersOpen, setCareersOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const home = publicPathForLocale(locale, '/');
   const staticPages: SitePage[] = [
     { href: home, label: 'Home', pageKey: 'home', editFile: 'app/[locale]/page.tsx', icon: <Globe size={20} /> },
@@ -50,11 +56,10 @@ export default function DeveloperDashboard({
     { href: home, label: 'Messages (en) — translations source', pageKey: 'messages-en', editFile: 'messages/en.json', icon: <Languages size={20} /> },
   ];
   const sitePages = staticPages;
-
   const isDeveloperView = viewerRole === 'DEVELOPER';
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-6xl space-y-3 pb-4">
       <DashboardPageHeader
         icon={Code2}
         title={getDashboardTitle(viewerRole)}
@@ -79,165 +84,208 @@ export default function DeveloperDashboard({
         }
       />
 
-      <CareersJobsPanel locale={locale} />
+      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-800/20">
+        <button
+          type="button"
+          onClick={() => setCareersOpen((o) => !o)}
+          className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-800 dark:text-slate-100"
+          aria-expanded={careersOpen}
+        >
+          <span>Careers & job listings</span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${careersOpen ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
+        </button>
+        {careersOpen ? (
+          <div className="border-t border-slate-200/80 p-2 dark:border-slate-700 sm:p-3">
+            <CareersJobsPanel locale={locale} />
+          </div>
+        ) : null}
+      </div>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
-          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-            <BookOpen size={18} className="text-slate-600" />
-            How to change the code
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:items-start">
+        <div className="min-w-0 space-y-3">
+          <section className={panelClass}>
+            <div className="border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                <BookOpen size={16} className="text-slate-600" />
+                How to change the code
+              </h2>
+            </div>
+            <div className="space-y-2 p-3 text-sm leading-snug text-slate-700">
+              <ol className="list-inside list-decimal space-y-1.5">
+                <li>Open the project folder in your code editor (Cursor or VS Code).</li>
+                <li>
+                  In a terminal: <code className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-800">npm run dev</code>.
+                </li>
+                <li>Edit the files (see table in the guide). Save; the site will reload.</li>
+                <li>
+                  Use the <strong>Site pages</strong> links to open each page and check your changes.
+                </li>
+              </ol>
+              <p className="pt-1 text-xs text-slate-600 sm:text-sm">
+                Full guide: <code className="rounded bg-slate-100 px-1">docs/DEVELOPER_GUIDE.md</code>
+              </p>
+            </div>
+          </section>
+
+          <section className={panelClass}>
+            <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+              <Languages size={16} className="text-slate-600" />
+              Multi-lingual — automatic translation
+            </h2>
+            <p className="px-3 pt-2 text-xs leading-snug text-slate-600 sm:text-sm">
+              Default: fills <strong>te</strong>, <strong>hi</strong>, and <strong>es</strong> from English via MyMemory
+              (free, no key)—usually a few minutes. For every app locale or a custom list, set{' '}
+              <code className="rounded bg-slate-100 px-1 text-xs">TRANSLATE_ALL_APP_LOCALES=true</code> or{' '}
+              <code className="rounded bg-slate-100 px-1 text-xs">TRANSLATE_LOCALES=te,hi,es</code> in{' '}
+              <code className="rounded bg-slate-100 px-1 text-xs">.env</code> (slow in the browser; prefer{' '}
+              <code className="rounded bg-slate-100 px-1 text-xs">npm run i18n:translate</code>).
+            </p>
+            <div className="flex flex-wrap items-center gap-2 p-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  setTranslateLoading(true);
+                  setTranslateResult(null);
+                  setTranslateError(null);
+                  try {
+                    const res = await fetch('/api/i18n/translate-all', { method: 'POST' });
+                    const data = (await res.json()) as {
+                      results?: { locale: string; translated: number; skipped: number }[];
+                      message?: string;
+                    };
+                    if (res.ok && data.results) setTranslateResult({ results: data.results });
+                    else {
+                      setTranslateResult(null);
+                      setTranslateError(
+                        typeof data.message === 'string' ? data.message : `Request failed (${res.status})`
+                      );
+                    }
+                  } catch {
+                    setTranslateResult(null);
+                    setTranslateError(
+                      'Network error or request timed out. Try again, or run npm run i18n:translate in a terminal.'
+                    );
+                  } finally {
+                    setTranslateLoading(false);
+                  }
+                }}
+                disabled={translateLoading}
+                className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              >
+                <Languages size={16} />
+                {translateLoading ? 'Translating…' : 'Translate all locales'}
+              </button>
+              {translateError && (
+                <p className="rounded-lg bg-red-50 px-2 py-1.5 text-xs text-red-700 sm:text-sm" role="alert">
+                  {translateError}
+                </p>
+              )}
+              {translateResult && (
+                <div className="w-full text-xs text-slate-600 sm:text-sm">
+                  {translateResult.results.map((r) => (
+                    <span key={r.locale} className="mr-2 block sm:inline">
+                      <strong>{r.locale}</strong>: {r.translated} translated, {r.skipped} skipped
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        <section className={`min-w-0 ${panelClass}`}>
+          <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+            <Globe size={16} className="shrink-0 text-slate-600" />
+            Site pages — every page on the website
           </h2>
-        </div>
-        <div className="p-5 space-y-3 text-slate-700 text-sm">
-          <ol className="list-decimal list-inside space-y-2">
-            <li>Open the project folder in your code editor (Cursor or VS Code).</li>
-            <li>In a terminal: <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">npm run dev</code>.</li>
-            <li>Edit the files (see table in the guide). Save; the site will reload.</li>
-            <li>Use the <strong>Site pages</strong> links below to open each page and check your changes.</li>
-          </ol>
-          <p className="text-slate-600 pt-2">
-            Full guide: <code className="bg-slate-100 px-1 rounded">docs/DEVELOPER_GUIDE.md</code>
+          <p className="px-3 pt-2 text-xs leading-snug text-slate-600 sm:text-sm">
+            <strong>Edit code</strong> or <strong>Messages (en)</strong> to change pages or copy. When you save{' '}
+            <strong>Messages (en)</strong>, all other languages (te, hi, es) are translated automatically from
+            English.
           </p>
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
-          <Globe size={20} className="text-slate-600" />
-          Site pages — every page on the website
-        </h2>
-        <p className="px-5 pt-3 text-sm text-slate-600">
-          <strong>Edit code</strong> or <strong>Messages (en)</strong> to change pages or copy. When you save <strong>Messages (en)</strong>, all other languages (te, hi, es) are translated automatically from English.
-        </p>
-        <div className="p-5 grid gap-3 sm:grid-cols-2">
-          {sitePages.map((page) => (
-            <div
-              key={`${page.pageKey}:${page.label}`}
-              className="flex flex-col rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all overflow-hidden"
-            >
-              <div className="flex items-center justify-between p-4 gap-2">
-                <Link
-                  href={page.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-slate-800 font-medium min-w-0 flex-1"
-                >
-                  {page.icon}
-                  <span className="truncate">{page.label}</span>
-                </Link>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setEditingPage(page)}
-                    className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-                    title="Edit content (updates live site)"
-                  >
-                    <Pencil size={18} />
-                  </button>
+          <div className="grid max-h-[min(70vh,520px)] gap-2 overflow-y-auto p-2 sm:grid-cols-2 sm:p-3 sm:pr-1">
+            {sitePages.map((page) => (
+              <div
+                key={`${page.pageKey}:${page.label}`}
+                className="flex flex-col rounded-lg border border-slate-200 bg-slate-50/50 text-sm dark:border-slate-600/80"
+              >
+                <div className="flex items-center justify-between gap-1.5 p-2 sm:p-2.5">
                   <Link
                     href={page.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-slate-500 hover:bg-slate-200 transition-colors"
-                    title="Open page"
+                    className="flex min-w-0 flex-1 items-center gap-2 font-medium text-slate-800"
                   >
-                    <ExternalLink size={18} />
+                    <span className="shrink-0 scale-90 opacity-90">{page.icon}</span>
+                    <span className="truncate text-xs sm:text-sm">{page.label}</span>
                   </Link>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setEditingPage(page)}
+                      className="rounded-md p-1.5 text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600"
+                      title="Edit content (updates live site)"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <Link
+                      href={page.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600"
+                      title="Open page"
+                    >
+                      <ExternalLink size={16} />
+                    </Link>
+                  </div>
                 </div>
+                <p
+                  className="truncate border-t border-slate-100/90 px-2 py-1.5 font-mono text-[10px] text-slate-500 dark:border-slate-600/50 sm:text-xs"
+                  title={page.editFile}
+                >
+                  Edit: {page.editFile}
+                </p>
               </div>
-              <p className="px-4 pb-3 text-xs text-slate-500 font-mono truncate" title={page.editFile}>
-                Edit: {page.editFile}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </div>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
-          <Languages size={20} className="text-slate-600" />
-          Multi-lingual — automatic translation
-        </h2>
-        <p className="px-5 pt-3 text-sm text-slate-600">
-          Default: fills <strong>te</strong>, <strong>hi</strong>, and <strong>es</strong> from English via MyMemory (free, no key)—usually a few minutes. For every app locale or a custom list, set{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_ALL_APP_LOCALES=true</code> or{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">TRANSLATE_LOCALES=te,hi,es</code> in{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">.env</code> (slow in the browser; prefer{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">npm run i18n:translate</code>).
-        </p>
-        <div className="p-5 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={async () => {
-              setTranslateLoading(true);
-              setTranslateResult(null);
-              setTranslateError(null);
-              try {
-                const res = await fetch('/api/i18n/translate-all', { method: 'POST' });
-                const data = (await res.json()) as {
-                  results?: { locale: string; translated: number; skipped: number }[];
-                  message?: string;
-                };
-                if (res.ok && data.results) setTranslateResult({ results: data.results });
-                else {
-                  setTranslateResult(null);
-                  setTranslateError(typeof data.message === 'string' ? data.message : `Request failed (${res.status})`);
-                }
-              } catch {
-                setTranslateResult(null);
-                setTranslateError(
-                  'Network error or request timed out. Try again, or run npm run i18n:translate in a terminal.'
-                );
-              } finally {
-                setTranslateLoading(false);
-              }
-            }}
-            disabled={translateLoading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
-          >
-            <Languages size={18} />
-            {translateLoading ? 'Translating…' : 'Translate all locales'}
-          </button>
-          {translateError && (
-            <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg max-w-2xl" role="alert">
-              {translateError}
-            </p>
-          )}
-          {translateResult && (
-            <div className="text-sm text-slate-600">
-              {translateResult.results.map((r) => (
-                <span key={r.locale} className="mr-3 block sm:inline sm:mr-3 mt-1 sm:mt-0">
-                  <strong>{r.locale}</strong>: {r.translated} translated, {r.skipped} skipped
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <FeatureGate feature="analyticsDashboard">
-        <DeveloperObservabilityPanel />
-      </FeatureGate>
-
-      <FeatureGate feature="errorMonitoring">
-        <DeveloperErrorsPanel />
-      </FeatureGate>
-
-      <FeatureGate feature="analyticsDashboard">
-        <DeveloperRequestMonitorPanel />
-      </FeatureGate>
-
-      <DeveloperTasksPanel />
-
-      <DeveloperEnvPanel />
-
-      <DeveloperCachePanel />
-
-      <DeveloperTimelinePanel />
-
-      <DeveloperAuditPanel />
-
-      <MyActivityPanel />
+      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-800/20">
+        <button
+          type="button"
+          onClick={() => setToolsOpen((o) => !o)}
+          className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-800 dark:text-slate-100"
+          aria-expanded={toolsOpen}
+        >
+          <span>Monitoring, environment, cache & activity</span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${toolsOpen ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
+        </button>
+        {toolsOpen ? (
+          <div className="space-y-3 border-t border-slate-200/80 p-2 sm:space-y-2 sm:p-2">
+            <FeatureGate feature="analyticsDashboard">
+              <DeveloperObservabilityPanel />
+            </FeatureGate>
+            <FeatureGate feature="errorMonitoring">
+              <DeveloperErrorsPanel />
+            </FeatureGate>
+            <FeatureGate feature="analyticsDashboard">
+              <DeveloperRequestMonitorPanel />
+            </FeatureGate>
+            <DeveloperBuildDeploymentsPanel />
+            <DeveloperEnvPanel />
+            <DeveloperCachePanel />
+            <DeveloperAuditPanel />
+            <MyActivityPanel />
+          </div>
+        ) : null}
+      </div>
 
       {editingPage && (
         <EditContentModal

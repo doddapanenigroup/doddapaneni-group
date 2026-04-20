@@ -81,8 +81,26 @@ function apiMediaRemotePatterns(): NonNullable<
 }
 
 /**
+ * Production: every request to the apex host goes to `www` in one 301.
+ * (Placed first in `redirects()` so it takes precedence; avoids loops because `www` is not matched.)
+ */
+function apexToWwwDoddapaneniGroupRedirect(): NonNullable<
+  Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
+> {
+  return [
+    {
+      source: '/:path*',
+      has: [{ type: 'host' as const, value: 'doddapanenigroup.net' }],
+      destination: 'https://www.doddapanenigroup.net/:path*',
+      permanent: true,
+    },
+  ];
+}
+
+/**
  * When NEXT_PUBLIC_SITE_URL (or SITE_URL) is set, send one hop to that hostname
- * (www ↔ apex) so users and crawlers do not chain multiple redirects.
+ * (www ↔ apex) for **other** deploys. Skips `doddapanenigroup.net` so we do not
+ * duplicate the rule from `apexToWwwDoddapaneniGroupRedirect` when canonical is `www`.
  */
 function hostCanonicalRedirects(): NonNullable<
   Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
@@ -97,6 +115,9 @@ function hostCanonicalRedirects(): NonNullable<
     }
     const bare = host.startsWith('www.') ? host.slice(4) : host;
     const www = `www.${bare}`;
+    if (host.startsWith('www.') && bare === 'doddapanenigroup.net') {
+      return [];
+    }
     if (host.startsWith('www.')) {
       return [
         {
@@ -128,6 +149,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      ...apexToWwwDoddapaneniGroupRedirect(),
       ...legacyFaviconRedirects(),
       ...hostCanonicalRedirects(),
       ...removedLocaleRedirects(),

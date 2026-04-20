@@ -14,6 +14,7 @@ import {
   newsPatchDataFromBody,
   parseTranslationPatches,
 } from '@/lib/marketer-news-fields';
+import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -106,7 +107,10 @@ export async function PATCH(
     }
 
     await connectDb();
-    const existing = await prisma.news.findUnique({ where: { slug: currentSlug } });
+    const existing = await prisma.news.findUnique({
+      where: { slug: currentSlug },
+      include: { sector: { select: { slug: true } } },
+    });
     if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
     const data = newsPatchDataFromBody(body);
@@ -231,6 +235,14 @@ export async function PATCH(
       }).catch(() => {});
     }
 
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: out.sector?.slug ?? null,
+      articleSlug: out.slug,
+      previousSectorSlug: existing.sector?.slug ?? null,
+      previousArticleSlug: existing.slug,
+    });
+
     return NextResponse.json({ item: out });
   } catch (error) {
     await captureErrorToDb({
@@ -260,7 +272,10 @@ export async function DELETE(
     if (!s) return NextResponse.json({ message: 'Invalid slug' }, { status: 400 });
 
     await connectDb();
-    const existing = await prisma.news.findUnique({ where: { slug: s } });
+    const existing = await prisma.news.findUnique({
+      where: { slug: s },
+      include: { sector: { select: { slug: true } } },
+    });
     if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
     await prisma.news.delete({ where: { slug: s } });
@@ -291,6 +306,13 @@ export async function DELETE(
       targetLabel: existing.slug,
       payload: { slug: existing.slug, title: existing.title },
     });
+
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: existing.sector?.slug ?? null,
+      articleSlug: existing.slug,
+    });
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     await captureErrorToDb({

@@ -1,12 +1,12 @@
 import type { Role } from '@/lib/constants';
-import { getDashboardTitle } from '@/lib/dashboard-title';
+import { getDashboardTitle, MARKETING_DASHBOARD_NAV_LABEL } from '@/lib/dashboard-title';
 import {
   canAccessAdminDashboard,
-  canAccessAnalyticsDashboard,
   canAccessDeveloperDashboard,
   canAccessEmployeesDashboard,
   canAccessMarketerDashboard,
 } from '@/lib/dashboard-access';
+import { hasMarketerAccess } from '@/lib/role-utils';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 export type DashboardNavSearchHit = {
@@ -57,10 +57,10 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
   if (canAccessMarketerDashboard(role)) {
     hits.push({
       id: 'nav:marketer',
-      title: getDashboardTitle('DIGITAL_MARKETER'),
-      subtitle: 'Blog, media, campaigns',
+      title: MARKETING_DASHBOARD_NAV_LABEL,
+      subtitle: 'Pages, blogs, campaigns (admins & digital marketers)',
       href: dash(locale, '/dashboard/marketer'),
-      searchBlob: 'marketer marketing digital blog content seo media campaigns links news',
+      searchBlob: 'marketer marketing digital blog content seo media campaigns links news pages',
     });
   }
   if (canAccessEmployeesDashboard(role)) {
@@ -72,7 +72,7 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
       searchBlob: 'employees users team people accounts invite hr',
     });
   }
-  if (canAccessAnalyticsDashboard(role)) {
+  if (hasMarketerAccess(role)) {
     hits.push({
       id: 'nav:analytics',
       title: 'Analytics',
@@ -85,9 +85,9 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
   hits.push({
     id: 'nav:security',
     title: 'Security',
-    subtitle: 'Password & sessions',
+    subtitle: 'Change password (current + new; no email code)',
     href: dash(locale, '/dashboard/security'),
-    searchBlob: 'security password login session account',
+    searchBlob: 'security password login change current new account no otp no code',
   });
 
   return hits;

@@ -43,6 +43,8 @@ export async function POST(request: Request) {
 
     const paths = strArray((body as { paths?: unknown }).paths);
     const tags = strArray((body as { tags?: unknown }).tags);
+    const pathScopeRaw = (body as { pathScope?: unknown }).pathScope;
+    const pathScope: 'page' | 'layout' = pathScopeRaw === 'layout' ? 'layout' : 'page';
 
     // Safe defaults: revalidate common public pages.
     const effectivePaths = paths.length
@@ -55,17 +57,22 @@ export async function POST(request: Request) {
           '/en/news',
         ];
 
-    const results: { paths: { path: string; ok: boolean }[]; tags: { tag: string; ok: boolean }[] } = {
+    const results: {
+      pathScope: 'page' | 'layout';
+      paths: { path: string; ok: boolean; scope: 'page' | 'layout' }[];
+      tags: { tag: string; ok: boolean }[];
+    } = {
+      pathScope,
       paths: [],
       tags: [],
     };
 
     for (const p of effectivePaths) {
       try {
-        revalidatePath(p);
-        results.paths.push({ path: p, ok: true });
+        revalidatePath(p, pathScope);
+        results.paths.push({ path: p, ok: true, scope: pathScope });
       } catch {
-        results.paths.push({ path: p, ok: false });
+        results.paths.push({ path: p, ok: false, scope: pathScope });
       }
     }
 

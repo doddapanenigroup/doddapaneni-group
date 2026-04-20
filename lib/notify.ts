@@ -47,13 +47,18 @@ export async function notifyUsersByRoles(args: {
     ).map((u) => u.id);
     if (!userIds.length) return;
     await prisma.notification.createMany({
-      data: userIds.map((userId) => ({
-        userId,
-        type: args.type,
-        title: args.title.slice(0, 500),
-        body: args.body ? args.body.slice(0, 8000) : null,
-        linkHref: args.linkHref ? args.linkHref.slice(0, 2000) : null,
-      })),
+      data: userIds.map((userId) => {
+        const title = args.title.slice(0, 500);
+        return {
+          userId,
+          type: args.type,
+          title,
+          message: title.slice(0, 2000),
+          body: args.body ? args.body.slice(0, 8000) : null,
+          linkHref: args.linkHref ? args.linkHref.slice(0, 2000) : null,
+          read: false,
+        };
+      }),
     });
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -160,4 +165,41 @@ export async function notifyForAuditEntry(args: {
       linkHref: `${dashBase()}/admin`,
     });
   }
+}
+
+/** Shown in every admin’s notification center when a JSON backup is saved. */
+export async function notifyAdminsBackupCreated(args: {
+  label: string | null;
+  createdByEmail: string | null;
+}) {
+  const by = args.createdByEmail?.trim() || 'Unknown';
+  const body = [args.label ? `Label: ${args.label}` : null, `Created by: ${by}`]
+    .filter(Boolean)
+    .join('\n');
+  await notifyUsersByRoles({
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+    type: NOTIFICATION_TYPES.USER_ACTION,
+    title: 'Database backup created',
+    body: body.slice(0, 8000),
+    linkHref: `${dashBase()}/admin`,
+  });
+}
+
+/** Other admins are notified when a new staff account is created. */
+export async function notifyAdminsUserCreated(args: {
+  newUserEmail: string;
+  newUserRole: string;
+  createdByEmail: string | null;
+  excludeUserId: string;
+}) {
+  const by = args.createdByEmail?.trim() || 'Unknown';
+  const body = `New account: ${args.newUserEmail} (${args.newUserRole})\nCreated by: ${by}`;
+  await notifyUsersByRoles({
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+    excludeUserId: args.excludeUserId,
+    type: NOTIFICATION_TYPES.USER_ACTION,
+    title: 'New team member added',
+    body: body.slice(0, 8000),
+    linkHref: `${dashBase()}/admin`,
+  });
 }

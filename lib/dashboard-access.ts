@@ -5,7 +5,10 @@ import {
   hasMarketerAccess,
 } from '@/lib/role-utils';
 
-const ANALYTICS_DASHBOARD_ROLES: readonly Role[] = ['DIGITAL_MARKETER', 'ADMIN', 'SUPER_ADMIN'];
+/**
+ * Dashboard route helpers — all delegate to `lib/role-utils` so page gates and API checks
+ * can import one semantic name and stay aligned.
+ */
 
 export function canAccessDeveloperDashboard(role: Role | null | undefined): boolean {
   return hasDeveloperAccess(role);
@@ -22,8 +25,4 @@ export function canAccessAdminDashboard(role: Role | null | undefined): boolean 
 
 export function canAccessEmployeesDashboard(role: Role | null | undefined): boolean {
   return hasAdminAccess(role);
-}
-
-export function canAccessAnalyticsDashboard(role: Role | null | undefined): boolean {
-  return role != null && ANALYTICS_DASHBOARD_ROLES.includes(role);
 }

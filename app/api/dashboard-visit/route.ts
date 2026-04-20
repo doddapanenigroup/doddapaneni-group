@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from '@/auth';
+import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import type { Role } from '@/lib/constants';
@@ -48,7 +48,7 @@ function asString(value: unknown): string | null {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession();
+  const session = await auth();
   const role = session?.user?.role as Role | undefined;
   console.info('[dashboard-visit] auth check', {
     hasSession: Boolean(session?.user?.id),

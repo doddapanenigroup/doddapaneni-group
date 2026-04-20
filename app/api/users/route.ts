@@ -9,6 +9,7 @@ import type { Role } from '@/lib/constants';
 import type { Role as DbRole } from '@/lib/prisma-generated';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
+import { notifyAdminsUserCreated } from '@/lib/notify';
 
 const usernameSchema = z
   .string()
@@ -118,6 +119,13 @@ export async function POST(request: Request) {
       createdAt,
       password
     ).catch((err) => console.error('Role created email to new user failed:', err));
+
+    void notifyAdminsUserCreated({
+      newUserEmail: doc.email,
+      newUserRole: newUserRole,
+      createdByEmail: session.user.email ?? null,
+      excludeUserId: session.user.id,
+    });
 
     return NextResponse.json({ user });
   } catch (error) {

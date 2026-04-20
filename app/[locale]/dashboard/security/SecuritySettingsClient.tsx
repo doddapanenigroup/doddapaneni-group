@@ -60,8 +60,10 @@ export default function SecuritySettingsClient({ locale }: { locale: string }) {
           Security
         </h1>
         <p className="text-slate-600 text-sm mt-1">
-          Change your password. Passwords are stored using a strong hash (bcrypt). Sign in with your email or
-          username and password.
+          <strong>Passwords only</strong> — no email, no verification codes. Enter your <strong>current</strong>{' '}
+          password, then a new one. The new password is stored as a bcrypt hash. Sign in with your email or username. To
+          change another user&apos;s password, admins use <strong>Manage employees</strong> on the admin dashboard. After
+          you change your password here, you stay signed in; if an admin resets your account, you must sign in again.
         </p>
       </div>
 

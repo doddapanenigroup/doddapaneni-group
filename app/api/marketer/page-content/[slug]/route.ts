@@ -8,6 +8,7 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
+import { revalidateCmsPublicSurfaces } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -169,6 +170,8 @@ export async function PATCH(
       }).catch(() => {});
     }
 
+    revalidateCmsPublicSurfaces();
+
     return NextResponse.json({ ok: true, item: doc });
   } catch (error) {
     await captureErrorToDb({
@@ -229,6 +232,8 @@ export async function DELETE(
       targetLabel: `${existing.slug} (${existing.locale})`,
       payload: { slug: existing.slug, pageKey: existing.pageKey, locale: existing.locale },
     });
+
+    revalidateCmsPublicSurfaces();
 
     return NextResponse.json({ ok: true });
   } catch (error) {

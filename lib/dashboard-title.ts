@@ -1,5 +1,11 @@
 import type { Role } from '@/lib/constants';
 
+/**
+ * Sidebar + ⌘K link to `/dashboard/marketer` for every role that has access
+ * (super admin, admin, digital marketer) — not only the “Digital Marketer” job title.
+ */
+export const MARKETING_DASHBOARD_NAV_LABEL = 'Content & marketing' as const;
+
 const ROLE_LABEL_BY_ROLE = {
   SUPER_ADMIN: 'Super Admin',
   ADMIN: 'Admin',

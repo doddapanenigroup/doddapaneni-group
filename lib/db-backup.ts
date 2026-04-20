@@ -34,7 +34,6 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     marketingActivityLogs,
     contentEditLogs,
     errorLogs,
-    taskExecutionLogs,
     auditLogs,
     visits,
     dashboardVisits,
@@ -42,6 +41,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     adminEmployeeCreateOtps,
     userInvites,
     careerJobs,
+    deployments,
   ] = await Promise.all([
     prisma.user.findMany(),
     prisma.pageContent.findMany(),
@@ -65,7 +65,6 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     prisma.marketingActivityLog.findMany(),
     prisma.contentEditLog.findMany(),
     prisma.errorLog.findMany(),
-    prisma.taskExecutionLog.findMany(),
     prisma.auditLog.findMany(),
     prisma.visit.findMany(),
     prisma.dashboardVisit.findMany(),
@@ -73,6 +72,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
     prisma.adminEmployeeCreateOtp.findMany(),
     prisma.userInvite.findMany(),
     prisma.careerJob.findMany({ include: { translations: true } }) as Promise<unknown[]>,
+    prisma.deployment.findMany(),
   ]);
 
   return {
@@ -91,7 +91,6 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
       MarketingActivityLog: marketingActivityLogs,
       ContentEditLog: contentEditLogs,
       ErrorLog: errorLogs,
-      TaskExecutionLog: taskExecutionLogs,
       AuditLog: auditLogs,
       Visit: visits,
       DashboardVisit: dashboardVisits,
@@ -99,6 +98,7 @@ export async function buildBackupJson(args: { includeMedia: boolean }): Promise<
       AdminEmployeeCreateOtp: adminEmployeeCreateOtps,
       UserInvite: userInvites,
       CareerJob: careerJobs,
+      Deployment: deployments,
     },
   };
 }
