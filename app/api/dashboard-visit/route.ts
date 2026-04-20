@@ -77,10 +77,9 @@ export async function POST(request: Request) {
   const bodyRole = asString(rawBody.role);
   const bodyUserId = asString(rawBody.userId);
 
-  const missing: string[] = [];
-  if (!bodyPath) missing.push('path');
-  if (!bodyRole) missing.push('role');
-  if (!bodyUserId) missing.push('userId');
+  /** Body hints only; `userId` / role always come from the session for writes. */
+  const missingBodyFields: string[] = [];
+  if (!bodyPath) missingBodyFields.push('path');
 
   const path = normalizePath(bodyPath ?? DEFAULT_PATH);
   const userId = session.user.id;
@@ -100,7 +99,7 @@ export async function POST(request: Request) {
       userId: rawBody.userId,
       userAgent: rawBody.userAgent,
     },
-    missingRequiredFields: missing,
+    missingBodyFields,
     bodyIdentityMismatch: mismatchedBodyIdentity,
     resolved: { path, role: safeRole, userId, userAgentLen: userAgent?.length ?? 0 },
   });

@@ -28,6 +28,13 @@ import { getDashboardTitle } from '@/lib/dashboard-title';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
+import { MarketerBlogFields, type MarketerBlogFieldsHandle } from '@/components/dashboard/MarketerBlogFields';
+import {
+  blogFromApiToForm,
+  emptyBlogForm,
+  type BlogFormState,
+  type BlogListRow,
+} from '@/lib/marketer-blog-form';
 import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
@@ -79,25 +86,6 @@ type PageContentRow = {
   metaDescription: string | null;
   keywords: string | null;
   canonicalUrl: string | null;
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImage: string | null;
-};
-
-type BlogRow = {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  sectorId: string | null;
-  sector?: { id: string; name: string; slug: string } | null;
-  featuredImage: string | null;
-  status: 'draft' | 'published';
-  publishedAt: string | null;
-  scheduledPublishAt: string | null;
-  metaTitle: string | null;
-  metaDescription: string | null;
-  keywords: string | null;
   ogTitle: string | null;
   ogDescription: string | null;
   ogImage: string | null;
@@ -506,23 +494,24 @@ function SeoImprovementsPanel(props: {
 export default function MarketerDashboard({
   locale,
   viewerRole,
+  canPages,
+  canBlogs,
 }: {
   locale: string;
   viewerRole: Role;
+  canPages: boolean;
+  canBlogs: boolean;
 }) {
   const base = publicPathForLocale(locale, '/');
   const { data: sessionData } = useSession();
   const { pushSaveLayer } = useDashboardShortcuts();
   const authorLabel = sessionData?.user?.email ?? sessionData?.user?.name ?? '—';
-  const [activeTab, setActiveTab] = useState<'campaigns' | 'links' | 'pages' | 'blogs'>('pages');
+  const [activeTab, setActiveTab] = useState<'campaigns' | 'links' | 'pages' | 'blogs'>(() =>
+    canPages ? 'pages' : canBlogs ? 'blogs' : 'campaigns',
+  );
 
   const [previewLink, setPreviewLink] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-
-  const canPages =
-    viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
-  const canBlogs =
-    viewerRole === 'DIGITAL_MARKETER' || viewerRole === 'ADMIN' || viewerRole === 'SUPER_ADMIN';
 
   // ——— Campaigns ———
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -737,30 +726,14 @@ export default function MarketerDashboard({
   });
 
   // ——— Blog + SEO ———
-  const [blogs, setBlogs] = useState<BlogRow[]>([]);
+  const [blogs, setBlogs] = useState<BlogListRow[]>([]);
   const [blogsLoading, setBlogsLoading] = useState(true);
   const [sectors, setSectors] = useState<SectorRow[]>([]);
   const [sectorsLoading, setSectorsLoading] = useState(true);
   const [blogSectorFilter, setBlogSectorFilter] = useState('');
   const [selectedBlogSlug, setSelectedBlogSlug] = useState('');
-  const [blogForm, setBlogForm] = useState({
-    title: '',
-    slug: '',
-    content: '',
-    sectorId: '',
-    featuredImage: '',
-    status: 'draft' as 'draft' | 'published',
-    publishedAt: '',
-    scheduledPublishAt: '',
-    seoNote: '',
-    metaTitle: '',
-    metaDescription: '',
-    keywords: '',
-    canonicalUrl: '',
-    ogTitle: '',
-    ogDescription: '',
-    ogImage: '',
-  });
+  const [blogForm, setBlogForm] = useState<BlogFormState>(() => emptyBlogForm());
+  const blogFieldsRef = useRef<MarketerBlogFieldsHandle>(null);
 
   // ——— Stored media picker ———
   const [images, setImages] = useState<StoredImageRow[]>([]);
@@ -774,6 +747,11 @@ export default function MarketerDashboard({
   }, [activeTab, selectedPageSlug, selectedBlogSlug]);
 
   useEffect(() => {
+    if (!canPages) {
+      setPages([]);
+      setPagesLoading(false);
+      return;
+    }
     fetch(`/api/marketer/page-content?locale=${encodeURIComponent(locale)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -783,7 +761,7 @@ export default function MarketerDashboard({
       })
       .catch(() => setPages([]))
       .finally(() => setPagesLoading(false));
-  }, [locale]);
+  }, [locale, canPages]);
 
   useEffect(() => {
     const qs = blogSectorFilter
@@ -792,31 +770,13 @@ export default function MarketerDashboard({
     fetch(`/api/marketer/news${qs}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        const items = (d?.items ?? []) as BlogRow[];
+        const items = (d?.items ?? []) as BlogListRow[];
         setBlogs(items);
         if (items[0]) {
           selectBlog(items[0]);
         } else {
           setSelectedBlogSlug('');
-          setBlogForm((f) => ({
-            ...f,
-            title: '',
-            slug: '',
-            content: '',
-            sectorId: blogSectorFilter,
-            featuredImage: '',
-            status: 'draft',
-            publishedAt: '',
-            scheduledPublishAt: '',
-            seoNote: '',
-            metaTitle: '',
-            metaDescription: '',
-            keywords: '',
-            canonicalUrl: '',
-            ogTitle: '',
-            ogDescription: '',
-            ogImage: '',
-          }));
+          setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
         }
       })
       .catch(() => setBlogs([]))
@@ -860,26 +820,9 @@ export default function MarketerDashboard({
     });
   }
 
-  function selectBlog(blog: BlogRow) {
+  function selectBlog(blog: BlogListRow) {
     setSelectedBlogSlug(blog.slug);
-    setBlogForm({
-      title: blog.title ?? '',
-      slug: blog.slug ?? '',
-      content: blog.content ?? '',
-      sectorId: blog.sectorId ?? '',
-      featuredImage: blog.featuredImage ?? '',
-      status: blog.status ?? 'draft',
-      publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().slice(0, 10) : '',
-      scheduledPublishAt: toDateTimeLocalValue(blog.scheduledPublishAt),
-      seoNote: '',
-      metaTitle: blog.metaTitle ?? '',
-      metaDescription: blog.metaDescription ?? '',
-      keywords: blog.keywords ?? '',
-      canonicalUrl: '',
-      ogTitle: blog.ogTitle ?? '',
-      ogDescription: blog.ogDescription ?? '',
-      ogImage: blog.ogImage ?? '',
-    });
+    setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
   }
 
   async function savePageSeo() {
@@ -997,40 +940,45 @@ export default function MarketerDashboard({
   }
 
   async function saveBlogSeo() {
-    if (!selectedBlogSlug) return;
-    const payload = {
+    if (!selectedBlogSlug) {
+      alert('Select a blog from the list on the left (or create one with “Create new blog”) before saving.');
+      return;
+    }
+    const patches =
+      typeof blogFieldsRef.current?.getTranslationPatches === 'function'
+        ? blogFieldsRef.current.getTranslationPatches()
+        : [];
+    const payload: Record<string, unknown> = {
       ...blogForm,
       featuredImage: blogForm.featuredImage || null,
+      translationPatches: patches,
     };
-    const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) return;
-    const item = data.item as BlogRow;
-    setBlogs((prev) => prev.map((b) => (b.id === item.id ? ({ ...b, ...item }) : b)));
-    setSelectedBlogSlug(item.slug);
-    setBlogForm((f) => ({
-      ...f,
-      title: item.title,
-      slug: item.slug,
-      content: item.content,
-      sectorId: item.sectorId ?? '',
-      featuredImage: item.featuredImage ?? '',
-      status: item.status ?? 'draft',
-      publishedAt: item.publishedAt ? new Date(item.publishedAt).toISOString().slice(0, 10) : '',
-      scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
-      seoNote: '',
-      metaTitle: item.metaTitle ?? '',
-      metaDescription: item.metaDescription ?? '',
-      keywords: item.keywords ?? '',
-      canonicalUrl: '',
-      ogTitle: item.ogTitle ?? '',
-      ogDescription: item.ogDescription ?? '',
-      ogImage: item.ogImage ?? '',
-    }));
+    try {
+      const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json().catch(() => ({}))) as { message?: string; item?: BlogListRow };
+      if (!res.ok) {
+        alert(
+          typeof data?.message === 'string' && data.message.trim()
+            ? data.message
+            : `Save failed (${res.status}). Check scheduling/feature flags or server logs.`,
+        );
+        return;
+      }
+      if (!data.item) {
+        alert('Save returned no data. Try again.');
+        return;
+      }
+      const item = data.item;
+      setBlogs((prev) => prev.map((b) => (b.id === item.id ? { ...b, ...item } : b)));
+      setSelectedBlogSlug(item.slug);
+      setBlogForm(blogFromApiToForm(item, item.sectorId ?? blogSectorFilter));
+    } catch {
+      alert('Save failed (network or server error).');
+    }
   }
 
   async function deleteSelectedBlog() {
@@ -1048,40 +996,44 @@ export default function MarketerDashboard({
     if (remaining[0]) selectBlog(remaining[0]);
     else {
       setSelectedBlogSlug('');
-      setBlogForm({
-        title: '',
-        slug: '',
-        content: '',
-        sectorId: '',
-        featuredImage: '',
-        status: 'draft',
-        publishedAt: '',
-        scheduledPublishAt: '',
-        seoNote: '',
-        metaTitle: '',
-        metaDescription: '',
-        keywords: '',
-        canonicalUrl: '',
-        ogTitle: '',
-        ogDescription: '',
-        ogImage: '',
-      });
+      setBlogForm(emptyBlogForm());
     }
   }
 
   async function createBlog() {
-    if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) return;
-    if (!blogForm.sectorId.trim()) return;
-    const res = await fetch('/api/marketer/news', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(blogForm),
-    });
-    const data = await res.json();
-    if (!res.ok) return;
-    const item = data.item as BlogRow;
-    setBlogs((prev) => [item, ...prev]);
-    selectBlog(item);
+    if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) {
+      alert('Title, slug, and full content are required to create a blog.');
+      return;
+    }
+    if (!blogForm.sectorId.trim()) {
+      alert('Select a sector for this post.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/marketer/news', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(blogForm),
+      });
+      const data = (await res.json().catch(() => ({}))) as { message?: string; item?: BlogListRow };
+      if (!res.ok) {
+        alert(
+          typeof data?.message === 'string' && data.message.trim()
+            ? data.message
+            : `Create failed (${res.status}). Slug may already exist, or scheduling may be disabled.`,
+        );
+        return;
+      }
+      if (!data.item) {
+        alert('Create returned no data. Try again.');
+        return;
+      }
+      const item = data.item;
+      setBlogs((prev) => [item, ...prev]);
+      selectBlog(item);
+    } catch {
+      alert('Create failed (network or server error).');
+    }
   }
 
   async function uploadImage(file: File, altText: string) {
@@ -1131,13 +1083,18 @@ export default function MarketerDashboard({
     setPreviewLoading(true);
     setPreviewLink(null);
     try {
-      const payload =
-        kind === "page"
-          ? { kind, slug: selectedPageSlug, locale }
-          : { kind, slug: selectedBlogSlug, locale };
+      const slug =
+        kind === 'page'
+          ? selectedPageSlug.trim()
+          : (selectedBlogSlug || blogForm.slug.trim());
+      const payload = { kind, slug, locale };
 
-      if (!payload.slug) {
-        alert("Please select a draft item first.");
+      if (!slug) {
+        alert(
+          kind === 'page'
+            ? 'Select or create a page first.'
+            : 'Select a post from the list or enter a slug in the form, then try preview again.',
+        );
         return;
       }
 
@@ -1564,115 +1521,57 @@ export default function MarketerDashboard({
               )}
             </div>
             <div className="lg:col-span-2 space-y-3">
-              <div className="grid sm:grid-cols-2 gap-3">
-                <input value={blogForm.title} onChange={(e) => setBlogForm((f) => ({ ...f, title: e.target.value }))} placeholder="Blog title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={blogForm.slug} onChange={(e) => setBlogForm((f) => ({ ...f, slug: e.target.value }))} placeholder="Slug (example: best-packers-movers)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <select
-                  value={blogForm.sectorId}
-                  onChange={(e) => setBlogForm((f) => ({ ...f, sectorId: e.target.value }))}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                >
-                  <option value="">{sectorsLoading ? 'Loading sectors...' : 'Select sector *'}</option>
-                  {sectors.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-                <input value={authorLabel} disabled placeholder="Author" className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
-              </div>
-              <textarea value={blogForm.content} onChange={(e) => setBlogForm((f) => ({ ...f, content: e.target.value }))} placeholder="Blog content" rows={8} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-              <div className="grid sm:grid-cols-2 gap-3">
-                <select
-                  value={blogForm.status}
-                  onChange={(e) =>
-                    setBlogForm((f) => {
-                      const nextStatus = e.target.value as 'draft' | 'published';
-                      return { ...f, status: nextStatus, publishedAt: nextStatus === 'published' ? f.publishedAt : '' };
-                    })
+              <MarketerBlogFields
+                ref={blogFieldsRef}
+                blogForm={blogForm}
+                setBlogForm={setBlogForm}
+                sectors={sectors}
+                sectorsLoading={sectorsLoading}
+                blogs={blogs}
+                authorLabel={authorLabel}
+                uploading={uploading}
+                activeBlog={blogs.find((b) => b.slug === selectedBlogSlug) ?? null}
+                onUploadFeatured={async (file: File) => {
+                  setUploading(true);
+                  try {
+                    const form = new FormData();
+                    form.append('file', file);
+                    if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
+                    const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
+                    const data = await res.json();
+                    if (!res.ok) return;
+                    setBlogForm((f) => ({
+                      ...f,
+                      featuredImage: data.url ?? '',
+                      ogImage: f.ogImage || (data.url ?? ''),
+                    }));
+                    setImages((prev) => [
+                      {
+                        id: data.id ?? `${Date.now()}`,
+                        key: data.key,
+                        url: data.url,
+                        fileName: data.fileName ?? null,
+                        altText: data.altText ?? null,
+                        size: data.size ?? null,
+                        updatedAt: new Date().toISOString(),
+                      },
+                      ...prev,
+                    ]);
+                  } finally {
+                    setUploading(false);
                   }
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
-                <input
-                  type="date"
-                  value={blogForm.publishedAt}
-                  onChange={(e) => setBlogForm((f) => ({ ...f, publishedAt: e.target.value }))}
-                  disabled={blogForm.status !== 'published'}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-                <FeatureGate feature="scheduling">
-                  <>
-                    <input
-                      type="datetime-local"
-                      value={blogForm.scheduledPublishAt}
-                      onChange={(e) => setBlogForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
-                      placeholder="Scheduled publish date/time"
-                    />
-                    <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
-                      Optional: if set to a future time, the blog post won’t show publicly until scheduledPublishAt is due.
-                    </p>
-                  </>
-                </FeatureGate>
-                <div className="sm:col-span-2 grid sm:grid-cols-2 gap-3">
-                  <div>
-                    <input
-                      value={blogForm.featuredImage}
-                      onChange={(e) => setBlogForm((f) => ({ ...f, featuredImage: e.target.value }))}
-                      placeholder="Featured image URL"
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm w-full"
-                    />
-                    <p className="text-xs text-slate-500 mt-1">Or upload a file below</p>
-                  </div>
-                  <label className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 cursor-pointer bg-white flex items-center justify-center">
-                    {uploading ? 'Uploading…' : 'Upload featured image'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      disabled={uploading}
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        setUploading(true);
-                        try {
-                          const form = new FormData();
-                          form.append('file', file);
-                          // Use blog title as alt text when available
-                          if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
-                          const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
-                          const data = await res.json();
-                          if (!res.ok) return;
-                          // stored-image endpoint always converts uploads to .webp
-                          setBlogForm((f) => ({
-                            ...f,
-                            featuredImage: data.url ?? '',
-                            ogImage: f.ogImage || (data.url ?? ''),
-                          }));
-                        } finally {
-                          setUploading(false);
-                        }
-                      }}
-                    />
-                  </label>
+                }}
+              />
+              {blogForm.featuredImage ? (
+                <div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={blogForm.featuredImage}
+                    alt="Featured preview"
+                    className="w-full max-h-48 object-cover rounded-lg border border-slate-200"
+                  />
                 </div>
-                {blogForm.featuredImage ? (
-                  <div className="sm:col-span-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={blogForm.featuredImage} alt="Featured preview" className="w-full h-32 object-cover rounded-lg border border-slate-200 mt-1" />
-                  </div>
-                ) : null}
-                <input value={blogForm.metaTitle} onChange={(e) => setBlogForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={blogForm.keywords} onChange={(e) => setBlogForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <textarea value={blogForm.metaDescription} onChange={(e) => setBlogForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
-                <input value={blogForm.ogTitle} onChange={(e) => setBlogForm((f) => ({ ...f, ogTitle: e.target.value }))} placeholder="OG title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={blogForm.ogImage} onChange={(e) => setBlogForm((f) => ({ ...f, ogImage: e.target.value }))} placeholder="OG image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <textarea value={blogForm.ogDescription} onChange={(e) => setBlogForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
-              </div>
-              <input value={blogForm.seoNote} onChange={(e) => setBlogForm((f) => ({ ...f, seoNote: e.target.value }))} placeholder="Note for team (saved in logs)" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              ) : null}
               <GoogleSnippetPreview
                 title={blogForm.metaTitle || blogForm.title}
                 description={blogForm.metaDescription}
@@ -1715,7 +1614,7 @@ export default function MarketerDashboard({
                     type="button"
                     onClick={() => createPreviewLink("blog")}
                     className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
-                    disabled={previewLoading || !selectedBlogSlug}
+                    disabled={previewLoading || (!selectedBlogSlug && !blogForm.slug.trim())}
                   >
                     {previewLoading ? "Generating…" : "Preview draft"}
                   </button>

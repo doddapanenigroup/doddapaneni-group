@@ -201,7 +201,18 @@ const nextConfig: NextConfig = {
     validateRSCRequestHeaders: true,
   },
   async headers() {
+    const loginNoStore = [
+      { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' },
+      { key: 'Pragma', value: 'no-cache' },
+      { key: 'CDN-Cache-Control', value: 'no-store' },
+    ] as const;
+
     return [
+      { source: '/login', headers: [...loginNoStore] },
+      ...APP_LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((loc) => ({
+        source: `/${loc}/login`,
+        headers: [...loginNoStore],
+      })),
       {
         source: '/(.*)',
         headers: [

@@ -6,6 +6,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { canManageCareers } from '@/lib/careers-permissions';
 import type { Role } from '@/lib/constants';
 import { routing } from '@/i18n/routing';
+import { parseApplyLanguageCodesCsv, toApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
 
 const LOCALES = new Set<string>(routing.locales);
 
@@ -38,6 +39,7 @@ export async function GET(request: Request) {
         slug: r.slug,
         sortOrder: r.sortOrder,
         status: r.status,
+        applyLanguageCodes: parseApplyLanguageCodesCsv(r.applyLanguageCodesCsv),
         updatedAt: r.updatedAt.toISOString(),
         translations: r.translations.map((t) => ({
           locale: t.locale,
@@ -82,13 +84,14 @@ export async function POST(request: Request) {
       sortOrder?: number;
       status?: 'draft' | 'published';
       translations?: TranslationIn[];
+      applyLanguageCodes?: string[];
     };
 
     const translations = Array.isArray(body.translations) ? body.translations : [];
     const en = translations.find((t) => t.locale === 'en');
-    if (!en?.title?.trim() || !en.subtitle?.trim() || !en.description?.trim() || !en.applyUrl?.trim()) {
+    if (!en?.title?.trim() || !en.subtitle?.trim() || !en.description?.trim()) {
       return NextResponse.json(
-        { message: 'English (en) requires title, subtitle, description, and applyUrl.' },
+        { message: 'English (en) requires title, subtitle, and description.' },
         { status: 400 },
       );
     }
@@ -107,7 +110,7 @@ export async function POST(request: Request) {
       const subtitle = typeof t.subtitle === 'string' ? t.subtitle.trim() : '';
       const description = typeof t.description === 'string' ? t.description.trim() : '';
       const applyUrl = typeof t.applyUrl === 'string' ? t.applyUrl.trim() : '';
-      if (!title || !subtitle || !description || !applyUrl) continue;
+      if (!title || !subtitle || !description) continue;
       const applyLabel =
         typeof t.applyLabel === 'string' && t.applyLabel.trim() ? t.applyLabel.trim() : 'Apply';
       normalized.push({ locale: loc, title, subtitle, description, applyLabel, applyUrl });
@@ -115,6 +118,14 @@ export async function POST(request: Request) {
 
     if (!normalized.some((n) => n.locale === 'en')) {
       return NextResponse.json({ message: 'At least English (en) translation is required.' }, { status: 400 });
+    }
+
+    const applyLanguageCodesCsv = toApplyLanguageCodesCsv(body.applyLanguageCodes);
+    if (!applyLanguageCodesCsv) {
+      return NextResponse.json(
+        { message: 'Select at least one application language (English, Telugu, or Hindi).' },
+        { status: 400 },
+      );
     }
 
     await connectDb();
@@ -129,6 +140,7 @@ export async function POST(request: Request) {
         slug,
         sortOrder,
         status,
+        applyLanguageCodesCsv,
         translations: {
           create: normalized.map((n) => ({
             locale: n.locale,
@@ -151,6 +163,7 @@ export async function POST(request: Request) {
         slug: job.slug,
         sortOrder: job.sortOrder,
         status: job.status,
+        applyLanguageCodes: parseApplyLanguageCodesCsv(job.applyLanguageCodesCsv),
         updatedAt: job.updatedAt.toISOString(),
         translations: job.translations.map((t) => ({
           locale: t.locale,

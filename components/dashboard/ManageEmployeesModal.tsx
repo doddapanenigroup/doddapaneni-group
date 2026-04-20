@@ -111,13 +111,17 @@ export default function ManageEmployeesModal({
           role,
         }),
       });
-      const json = (await res.json().catch(() => ({}))) as { message?: string; codeSentTo?: string };
+      const json = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        codeSentTo?: string;
+        devOtp?: string;
+      };
       if (!res.ok) {
         setMessage(typeof json.message === 'string' ? json.message : 'Could not send verification code.');
         return;
       }
       setCreateStep('otp');
-      setCreateOtp('');
+      setCreateOtp(typeof json.devOtp === 'string' ? json.devOtp : '');
       const dest = json.codeSentTo ?? 'your email';
       setInfo(`Enter the 6-digit code sent to ${dest} to create this employee.`);
     } catch {

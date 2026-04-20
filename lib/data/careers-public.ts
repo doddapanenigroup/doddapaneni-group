@@ -2,6 +2,14 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { routing } from '@/i18n/routing';
+import type { CareerSpokenLanguageCode } from '@/lib/career-apply-languages';
+import { parseApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
+
+/** Stale Prisma client (dev server not restarted after `prisma generate`) omits new fields. */
+function isStaleClientMissingApplyLanguagesField(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /applyLanguageCodesCsv|Unknown field.*CareerJob/i.test(msg);
+}
 
 export type PublicCareerJob = {
   slug: string;
@@ -10,6 +18,7 @@ export type PublicCareerJob = {
   description: string;
   applyLabel: string;
   applyUrl: string;
+  applyLanguageCodes: CareerSpokenLanguageCode[];
 };
 
 async function fetchPublishedJobs(locale: string): Promise<PublicCareerJob[]> {
@@ -23,6 +32,7 @@ async function fetchPublishedJobs(locale: string): Promise<PublicCareerJob[]> {
 
   let jobs: Array<{
     slug: string;
+    applyLanguageCodesCsv: string;
     translations: Array<{
       locale: string;
       title: string;
@@ -36,11 +46,29 @@ async function fetchPublishedJobs(locale: string): Promise<PublicCareerJob[]> {
     jobs = await prisma.careerJob.findMany({
       where: { status: 'published' },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-      include: { translations: true },
+      select: {
+        slug: true,
+        applyLanguageCodesCsv: true,
+        translations: true,
+      },
     });
-  } catch {
-    // e.g. migration not applied yet (P2021) — still ship the careers page shell
-    return [];
+  } catch (e) {
+    if (!isStaleClientMissingApplyLanguagesField(e)) {
+      return [];
+    }
+    try {
+      const rows = await prisma.careerJob.findMany({
+        where: { status: 'published' },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: {
+          slug: true,
+          translations: true,
+        },
+      });
+      jobs = rows.map((r) => ({ ...r, applyLanguageCodesCsv: 'en,te,hi' }));
+    } catch {
+      return [];
+    }
   }
 
   const fallback = routing.defaultLocale;
@@ -59,6 +87,7 @@ async function fetchPublishedJobs(locale: string): Promise<PublicCareerJob[]> {
       description: tr.description,
       applyLabel: tr.applyLabel,
       applyUrl: tr.applyUrl,
+      applyLanguageCodes: parseApplyLanguageCodesCsv(job.applyLanguageCodesCsv),
     });
   }
   return out;

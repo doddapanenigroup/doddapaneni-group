@@ -3,8 +3,6 @@ import {
   hasAdminAccess,
   hasDeveloperAccess,
   hasMarketerAccess,
-  isAdmin,
-  isSuperAdmin,
 } from '@/lib/role-utils';
 
 const ANALYTICS_DASHBOARD_ROLES: readonly Role[] = ['DIGITAL_MARKETER', 'ADMIN', 'SUPER_ADMIN'];
@@ -17,12 +15,9 @@ export function canAccessMarketerDashboard(role: Role | null | undefined): boole
   return hasMarketerAccess(role);
 }
 
+/** Primary admin UI: `ADMIN` and `SUPER_ADMIN` (same route; super-only tools are gated in the page). */
 export function canAccessAdminDashboard(role: Role | null | undefined): boolean {
-  return isAdmin(role);
-}
-
-export function canAccessSuperAdminDashboard(role: Role | null | undefined): boolean {
-  return isSuperAdmin(role);
+  return hasAdminAccess(role);
 }
 
 export function canAccessEmployeesDashboard(role: Role | null | undefined): boolean {

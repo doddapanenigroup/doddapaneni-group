@@ -117,9 +117,9 @@ export async function POST(request: Request) {
     }
 
     const createdAt = new Date();
-    const [, doc] = await prisma.$transaction([
-      prisma.adminEmployeeCreateOtp.deleteMany({ where: { id: pending.id } }),
-      prisma.user.create({
+    const doc = await prisma.$transaction(async (tx) => {
+      await tx.adminEmployeeCreateOtp.deleteMany({ where: { id: pending.id } });
+      return tx.user.create({
         data: {
           email: pending.email,
           username: pending.username,
@@ -130,8 +130,8 @@ export async function POST(request: Request) {
           createdAtIST: formatInIST(createdAt),
           createdAtET: formatInET(createdAt),
         },
-      }),
-    ]);
+      });
+    });
 
     const user = {
       id: doc.id,

@@ -47,6 +47,7 @@ export async function syncBlogTranslations(newsId: string): Promise<void> {
       const metaDescription = await translateOptional(post.metaDescription, locale);
       const ogTitle = await translateOptional(post.ogTitle, locale);
       const ogDescription = await translateOptional(post.ogDescription, locale);
+      const excerpt = await translateOptional(post.excerpt, locale);
 
       const content = await translateHtmlContent(post.content, locale, SOURCE_LOCALE);
 
@@ -59,6 +60,7 @@ export async function syncBlogTranslations(newsId: string): Promise<void> {
           locale,
           title,
           content,
+          excerpt,
           metaTitle,
           metaDescription,
           ogTitle,
@@ -67,6 +69,7 @@ export async function syncBlogTranslations(newsId: string): Promise<void> {
         update: {
           title,
           content,
+          excerpt,
           metaTitle,
           metaDescription,
           ogTitle,

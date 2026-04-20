@@ -10,6 +10,10 @@ import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
+import {
+  newsPatchDataFromBody,
+  parseTranslationPatches,
+} from '@/lib/marketer-news-fields';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -57,7 +61,14 @@ export async function GET(
 
     const { slug } = await params;
     await connectDb();
-    const doc = await prisma.news.findUnique({ where: { slug: slug.trim() } });
+    const doc = await prisma.news.findUnique({
+      where: { slug: slug.trim() },
+      include: {
+        author: { select: { id: true, email: true, name: true } },
+        sector: { select: { id: true, name: true, slug: true } },
+        translations: true,
+      },
+    });
     if (!doc) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
     return NextResponse.json({ item: doc });
   } catch (error) {
@@ -98,24 +109,17 @@ export async function PATCH(
     const existing = await prisma.news.findUnique({ where: { slug: currentSlug } });
     if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
-    const data: Record<string, unknown> = {};
-    if (typeof body.title === 'string' && body.title.trim()) data.title = body.title.trim();
-    if (typeof body.slug === 'string' && body.slug.trim()) data.slug = body.slug.trim();
-    if (typeof body.content === 'string') data.content = body.content;
-    if ('featuredImage' in body) data.featuredImage = strOrNull(body.featuredImage);
-    if ('metaTitle' in body) data.metaTitle = strOrNull(body.metaTitle);
-    if ('metaDescription' in body) data.metaDescription = strOrNull(body.metaDescription);
-    if ('keywords' in body) data.keywords = strOrNull(body.keywords);
-    if ('ogTitle' in body) data.ogTitle = strOrNull(body.ogTitle);
-    if ('ogDescription' in body) data.ogDescription = strOrNull(body.ogDescription);
-    if ('ogImage' in body) data.ogImage = strOrNull(body.ogImage);
-    if (body.status === 'draft' || body.status === 'published') data.status = body.status;
+    const data = newsPatchDataFromBody(body);
     if ('sectorId' in body) {
       const sectorResult = await resolveSectorIdIfProvided(body.sectorId);
       if (!sectorResult.ok) {
         return NextResponse.json({ message: sectorResult.message }, { status: sectorResult.status });
       }
-      data.sectorId = sectorResult.sectorId;
+      if (sectorResult.sectorId === null) {
+        data.sector = { disconnect: true };
+      } else {
+        data.sector = { connect: { id: sectorResult.sectorId } };
+      }
     }
     if ('scheduledPublishAt' in body) {
       const nextSched = dateOrNull(body.scheduledPublishAt);
@@ -133,16 +137,64 @@ export async function PATCH(
     const doc = await prisma.news.update({
       where: { slug: currentSlug },
       data,
+      include: {
+        author: { select: { id: true, email: true, name: true } },
+        sector: { select: { id: true, name: true, slug: true } },
+        translations: true,
+      },
     });
 
-    scheduleBlogTranslationSync(doc.id);
+    const patches = parseTranslationPatches(body);
+    for (const p of patches) {
+      if (p.locale === routing.defaultLocale) continue;
+      const row = await prisma.newsTranslation.findUnique({
+        where: { newsId_locale: { newsId: doc.id, locale: p.locale } },
+      });
+      const title = p.title ?? row?.title ?? doc.title;
+      const content = p.content ?? row?.content ?? doc.content;
+      await prisma.newsTranslation.upsert({
+        where: { newsId_locale: { newsId: doc.id, locale: p.locale } },
+        create: {
+          newsId: doc.id,
+          locale: p.locale,
+          title,
+          content,
+          excerpt: p.excerpt ?? null,
+          metaTitle: p.metaTitle ?? null,
+          metaDescription: p.metaDescription ?? null,
+          translatedSlug: p.translatedSlug ?? null,
+          hreflangJson: p.hreflangJson ?? null,
+        },
+        update: {
+          title: p.title !== undefined ? p.title : row?.title ?? doc.title,
+          content: p.content !== undefined ? p.content : row?.content ?? doc.content,
+          excerpt: p.excerpt !== undefined ? p.excerpt : row?.excerpt ?? null,
+          metaTitle: p.metaTitle !== undefined ? p.metaTitle : row?.metaTitle ?? null,
+          metaDescription: p.metaDescription !== undefined ? p.metaDescription : row?.metaDescription ?? null,
+          translatedSlug: p.translatedSlug !== undefined ? p.translatedSlug : row?.translatedSlug ?? null,
+          hreflangJson: p.hreflangJson !== undefined ? p.hreflangJson : row?.hreflangJson ?? null,
+        },
+      });
+    }
+
+    const finalDoc = await prisma.news.findUnique({
+      where: { id: doc.id },
+      include: {
+        author: { select: { id: true, email: true, name: true } },
+        sector: { select: { id: true, name: true, slug: true } },
+        translations: true,
+      },
+    });
+    const out = finalDoc ?? doc;
+
+    scheduleBlogTranslationSync(out.id);
 
     await logMarketingActivity({
       userId: session.user.id,
       userEmail: session.user.email ?? '',
       userRole: session.user.role ?? '',
       entity: 'blog',
-      entityId: doc.id,
+      entityId: out.id,
       action: 'update',
       seoNote: strOrNull(body.seoNote),
       payload: {
@@ -153,10 +205,10 @@ export async function PATCH(
           sectorId: existing.sectorId ?? null,
         },
         after: {
-          slug: doc.slug,
-          title: doc.title,
-          status: doc.status,
-          sectorId: doc.sectorId ?? null,
+          slug: out.slug,
+          title: out.title,
+          status: out.status,
+          sectorId: out.sectorId ?? null,
         },
       },
     });
@@ -165,21 +217,21 @@ export async function PATCH(
       userEmail: session.user.email ?? '',
       userRole: session.user.role ?? '',
       kind: 'blog',
-      targetPath: doc.slug,
-      summary: `update title length ${doc.title.length}, content length ${doc.content.length}`,
+      targetPath: out.slug,
+      summary: `update title length ${out.title.length}, content length ${out.content.length}`,
     });
 
-    if (existing.status !== 'published' && doc.status === 'published') {
+    if (existing.status !== 'published' && out.status === 'published') {
       void notifyContentPublished({
         kind: 'blog',
         locale: routing.defaultLocale,
-        title: doc.title,
-        slug: doc.slug,
+        title: out.title,
+        slug: out.slug,
         actorUserId: session.user.id,
       }).catch(() => {});
     }
 
-    return NextResponse.json({ item: doc });
+    return NextResponse.json({ item: out });
   } catch (error) {
     await captureErrorToDb({
       error,

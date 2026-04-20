@@ -60,8 +60,8 @@ export default function SecuritySettingsClient({ locale }: { locale: string }) {
           Security
         </h1>
         <p className="text-slate-600 text-sm mt-1">
-          Change your password. Passwords are stored using a strong hash (bcrypt). Sign-in also requires a
-          one-time code sent to your email after you enter your password.
+          Change your password. Passwords are stored using a strong hash (bcrypt). Sign in with your email or
+          username and password.
         </p>
       </div>
 

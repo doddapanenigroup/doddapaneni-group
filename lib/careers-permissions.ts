@@ -1,11 +1,10 @@
 import type { Role } from '@/lib/constants';
 import { hasDeveloperAccess, isMarketer } from '@/lib/role-utils';
-import { isModuleAllowedForRole } from '@/lib/module-permissions';
 
-/** Developer, Super Admin, Admin; Digital Marketer only if `pages` module is allowed. */
+/** Developer, Super Admin, Admin. Digital marketers are blogs-only (no careers CMS). */
 export async function canManageCareers(role: Role | undefined): Promise<boolean> {
   if (!role) return false;
+  if (isMarketer(role)) return false;
   if (hasDeveloperAccess(role)) return true;
-  if (isMarketer(role)) return isModuleAllowedForRole(role, 'pages');
   return false;
 }

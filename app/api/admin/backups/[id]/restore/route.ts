@@ -71,7 +71,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         await tx.taskExecutionLog.deleteMany({});
         // audit_log is immutable; we do NOT delete/restore it in replace mode.
         await tx.userInvite.deleteMany({});
-        await tx.loginEmailOtp.deleteMany({});
         await tx.adminEmployeeCreateOtp.deleteMany({});
         await tx.roleModulePermission.deleteMany({});
         await tx.featureToggle.deleteMany({});
@@ -180,11 +179,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         const slug = String(j.slug);
         const sortOrder = Number(j.sortOrder) || 0;
         const status = j.status === 'draft' ? 'draft' : 'published';
+        const applyCsv =
+          typeof j.applyLanguageCodesCsv === 'string' && j.applyLanguageCodesCsv.trim()
+            ? j.applyLanguageCodesCsv.trim()
+            : 'en,te,hi';
         const existing = await tx.careerJob.findUnique({ where: { slug } });
         if (existing) {
           await tx.careerJob.update({
             where: { id: existing.id },
-            data: { sortOrder, status },
+            data: { sortOrder, status, applyLanguageCodesCsv: applyCsv },
           });
           await tx.careerJobTranslation.deleteMany({ where: { jobId: existing.id } });
           if (translations.length) {
@@ -208,6 +211,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               slug,
               sortOrder,
               status,
+              applyLanguageCodesCsv: applyCsv,
               translations: {
                 create: translations
                   .filter((tr: any) => tr?.locale && tr?.title && tr?.description && tr?.applyUrl)

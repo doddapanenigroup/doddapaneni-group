@@ -12,6 +12,10 @@ import {
 import { isLoginEmailDeliveryConfigured, sendAdminEmployeeCreateOtpEmail } from '@/lib/email';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
+import {
+  devEmployeeCreateOtpCode,
+  shouldSkipEmployeeCreateEmailAndOtp,
+} from '@/lib/dev-employee-create-skip';
 
 const usernameSchema = z
   .string()
@@ -49,11 +53,13 @@ const ROLE_LABEL_LOCAL: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    if (!isLoginEmailDeliveryConfigured()) {
+    const skipEmailOtp = shouldSkipEmployeeCreateEmailAndOtp();
+
+    if (!skipEmailOtp && !isLoginEmailDeliveryConfigured()) {
       return NextResponse.json(
         {
           message:
-            'Email is not configured. Set EMAIL_USER and EMAIL_PASS (Gmail app password) or SMTP, then restart the server.',
+            'Email is not configured. Set EMAIL_USER and EMAIL_PASS (Gmail app password) or SMTP, then restart the server. For local dev without mail, set SKIP_EMPLOYEE_CREATE_OTP=1 in .env.local and restart.',
         },
         { status: 503 }
       );
@@ -67,7 +73,7 @@ export async function POST(request: Request) {
     }
 
     const adminEmail = session.user.email?.trim();
-    if (!adminEmail) {
+    if (!skipEmailOtp && !adminEmail) {
       return NextResponse.json(
         { message: 'Your account has no email; cannot send verification code.' },
         { status: 400 }
@@ -111,7 +117,7 @@ export async function POST(request: Request) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const code = generateAdminEmployeeCreateOtpCode();
+    const code = skipEmailOtp ? devEmployeeCreateOtpCode() : generateAdminEmployeeCreateOtpCode();
     const codeHash = hashAdminEmployeeCreateOtp(session.user.id, code);
     const expiresAt = adminEmployeeCreateOtpExpiresAt();
 
@@ -134,27 +140,33 @@ export async function POST(request: Request) {
 
     const roleLabel = ROLE_LABEL_LOCAL[newUserRole] ?? newUserRole;
 
-    try {
-      await sendAdminEmployeeCreateOtpEmail(
-        adminEmail,
-        session.user.name ?? null,
-        emailLower,
-        username,
-        roleLabel,
-        code
-      );
-    } catch (err) {
-      console.error('[create-employee-otp] send mail failed:', err);
-      await prisma.adminEmployeeCreateOtp.deleteMany({ where: { adminUserId: session.user.id } });
-      const detail = err instanceof Error ? err.message : String(err);
-      const devHint = process.env.NODE_ENV === 'development' ? ` ${detail.slice(0, 200)}` : '';
-      return NextResponse.json(
-        { message: `Could not send verification email.${devHint}` },
-        { status: 502 }
-      );
+    if (!skipEmailOtp) {
+      try {
+        await sendAdminEmployeeCreateOtpEmail(
+          adminEmail!,
+          session.user.name ?? null,
+          emailLower,
+          username,
+          roleLabel,
+          code
+        );
+      } catch (err) {
+        console.error('[create-employee-otp] send mail failed:', err);
+        await prisma.adminEmployeeCreateOtp.deleteMany({ where: { adminUserId: session.user.id } });
+        const detail = err instanceof Error ? err.message : String(err);
+        const devHint = process.env.NODE_ENV === 'development' ? ` ${detail.slice(0, 200)}` : '';
+        return NextResponse.json(
+          { message: `Could not send verification email.${devHint}` },
+          { status: 502 }
+        );
+      }
     }
 
-    return NextResponse.json({ ok: true, codeSentTo: adminEmail });
+    return NextResponse.json({
+      ok: true,
+      codeSentTo: skipEmailOtp ? 'development (no email)' : adminEmail,
+      ...(skipEmailOtp ? { devOtp: code } : {}),
+    });
   } catch (e) {
     await captureErrorToDb({
       error: e,

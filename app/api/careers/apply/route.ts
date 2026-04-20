@@ -7,6 +7,7 @@ import {
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import { routing } from '@/i18n/routing';
+import { normalizeLanguagesKnownForJob, parseApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
 
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -95,6 +96,7 @@ export async function POST(request: Request) {
     await connectDb();
     let job: {
       slug: string;
+      applyLanguageCodesCsv: string;
       translations: Array<{ locale: string; title: string; subtitle: string }>;
     } | null;
     try {
@@ -102,6 +104,7 @@ export async function POST(request: Request) {
         where: { slug: jobSlug, status: 'published' },
         select: {
           slug: true,
+          applyLanguageCodesCsv: true,
           translations: { select: { locale: true, title: true, subtitle: true } },
         },
       });
@@ -112,6 +115,18 @@ export async function POST(request: Request) {
 
     if (!job?.translations.length) {
       return NextResponse.json({ message: 'This role is not open for applications.' }, { status: 404 });
+    }
+
+    const jobLanguages = parseApplyLanguageCodesCsv(job.applyLanguageCodesCsv);
+    const rawLangSelections = form
+      .getAll('languagesKnown')
+      .filter((v): v is string => typeof v === 'string');
+    const languagesKnown = normalizeLanguagesKnownForJob(rawLangSelections, jobLanguages);
+    if (languagesKnown.length === 0) {
+      return NextResponse.json(
+        { message: 'Select at least one language you know, from the options listed for this role.' },
+        { status: 400 },
+      );
     }
 
     const tr =
@@ -150,6 +165,7 @@ export async function POST(request: Request) {
       jobSlug: job.slug,
       jobTitle,
       jobSubtitle,
+      languagesKnown,
       name,
       email,
       phone: phone || null,
@@ -200,6 +216,7 @@ export async function POST(request: Request) {
         ${employmentType ? row('Employment type', employmentType) : ''}
         ${availabilityNotice ? row('Notice period', availabilityNotice) : ''}
         ${experienceYears ? row('Years of experience', experienceYears) : ''}
+        ${row('Languages known', languagesKnown.join(', '))}
         ${row('Key skills', keySkills)}
         ${row('Why apply', whyApply)}
         ${startDate ? row('Available start', startDate) : ''}

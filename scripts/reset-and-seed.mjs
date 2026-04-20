@@ -82,7 +82,6 @@ async function main() {
   await prisma.$transaction(async (tx) => {
     await tx.storedImage.deleteMany();
     await tx.adminEmployeeCreateOtp.deleteMany();
-    await tx.loginEmailOtp.deleteMany();
     await tx.developerPageView.deleteMany();
     await tx.loginLog.deleteMany();
     await tx.passwordChangeLog.deleteMany();

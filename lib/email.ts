@@ -185,37 +185,6 @@ export async function sendLoginSuccessEmail(
 }
 
 /**
- * Send a one-time login verification code. Requires SMTP credentials (see getSmtpUser / isLoginEmailDeliveryConfigured).
- */
-export async function sendLoginVerificationCodeEmail(
-  to: string,
-  name: string | null,
-  code: string
-): Promise<void> {
-  const transporter = getTransporter();
-  if (!transporter) {
-    throw new Error('Email is not configured (set EMAIL_USER + EMAIL_PASS, or SMTP_USER + SMTP_PASS, or SMTP_HOST + SMTP_USER + SMTP_PASS)');
-  }
-  const displayName = name?.trim() || to;
-  await transporter.sendMail({
-    from: mailFromHeader(),
-    to,
-    subject: 'Your login verification code – Doddapaneni Group',
-    text: `Hello ${displayName},\n\nYour verification code is: ${code}\n\nIt expires in 15 minutes. If you did not try to sign in, ignore this email.\n\nDoddapaneni Group`,
-    html: `
-      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
-        <h2 style="color: #1e3a8a;">Login verification</h2>
-        <p>Hello <strong>${displayName}</strong>,</p>
-        <p>Use this code to finish signing in:</p>
-        <p style="font-size: 28px; letter-spacing: 0.2em; font-weight: bold; color: #1e3a8a;">${code}</p>
-        <p style="font-size: 14px; color: #666;">This code expires in 15 minutes. If you did not try to sign in, you can ignore this email.</p>
-        <p style="margin-top: 24px; font-size: 14px; color: #1e3a8a; font-weight: bold;">Doddapaneni Group</p>
-      </div>
-    `,
-  });
-}
-
-/**
  * OTP emailed to Super Admin / Admin to confirm creating an employee account.
  */
 export async function sendAdminEmployeeCreateOtpEmail(

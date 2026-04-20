@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { LayoutDashboard, LogOut, Shield } from 'lucide-react';
+import { LayoutDashboard, LogOut } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle, getRoleLabel } from '@/lib/dashboard-title';
-import DashboardNotificationsMenu from '@/components/dashboard/DashboardNotificationsMenu';
 import DashboardThemeToggle from '@/components/dashboard/DashboardThemeToggle';
 import GlobalSearchPalette from '@/components/dashboard/GlobalSearchPalette';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
@@ -53,16 +52,7 @@ export default function DashboardHeader({
           </span>
 
           <DashboardThemeToggle />
-          <DashboardNotificationsMenu locale={locale} role={user.role} />
 
-          <Link
-            href={publicPathForLocale(locale, '/dashboard/security')}
-            className={iconActionClass}
-            title="Password & security"
-            aria-label="Password and security"
-          >
-            <Shield size={18} className="opacity-85" />
-          </Link>
           <Link
             href={publicPathForLocale(locale, '/')}
             className={iconActionClass}

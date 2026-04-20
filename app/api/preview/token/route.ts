@@ -88,7 +88,12 @@ export async function POST(request: Request) {
     const doc = await prisma.news.findFirst({
       where: {
         slug,
-        OR: [{ status: "draft" }, { status: "published", scheduledPublishAt: { gt: now } }],
+        OR: [
+          { status: "draft" },
+          { status: "scheduled" },
+          { status: "archived" },
+          { status: "published", scheduledPublishAt: { gt: now } },
+        ],
       },
       select: { slug: true },
     });

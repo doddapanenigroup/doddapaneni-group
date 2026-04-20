@@ -8,7 +8,7 @@ const ROLE_LABEL_BY_ROLE = {
 } as const satisfies Record<Role, string>;
 
 const DASHBOARD_TITLE_BY_ROLE = {
-  SUPER_ADMIN: 'Super Admin Dashboard',
+  SUPER_ADMIN: 'Admin Dashboard',
   ADMIN: 'Admin Dashboard',
   DEVELOPER: 'Developer Dashboard',
   DIGITAL_MARKETER: 'Digital Marketer Dashboard',

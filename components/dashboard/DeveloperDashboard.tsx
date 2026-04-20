@@ -112,7 +112,7 @@ export default function DeveloperDashboard({
         <div className="p-5 grid gap-3 sm:grid-cols-2">
           {sitePages.map((page) => (
             <div
-              key={page.href}
+              key={`${page.pageKey}:${page.label}`}
               className="flex flex-col rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100 transition-all overflow-hidden"
             >
               <div className="flex items-center justify-between p-4 gap-2">

@@ -6,7 +6,6 @@ import {
   canAccessDeveloperDashboard,
   canAccessEmployeesDashboard,
   canAccessMarketerDashboard,
-  canAccessSuperAdminDashboard,
 } from '@/lib/dashboard-access';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
@@ -36,22 +35,14 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
     searchBlob: 'dashboard home overview start landing',
   });
 
-  if (canAccessSuperAdminDashboard(role)) {
-    hits.push({
-      id: 'nav:super-admin',
-      title: getDashboardTitle('SUPER_ADMIN'),
-      subtitle: 'Sectors, flags, backups',
-      href: dash(locale, '/dashboard/super-admin'),
-      searchBlob: 'super admin superadmin sectors feature flags companies backup',
-    });
-  }
   if (canAccessAdminDashboard(role)) {
     hits.push({
       id: 'nav:admin',
       title: getDashboardTitle('ADMIN'),
-      subtitle: 'Administration',
+      subtitle: 'Administration, sectors, employees',
       href: dash(locale, '/dashboard/admin'),
-      searchBlob: 'admin administration companies sectors employees',
+      searchBlob:
+        'admin administration companies sectors employees super admin superadmin feature flags backup',
     });
   }
   if (canAccessDeveloperDashboard(role)) {
@@ -96,7 +87,7 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
     title: 'Security',
     subtitle: 'Password & sessions',
     href: dash(locale, '/dashboard/security'),
-    searchBlob: 'security password login session account 2fa',
+    searchBlob: 'security password login session account',
   });
 
   return hits;

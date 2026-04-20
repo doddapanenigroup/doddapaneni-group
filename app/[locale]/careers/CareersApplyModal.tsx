@@ -27,9 +27,15 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
   const firstFieldRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  /** Languages offered for this role → candidate multi-select */
+  const [langPick, setLangPick] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!job) return;
+    const init: Record<string, boolean> = {};
+    for (const c of job.applyLanguageCodes) init[c] = false;
+    setLangPick(init);
+
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     firstFieldRef.current?.focus();
@@ -63,6 +69,16 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
     const fd = new FormData(form);
     fd.set('jobSlug', job.slug);
     fd.set('locale', locale);
+
+    const chosen = job.applyLanguageCodes.filter((c) => langPick[c]);
+    if (!chosen.length) {
+      setStatus('error');
+      setErrorMessage(t('applyLanguagesRequired'));
+      return;
+    }
+    for (const c of chosen) {
+      fd.append('languagesKnown', c);
+    }
 
     try {
       const res = await fetch('/api/careers/apply', {
@@ -194,6 +210,28 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                       defaultValue={job.title}
                       className={inputClass}
                     />
+                  </div>
+                  <div>
+                    <p className={labelClass}>{t('applySectionLanguages')}</p>
+                    <p className="mt-1 text-xs font-normal normal-case text-slate-500">{t('applyLanguagesHint')}</p>
+                    <div className="mt-3 flex flex-wrap gap-4">
+                      {job.applyLanguageCodes.map((code) => (
+                        <label
+                          key={code}
+                          className="flex cursor-pointer items-center gap-2 text-sm font-normal normal-case text-slate-800"
+                        >
+                          <input
+                            type="checkbox"
+                            className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+                            checked={!!langPick[code]}
+                            onChange={(e) =>
+                              setLangPick((p) => ({ ...p, [code]: e.target.checked }))
+                            }
+                          />
+                          {code === 'en' ? t('applyLangEn') : code === 'te' ? t('applyLangTe') : t('applyLangHi')}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>

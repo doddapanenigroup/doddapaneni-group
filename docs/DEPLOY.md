@@ -9,7 +9,7 @@
    - Optional first data: `npm run db:seed` (set seed env vars first; see `.env.example`).
 3. **Secrets** — Set `AUTH_SECRET` (32+ random bytes, e.g. `openssl rand -base64 32`).
 4. **Public URL** — Set `NEXTAUTH_URL` (and optionally `AUTH_URL`) to the **HTTPS** URL users use, e.g. `https://your-domain.com`. Wrong values break login cookies and redirects.
-5. **Email** — Set `EMAIL_USER`, `EMAIL_PASS`, and for Hostinger (or other SMTP) `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`. The contact form and login OTP use the same settings as in `lib/email.ts`.
+5. **Email** — Set `EMAIL_USER`, `EMAIL_PASS`, and for Hostinger (or other SMTP) `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`. The contact form, invites, and similar mail use the same settings as in `lib/email.ts`.
 
 Health check for monitors/load balancers: `GET /api/health`.
 

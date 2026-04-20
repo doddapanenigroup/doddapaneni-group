@@ -127,9 +127,7 @@ export default async function EmployeesPage({ params }: Props) {
         (a.name || a.email).localeCompare(b.name || b.email)
     );
 
-  const dashboardHref = isSuperAdmin(role as any)
-    ? publicPathForLocale(locale, '/dashboard/super-admin')
-    : publicPathForLocale(locale, '/dashboard/admin');
+  const dashboardHref = publicPathForLocale(locale, '/dashboard/admin');
 
   return (
     <EmployeesPageView

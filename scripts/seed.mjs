@@ -58,21 +58,24 @@ const SEED_USERS = [
 
 async function main() {
   for (const u of SEED_USERS) {
-    const existing = await prisma.user.findUnique({ where: { email: u.email } });
-    if (!existing) {
-      await prisma.user.create({
-        data: {
-          email: u.email,
-          username: u.username,
-          passwordHash: await bcrypt.hash(u.password, 10),
-          name: u.name,
-          role: u.role,
-        },
-      });
-      console.log('Created', u.role, 'user:', u.email, '(@' + u.username + ')');
-    } else {
-      console.log(u.role, 'user already exists:', u.email);
-    }
+    const passwordHash = await bcrypt.hash(u.password, 10);
+    await prisma.user.upsert({
+      where: { email: u.email },
+      create: {
+        email: u.email,
+        username: u.username,
+        passwordHash,
+        name: u.name,
+        role: u.role,
+      },
+      update: {
+        username: u.username,
+        passwordHash,
+        name: u.name,
+        role: u.role,
+      },
+    });
+    console.log('Upserted', u.role, 'user:', u.email, '(@' + u.username + ')');
   }
 
   for (const row of SECTOR_SEEDS) {
@@ -97,9 +100,6 @@ async function main() {
     const careerCount = await prisma.careerJob.count();
     if (careerCount === 0) {
       const locales = ['en', 'te', 'hi', 'es'];
-      const mailto = (title) =>
-        `mailto:doddapanenigroup@yahoo.com?subject=${encodeURIComponent(`Application: ${title}`)}`;
-
       const seeds = [
         {
           slug: 'full-stack-developer-next-node',
@@ -147,7 +147,7 @@ async function main() {
                 subtitle: en.subtitle,
                 description: en.description,
                 applyLabel: 'Apply',
-                applyUrl: mailto(en.title),
+                applyUrl: '',
               })),
             },
           },
@@ -172,10 +172,11 @@ async function main() {
   }
 
   console.log(
-   (
-      'Seed done. Sign in with email or username and password at /en/login, then enter the email OTP.\n' +
-      'Optional: `npm run media:seed` and/or `npm run db:seed:blogs` (division posts).'
-    ).trim(),
+    [
+      'Seed done. Sign in at /en/login with email or username + password (same DATABASE_URL as the app).',
+      'Optional: `npm run media:seed` and/or `npm run db:seed:blogs` (division posts).',
+      'Local dev without SMTP: set SKIP_EMPLOYEE_CREATE_OTP=1 to create employees from the dashboard.',
+    ].join('\n'),
   );
 }
 

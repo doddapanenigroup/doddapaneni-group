@@ -157,7 +157,7 @@ export async function notifyForAuditEntry(args: {
       type: NOTIFICATION_TYPES.USER_ACTION,
       title: 'Database restore',
       body: `${actorEmail} ran a DB restore${p?.mode ? ` (${p.mode})` : ''}.`,
-      linkHref: `${dashBase()}/super-admin`,
+      linkHref: `${dashBase()}/admin`,
     });
   }
 }

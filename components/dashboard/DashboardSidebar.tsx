@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Shield, Users, Code2, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Users, Code2, Megaphone } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
@@ -17,16 +17,10 @@ type DashboardMenuItem = {
 function dashboardItems(locale: string): DashboardMenuItem[] {
   return [
     {
-      href: publicPathForLocale(locale, '/dashboard/super-admin'),
-      label: getDashboardTitle('SUPER_ADMIN'),
-      icon: Shield,
-      roles: ['SUPER_ADMIN'],
-    },
-    {
       href: publicPathForLocale(locale, '/dashboard/admin'),
       label: getDashboardTitle('ADMIN'),
       icon: Users,
-      roles: ['SUPER_ADMIN'],
+      roles: ['SUPER_ADMIN', 'ADMIN'],
     },
     {
       href: publicPathForLocale(locale, '/dashboard/developer'),

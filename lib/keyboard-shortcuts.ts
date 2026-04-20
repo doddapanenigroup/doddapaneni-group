@@ -21,14 +21,20 @@ export function keyboardBindingMatches(e: KeyboardEvent, binding: KeyBinding): b
   return true;
 }
 
-export function shortcutParts(binding: KeyBinding): {
+export function shortcutParts(
+  binding: KeyBinding,
+  /** When set, avoids reading `navigator` (SSR + first client paint must match). */
+  platformIsApple?: boolean,
+): {
   modLabel: string;
   shift: boolean;
   keyLabel: string;
 } {
   const isApple =
-    typeof navigator !== 'undefined' &&
-    /Mac|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    platformIsApple !== undefined
+      ? platformIsApple
+      : typeof navigator !== 'undefined' &&
+        /Mac|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const modLabel = binding.mod ? (isApple ? '⌘' : 'Ctrl') : '';
   return {
     modLabel,

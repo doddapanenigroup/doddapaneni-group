@@ -1,47 +1,21 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { publicPathForLocale } from '@/lib/public-path-with-locale';
-import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
-import { canAccessSuperAdminDashboard } from '@/lib/dashboard-access';
-import type { User as DbUser } from '@/lib/prisma-generated';
-import SuperAdminDashboard from '@/components/dashboard/SuperAdminDashboard';
+import { hasAdminAccess } from '@/lib/role-utils';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export default async function SuperAdminDashboardPage({ params }: Props) {
+/** Legacy URL: admin UI lives at `/dashboard/admin` for both ADMIN and SUPER_ADMIN. */
+export default async function SuperAdminDashboardRedirect({ params }: Props) {
   const session = await auth();
   const { locale } = await params;
 
-  if (
-    !session?.user ||
-    !canAccessSuperAdminDashboard(session.user.role as Role | null | undefined)
-  ) {
-    redirect(publicPathForLocale(locale, '/dashboard'));
+  if (!session?.user) {
+    redirect(publicPathForLocale(locale, '/login'));
   }
-
-  await connectDb();
-
-  const userDocs = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
-  const users = userDocs.map((u: DbUser) => ({
-    id: u.id,
-    email: u.email,
-    username: u.username ?? null,
-    name: u.name ?? null,
-    role: u.role as Role,
-    createdAt: u.createdAt,
-    createdAtIST: u.createdAtIST ?? null,
-    createdAtET: u.createdAtET ?? null,
-  }));
-
-  return (
-    <SuperAdminDashboard
-      users={users}
-      locale={locale}
-      currentUserId={session.user.id}
-      viewerRole={session.user.role as Role}
-    />
-  );
+  if (hasAdminAccess(session.user.role as Role)) {
+    redirect(publicPathForLocale(locale, '/dashboard/admin'));
+  }
+  redirect(publicPathForLocale(locale, '/dashboard'));
 }

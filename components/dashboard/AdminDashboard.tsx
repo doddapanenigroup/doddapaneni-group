@@ -6,6 +6,7 @@ import { Users, UserCog, UserCircle, Pencil, BarChart3 } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
+import { isSuperAdmin } from '@/lib/role-utils';
 import VisitStatsLazy from './VisitStatsLazy';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
@@ -14,6 +15,8 @@ import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import DashboardPageHeader from './DashboardPageHeader';
 import CareersJobsPanel from './CareersJobsPanel';
+import PermissionMatrixPanel from './PermissionMatrixPanel';
+import FeatureFlagsPanel from './FeatureFlagsPanel';
 import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
@@ -29,6 +32,7 @@ type UserRow = {
   createdBy?: { email: string; name: string | null } | null;
 };
 
+const EMPLOYEE_ROLES_SUPER: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 const EMPLOYEE_ROLES_ADMIN: Role[] = ['DEVELOPER', 'DIGITAL_MARKETER'];
 
 export default function AdminDashboard({
@@ -44,8 +48,14 @@ export default function AdminDashboard({
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [showManageModal, setShowManageModal] = useState(false);
+  const superViewer = isSuperAdmin(viewerRole);
+  const employeeRoles = superViewer ? EMPLOYEE_ROLES_SUPER : EMPLOYEE_ROLES_ADMIN;
+  const allowedRolesForPasswordChange: Role[] = superViewer
+    ? ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
+    : ['DEVELOPER', 'DIGITAL_MARKETER'];
+
   const employees = users
-    .filter((u) => EMPLOYEE_ROLES_ADMIN.includes(u.role))
+    .filter((u) => employeeRoles.includes(u.role))
     .sort((a, b) => getRoleOrder(a.role) - getRoleOrder(b.role) || (a.name || a.email).localeCompare(b.name || b.email));
 
   async function handleDeleteEmployee(id: string) {
@@ -71,7 +81,7 @@ export default function AdminDashboard({
     <div className="space-y-8">
       <DashboardPageHeader
         icon={Users}
-        title={getDashboardTitle(viewerRole)}
+        title={getDashboardTitle('ADMIN')}
         description="Manage users, view visit statistics, and monitor developer and marketer activity."
         actions={
           <>
@@ -107,9 +117,9 @@ export default function AdminDashboard({
       {showManageModal && (
         <ManageEmployeesModal
           employees={employees}
-          allowedRoles={EMPLOYEE_ROLES_ADMIN}
+          allowedRoles={employeeRoles}
           currentUserId={currentUserId}
-          allowedRolesForPasswordChange={['DEVELOPER', 'DIGITAL_MARKETER']}
+          allowedRolesForPasswordChange={allowedRolesForPasswordChange}
           onEmployeeCreated={(user) =>
             setUsers((prev) => [{ ...user, createdBy: { email: 'You', name: 'You' } }, ...prev])
           }
@@ -122,6 +132,13 @@ export default function AdminDashboard({
       <CareersJobsPanel locale={locale} />
 
       <AdminOpsInsights />
+
+      {superViewer ? (
+        <>
+          <PermissionMatrixPanel />
+          <FeatureFlagsPanel />
+        </>
+      ) : null}
 
       <AdminBackupsPanel />
 

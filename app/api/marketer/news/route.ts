@@ -9,6 +9,11 @@ import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
+import {
+  estimateReadingMinutesFromHtml,
+  parseContentType,
+  parseNewsStatus,
+} from '@/lib/marketer-news-fields';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -73,13 +78,19 @@ export async function GET(request: Request) {
     await connectDb();
     const blogs = await prisma.news.findMany({
       where: {
-        ...(status === 'draft' || status === 'published' ? { status } : {}),
+        ...(status === 'draft' ||
+        status === 'published' ||
+        status === 'scheduled' ||
+        status === 'archived'
+          ? { status: status as 'draft' | 'published' | 'scheduled' | 'archived' }
+          : {}),
         ...(sectorIdFilter.sectorId ? { sectorId: sectorIdFilter.sectorId } : {}),
       },
       orderBy: [{ updatedAt: 'desc' }],
       include: {
         author: { select: { id: true, email: true, name: true } },
         sector: { select: { id: true, name: true, slug: true } },
+        translations: true,
       },
     });
     return NextResponse.json({ items: blogs });
@@ -112,40 +123,85 @@ export async function POST(request: Request) {
 
     const title = strOrNull(body.title);
     const slug = strOrNull(body.slug);
-    const content = typeof body.content === 'string' ? body.content : '';
-    if (!title || !slug || !content.trim()) {
+    const articleBody = typeof body.content === 'string' ? body.content : '';
+    if (!title || !slug || !articleBody.trim()) {
       return NextResponse.json({ message: 'title, slug and content are required' }, { status: 400 });
     }
 
-    const status = strOrNull(body.status);
+    const parsedStatus = parseNewsStatus(body.status) ?? 'draft';
     const publishedAt =
       body.publishedAt && typeof body.publishedAt === 'string' ? new Date(body.publishedAt) : null;
     const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
     const schedGate = await schedulingForbiddenIfScheduled(scheduledPublishAt);
     if (schedGate) return schedGate;
 
+    if (parsedStatus === 'scheduled' && !scheduledPublishAt) {
+      return NextResponse.json(
+        { message: 'scheduled status requires scheduledPublishAt' },
+        { status: 400 },
+      );
+    }
+
     await connectDb();
     const sectorResult = await resolveSectorIdOrError(body.sectorId);
     if (!sectorResult.ok) {
       return NextResponse.json({ message: sectorResult.message }, { status: sectorResult.status });
     }
+
+    const contentType = parseContentType(body.contentType) ?? 'blog';
+
     const doc = await prisma.news.create({
       data: {
         title,
         slug,
-        content,
+        content: articleBody,
+        excerpt: strOrNull(body.excerpt),
         sectorId: sectorResult.sectorId,
         featuredImage: strOrNull(body.featuredImage),
+        featuredImageAlt: strOrNull(body.featuredImageAlt),
+        bannerImage: strOrNull(body.bannerImage),
+        galleryImageUrls: strOrNull(body.galleryImageUrls),
+        embeddedVideoUrl: strOrNull(body.embeddedVideoUrl),
+        infographicUrls: strOrNull(body.infographicUrls),
         authorId: session.user.id,
-        status: status === 'published' ? 'published' : 'draft',
-        publishedAt: publishedAt && !isNaN(publishedAt.getTime()) ? publishedAt : null,
+        authorDisplayName: strOrNull(body.authorDisplayName),
+        authorBio: strOrNull(body.authorBio),
+        status: parsedStatus,
+        publishedAt:
+          parsedStatus === 'published' && publishedAt && !isNaN(publishedAt.getTime())
+            ? publishedAt
+            : parsedStatus === 'published'
+              ? new Date()
+              : null,
         scheduledPublishAt,
         metaTitle: strOrNull(body.metaTitle),
         metaDescription: strOrNull(body.metaDescription),
         keywords: strOrNull(body.keywords),
+        focusKeyword: strOrNull(body.focusKeyword),
+        secondaryKeywords: strOrNull(body.secondaryKeywords),
+        canonicalUrl: strOrNull(body.canonicalUrl),
+        breadcrumbTitle: strOrNull(body.breadcrumbTitle),
+        metaRobots: strOrNull(body.metaRobots),
+        categorySlugs: strOrNull(body.categorySlugs),
+        tags: strOrNull(body.tags),
+        subCategory: strOrNull(body.subCategory),
+        contentType,
         ogTitle: strOrNull(body.ogTitle),
         ogDescription: strOrNull(body.ogDescription),
         ogImage: strOrNull(body.ogImage),
+        commentsEnabled: body.commentsEnabled === false ? false : true,
+        articleSchemaJson: strOrNull(body.articleSchemaJson),
+        faqSchemaJson: strOrNull(body.faqSchemaJson),
+        howToSchemaJson: strOrNull(body.howToSchemaJson),
+        relatedPostSlugs: strOrNull(body.relatedPostSlugs),
+        pillarSlug: strOrNull(body.pillarSlug),
+        outboundLinksJson: strOrNull(body.outboundLinksJson),
+        readingTimeMinutes: estimateReadingMinutesFromHtml(articleBody),
+      },
+      include: {
+        author: { select: { id: true, email: true, name: true } },
+        sector: { select: { id: true, name: true, slug: true } },
+        translations: true,
       },
     });
 

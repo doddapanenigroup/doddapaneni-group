@@ -37,7 +37,6 @@ model User {
 
   loginLogs                  LoginLog[]
   passwordChangeLogs         PasswordChangeLog[]      @relation("PasswordChangeTarget")
-  loginEmailOtps             LoginEmailOtp[]
   adminEmployeeCreateOtps    AdminEmployeeCreateOtp[]
   newsPosts                  News[]
   invitesCreated             UserInvite[]             @relation("InviteCreator")
@@ -133,18 +132,6 @@ model AdminEmployeeCreateOtp {
   @@map("admin_employee_create_otp")
 }
 
-/// One-time code sent by email to complete login after password check.
-model LoginEmailOtp {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  codeHash  String   @map("code_hash")
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([userId, expiresAt])
-}
-
 model LoginLog {
   id            String    @id @default(cuid())
   userId        String    @map("user_id")
@@ -233,6 +220,8 @@ model CareerJob {
   slug      String     @unique
   sortOrder Int        @default(0) @map("sort_order")
   status    PageStatus @default(published)
+  /// Comma-separated subset of en,te,hi — languages offered for this role on the apply form.
+  applyLanguageCodesCsv String @default("en,te,hi") @map("apply_language_codes_csv")
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
 
@@ -265,6 +254,15 @@ enum PageStatus {
 enum NewsStatus {
   draft
   published
+  scheduled
+  archived
+}
+
+enum NewsContentType {
+  blog
+  case_study
+  news
+  guide
 }
 
 model News {
@@ -272,9 +270,17 @@ model News {
   title           String
   slug            String     @unique
   content         String     @db.Text
+  excerpt         String?    @db.Text
   featuredImage   String?    @map("featured_image")
+  featuredImageAlt String?  @map("featured_image_alt")
+  bannerImage     String?    @map("banner_image")
+  galleryImageUrls String?   @map("gallery_image_urls") @db.Text
+  embeddedVideoUrl String?   @map("embedded_video_url")
+  infographicUrls String?    @map("infographic_urls") @db.Text
   authorId        String     @map("author_id")
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorDisplayName String?  @map("author_display_name")
+  authorBio       String?    @map("author_bio") @db.Text
   sectorId        String?    @map("sector_id")
   sector          Sector?    @relation(fields: [sectorId], references: [id], onDelete: SetNull)
   status          NewsStatus @default(draft)
@@ -283,9 +289,29 @@ model News {
   metaTitle       String?    @map("meta_title")
   metaDescription String?    @map("meta_description")
   keywords        String?
+  focusKeyword    String?    @map("focus_keyword")
+  secondaryKeywords String?  @map("secondary_keywords") @db.Text
+  canonicalUrl    String?    @map("canonical_url")
+  breadcrumbTitle String?    @map("breadcrumb_title")
+  metaRobots      String?    @map("meta_robots")
+  categorySlugs   String?    @map("category_slugs") @db.Text
+  tags            String?    @db.Text
+  subCategory     String?    @map("sub_category")
+  contentType     NewsContentType @default(blog) @map("content_type")
   ogTitle         String?    @map("og_title")
   ogDescription   String?    @map("og_description")
   ogImage         String?    @map("og_image")
+  viewCount       Int        @default(0) @map("view_count")
+  likeCount       Int        @default(0) @map("like_count")
+  shareCount      Int        @default(0) @map("share_count")
+  commentsEnabled Boolean  @default(true) @map("comments_enabled")
+  readingTimeMinutes Int?    @map("reading_time_minutes")
+  articleSchemaJson String?  @map("article_schema_json") @db.Text
+  faqSchemaJson   String?    @map("faq_schema_json") @db.Text
+  howToSchemaJson String?    @map("how_to_schema_json") @db.Text
+  relatedPostSlugs String?   @map("related_post_slugs") @db.Text
+  pillarSlug      String?    @map("pillar_slug")
+  outboundLinksJson String?  @map("outbound_links_json") @db.Text
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
@@ -304,6 +330,9 @@ model NewsTranslation {
   locale           String
   title            String
   content          String   @db.Text
+  excerpt          String?  @db.Text
+  translatedSlug   String?  @map("translated_slug")
+  hreflangJson     String?  @map("hreflang_json") @db.Text
   metaTitle        String?  @map("meta_title")
   metaDescription  String? @map("meta_description")
   ogTitle          String?  @map("og_title")

@@ -78,8 +78,10 @@ export async function publishScheduledContent(
   // Blogs: promote each due draft individually so we can trigger translation sync per post.
   const dueBlogs = await prisma.news.findMany({
     where: {
-      status: 'draft',
-      scheduledPublishAt: { lte: now },
+      OR: [
+        { status: 'draft', scheduledPublishAt: { lte: now } },
+        { status: 'scheduled', scheduledPublishAt: { lte: now } },
+      ],
     },
     select: { id: true, publishedAt: true },
   });

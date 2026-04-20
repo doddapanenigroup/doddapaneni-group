@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import { connectDb, prisma } from '@/lib/db';
 import { formatInIST, formatInET } from '@/lib/date-timezones';
 import { getUserByLoginIdentifier } from '@/lib/get-user-for-login';
-import { verifyLoginEmailOtpCode } from '@/lib/login-email-otp';
 import { shouldSendLoginSuccessEmail, sendLoginSuccessEmail } from '@/lib/email';
 import type { Role } from '@/lib/constants';
 
@@ -29,7 +28,6 @@ const nextAuth = NextAuth({
       credentials: {
         login: { label: 'Email or username', type: 'text' },
         password: { label: 'Password', type: 'password' },
-        emailOtp: { label: 'Email verification code', type: 'text' },
       },
       async authorize(credentials) {
         const login = String(credentials?.login ?? '').trim();
@@ -37,35 +35,15 @@ const nextAuth = NextAuth({
         const password = String(credentials.password).trim();
         if (!password) return null;
 
-        const emailOtpRaw =
-          credentials.emailOtp != null ? String(credentials.emailOtp).replace(/\s/g, '') : '';
-        if (!emailOtpRaw || emailOtpRaw.length < 6) return null;
-
         try {
           const user = await getUserByLoginIdentifier(login);
           if (!user?.passwordHash) return null;
           const ok = await bcrypt.compare(password, user.passwordHash);
           if (!ok) return null;
 
-          await connectDb();
-
-          const now = new Date();
-          const row = await prisma.loginEmailOtp.findFirst({
-            where: {
-              userId: user.id,
-              expiresAt: { gt: now },
-            },
-            orderBy: { createdAt: 'desc' },
-          });
-          if (!row || !verifyLoginEmailOtpCode(row.codeHash, user.id, emailOtpRaw)) {
-            return null;
-          }
-
           if (AUTH_DEBUG) {
-            console.info('[auth-debug] otp-verified', { userId: user.id, at: now.toISOString() });
+            console.info('[auth-debug] password-sign-in', { userId: user.id });
           }
-
-          await prisma.loginEmailOtp.deleteMany({ where: { userId: user.id } });
 
           return {
             id: user.id,

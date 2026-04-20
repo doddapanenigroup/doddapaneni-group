@@ -6,6 +6,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { canManageCareers } from '@/lib/careers-permissions';
 import type { Role } from '@/lib/constants';
 import { routing } from '@/i18n/routing';
+import { parseApplyLanguageCodesCsv, toApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
 
 const LOCALES = new Set<string>(routing.locales);
 
@@ -43,6 +44,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       sortOrder?: number;
       status?: 'draft' | 'published';
       translations?: TranslationIn[];
+      applyLanguageCodes?: string[];
     };
 
     await connectDb();
@@ -67,6 +69,18 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
         : job.sortOrder;
     const status = body.status === 'draft' || body.status === 'published' ? body.status : job.status;
 
+    let applyLanguageCodesCsv = job.applyLanguageCodesCsv;
+    if (body.applyLanguageCodes !== undefined) {
+      const next = toApplyLanguageCodesCsv(body.applyLanguageCodes);
+      if (!next) {
+        return NextResponse.json(
+          { message: 'Select at least one application language (English, Telugu, or Hindi).' },
+          { status: 400 },
+        );
+      }
+      applyLanguageCodesCsv = next;
+    }
+
     const translations = Array.isArray(body.translations) ? body.translations : null;
     if (translations) {
       const normalized: {
@@ -85,7 +99,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
         const subtitle = typeof t.subtitle === 'string' ? t.subtitle.trim() : '';
         const description = typeof t.description === 'string' ? t.description.trim() : '';
         const applyUrl = typeof t.applyUrl === 'string' ? t.applyUrl.trim() : '';
-        if (!title || !subtitle || !description || !applyUrl) continue;
+        if (!title || !subtitle || !description) continue;
         const applyLabel =
           typeof t.applyLabel === 'string' && t.applyLabel.trim() ? t.applyLabel.trim() : 'Apply';
         normalized.push({ locale: loc, title, subtitle, description, applyLabel, applyUrl });
@@ -106,6 +120,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
             slug: nextSlug,
             sortOrder,
             status,
+            applyLanguageCodesCsv,
             translations: {
               create: normalized.map((n) => ({
                 locale: n.locale,
@@ -122,7 +137,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
     } else {
       await prisma.careerJob.update({
         where: { id },
-        data: { slug: nextSlug, sortOrder, status },
+        data: { slug: nextSlug, sortOrder, status, applyLanguageCodesCsv },
       });
     }
 
@@ -139,6 +154,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
         slug: updated.slug,
         sortOrder: updated.sortOrder,
         status: updated.status,
+        applyLanguageCodes: parseApplyLanguageCodesCsv(updated.applyLanguageCodesCsv),
         updatedAt: updated.updatedAt.toISOString(),
         translations: updated.translations.map((t) => ({
           locale: t.locale,

@@ -45,12 +45,15 @@ export function useDashboardTheme(): Ctx {
 }
 
 export function DashboardThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<DashboardColorMode>(() => readStoredMode());
+  // Fixed initial value so SSR and the client's first paint match. Stored preference is applied
+  // in useLayoutEffect before paint (avoids hydration mismatch from readStoredMode in useState).
+  const [mode, setModeState] = useState<DashboardColorMode>('light');
 
   useLayoutEffect(() => {
-    // Ensure the <html> class is in sync on mount (including after refresh).
-    applyDashboardDarkClass(mode);
-  }, [mode]);
+    const resolved = readStoredMode();
+    setModeState(resolved);
+    applyDashboardDarkClass(resolved);
+  }, []);
 
   const setMode = useCallback((m: DashboardColorMode) => {
     try {

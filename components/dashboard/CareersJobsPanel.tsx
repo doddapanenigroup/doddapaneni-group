@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Briefcase, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import { routing } from '@/i18n/routing';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
+import {
+  CAREER_SPOKEN_LANGUAGE_CODES,
+  CAREER_SPOKEN_LANGUAGE_LABELS,
+} from '@/lib/career-apply-languages';
 
 type TranslationRow = {
   locale: string;
@@ -19,6 +23,7 @@ type JobRow = {
   slug: string;
   sortOrder: number;
   status: 'draft' | 'published';
+  applyLanguageCodes?: string[];
   updatedAt: string;
   translations: TranslationRow[];
 };
@@ -36,11 +41,6 @@ function emptyTranslation(locale: string): TranslationRow {
   };
 }
 
-function defaultMailtoApply(title: string): string {
-  const sub = encodeURIComponent(`Application: ${title || 'Careers'}`);
-  return `mailto:doddapanenigroup@yahoo.com?subject=${sub}`;
-}
-
 export default function CareersJobsPanel({ locale }: { locale: string }) {
   const [items, setItems] = useState<JobRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +52,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
     slug: string;
     sortOrder: number;
     status: 'draft' | 'published';
+    applyLanguageCodes: string[];
     translations: TranslationRow[];
   } | null>(null);
 
@@ -81,6 +82,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
       slug: '',
       sortOrder: items.length,
       status: 'published',
+      applyLanguageCodes: [...CAREER_SPOKEN_LANGUAGE_CODES],
       translations: LOCALES.map((loc) => emptyTranslation(loc)),
     });
   }
@@ -93,11 +95,13 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
       slug: job.slug,
       sortOrder: job.sortOrder,
       status: job.status,
+      applyLanguageCodes:
+        job.applyLanguageCodes && job.applyLanguageCodes.length > 0
+          ? [...job.applyLanguageCodes]
+          : [...CAREER_SPOKEN_LANGUAGE_CODES],
       translations: LOCALES.map((loc) => {
         const existing = byLoc.get(loc);
-        return existing
-          ? { ...existing }
-          : { ...emptyTranslation(loc), applyUrl: defaultMailtoApply(byLoc.get('en')?.title ?? '') };
+        return existing ? { ...existing } : emptyTranslation(loc);
       }),
     });
   }
@@ -120,7 +124,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
       return {
         ...prev,
         translations: prev.translations.map((t) =>
-          t.locale === editLocale ? { ...t, ...en, locale: editLocale } : t,
+          t.locale === editLocale ? { ...en, locale: editLocale, applyUrl: '' } : t,
         ),
       };
     });
@@ -129,8 +133,12 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
   async function save() {
     if (!form) return;
     const en = form.translations.find((t) => t.locale === 'en');
-    if (!en?.title?.trim() || !en.subtitle?.trim() || !en.description?.trim() || !en.applyUrl?.trim()) {
-      setError('English fields need title, subtitle, description, and apply URL.');
+    if (!en?.title?.trim() || !en.subtitle?.trim() || !en.description?.trim()) {
+      setError('English fields need title, subtitle, and description.');
+      return;
+    }
+    if (!form.applyLanguageCodes.length) {
+      setError('Select at least one application language (English, Telugu, or Hindi).');
       return;
     }
 
@@ -141,13 +149,10 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
         slug: form.slug.trim() || undefined,
         sortOrder: form.sortOrder,
         status: form.status,
-        translations: form.translations.filter(
-          (t) =>
-            t.title.trim() &&
-            t.subtitle.trim() &&
-            t.description.trim() &&
-            t.applyUrl.trim(),
-        ),
+        applyLanguageCodes: form.applyLanguageCodes,
+        translations: form.translations
+          .filter((t) => t.title.trim() && t.subtitle.trim() && t.description.trim())
+          .map((t) => ({ ...t, applyUrl: '' })),
       };
 
       if (selectedId === 'new') {
@@ -332,6 +337,39 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                 </select>
               </label>
 
+              <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 dark:border-slate-600 dark:bg-slate-900">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Application languages
+                </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Candidates choose which of these they know on the public apply form (multiple choice).
+                </p>
+                <div className="mt-3 flex flex-wrap gap-4">
+                  {CAREER_SPOKEN_LANGUAGE_CODES.map((code) => (
+                    <label
+                      key={code}
+                      className="flex cursor-pointer items-center gap-2 text-sm text-slate-800 dark:text-slate-100"
+                    >
+                      <input
+                        type="checkbox"
+                        className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+                        checked={form.applyLanguageCodes.includes(code)}
+                        onChange={(e) => {
+                          setForm((prev) => {
+                            if (!prev) return prev;
+                            const set = new Set(prev.applyLanguageCodes);
+                            if (e.target.checked) set.add(code);
+                            else set.delete(code);
+                            return { ...prev, applyLanguageCodes: Array.from(set) };
+                          });
+                        }}
+                      />
+                      {CAREER_SPOKEN_LANGUAGE_LABELS[code]}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Language</p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -396,24 +434,9 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                       onChange={(e) => updateTranslation({ applyLabel: e.target.value })}
                     />
                   </label>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
-                    Apply URL (mailto:… or https://…)
-                    <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
-                      value={currentTr.applyUrl}
-                      onChange={(e) => updateTranslation({ applyUrl: e.target.value })}
-                      placeholder={defaultMailtoApply(currentTr.title)}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateTranslation({ applyUrl: defaultMailtoApply(currentTr.title) })
-                    }
-                    className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
-                  >
-                    Reset apply URL to mailto template
-                  </button>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Applications use the on-site form only (no external posting link).
+                  </p>
                 </div>
               ) : null}
 

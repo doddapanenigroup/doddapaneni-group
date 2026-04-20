@@ -164,11 +164,16 @@ const kbdHintClass =
   'rounded border border-slate-200 bg-slate-50 px-1 dark:border-slate-700 dark:bg-slate-800';
 
 function SearchShortcutHints() {
+  // Force non-Apple labels until after layout so server HTML matches the client's first paint
+  // (`shortcutParts` otherwise reads `navigator` and hydrates as Ctrl vs ⌘).
   const [parts, setParts] = useState(() =>
-    shortcutParts(defaultDashboardKeyboardShortcuts.search.binding),
+    shortcutParts(defaultDashboardKeyboardShortcuts.search.binding, false),
   );
   useLayoutEffect(() => {
-    setParts(shortcutParts(getDashboardKeyboardConfig().search.binding));
+    const isApple =
+      typeof navigator !== 'undefined' &&
+      /Mac|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    setParts(shortcutParts(getDashboardKeyboardConfig().search.binding, isApple));
   }, []);
   return (
     <>

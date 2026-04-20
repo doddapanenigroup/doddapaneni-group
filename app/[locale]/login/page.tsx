@@ -1,5 +1,9 @@
 import LoginFormDynamic from './LoginFormDynamic';
 
+/** Avoid stale HTML/JS for login after auth UI changes (password-only, no OTP). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function LoginPage({
   params,
   searchParams,
