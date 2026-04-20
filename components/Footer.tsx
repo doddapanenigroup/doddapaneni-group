@@ -2,6 +2,11 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from '@/lib/dictionary-react';
+import {
+  BRAND_LOGO_INTRINSIC,
+  brandLogoSrc,
+  brandLogoSrcSet,
+} from '@/lib/brand-logo';
 import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
 function PinterestIcon({ className }: { className?: string }) {
   return (
@@ -47,110 +52,50 @@ export default function Footer() {
     pinterest: 'https://www.pinterest.com/doddapanenigroup/',
   };
 
-  const legalLinkClass =
-    'text-blue-200 hover:text-white text-xs sm:text-sm transition-colors underline-offset-2 hover:underline';
+  const siteLinks = [
+    { href: '/', label: navT('home') },
+    { href: '/news', label: navT('blog') },
+    { href: '/team', label: navT('team') },
+    { href: '/careers', label: navT('careers') },
+    { href: '/faq', label: t('faq') },
+  ] as const;
+
+  const siteLinkChipClass =
+    'inline-flex items-center rounded-md border border-blue-700/60 bg-blue-950/35 px-2 py-1 text-[11px] font-medium text-blue-100 transition-colors hover:border-blue-500/70 hover:bg-blue-800/50 hover:text-white sm:px-2.5 sm:text-xs';
 
   return (
     <footer className="mt-auto w-full bg-blue-900 text-white">
-      <div className="w-full px-5 pt-6 pb-4 sm:px-8 md:pt-10 md:pb-6 lg:px-12 xl:px-16">
-        <nav
-          aria-label={t('companyLegalNavAria')}
-          className="border-b border-blue-700/80 pb-5 md:pb-6"
-        >
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-blue-300 sm:text-xs">
-            {t('companyLegalNav')}
-          </p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-8">
-            <li>
-              <Link href="/about" className={legalLinkClass}>
-                {navT('about')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/team" className={legalLinkClass}>
-                {navT('team')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className={legalLinkClass}>
-                {navT('contact')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/careers" className={legalLinkClass}>
-                {navT('careers')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy-policy" className={legalLinkClass}>
-                {t('privacyPolicy')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className={legalLinkClass}>
-                {t('termsShort')}
-              </Link>
-            </li>
-            <li>
-              <Link href="/disclaimer" className={legalLinkClass}>
-                {t('disclaimer')}
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-10">
-          <div className="lg:max-w-md">
-            <Link href="/" className="mb-3 block shrink-0 md:mb-4">
+      <div className="w-full px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4 md:px-8 md:pt-10 md:pb-6 lg:px-12 xl:px-16">
+        <div className="grid grid-cols-1 gap-4 py-3 sm:gap-5 sm:py-4 md:grid-cols-3 md:gap-6 md:py-6 lg:gap-8 lg:py-8">
+          <div className="min-w-0 md:max-w-md">
+            <Link href="/" className="mb-1.5 block shrink-0 sm:mb-2 md:mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element -- same public brandmark as `Navbar`. */}
               <img
-                src="/doddapaneni-logo.webp?v=6"
+                src={brandLogoSrc(640)}
+                srcSet={brandLogoSrcSet}
+                sizes="(max-width: 768px) min(80vw, 200px), 260px"
                 alt={COMPANY_NAME}
-                width={1007}
-                height={254}
+                width={BRAND_LOGO_INTRINSIC.width}
+                height={BRAND_LOGO_INTRINSIC.height}
                 decoding="async"
                 loading="lazy"
-                className="block h-16 w-auto max-w-full object-contain object-left md:h-20"
+                className="block h-10 w-auto max-w-full object-contain object-left sm:h-11 md:h-14 lg:h-16"
               />
             </Link>
-            <p className="text-base font-semibold text-white">{COMPANY_NAME}</p>
-            <p className="mt-2 text-xs leading-relaxed text-blue-300 md:text-sm">{t('tagline')}</p>
+            <p className="text-sm font-semibold text-white sm:text-base">{COMPANY_NAME}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-blue-300 sm:mt-1.5 sm:text-xs md:text-sm">{t('tagline')}</p>
+            <nav aria-label={t('footerSiteLinksAria')} className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1.5 sm:mt-2.5 sm:gap-x-2 sm:gap-y-2">
+              {siteLinks.map(({ href, label }) => (
+                <Link key={href} href={href} className={siteLinkChipClass}>
+                  {label}
+                </Link>
+              ))}
+            </nav>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('quickLinks')}</h3>
-            <ul className="space-y-1.5 md:space-y-2">
-              <li>
-                <Link href="/" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {navT('home')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/news" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {navT('blog')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/team" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {navT('team')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/careers" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {navT('careers')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-blue-300 hover:text-white text-xs md:text-sm transition-colors">
-                  {t('faq')}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('contact')}</h3>
-            <div className="text-xs text-blue-300 md:text-sm space-y-3 md:space-y-4">
+            <h3 className="mb-2 text-xs font-semibold text-white sm:mb-3 sm:text-sm md:text-base">{t('contact')}</h3>
+            <div className="space-y-2 text-[11px] text-blue-300 sm:space-y-3 sm:text-xs md:space-y-4 md:text-sm">
               {contact.locations.map((location, index) => {
                 const addressParts = location.address.split(',');
                 const shortAddress =
@@ -197,8 +142,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-white md:text-base">{t('followUs')}</h3>
-            <div className="flex flex-wrap gap-3 md:gap-4">
+            <h3 className="mb-2 text-xs font-semibold text-white sm:mb-3 sm:text-sm md:text-base">{t('followUs')}</h3>
+            <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
               <a
                 href={socialLinks.facebook}
                 target="_blank"
@@ -248,8 +193,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-blue-800 pt-4 md:pt-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="border-t border-blue-800 pt-3 sm:pt-4 md:pt-6">
+          <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
             <p className="text-center text-xs text-blue-300 md:text-left md:text-sm">
               © {currentYear} <span className="font-semibold text-white">{COMPANY_NAME}</span>. {t('rights')}
             </p>

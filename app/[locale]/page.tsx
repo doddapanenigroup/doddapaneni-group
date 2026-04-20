@@ -65,8 +65,10 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  /** CMS override must be decided before the default hub (hero + divisions). */
-  const cms = await findPublishedPageContent('home', locale);
+  /** CMS lookup runs in parallel with LCP hero preload so slow DB/IO does not defer the image request. */
+  const cmsPromise = findPublishedPageContent('home', locale);
+  preload('/image.webp', { as: 'image', type: 'image/webp', fetchPriority: 'high' });
+  const cms = await cmsPromise;
 
   if (cms && (cms.title || cms.body)) {
     return (
@@ -80,12 +82,6 @@ export default async function Page({ params }: Props) {
       </>
     );
   }
-
-  /**
-   * React `preload` (home only) + divisions behind Suspense so LCP is not blocked by
-   * `getBusinessDivisionsForHome`. JSON-LD is deferred so it does not block the hero stream.
-   */
-  preload('/image.webp', { as: 'image', type: 'image/webp', fetchPriority: 'high' });
 
   const tHome = createTranslator(getDictionary(locale), 'Home');
   const heroCopy: HomeHeroCopy = {

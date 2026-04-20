@@ -18,9 +18,8 @@
   },
   "Footer": {
     "tagline": "उद्योगों में व्यवसायों का निर्माण",
-    "companyLegalNav": "कंपनी और कानूनी",
-    "companyLegalNavAria": "कंपनी और कानूनी लिंक",
     "quickLinks": "त्वरित लिंक",
+    "footerSiteLinksAria": "साइट लिंक",
     "contact": "संपर्क",
     "rights": "सर्वाधिकार सुरक्षित।",
     "phone": "फ़ोन",
@@ -30,7 +29,6 @@
     "emailPlaceholder": "अपना ईमेल दर्ज करें",
     "subscribe": "सदस्यता लें",
     "subscribed": "सदस्यता लेने के लिए धन्यवाद!",
-    "legal": "कानूनी",
     "privacyPolicy": "गोपनीयता नीति",
     "termsConditions": "नियम और शर्तें",
     "termsShort": "नियम",

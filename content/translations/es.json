@@ -18,9 +18,8 @@
   },
   "Footer": {
     "tagline": "Construyendo Negocios en Todas las Industrias",
-    "companyLegalNav": "Empresa y legal",
-    "companyLegalNavAria": "Enlaces de empresa y legales",
     "quickLinks": "Enlaces Rápidos",
+    "footerSiteLinksAria": "Enlaces del sitio",
     "contact": "Contacto",
     "rights": "Todos los derechos reservados.",
     "phone": "Teléfono",
@@ -30,7 +29,6 @@
     "emailPlaceholder": "Ingrese su correo electrónico",
     "subscribe": "Suscribirse",
     "subscribed": "¡Gracias por suscribirse!",
-    "legal": "Jurídico",
     "privacyPolicy": "Política de Privacidad",
     "termsConditions": "Términos y Condiciones",
     "termsShort": "Términos",

@@ -37,11 +37,11 @@ export default function LanguageSwitcher({ isTransparent }: { isTransparent?: bo
   ];
 
   return (
-    <div className="relative ml-4">
+    <div className="relative ml-0 sm:ml-2 md:ml-4">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 rounded-2xl border border-transparent px-4 py-2 text-sm font-medium transition-all duration-200 hover:backdrop-blur-md hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100 ${
+        className={`flex items-center gap-1 rounded-xl border border-transparent px-2 py-1 text-xs font-medium transition-all duration-200 hover:backdrop-blur-md hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100 sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 ${
           isTransparent
             ? 'text-white hover:border-white/30 hover:bg-white/20 hover:shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]'
             : 'text-blue-900 hover:border-blue-200/50 hover:bg-blue-500/10 hover:shadow-[0_8px_32px_0_rgba(30,58,138,0.1)]'
@@ -50,7 +50,7 @@ export default function LanguageSwitcher({ isTransparent }: { isTransparent?: bo
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
-        <Globe size={18} aria-hidden />
+        <Globe className="h-3.5 w-3.5 shrink-0 sm:h-[18px] sm:w-[18px]" aria-hidden />
         <span className="uppercase">{locale}</span>
       </button>
 

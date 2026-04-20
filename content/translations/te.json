@@ -18,9 +18,8 @@
   },
   "Footer": {
     "tagline": "పరిశ్రమల అంతటా వ్యాపారాలను నిర్మించడం",
-    "companyLegalNav": "కంపెనీ & చట్టపరమైన",
-    "companyLegalNavAria": "కంపెనీ మరియు చట్టపరమైన లింకులు",
     "quickLinks": "త్వరిత లింకులు",
+    "footerSiteLinksAria": "సైట్ లింకులు",
     "contact": "సంప్రదించండి",
     "rights": "అన్ని హక్కులూ ప్రత్యేకించబడ్డాయి.",
     "phone": "ఫోన్",
@@ -30,7 +29,6 @@
     "emailPlaceholder": "మీ ఇమెయిల్ నమోదు చేయండి",
     "subscribe": "సభ్యత్వం పొందండి",
     "subscribed": "సభ్యత్వం పొందినందుకు ధన్యవాదాలు!",
-    "legal": "చట్టపరమైన",
     "privacyPolicy": "గోప్యతా విధానం",
     "termsConditions": "నిబంధనలు మరియు షరతులు",
     "termsShort": "నిబంధనలు",

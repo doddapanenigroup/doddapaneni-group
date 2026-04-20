@@ -12,7 +12,8 @@ export const poppins = Poppins({
   display: 'swap',
   variable: '--font-poppins',
   adjustFontFallback: true,
-  preload: false,
+  /** Hero headings use `font-serif` (Poppins); preloading shortens CSS→font critical chain in audits. */
+  preload: true,
 });
 
 export const openSans = Open_Sans({

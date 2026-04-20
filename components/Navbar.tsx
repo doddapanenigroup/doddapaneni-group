@@ -20,6 +20,11 @@ import {
 } from '@/lib/company-divisions';
 import { stripLocalePrefixFromPathname } from '@/lib/locale-from-path';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
+import {
+  BRAND_LOGO_INTRINSIC,
+  brandLogoSrc,
+  brandLogoSrcSet,
+} from '@/lib/brand-logo';
 
 /** Align with `/api/public/sectors` short HTTP cache — avoids hammering the origin and inflating “fully loaded” metrics. */
 const SECTOR_POLL_MS = 60_000;
@@ -239,14 +244,14 @@ export default function Navbar() {
       : ''
   } ${companiesOpen ? (isTransparent ? 'bg-white/20 border-white/30' : 'bg-blue-100/90 border-blue-200') : ''}`;
 
-  const inset = 'px-5 sm:px-8 lg:px-12 xl:px-16';
+  const inset = 'pl-3 pr-5 sm:px-5 md:px-8 lg:px-12 xl:px-16';
 
   const renderCompanyRows = (onNavigate?: () => void, mobile = false) => {
     if (!sectorLiveReady) {
       return (
         <div
           className={
-            mobile ? 'py-6 px-3 text-center text-sm text-slate-500' : 'py-6 px-4 text-center text-sm text-slate-500'
+            mobile ? 'py-4 px-3 text-center text-sm text-slate-500' : 'py-6 px-4 text-center text-sm text-slate-500'
           }
         >
           {t('sectorLiveLoading')}
@@ -258,7 +263,7 @@ export default function Navbar() {
       <ul
         className={
           mobile
-            ? 'space-y-0.5 py-1'
+            ? 'space-y-0 py-0.5'
             : 'flex flex-col gap-0.5 py-2 px-2 sm:px-3'
         }
       >
@@ -276,7 +281,7 @@ export default function Navbar() {
                     setCompaniesOpen(false);
                     onNavigate?.();
                   }}
-                  className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-md ${
+                  className={`flex items-center gap-2 px-2 py-2 text-sm transition-colors rounded-md sm:gap-3 sm:px-3 sm:py-2.5 ${
                     isActiveHere
                       ? 'bg-blue-600 font-semibold text-white'
                       : 'text-slate-800 hover:bg-slate-100'
@@ -291,7 +296,7 @@ export default function Navbar() {
           return (
             <li key={slug}>
               <div
-                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-3 py-2.5 text-sm rounded-md ${
+                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 px-2 py-2 text-sm rounded-md sm:px-3 sm:py-2.5 ${
                   isActiveHere ? 'border-l-2 border-blue-600 bg-blue-50 text-slate-800' : 'text-slate-500'
                 }`}
               >
@@ -315,22 +320,24 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 overflow-visible transition-all duration-300 ${navbarClasses}`}>
-      <div className={`flex h-20 w-full items-center justify-between gap-3 ${inset}`}>
+      <div className={`flex h-16 w-full items-center justify-between gap-2 md:h-20 md:gap-3 ${inset}`}>
         <div className="flex shrink-0 items-center">
           <Link
             href="/"
-            className="group flex h-20 shrink-0 items-center"
+            className="group flex h-16 shrink-0 items-center md:h-20"
             onClick={handleLogoClick}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; fixed `h-20` box (see HomeHero). */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; `h-14`–`h-20` by breakpoint (see HomeHero). */}
             <img
-              src="/doddapaneni-logo.webp?v=6"
+              src={brandLogoSrc(640)}
+              srcSet={brandLogoSrcSet}
+              sizes="(max-width: 768px) min(calc(100vw - 8rem), 220px), 360px"
               alt={companyName}
-              width={1007}
-              height={254}
+              width={BRAND_LOGO_INTRINSIC.width}
+              height={BRAND_LOGO_INTRINSIC.height}
               decoding="async"
-              fetchPriority="high"
-              className="block h-20 w-auto max-w-[calc(100vw-9.5rem)] shrink-0 object-contain object-left sm:max-w-[min(92vw,42rem)] lg:max-w-[52rem]"
+              fetchPriority="low"
+              className="block h-14 w-auto max-w-[calc(100vw-7.5rem)] shrink-0 object-contain object-left sm:h-16 sm:max-w-[calc(100vw-9rem)] md:h-20 md:max-w-[min(92vw,42rem)] lg:max-w-[52rem]"
             />
           </Link>
         </div>
@@ -394,7 +401,7 @@ export default function Navbar() {
             ))}
           <LanguageSwitcher isTransparent={isTransparent} />
         </div>
-        <div className="flex shrink-0 items-center gap-3 sm:gap-4 md:hidden">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3 md:hidden">
           <LanguageSwitcher isTransparent={isTransparent} />
           <button
             type="button"
@@ -404,34 +411,34 @@ export default function Navbar() {
                 return !open;
               });
             }}
-            className={`inline-flex items-center justify-center rounded-md p-2 transition-colors focus:outline-none ${mobileButtonClass}`}
+            className={`inline-flex items-center justify-center rounded-md p-1.5 transition-colors focus:outline-none sm:p-2 ${mobileButtonClass}`}
             aria-expanded={isOpen}
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
       {isOpen ? (
         <div className="border-t border-gray-100 md:hidden">
-          <div className={`${inset} space-y-1 bg-white/95 py-2 pb-4 pt-2 backdrop-blur-lg`}>
+          <div className={`${inset} space-y-0.5 bg-white/95 py-1.5 pb-3 pt-1.5 backdrop-blur-lg`}>
             {navBeforeMega
               .filter((link) => link.href !== pathname)
               .map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block rounded-md px-3 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900"
+                  className="block rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900 sm:px-3 sm:py-2.5 sm:text-base"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-            <div className="border-t border-slate-100 pt-1">
+            <div className="border-t border-slate-100 pt-0.5">
               <button
                 type="button"
-                className={`flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-base font-medium hover:bg-slate-50 ${
+                className={`flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm font-medium hover:bg-slate-50 sm:px-3 sm:py-2.5 sm:text-base ${
                   isOnGroupCompany ? 'bg-blue-50 text-blue-950' : 'text-slate-800'
                 }`}
                 onClick={() => {
@@ -445,12 +452,12 @@ export default function Navbar() {
               >
                 {t('ourCompanies')}
                 <ChevronDown
-                  className={`h-5 w-5 shrink-0 text-slate-500 transition-transform ${mobileCompaniesOpen ? 'rotate-180' : ''}`}
+                  className={`h-4 w-4 shrink-0 text-slate-500 transition-transform sm:h-5 sm:w-5 ${mobileCompaniesOpen ? 'rotate-180' : ''}`}
                   aria-hidden
                 />
               </button>
               {mobileCompaniesOpen ? (
-                <div className="max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain border-l-2 border-blue-100 bg-slate-50/80 pl-2 [-webkit-overflow-scrolling:touch]">
+                <div className="max-h-[min(55vh,22rem)] overflow-y-auto overscroll-contain border-l-2 border-blue-100 bg-slate-50/80 pl-2 [-webkit-overflow-scrolling:touch] sm:max-h-[min(70vh,28rem)]">
                   {renderCompanyRows(() => {
                     setIsOpen(false);
                     setMobileCompaniesOpen(false);
@@ -464,7 +471,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block rounded-md px-3 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900"
+                  className="block rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900 sm:px-3 sm:py-2.5 sm:text-base"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}

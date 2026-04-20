@@ -18,9 +18,8 @@
   },
   "Footer": {
     "tagline": "A diversified group with offices in India and the United States",
-    "companyLegalNav": "Company & legal",
-    "companyLegalNavAria": "Company and legal links",
     "quickLinks": "Explore",
+    "footerSiteLinksAria": "Site links",
     "contact": "Contact",
     "rights": "All rights reserved.",
     "phone": "Phone",
@@ -30,7 +29,6 @@
     "emailPlaceholder": "Enter your email",
     "subscribe": "Subscribe",
     "subscribed": "Thank you for subscribing!",
-    "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
     "termsConditions": "Terms & Conditions",
     "termsShort": "Terms",
