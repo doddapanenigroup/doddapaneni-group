@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
@@ -7,12 +7,14 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
-import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { applyMachineTranslationsFromCanonicalPost } from '@/lib/blog-translations-sync';
+import { applyNewsTranslationPatches } from '@/lib/news-apply-translation-patches';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
 import {
   estimateReadingMinutesFromHtml,
   parseContentType,
   parseNewsStatus,
+  parseTranslationPatches,
 } from '@/lib/marketer-news-fields';
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
 import { Prisma } from '@/lib/prisma-generated';
@@ -201,7 +203,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'title, slug and content are required' }, { status: 400 });
     }
 
-    const parsedStatus = parseNewsStatus(body.status) ?? 'draft';
+    /** Default published so dashboard-created posts appear on public `/news/{sector}` without an extra save. */
+    const parsedStatus = parseNewsStatus(body.status) ?? 'published';
     const publishedAt =
       body.publishedAt && typeof body.publishedAt === 'string' ? new Date(body.publishedAt) : null;
     const scheduledPublishAt = dateOrNull(body.scheduledPublishAt);
@@ -278,27 +281,61 @@ export async function POST(request: Request) {
       },
     });
 
-    await logMarketingActivity({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      entity: 'blog',
-      entityId: doc.id,
-      action: 'create',
-      seoNote: strOrNull(body.seoNote),
-      payload: { title: doc.title, slug: doc.slug, status: doc.status, sectorId: doc.sectorId },
-    });
-    await logContentEdit({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      kind: 'blog',
-      targetPath: doc.slug,
-      summary: `create title length ${doc.title.length}, content length ${doc.content.length}`,
-    });
+    const patches = parseTranslationPatches(body);
+    await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+
+    let out = doc;
+    const autoOn = process.env.BLOG_AUTO_TRANSLATE !== '0';
+    let refetch = patches.length > 0;
+
+    if (autoOn && doc.status === 'published' && patches.length === 0) {
+      await applyMachineTranslationsFromCanonicalPost({
+        id: doc.id,
+        title: doc.title,
+        content: doc.content,
+        excerpt: doc.excerpt,
+        metaTitle: doc.metaTitle,
+        metaDescription: doc.metaDescription,
+        ogTitle: doc.ogTitle,
+        ogDescription: doc.ogDescription,
+      });
+      refetch = true;
+    }
+
+    if (refetch) {
+      const full = await prisma.news.findUnique({
+        where: { id: doc.id },
+        include: {
+          author: { select: { id: true, email: true, name: true } },
+          sector: { select: { id: true, name: true, slug: true } },
+          translations: true,
+        },
+      });
+      if (full) out = full;
+    }
+
+    await Promise.all([
+      logMarketingActivity({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        entity: 'blog',
+        entityId: doc.id,
+        action: 'create',
+        seoNote: strOrNull(body.seoNote),
+        payload: { title: doc.title, slug: doc.slug, status: doc.status, sectorId: doc.sectorId },
+      }),
+      logContentEdit({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        kind: 'blog',
+        targetPath: doc.slug,
+        summary: `create title length ${doc.title.length}, content length ${doc.content.length}`,
+      }),
+    ]);
 
     if (doc.status === 'published') {
-      scheduleBlogTranslationSync(doc.id);
       void notifyContentPublished({
         kind: 'blog',
         locale: routing.defaultLocale,
@@ -308,13 +345,15 @@ export async function POST(request: Request) {
       }).catch(() => {});
     }
 
-    revalidateCmsPublicSurfaces();
-    revalidateNewsPostPublicPaths({
-      sectorSlug: doc.sector?.slug ?? null,
-      articleSlug: doc.slug,
+    after(() => {
+      revalidateCmsPublicSurfaces();
+      revalidateNewsPostPublicPaths({
+        sectorSlug: doc.sector?.slug ?? null,
+        articleSlug: doc.slug,
+      });
     });
 
-    return NextResponse.json({ item: doc });
+    return NextResponse.json({ item: out });
   } catch (error) {
     if (isNewsSlugUniqueViolation(error)) {
       return NextResponse.json(

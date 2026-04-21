@@ -1,9 +1,11 @@
 import { revalidatePath } from 'next/cache';
 
 /**
- * Next.js 16+ cache invalidation uses cacheLife profiles; `"max"` is always valid.
- * `revalidatePath` typings may still be `layout | page` only — cast at the boundary.
+ * Invalidate cached HTML/data for a pathname after CMS writes.
+ * The second argument must be `layout` or `page` (not a cacheLife name). For App Router
+ * routes under dynamic segments (e.g. `/[locale]/news/...`), omitting it can no-op with a
+ * console warning — `layout` revalidates that subtree reliably.
  */
 export function revalidatePathMax(path: string) {
-  (revalidatePath as (p: string, profile?: string) => void)(path, 'max');
+  revalidatePath(path, 'layout');
 }

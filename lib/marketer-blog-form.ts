@@ -64,6 +64,8 @@ export type BlogListRow = {
   outboundLinksJson?: string | null;
   author?: { id: string; email: string; name: string | null };
   translations?: BlogTranslationRow[];
+  /** Present on list API responses for dashboard sorting / display. */
+  updatedAt?: string | null;
 };
 
 export type BlogFormState = {
@@ -137,7 +139,8 @@ export function emptyBlogForm(partial?: Partial<BlogFormState>): BlogFormState {
     infographicUrls: '',
     authorDisplayName: '',
     authorBio: '',
-    status: 'draft',
+    /** Default published so marketer-created posts show on public sector `/news/{sector}` pages immediately. */
+    status: 'published',
     publishedAt: '',
     scheduledPublishAt: '',
     metaTitle: '',

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Calendar, ArrowLeft, Clock } from 'lucide-react';
 import NewsPostEngagement from '@/components/news/NewsPostEngagement';
 import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
+import { prepareBlogBodyHtml } from '@/lib/blog-content-display';
 
 type Props = {
   locale: string;
@@ -67,7 +68,7 @@ export default function BlogPostClient({
         <article className="mx-auto max-w-4xl">
           <div
             className="prose prose-lg max-w-none text-blue-950 prose-headings:text-blue-950 prose-headings:font-bold prose-p:text-blue-900/90 prose-a:font-semibold prose-a:text-blue-900 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-li:text-blue-900/90"
-            dangerouslySetInnerHTML={{ __html: blogContent ?? '' }}
+            dangerouslySetInnerHTML={{ __html: prepareBlogBodyHtml(blogContent) }}
           />
         </article>
       </section>

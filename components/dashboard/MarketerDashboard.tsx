@@ -19,26 +19,19 @@ import {
   Search,
   BarChart3,
   Users,
-  BookOpen,
   Loader2,
-  CheckCircle2,
-  AlertCircle,
 } from 'lucide-react';
 import VisitStatsLazy from './VisitStatsLazy';
 import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
-import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
-import { MarketerBlogFields, type MarketerBlogFieldsHandle } from '@/components/dashboard/MarketerBlogFields';
-import {
-  blogFromApiToForm,
-  emptyBlogForm,
-  type BlogFormState,
-  type BlogListRow,
-} from '@/lib/marketer-blog-form';
+import GoogleSnippetPreview from '@/components/dashboard/GoogleSnippetPreview';
+import MarketerBlogsManager, {
+  type MarketerBlogsManagerHandle,
+} from '@/components/dashboard/MarketerBlogsManager';
 import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
@@ -96,13 +89,6 @@ type PageContentRow = {
   ogImage: string | null;
 };
 
-type SectorRow = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-};
-
 type StoredImageRow = {
   id: string;
   key: string;
@@ -112,39 +98,6 @@ type StoredImageRow = {
   size: number | null;
   updatedAt: string;
 };
-
-function GoogleSnippetPreview({
-  title,
-  description,
-  url,
-  ogImage,
-}: {
-  title: string;
-  description: string;
-  url: string;
-  ogImage?: string | null;
-}) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        Google preview
-      </p>
-      <p className="truncate text-sm text-emerald-700 dark:text-emerald-400">{url || 'https://example.com/page-url'}</p>
-      <p className="truncate text-[18px] leading-6 text-blue-700 hover:underline dark:text-blue-400">
-        {title || 'Your page title appears here'}
-      </p>
-      <p className="line-clamp-2 text-sm text-slate-600 dark:text-slate-300">
-        {description || 'Your meta description appears here for search users.'}
-      </p>
-      {ogImage ? (
-        <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ogImage} alt="OG preview" className="h-28 w-full bg-slate-100 object-cover dark:bg-slate-800" />
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 function toDateTimeLocalValue(v: string | null | undefined) {
   if (!v) return '';
@@ -164,33 +117,6 @@ function stripHtmlToText(value: string | null | undefined) {
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
-}
-
-function blogStatusBadgeClass(status: string): string {
-  switch (status) {
-    case 'published':
-      return 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800/60';
-    case 'draft':
-      return 'bg-amber-100 text-amber-900 ring-1 ring-amber-200/80 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-800/50';
-    case 'scheduled':
-      return 'bg-sky-100 text-sky-900 ring-1 ring-sky-200/80 dark:bg-sky-950/40 dark:text-sky-200 dark:ring-sky-800/50';
-    case 'archived':
-      return 'bg-slate-200 text-slate-700 ring-1 ring-slate-300/80 dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600';
-    default:
-      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
-  }
-}
-
-function formatBlogApiError(
-  data: { message?: string; debug?: string },
-  fallback: string,
-): string {
-  const base =
-    typeof data.message === 'string' && data.message.trim() ? data.message.trim() : fallback;
-  const dbg = typeof data.debug === 'string' && data.debug.trim() ? data.debug.trim() : '';
-  if (!dbg) return base;
-  const short = dbg.length > 120 ? `${dbg.slice(0, 117)}…` : dbg;
-  return `${base} — ${short}`;
 }
 
 type SeoScoreResult = {
@@ -769,47 +695,17 @@ export default function MarketerDashboard({
     ogImage: '',
   });
 
-  // ——— Blog + SEO ———
-  const [blogs, setBlogs] = useState<BlogListRow[]>([]);
-  const [blogsLoading, setBlogsLoading] = useState(true);
-  const [sectors, setSectors] = useState<SectorRow[]>([]);
-  const [sectorsLoading, setSectorsLoading] = useState(true);
-  const [blogSectorFilter, setBlogSectorFilter] = useState('');
-  const [selectedBlogSlug, setSelectedBlogSlug] = useState('');
-  const [blogForm, setBlogForm] = useState<BlogFormState>(() => emptyBlogForm());
-  const blogFieldsRef = useRef<MarketerBlogFieldsHandle>(null);
-  const [blogListSearch, setBlogListSearch] = useState('');
-  const [blogToast, setBlogToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [blogLoadingSlug, setBlogLoadingSlug] = useState<string | null>(null);
-  const [blogActionLoading, setBlogActionLoading] = useState<'save' | 'create' | 'delete' | null>(null);
-
-  const filteredBlogs = useMemo(() => {
-    const q = blogListSearch.trim().toLowerCase();
-    if (!q) return blogs;
-    return blogs.filter(
-      (b) =>
-        (b.title ?? '').toLowerCase().includes(q) ||
-        (b.slug ?? '').toLowerCase().includes(q) ||
-        (b.sector?.name ?? '').toLowerCase().includes(q),
-    );
-  }, [blogs, blogListSearch]);
-
-  useEffect(() => {
-    if (!blogToast) return;
-    const t = window.setTimeout(() => setBlogToast(null), 5200);
-    return () => window.clearTimeout(t);
-  }, [blogToast]);
-
   // ——— Stored media picker ———
   const [images, setImages] = useState<StoredImageRow[]>([]);
   const [imagesLoading, setImagesLoading] = useState(true);
   const [imageSearch, setImageSearch] = useState('');
   const [uploading, setUploading] = useState(false);
+  const blogsManagerRef = useRef<MarketerBlogsManagerHandle>(null);
 
   useEffect(() => {
     // Clear preview link when switching contexts.
     setPreviewLink(null);
-  }, [activeTab, selectedPageSlug, selectedBlogSlug]);
+  }, [activeTab, selectedPageSlug]);
 
   useEffect(() => {
     if (!canPages) {
@@ -827,39 +723,6 @@ export default function MarketerDashboard({
       .catch(() => setPages([]))
       .finally(() => setPagesLoading(false));
   }, [locale, canPages]);
-
-  useEffect(() => {
-    if (!canBlogs) {
-      setBlogs([]);
-      setBlogsLoading(false);
-      return;
-    }
-    const qs = blogSectorFilter
-      ? `?sectorId=${encodeURIComponent(blogSectorFilter)}`
-      : '';
-    fetch(`/api/marketer/news${qs}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        const items = (d?.items ?? []) as BlogListRow[];
-        setBlogs(items);
-        if (items[0]) {
-          void selectBlog(items[0]);
-        } else {
-          setSelectedBlogSlug('');
-          setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
-        }
-      })
-      .catch(() => setBlogs([]))
-      .finally(() => setBlogsLoading(false));
-  }, [blogSectorFilter, canBlogs]);
-
-  useEffect(() => {
-    fetch('/api/marketer/sectors')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setSectors(pickCanonicalSectorRows((d?.items ?? []) as SectorRow[])))
-      .catch(() => setSectors([]))
-      .finally(() => setSectorsLoading(false));
-  }, []);
 
   useEffect(() => {
     fetch('/api/marketer/stored-image')
@@ -888,42 +751,6 @@ export default function MarketerDashboard({
       ogDescription: page.ogDescription ?? '',
       ogImage: page.ogImage ?? '',
     });
-  }
-
-  function startNewBlogPost() {
-    setSelectedBlogSlug('');
-    setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
-  }
-
-  async function selectBlog(blog: BlogListRow) {
-    setSelectedBlogSlug(blog.slug);
-    if (typeof blog.content === 'string') {
-      setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
-      return;
-    }
-    setBlogLoadingSlug(blog.slug);
-    try {
-      const res = await fetch(`/api/marketer/news/${encodeURIComponent(blog.slug)}`);
-      const data = (await res.json().catch(() => ({}))) as { item?: BlogListRow; message?: string };
-      if (!res.ok || !data.item) {
-        setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
-        if (!res.ok) {
-          setBlogToast({
-            type: 'error',
-            message: typeof data.message === 'string' ? data.message : 'Could not load this post.',
-          });
-        }
-        return;
-      }
-      const item = data.item;
-      setBlogs((prev) => prev.map((b) => (b.id === item.id ? { ...b, ...item } : b)));
-      setBlogForm(blogFromApiToForm(item, item.sectorId ?? blogSectorFilter));
-    } catch {
-      setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
-      setBlogToast({ type: 'error', message: 'Network error while loading the post.' });
-    } finally {
-      setBlogLoadingSlug(null);
-    }
   }
 
   async function savePageSeo() {
@@ -1040,147 +867,6 @@ export default function MarketerDashboard({
     });
   }
 
-  async function saveBlogSeo() {
-    if (!selectedBlogSlug) {
-      setBlogToast({
-        type: 'error',
-        message: 'Select a post from the list, or use “New post” to create one.',
-      });
-      return;
-    }
-    const patches =
-      typeof blogFieldsRef.current?.getTranslationPatches === 'function'
-        ? blogFieldsRef.current.getTranslationPatches()
-        : [];
-    const payload: Record<string, unknown> = {
-      ...blogForm,
-      featuredImage: blogForm.featuredImage || null,
-      translationPatches: patches,
-    };
-    setBlogActionLoading('save');
-    try {
-      const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        message?: string;
-        debug?: string;
-        item?: BlogListRow;
-      };
-      if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message: formatBlogApiError(
-            data,
-            `Save failed (${res.status}). Check scheduling or feature flags.`,
-          ),
-        });
-        return;
-      }
-      if (!data.item) {
-        setBlogToast({ type: 'error', message: 'Save returned no data. Try again.' });
-        return;
-      }
-      const item = data.item;
-      setBlogs((prev) => prev.map((b) => (b.id === item.id ? { ...b, ...item } : b)));
-      setSelectedBlogSlug(item.slug);
-      setBlogForm(blogFromApiToForm(item, item.sectorId ?? blogSectorFilter));
-      setBlogToast({ type: 'success', message: 'Changes saved to the database.' });
-    } catch {
-      setBlogToast({ type: 'error', message: 'Save failed (network or server error).' });
-    } finally {
-      setBlogActionLoading(null);
-    }
-  }
-
-  async function deleteSelectedBlog() {
-    if (!selectedBlogSlug) return;
-    if (!confirm('Delete this blog from the database? This cannot be undone.')) return;
-
-    setBlogActionLoading('delete');
-    try {
-      const res = await fetch(`/api/marketer/news/${encodeURIComponent(selectedBlogSlug)}`, {
-        method: 'DELETE',
-      });
-      const data = (await res.json().catch(() => ({}))) as { message?: string };
-      if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message:
-            typeof data.message === 'string' && data.message.trim()
-              ? data.message.trim()
-              : `Delete failed (${res.status}).`,
-        });
-        return;
-      }
-
-      const remaining = blogs.filter((b) => b.slug !== selectedBlogSlug);
-      setBlogs(remaining);
-      setBlogToast({ type: 'success', message: 'Blog removed from the database.' });
-
-      if (remaining[0]) void selectBlog(remaining[0]);
-      else {
-        setSelectedBlogSlug('');
-        setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
-      }
-    } catch {
-      setBlogToast({ type: 'error', message: 'Delete failed (network error).' });
-    } finally {
-      setBlogActionLoading(null);
-    }
-  }
-
-  async function createBlog() {
-    if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) {
-      setBlogToast({
-        type: 'error',
-        message: 'Add a title, URL slug, and article body before creating the post.',
-      });
-      return;
-    }
-    if (!blogForm.sectorId.trim()) {
-      setBlogToast({ type: 'error', message: 'Choose a sector for this post.' });
-      return;
-    }
-    setBlogActionLoading('create');
-    try {
-      const res = await fetch('/api/marketer/news', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(blogForm),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        message?: string;
-        debug?: string;
-        item?: BlogListRow;
-      };
-      if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message: formatBlogApiError(
-            data,
-            `Create failed (${res.status}). The slug may already exist, or scheduling may be disabled.`,
-          ),
-        });
-        return;
-      }
-      if (!data.item) {
-        setBlogToast({ type: 'error', message: 'Create returned no data. Try again.' });
-        return;
-      }
-      const item = data.item;
-      setBlogs((prev) => [item, ...prev]);
-      void selectBlog(item);
-      setBlogToast({ type: 'success', message: 'New blog created and stored in the database.' });
-    } catch {
-      setBlogToast({ type: 'error', message: 'Create failed (network or server error).' });
-    } finally {
-      setBlogActionLoading(null);
-    }
-  }
-
   async function uploadImage(file: File, altText: string) {
     const form = new FormData();
     form.append('file', file);
@@ -1224,34 +910,25 @@ export default function MarketerDashboard({
     }
   }
 
-  async function createPreviewLink(kind: "page" | "blog") {
+  async function createPreviewLink() {
     setPreviewLoading(true);
     setPreviewLink(null);
     try {
-      const slug =
-        kind === 'page'
-          ? selectedPageSlug.trim()
-          : (selectedBlogSlug || blogForm.slug.trim());
-      const payload = { kind, slug, locale };
-
+      const slug = selectedPageSlug.trim();
       if (!slug) {
-        alert(
-          kind === 'page'
-            ? 'Select or create a page first.'
-            : 'Select a post from the list or enter a slug in the form, then try preview again.',
-        );
+        alert('Select or create a page first.');
         return;
       }
 
-      const res = await fetch("/api/preview/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const res = await fetch('/api/preview/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'page', slug, locale }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data?.message ?? "Failed to create preview link");
+        alert(data?.message ?? 'Failed to create preview link');
         return;
       }
 
@@ -1259,7 +936,7 @@ export default function MarketerDashboard({
         setPreviewLink(data.url);
       }
     } catch {
-      alert("Failed to create preview link");
+      alert('Failed to create preview link');
     } finally {
       setPreviewLoading(false);
     }
@@ -1288,7 +965,7 @@ export default function MarketerDashboard({
       if (creatingPage) void createPage();
       else if (selectedPageSlug) void savePageSeo();
     } else if (activeTab === 'blogs' && canBlogs) {
-      if (selectedBlogSlug) void saveBlogSeo();
+      blogsManagerRef.current?.requestSave();
     } else if (activeTab === 'campaigns' && showCampaignForm) {
       void handleSaveCampaign();
     } else if (activeTab === 'links' && showLinkForm) {
@@ -1574,7 +1251,7 @@ export default function MarketerDashboard({
                 <FeatureGate feature="previewSharing">
                   <button
                     type="button"
-                    onClick={() => createPreviewLink("page")}
+                    onClick={() => createPreviewLink()}
                     className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
                     disabled={previewLoading || creatingPage || !selectedPageSlug}
                   >
@@ -1627,368 +1304,12 @@ export default function MarketerDashboard({
       )}
 
       {activeTab === 'blogs' && canBlogs && (
-        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/30">
-          {blogToast ? (
-            <div
-              role="status"
-              className={`flex items-start gap-3 border-b px-4 py-3 text-sm sm:px-6 ${
-                blogToast.type === 'success'
-                  ? 'border-emerald-200/80 bg-emerald-50/95 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/35 dark:text-emerald-100'
-                  : 'border-red-200/80 bg-red-50/95 text-red-950 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100'
-              }`}
-            >
-              {blogToast.type === 'success' ? (
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
-              ) : (
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" aria-hidden />
-              )}
-              <p className="min-w-0 flex-1 leading-snug">{blogToast.message}</p>
-              <button
-                type="button"
-                onClick={() => setBlogToast(null)}
-                className="shrink-0 rounded-lg p-1 text-slate-500 transition hover:bg-black/5 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white"
-                aria-label="Dismiss notification"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
-          ) : null}
-
-          <div className="flex flex-col gap-4 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 via-white to-violet-50/30 p-5 dark:border-slate-800 dark:from-slate-800/45 dark:via-slate-900/85 dark:to-violet-950/20 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div className="flex min-w-0 items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-md ring-1 ring-violet-500/30">
-                <BookOpen size={22} strokeWidth={2} aria-hidden />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">
-                  Blog posts
-                </h2>
-                <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                  Add, edit, or remove articles — all actions persist in the database. Use{' '}
-                  <span className="font-medium text-slate-800 dark:text-slate-200">Save changes</span> when editing an
-                  existing post, or <span className="font-medium text-slate-800 dark:text-slate-200">Create post</span>{' '}
-                  after starting a new draft.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={startNewBlogPost}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:shadow-violet-900/40"
-            >
-              <Plus size={18} strokeWidth={2.5} aria-hidden />
-              New post
-            </button>
-          </div>
-
-          <div className="flex flex-col lg:flex-row lg:min-h-[min(72vh,760px)]">
-            <aside className="flex flex-col border-b border-slate-200 bg-slate-50/70 dark:border-slate-700 dark:bg-slate-950/40 lg:w-[min(100%,22rem)] lg:shrink-0 lg:border-b-0 lg:border-r xl:w-96">
-              <div className="space-y-3 p-4 sm:p-5">
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Sector
-                  </label>
-                  <select
-                    value={blogSectorFilter}
-                    onChange={(e) => setBlogSectorFilter(e.target.value)}
-                    className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm transition hover:border-slate-300 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500"
-                  >
-                    <option value="">All sectors</option>
-                    {sectors.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Search
-                  </label>
-                  <div className="relative">
-                    <Search
-                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                      aria-hidden
-                    />
-                    <input
-                      type="search"
-                      value={blogListSearch}
-                      onChange={(e) => setBlogListSearch(e.target.value)}
-                      placeholder="Title, slug, sector…"
-                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="min-h-[180px] flex-1 space-y-2 overflow-y-auto px-4 pb-4 sm:px-5 lg:max-h-none lg:flex-1">
-                {blogsLoading ? (
-                  <div className="flex flex-col items-center justify-center gap-2 py-14 text-sm text-slate-500 dark:text-slate-400">
-                    <Loader2 className="h-8 w-8 animate-spin text-violet-500" aria-hidden />
-                    Loading posts…
-                  </div>
-                ) : filteredBlogs.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-300 bg-white/80 p-6 text-center text-sm leading-relaxed text-slate-600 dark:border-slate-600 dark:bg-slate-900/50 dark:text-slate-400">
-                    {blogs.length === 0
-                      ? 'No posts yet. Click “New post”, add title, slug, sector, and content, then create.'
-                      : 'No posts match your search. Clear the search box or pick another sector.'}
-                  </div>
-                ) : (
-                  filteredBlogs.map((b) => {
-                    const isActive = selectedBlogSlug === b.slug;
-                    const isLoading = blogLoadingSlug === b.slug;
-                    return (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => void selectBlog(b)}
-                        className={`group relative w-full rounded-xl border p-3.5 text-left transition ${
-                          isActive
-                            ? 'border-violet-500 bg-violet-50/90 shadow-sm ring-1 ring-violet-500/20 dark:border-violet-500/60 dark:bg-violet-950/30 dark:ring-violet-400/20'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-600'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
-                            {b.title}
-                          </p>
-                          {isLoading ? (
-                            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-violet-500" aria-hidden />
-                          ) : null}
-                        </div>
-                        <p className="mt-1 font-mono text-[11px] text-slate-500 dark:text-slate-400">/{b.slug}</p>
-                        {b.sector?.name ? (
-                          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-500">{b.sector.name}</p>
-                        ) : null}
-                        <span
-                          className={`mt-2 inline-flex rounded-md px-2 py-0.5 text-[11px] font-semibold capitalize ${blogStatusBadgeClass(b.status)}`}
-                        >
-                          {b.status}
-                        </span>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-              <p className="hidden border-t border-slate-200 px-4 py-2.5 text-center text-[11px] text-slate-500 dark:border-slate-800 dark:text-slate-500 lg:block">
-                {filteredBlogs.length} of {blogs.length} post{blogs.length === 1 ? '' : 's'}
-                {blogListSearch.trim() ? ' shown' : ''}
-              </p>
-            </aside>
-
-            <div className="flex min-w-0 flex-1 flex-col">
-              <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                <div
-                  className={`rounded-xl border px-4 py-3 text-sm ${
-                    selectedBlogSlug
-                      ? 'border-sky-200/90 bg-sky-50/90 text-sky-950 dark:border-sky-900/50 dark:bg-sky-950/30 dark:text-sky-100'
-                      : 'border-violet-200/90 bg-violet-50/80 text-violet-950 dark:border-violet-900/50 dark:bg-violet-950/25 dark:text-violet-100'
-                  }`}
-                >
-                  {selectedBlogSlug ? (
-                    <>
-                      <span className="font-semibold">Editing </span>
-                      <span className="font-mono text-[13px]">/{selectedBlogSlug}</span>
-                      <span className="text-sky-900/80 dark:text-sky-200/90">
-                        {' '}
-                        — use Save changes to update the database.
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-semibold">New post</span>
-                      <span className="text-violet-900/85 dark:text-violet-200/90">
-                        {' '}
-                        — set sector, title, a unique slug, and body, then use Create post below.
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                <MarketerBlogFields
-                  ref={blogFieldsRef}
-                  blogForm={blogForm}
-                  setBlogForm={setBlogForm}
-                  sectors={sectors}
-                  sectorsLoading={sectorsLoading}
-                  blogs={blogs}
-                  authorLabel={authorLabel}
-                  uploading={uploading}
-                  activeBlog={blogs.find((b) => b.slug === selectedBlogSlug) ?? null}
-                  onUploadFeatured={async (file: File) => {
-                    setUploading(true);
-                    try {
-                      const form = new FormData();
-                      form.append('file', file);
-                      if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
-                      const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
-                      const data = await res.json();
-                      if (!res.ok) return;
-                      setBlogForm((f) => ({
-                        ...f,
-                        featuredImage: data.url ?? '',
-                        ogImage: f.ogImage || (data.url ?? ''),
-                      }));
-                      setImages((prev) => [
-                        {
-                          id: data.id ?? `${Date.now()}`,
-                          key: data.key,
-                          url: data.url,
-                          fileName: data.fileName ?? null,
-                          altText: data.altText ?? null,
-                          size: data.size ?? null,
-                          updatedAt: new Date().toISOString(),
-                        },
-                        ...prev,
-                      ]);
-                    } finally {
-                      setUploading(false);
-                    }
-                  }}
-                />
-                {blogForm.featuredImage ? (
-                  <div>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={blogForm.featuredImage}
-                      alt="Featured preview"
-                      className="max-h-52 w-full rounded-xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
-                    />
-                  </div>
-                ) : null}
-                <GoogleSnippetPreview
-                  title={blogForm.metaTitle || blogForm.title}
-                  description={blogForm.metaDescription}
-                  url={`${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
-                  ogImage={blogForm.ogImage || blogForm.featuredImage}
-                />
-                <FeatureGate feature="seoScore">
-                  <SeoScorePanel
-                    metaTitle={blogForm.metaTitle}
-                    metaDescription={blogForm.metaDescription}
-                    keywords={blogForm.keywords}
-                    content={blogForm.content}
-                  />
-                  <SeoImprovementsPanel
-                    content={blogForm.content}
-                    keywordsCsv={blogForm.keywords}
-                    metaDescription={blogForm.metaDescription}
-                    onCopyKeywords={() => {
-                      const res = computeSeoSuggestions({
-                        contentHtml: blogForm.content,
-                        currentKeywordsCsv: blogForm.keywords,
-                        currentMetaDescription: blogForm.metaDescription,
-                      });
-                      void copyTextToClipboard(res.suggestedKeywordsCsv);
-                    }}
-                    onCopyMetaDescription={() => {
-                      const res = computeSeoSuggestions({
-                        contentHtml: blogForm.content,
-                        currentKeywordsCsv: blogForm.keywords,
-                        currentMetaDescription: blogForm.metaDescription,
-                      });
-                      void copyTextToClipboard(res.suggestedMetaDescription);
-                    }}
-                  />
-                </FeatureGate>
-                <FeatureGate feature="previewSharing">
-                  {previewLink ? (
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/50">
-                      <a
-                        href={previewLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="truncate text-sm text-blue-700 hover:underline dark:text-blue-400"
-                      >
-                        {previewLink}
-                      </a>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => void copyTextToClipboard(previewLink)}
-                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-                        >
-                          Copy link
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPreviewLink(null)}
-                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                </FeatureGate>
-              </div>
-
-              <div className="sticky bottom-0 z-10 border-t border-slate-200/95 bg-white/95 px-4 py-3 shadow-[0_-4px_24px_rgba(15,23,42,0.06)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 sm:px-6">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="hidden max-w-md text-xs text-slate-500 dark:text-slate-400 sm:block">
-                    {selectedBlogSlug
-                      ? 'Save writes updates to the database. Delete removes the post permanently.'
-                      : 'Create post inserts a new row. The URL slug must be unique site-wide.'}
-                  </p>
-                  <div className="flex flex-wrap items-center justify-end gap-2">
-                    {selectedBlogSlug ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => void saveBlogSeo()}
-                          disabled={blogActionLoading !== null}
-                          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-500"
-                        >
-                          {blogActionLoading === 'save' ? (
-                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                          ) : null}
-                          Save changes
-                        </button>
-                        <FeatureGate feature="previewSharing">
-                          <button
-                            type="button"
-                            onClick={() => createPreviewLink('blog')}
-                            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                            disabled={previewLoading || (!selectedBlogSlug && !blogForm.slug.trim())}
-                          >
-                            {previewLoading ? 'Generating…' : 'Preview draft'}
-                          </button>
-                        </FeatureGate>
-                        <button
-                          type="button"
-                          onClick={() => void deleteSelectedBlog()}
-                          disabled={blogActionLoading !== null}
-                          className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50/80 px-4 py-2.5 text-sm font-semibold text-red-800 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 dark:hover:bg-red-950/50"
-                        >
-                          {blogActionLoading === 'delete' ? (
-                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                          ) : (
-                            <Trash2 className="h-4 w-4" aria-hidden />
-                          )}
-                          Delete
-                        </button>
-                      </>
-                    ) : null}
-                    {!selectedBlogSlug ? (
-                      <button
-                        type="button"
-                        onClick={() => void createBlog()}
-                        disabled={!blogForm.sectorId.trim() || blogActionLoading !== null}
-                        className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/25 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-violet-900/30"
-                      >
-                        {blogActionLoading === 'create' ? (
-                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                        ) : (
-                          <Plus className="h-4 w-4" aria-hidden />
-                        )}
-                        Create post
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <MarketerBlogsManager
+          ref={blogsManagerRef}
+          locale={locale}
+          authorLabel={authorLabel}
+          setImages={setImages}
+        />
       )}
 
       {((activeTab === 'pages' && canPages) || (activeTab === 'blogs' && canBlogs)) && (
@@ -2035,8 +1356,8 @@ export default function MarketerDashboard({
                     onClick={() => {
                       if (activeTab === 'pages' && canPages) {
                         setPageForm((f) => ({ ...f, ogImage: img.url }));
-                      } else {
-                        setBlogForm((f) => ({ ...f, featuredImage: img.url, ogImage: img.url }));
+                      } else if (activeTab === 'blogs' && canBlogs) {
+                        blogsManagerRef.current?.applyImageFromLibrary(img.url);
                       }
                     }}
                   >

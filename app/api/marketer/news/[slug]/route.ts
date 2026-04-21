@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
@@ -8,7 +8,8 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
-import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { applyMachineTranslationsFromCanonicalPost } from '@/lib/blog-translations-sync';
+import { applyNewsTranslationPatches } from '@/lib/news-apply-translation-patches';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
 import {
   newsPatchDataFromBody,
@@ -16,6 +17,10 @@ import {
 } from '@/lib/marketer-news-fields';
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
 import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
+import {
+  collectStoredImageKeysFromNews,
+  deleteOrphanedStoredImagesForKeys,
+} from '@/lib/news-stored-image-cleanup';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -155,81 +160,76 @@ export async function PATCH(
     });
 
     const patches = parseTranslationPatches(body);
-    for (const p of patches) {
-      if (p.locale === routing.defaultLocale) continue;
-      const row = await prisma.newsTranslation.findUnique({
-        where: { newsId_locale: { newsId: doc.id, locale: p.locale } },
-      });
-      const title = p.title ?? row?.title ?? doc.title;
-      const content = p.content ?? row?.content ?? doc.content;
-      await prisma.newsTranslation.upsert({
-        where: { newsId_locale: { newsId: doc.id, locale: p.locale } },
-        create: {
-          newsId: doc.id,
-          locale: p.locale,
-          title,
-          content,
-          excerpt: p.excerpt ?? null,
-          metaTitle: p.metaTitle ?? null,
-          metaDescription: p.metaDescription ?? null,
-          translatedSlug: p.translatedSlug ?? null,
-          hreflangJson: p.hreflangJson ?? null,
-        },
-        update: {
-          title: p.title !== undefined ? p.title : row?.title ?? doc.title,
-          content: p.content !== undefined ? p.content : row?.content ?? doc.content,
-          excerpt: p.excerpt !== undefined ? p.excerpt : row?.excerpt ?? null,
-          metaTitle: p.metaTitle !== undefined ? p.metaTitle : row?.metaTitle ?? null,
-          metaDescription: p.metaDescription !== undefined ? p.metaDescription : row?.metaDescription ?? null,
-          translatedSlug: p.translatedSlug !== undefined ? p.translatedSlug : row?.translatedSlug ?? null,
-          hreflangJson: p.hreflangJson !== undefined ? p.hreflangJson : row?.hreflangJson ?? null,
+    await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+
+    let out = doc;
+    if (patches.length > 0) {
+      const finalDoc = await prisma.news.findUnique({
+        where: { id: doc.id },
+        include: {
+          author: { select: { id: true, email: true, name: true } },
+          sector: { select: { id: true, name: true, slug: true } },
+          translations: true,
         },
       });
+      out = finalDoc ?? doc;
     }
 
-    const finalDoc = await prisma.news.findUnique({
-      where: { id: doc.id },
-      include: {
-        author: { select: { id: true, email: true, name: true } },
-        sector: { select: { id: true, name: true, slug: true } },
-        translations: true,
-      },
-    });
-    const out = finalDoc ?? doc;
-
-    scheduleBlogTranslationSync(out.id);
-
-    await logMarketingActivity({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      entity: 'blog',
-      entityId: out.id,
-      action: 'update',
-      seoNote: strOrNull(body.seoNote),
-      payload: {
-        before: {
-          slug: existing.slug,
-          title: existing.title,
-          status: existing.status,
-          sectorId: existing.sectorId ?? null,
+    if (process.env.BLOG_AUTO_TRANSLATE !== '0' && out.status === 'published') {
+      await applyMachineTranslationsFromCanonicalPost({
+        id: out.id,
+        title: out.title,
+        content: out.content,
+        excerpt: out.excerpt,
+        metaTitle: out.metaTitle,
+        metaDescription: out.metaDescription,
+        ogTitle: out.ogTitle,
+        ogDescription: out.ogDescription,
+      });
+      const synced = await prisma.news.findUnique({
+        where: { id: out.id },
+        include: {
+          author: { select: { id: true, email: true, name: true } },
+          sector: { select: { id: true, name: true, slug: true } },
+          translations: true,
         },
-        after: {
-          slug: out.slug,
-          title: out.title,
-          status: out.status,
-          sectorId: out.sectorId ?? null,
+      });
+      if (synced) out = synced;
+    }
+
+    await Promise.all([
+      logMarketingActivity({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        entity: 'blog',
+        entityId: out.id,
+        action: 'update',
+        seoNote: strOrNull(body.seoNote),
+        payload: {
+          before: {
+            slug: existing.slug,
+            title: existing.title,
+            status: existing.status,
+            sectorId: existing.sectorId ?? null,
+          },
+          after: {
+            slug: out.slug,
+            title: out.title,
+            status: out.status,
+            sectorId: out.sectorId ?? null,
+          },
         },
-      },
-    });
-    await logContentEdit({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      kind: 'blog',
-      targetPath: out.slug,
-      summary: `update title length ${out.title.length}, content length ${out.content.length}`,
-    });
+      }),
+      logContentEdit({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        kind: 'blog',
+        targetPath: out.slug,
+        summary: `update title length ${out.title.length}, content length ${out.content.length}`,
+      }),
+    ]);
 
     if (existing.status !== 'published' && out.status === 'published') {
       void notifyContentPublished({
@@ -241,12 +241,14 @@ export async function PATCH(
       }).catch(() => {});
     }
 
-    revalidateCmsPublicSurfaces();
-    revalidateNewsPostPublicPaths({
-      sectorSlug: out.sector?.slug ?? null,
-      articleSlug: out.slug,
-      previousSectorSlug: existing.sector?.slug ?? null,
-      previousArticleSlug: existing.slug,
+    after(() => {
+      revalidateCmsPublicSurfaces();
+      revalidateNewsPostPublicPaths({
+        sectorSlug: out.sector?.slug ?? null,
+        articleSlug: out.slug,
+        previousSectorSlug: existing.sector?.slug ?? null,
+        previousArticleSlug: existing.slug,
+      });
     });
 
     return NextResponse.json({ item: out });
@@ -291,43 +293,53 @@ export async function DELETE(
     await connectDb();
     const existing = await prisma.news.findUnique({
       where: { slug: s },
-      include: { sector: { select: { slug: true } } },
+      include: {
+        sector: { select: { slug: true } },
+        translations: { select: { content: true, excerpt: true } },
+      },
     });
     if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
 
+    const storedImageKeys = collectStoredImageKeysFromNews(existing);
+
     await prisma.news.delete({ where: { slug: s } });
-    await logMarketingActivity({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      entity: 'blog',
-      entityId: existing.id,
-      action: 'delete',
-      payload: { slug: existing.slug, title: existing.title },
-    });
-    await logContentEdit({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      kind: 'blog',
-      targetPath: existing.slug,
-      summary: 'delete',
-    });
 
-    await writeAuditLog({
-      request,
-      actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
-      action: 'content.news.delete',
-      targetType: 'News',
-      targetId: existing.id,
-      targetLabel: existing.slug,
-      payload: { slug: existing.slug, title: existing.title },
-    });
+    await deleteOrphanedStoredImagesForKeys(storedImageKeys);
+    await Promise.all([
+      logMarketingActivity({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        entity: 'blog',
+        entityId: existing.id,
+        action: 'delete',
+        payload: { slug: existing.slug, title: existing.title },
+      }),
+      logContentEdit({
+        userId: session.user.id,
+        userEmail: session.user.email ?? '',
+        userRole: session.user.role ?? '',
+        kind: 'blog',
+        targetPath: existing.slug,
+        summary: 'delete',
+      }),
+      writeAuditLog({
+        request,
+        actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+        action: 'content.news.delete',
+        targetType: 'News',
+        targetId: existing.id,
+        targetLabel: existing.slug,
+        payload: { slug: existing.slug, title: existing.title },
+      }),
+    ]);
 
-    revalidateCmsPublicSurfaces();
-    revalidateNewsPostPublicPaths({
-      sectorSlug: existing.sector?.slug ?? null,
-      articleSlug: existing.slug,
+    after(() => {
+      revalidateCmsPublicSurfaces();
+      revalidateNewsPostPublicPaths({
+        sectorSlug: existing.sector?.slug ?? null,
+        articleSlug: existing.slug,
+      });
     });
 
     return NextResponse.json({ ok: true });

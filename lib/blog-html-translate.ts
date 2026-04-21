@@ -1,6 +1,4 @@
-import { delay, translateText } from '@/lib/translate';
-
-const DELAY_MS = Number(process.env.TRANSLATE_DELAY_MS) || 400;
+import { translateText } from '@/lib/translate';
 
 type HtmlSegment =
   | { type: 'html'; value: string }
@@ -60,16 +58,19 @@ export async function translateHtmlContent(
   const segments = parseHtmlSegments(trimmed);
   const textSegments = segments.filter((s): s is Extract<HtmlSegment, { type: 'text' }> => s.type === 'text');
   if (textSegments.length === 0) {
+    // Never strip tags to plain text: that destroyed rich posts in `NewsTranslation`
+    // when HTML used nested tags, unknown wrappers, or markdown pasted without angle brackets.
+    const hasAngleTag = /<[a-z?/!]/i.test(trimmed);
+    if (hasAngleTag) {
+      return trimmed;
+    }
     const plain = trimmed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     if (!plain) return trimmed;
     return translateText(plain, targetLocale, sourceLocale);
   }
 
-  const translated: string[] = [];
-  for (const seg of textSegments) {
-    const t = await translateText(seg.value, targetLocale, sourceLocale);
-    translated.push(t);
-    await delay(DELAY_MS);
-  }
+  const translated = await Promise.all(
+    textSegments.map((seg) => translateText(seg.value, targetLocale, sourceLocale)),
+  );
   return buildHtmlFromSegments(segments, translated);
 }

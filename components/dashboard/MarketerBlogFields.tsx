@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useImperativeHandle, useState, forwardRef, useMemo } from 'react';
-import FeatureGate from '@/components/FeatureGate';
+import { useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import type { TranslationPatch } from '@/lib/marketer-news-fields';
 import {
   BLOG_LOCALES_FOR_TRANSLATIONS,
   type BlogFormState,
   type BlogListRow,
 } from '@/lib/marketer-blog-form';
+import { Loader2 } from 'lucide-react';
+import { BlogRichContentField } from '@/components/dashboard/BlogRichContentField';
 
 type SectorOption = { id: string; name: string; slug: string };
 
@@ -31,8 +32,12 @@ const emptyLoc = (): LocDraft => ({
   hreflangJson: '',
 });
 
+/** Partial locale drafts returned from `POST /api/marketer/news/translate-fields` for create mode. */
+export type TranslationDraftHydration = Record<string, Partial<LocDraft>>;
+
 export type MarketerBlogFieldsHandle = {
   getTranslationPatches: () => TranslationPatch[];
+  hydrateTranslationDrafts: (byLocale: TranslationDraftHydration) => void;
 };
 
 type Props = {
@@ -40,11 +45,17 @@ type Props = {
   setBlogForm: React.Dispatch<React.SetStateAction<BlogFormState>>;
   sectors: SectorOption[];
   sectorsLoading: boolean;
-  blogs: BlogListRow[];
   authorLabel: string;
   uploading: boolean;
   activeBlog: BlogListRow | null;
   onUploadFeatured: (file: File) => Promise<void>;
+  /** Saved post in edit mode (slug exists in the database). */
+  autoTranslateEligible?: boolean;
+  autoTranslateRunning?: boolean;
+  /** True while save/create/delete is in progress — translation button waits. */
+  autoTranslateBlocked?: boolean;
+  /** Machine-translate from English into te, hi, es and refresh translation fields. */
+  onAutoTranslateLocales?: () => Promise<void>;
 };
 
 const fieldClass =
@@ -57,7 +68,20 @@ const summaryBtn =
   'cursor-pointer list-none bg-slate-50/95 px-4 py-3 text-sm font-semibold text-slate-800 transition marker:content-none hover:bg-slate-100 dark:bg-slate-800/50 dark:text-slate-100 dark:hover:bg-slate-800 [&::-webkit-details-marker]:hidden';
 
 export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(function MarketerBlogFields(
-  { blogForm, setBlogForm, sectors, sectorsLoading, blogs, authorLabel, uploading, activeBlog, onUploadFeatured }: Props,
+  {
+    blogForm,
+    setBlogForm,
+    sectors,
+    sectorsLoading,
+    authorLabel,
+    uploading,
+    activeBlog,
+    onUploadFeatured,
+    autoTranslateEligible = false,
+    autoTranslateRunning = false,
+    autoTranslateBlocked = false,
+    onAutoTranslateLocales,
+  }: Props,
   ref,
 ) {
   const [locDrafts, setLocDrafts] = useState<Record<string, LocDraft>>({});
@@ -82,11 +106,6 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
     // Depend on `activeBlog`, not only `id`, so a lazy-loaded row (list omits bodies) still
     // hydrates translation tabs after `GET /api/marketer/news/[slug]` merges full content.
   }, [activeBlog]);
-
-  const relatedOptions = useMemo(
-    () => blogs.filter((b) => b.slug && b.slug !== blogForm.slug).map((b) => ({ slug: b.slug, title: b.title })),
-    [blogs, blogForm.slug],
-  );
 
   useImperativeHandle(ref, () => ({
     getTranslationPatches: () => {
@@ -114,6 +133,15 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         });
       }
       return patches;
+    },
+    hydrateTranslationDrafts: (byLocale: TranslationDraftHydration) => {
+      setLocDrafts((prev) => {
+        const next = { ...prev };
+        for (const loc of Object.keys(byLocale)) {
+          next[loc] = { ...(next[loc] ?? emptyLoc()), ...byLocale[loc] };
+        }
+        return next;
+      });
     },
   }));
 
@@ -169,16 +197,14 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
               placeholder="Card and SERP-friendly summary"
             />
           </div>
-          <div className="sm:col-span-2">
-            <label className={labelClass}>Full content (HTML or markdown)</label>
-            <textarea
-              className={fieldClass}
-              rows={10}
-              value={blogForm.content}
-              onChange={(e) => setBlogForm((f) => ({ ...f, content: e.target.value }))}
-              placeholder="Article body"
-            />
-          </div>
+          <BlogRichContentField
+            instanceKey={`blog-main-${activeBlog?.id ?? 'new'}`}
+            label="Full article (formatted)"
+            value={blogForm.content}
+            onChange={(content) => setBlogForm((f) => ({ ...f, content }))}
+            placeholder="Write and format your article — bold, headings, lists, and alignment work like Word."
+            minHeightClass="min-h-[26rem] sm:min-h-[30rem]"
+          />
           <div>
             <label className={labelClass}>Author (account)</label>
             <input className={fieldClass} value={authorLabel} disabled placeholder="Author" />
@@ -206,99 +232,8 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
       </details>
 
       <details className={detailsShell}>
-        <summary className={summaryBtn}>2. Publishing & status</summary>
-        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
-          <div>
-            <label className={labelClass}>Status</label>
-            <select
-              className={fieldClass}
-              value={blogForm.status}
-              onChange={(e) =>
-                setBlogForm((f) => ({
-                  ...f,
-                  status: e.target.value as BlogFormState['status'],
-                  publishedAt: e.target.value === 'published' ? f.publishedAt : '',
-                }))
-              }
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelClass}>Publish date (when published)</label>
-            <input
-              type="date"
-              className={fieldClass}
-              value={blogForm.publishedAt}
-              onChange={(e) => setBlogForm((f) => ({ ...f, publishedAt: e.target.value }))}
-              disabled={blogForm.status !== 'published'}
-            />
-          </div>
-          <FeatureGate feature="scheduling">
-            <div className="sm:col-span-2">
-              <label className={labelClass}>Schedule publish (datetime)</label>
-              <input
-                type="datetime-local"
-                className={fieldClass}
-                value={blogForm.scheduledPublishAt}
-                onChange={(e) => setBlogForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
-              />
-              <p className="text-xs text-slate-500 mt-1">
-                For <strong>Scheduled</strong> status, set a future time. Cron promotes due posts to published.
-              </p>
-            </div>
-          </FeatureGate>
-          <div>
-            <label className={labelClass}>Content type</label>
-            <select
-              className={fieldClass}
-              value={blogForm.contentType}
-              onChange={(e) =>
-                setBlogForm((f) => ({ ...f, contentType: e.target.value as BlogFormState['contentType'] }))
-              }
-            >
-              <option value="blog">Blog</option>
-              <option value="case_study">Case study</option>
-              <option value="news">News</option>
-              <option value="guide">Guide</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelClass}>Sub-category (optional)</label>
-            <input
-              className={fieldClass}
-              value={blogForm.subCategory}
-              onChange={(e) => setBlogForm((f) => ({ ...f, subCategory: e.target.value }))}
-              placeholder="e.g. logistics"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Categories (comma-separated slugs)</label>
-            <input
-              className={fieldClass}
-              value={blogForm.categorySlugs}
-              onChange={(e) => setBlogForm((f) => ({ ...f, categorySlugs: e.target.value }))}
-              placeholder="sector-news, guides"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Tags (comma-separated)</label>
-            <input
-              className={fieldClass}
-              value={blogForm.tags}
-              onChange={(e) => setBlogForm((f) => ({ ...f, tags: e.target.value }))}
-              placeholder="seo, marketing, 2026"
-            />
-          </div>
-        </div>
-      </details>
-
-      <details className={detailsShell}>
         <summary className={summaryBtn}>
-          3. SEO & URL
+          2. SEO & URL
         </summary>
         <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
@@ -373,7 +308,7 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
 
       <details className={detailsShell}>
         <summary className={summaryBtn}>
-          4. Media
+          3. Media
         </summary>
         <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
@@ -403,9 +338,27 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
                 const file = e.target.files?.[0];
                 if (!file) return;
                 await onUploadFeatured(file);
+                e.target.value = '';
               }}
             />
           </label>
+          {blogForm.featuredImage?.trim() ? (
+            <div className="sm:col-span-2">
+              <p className={labelClass}>Featured preview (full image, not cropped)</p>
+              <div className="flex max-h-[min(72vh,600px)] w-full items-center justify-center overflow-auto rounded-xl border border-slate-200 bg-slate-50/90 p-2 dark:border-slate-600 dark:bg-slate-900/60">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={blogForm.featuredImage}
+                  alt={blogForm.featuredImageAlt?.trim() || blogForm.title?.trim() || 'Featured image'}
+                  className="h-auto max-h-[min(72vh,600px)] w-full max-w-full object-contain object-center"
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                Uploads are converted to <span className="font-mono">.webp</span> and stored in the database
+                (media library). In edit mode the post is updated automatically after upload.
+              </p>
+            </div>
+          ) : null}
           <div>
             <label className={labelClass}>Banner image URL</label>
             <input
@@ -472,136 +425,39 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
 
       <details className={detailsShell}>
         <summary className={summaryBtn}>
-          5. Engagement & analytics (manual counts)
-        </summary>
-        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
-          <div>
-            <label className={labelClass}>Views</label>
-            <input
-              className={fieldClass}
-              inputMode="numeric"
-              value={blogForm.viewCount}
-              onChange={(e) => setBlogForm((f) => ({ ...f, viewCount: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Likes / claps</label>
-            <input
-              className={fieldClass}
-              inputMode="numeric"
-              value={blogForm.likeCount}
-              onChange={(e) => setBlogForm((f) => ({ ...f, likeCount: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Shares</label>
-            <input
-              className={fieldClass}
-              inputMode="numeric"
-              value={blogForm.shareCount}
-              onChange={(e) => setBlogForm((f) => ({ ...f, shareCount: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Reading time (minutes, optional override)</label>
-            <input
-              className={fieldClass}
-              inputMode="numeric"
-              value={blogForm.readingTimeMinutes}
-              onChange={(e) => setBlogForm((f) => ({ ...f, readingTimeMinutes: e.target.value }))}
-              placeholder="Auto from content if empty on save"
-            />
-          </div>
-          <div className="sm:col-span-2 flex items-center gap-2">
-            <input
-              id="comments-enabled"
-              type="checkbox"
-              checked={blogForm.commentsEnabled}
-              onChange={(e) => setBlogForm((f) => ({ ...f, commentsEnabled: e.target.checked }))}
-            />
-            <label htmlFor="comments-enabled" className="text-sm text-slate-700 dark:text-slate-300">
-              Comments enabled
-            </label>
-          </div>
-          <p className="text-xs text-slate-500 sm:col-span-2">
-            Scroll depth and automated view increments can be wired to analytics separately; this form stores editable
-            counters for campaigns.
-          </p>
-        </div>
-      </details>
-
-      <details className={detailsShell}>
-        <summary className={summaryBtn}>
-          6. Schema JSON-LD & linking
-        </summary>
-        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800">
-          <div>
-            <label className={labelClass}>Article schema (JSON-LD)</label>
-            <textarea
-              className={fieldClass}
-              rows={4}
-              value={blogForm.articleSchemaJson}
-              onChange={(e) => setBlogForm((f) => ({ ...f, articleSchemaJson: e.target.value }))}
-              placeholder='{"@context":"https://schema.org",...}'
-            />
-          </div>
-          <div>
-            <label className={labelClass}>FAQ schema (JSON-LD)</label>
-            <textarea
-              className={fieldClass}
-              rows={3}
-              value={blogForm.faqSchemaJson}
-              onChange={(e) => setBlogForm((f) => ({ ...f, faqSchemaJson: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>How-To schema (JSON-LD)</label>
-            <textarea
-              className={fieldClass}
-              rows={3}
-              value={blogForm.howToSchemaJson}
-              onChange={(e) => setBlogForm((f) => ({ ...f, howToSchemaJson: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Related posts (comma-separated slugs)</label>
-            <input
-              className={fieldClass}
-              value={blogForm.relatedPostSlugs}
-              onChange={(e) => setBlogForm((f) => ({ ...f, relatedPostSlugs: e.target.value }))}
-              placeholder="slug-one, slug-two"
-            />
-            <p className="text-xs text-slate-500 mt-1">Known slugs: {relatedOptions.map((o) => o.slug).join(', ') || '—'}</p>
-          </div>
-          <div>
-            <label className={labelClass}>Pillar content slug</label>
-            <input
-              className={fieldClass}
-              value={blogForm.pillarSlug}
-              onChange={(e) => setBlogForm((f) => ({ ...f, pillarSlug: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Outbound links JSON</label>
-            <textarea
-              className={fieldClass}
-              rows={3}
-              value={blogForm.outboundLinksJson}
-              onChange={(e) => setBlogForm((f) => ({ ...f, outboundLinksJson: e.target.value }))}
-              placeholder='[{"url":"https://…","label":"Source","nofollow":true}]'
-            />
-          </div>
-        </div>
-      </details>
-
-      <details className={detailsShell}>
-        <summary className={summaryBtn}>
-          7. Translations (non-English locales)
+          4. Translations (non-English locales)
         </summary>
         <div className="border-t border-slate-100 p-4 dark:border-slate-800">
           <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-            Auto-translation still runs from English on publish. Edit overrides here (hreflang JSON for alternate URLs).
+            Machine translation uses your English (default) title, excerpt, meta fields, and article body. Saving a
+            published post re-syncs all locales before the response. Visitors in{' '}
+            <span className="font-mono">{BLOG_LOCALES_FOR_TRANSLATIONS.join(', ')}</span> see these rows when the post
+            is published.
           </p>
+          {onAutoTranslateLocales ? (
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <button
+                type="button"
+                onClick={() => void onAutoTranslateLocales()}
+                disabled={
+                  !autoTranslateEligible || autoTranslateRunning || autoTranslateBlocked
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-violet-300 bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-700 dark:bg-violet-700 dark:hover:bg-violet-600"
+              >
+                {autoTranslateRunning ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : null}
+                Translate languages
+              </button>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {!autoTranslateEligible
+                  ? 'Add English title and body first (new post), or open an existing post with Edit.'
+                  : autoTranslateBlocked
+                    ? 'Wait for save or delete to finish.'
+                    : autoTranslateRunning
+                      ? 'Translating… locales run in parallel; large posts may still take several seconds.'
+                      : 'Uses MyMemory from English. You can still edit any locale below afterward.'}
+              </p>
+            </div>
+          ) : null}
           <div className="space-y-4">
             {BLOG_LOCALES_FOR_TRANSLATIONS.map((loc) => (
               <div
@@ -631,13 +487,18 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
                   value={locDrafts[loc]?.excerpt ?? ''}
                   onChange={(e) => setLoc(loc, { excerpt: e.target.value })}
                 />
-                <textarea
-                  className={`${fieldClass} sm:col-span-2`}
-                  rows={5}
-                  placeholder="Translated HTML content"
-                  value={locDrafts[loc]?.content ?? ''}
-                  onChange={(e) => setLoc(loc, { content: e.target.value })}
-                />
+                <div className="sm:col-span-2">
+                  <BlogRichContentField
+                    instanceKey={`blog-loc-${activeBlog?.id ?? 'new'}-${loc}`}
+                    label="Article body (formatted)"
+                    embedded
+                    showHint={false}
+                    value={locDrafts[loc]?.content ?? ''}
+                    onChange={(content) => setLoc(loc, { content })}
+                    placeholder="Translated article — same editor as English."
+                    minHeightClass="min-h-[16rem] sm:min-h-[22rem]"
+                  />
+                </div>
                 <input
                   className={fieldClass}
                   placeholder="Meta title"
