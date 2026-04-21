@@ -47,8 +47,14 @@ type Props = {
   onUploadFeatured: (file: File) => Promise<void>;
 };
 
-const fieldClass = 'rounded-lg border border-slate-300 px-3 py-2 text-sm w-full';
-const labelClass = 'block text-xs font-medium text-slate-600 mb-1';
+const fieldClass =
+  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/15 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500';
+const labelClass =
+  'mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400';
+const detailsShell =
+  'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950/50';
+const summaryBtn =
+  'cursor-pointer list-none bg-slate-50/95 px-4 py-3 text-sm font-semibold text-slate-800 transition marker:content-none hover:bg-slate-100 dark:bg-slate-800/50 dark:text-slate-100 dark:hover:bg-slate-800 [&::-webkit-details-marker]:hidden';
 
 export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(function MarketerBlogFields(
   { blogForm, setBlogForm, sectors, sectorsLoading, blogs, authorLabel, uploading, activeBlog, onUploadFeatured }: Props,
@@ -117,11 +123,9 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
 
   return (
     <div className="space-y-4">
-      <details open className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
-          1. Core content & author
-        </summary>
-        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+      <details open className={detailsShell}>
+        <summary className={summaryBtn}>1. Core content & author</summary>
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label className={labelClass}>Title</label>
             <input
@@ -201,11 +205,9 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
-          2. Publishing & status
-        </summary>
-        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>2. Publishing & status</summary>
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
             <label className={labelClass}>Status</label>
             <select
@@ -294,11 +296,11 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>
           3. SEO & URL
         </summary>
-        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
             <label className={labelClass}>Meta title</label>
             <input
@@ -369,11 +371,11 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>
           4. Media
         </summary>
-        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
             <label className={labelClass}>Featured image URL</label>
             <input
@@ -390,7 +392,7 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
               onChange={(e) => setBlogForm((f) => ({ ...f, featuredImageAlt: e.target.value }))}
             />
           </div>
-          <label className="flex flex-col justify-end rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 cursor-pointer bg-white">
+          <label className="flex cursor-pointer flex-col justify-end rounded-xl border border-dashed border-violet-300 bg-violet-50/50 px-3 py-3 text-center text-sm font-medium text-violet-900 transition hover:border-violet-400 hover:bg-violet-50 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-200 dark:hover:border-violet-600">
             {uploading ? 'Uploading…' : 'Upload featured image'}
             <input
               type="file"
@@ -468,11 +470,11 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>
           5. Engagement & analytics (manual counts)
         </summary>
-        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800 sm:grid-cols-2">
           <div>
             <label className={labelClass}>Views</label>
             <input
@@ -517,7 +519,7 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
               checked={blogForm.commentsEnabled}
               onChange={(e) => setBlogForm((f) => ({ ...f, commentsEnabled: e.target.checked }))}
             />
-            <label htmlFor="comments-enabled" className="text-sm text-slate-700">
+            <label htmlFor="comments-enabled" className="text-sm text-slate-700 dark:text-slate-300">
               Comments enabled
             </label>
           </div>
@@ -528,11 +530,11 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>
           6. Schema JSON-LD & linking
         </summary>
-        <div className="mt-3 grid gap-3">
+        <div className="grid gap-3 border-t border-slate-100 p-4 dark:border-slate-800">
           <div>
             <label className={labelClass}>Article schema (JSON-LD)</label>
             <textarea
@@ -592,18 +594,24 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+      <details className={detailsShell}>
+        <summary className={summaryBtn}>
           7. Translations (non-English locales)
         </summary>
-        <p className="text-xs text-slate-500 mt-2 mb-3">
-          Auto-translation still runs from English on publish. Edit overrides here (hreflang JSON for alternate URLs).
-        </p>
-        <div className="space-y-4">
-          {BLOG_LOCALES_FOR_TRANSLATIONS.map((loc) => (
-            <div key={loc} className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-600 dark:bg-slate-950/40">
-              <p className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">{loc}</p>
-              <div className="grid sm:grid-cols-2 gap-2">
+        <div className="border-t border-slate-100 p-4 dark:border-slate-800">
+          <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+            Auto-translation still runs from English on publish. Edit overrides here (hreflang JSON for alternate URLs).
+          </p>
+          <div className="space-y-4">
+            {BLOG_LOCALES_FOR_TRANSLATIONS.map((loc) => (
+              <div
+                key={loc}
+                className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 dark:border-slate-600 dark:bg-slate-950/40"
+              >
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+                  {loc}
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
                 <input
                   className={fieldClass}
                   placeholder="Translated title"
@@ -649,13 +657,14 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
                   value={locDrafts[loc]?.hreflangJson ?? ''}
                   onChange={(e) => setLoc(loc, { hreflangJson: e.target.value })}
                 />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </details>
 
-      <div>
+      <div className="rounded-xl border border-slate-200 bg-violet-50/30 p-4 dark:border-slate-700 dark:bg-violet-950/20">
         <label className={labelClass}>Team note (activity log only)</label>
         <input
           className={fieldClass}

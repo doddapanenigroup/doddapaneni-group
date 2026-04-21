@@ -146,7 +146,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       include: { translations: { orderBy: { locale: 'asc' } } },
     });
 
-    revalidateTag('careers-jobs', 'page');
+    revalidateTag('careers-jobs', 'max');
 
     return NextResponse.json({
       item: {
@@ -194,7 +194,7 @@ export async function DELETE(request: Request, ctx: { params: Promise<{ id: stri
     } catch {
       return NextResponse.json({ message: 'Not found' }, { status: 404 });
     }
-    revalidateTag('careers-jobs', 'page');
+    revalidateTag('careers-jobs', 'max');
     return NextResponse.json({ ok: true });
   } catch (error) {
     await captureErrorToDb({

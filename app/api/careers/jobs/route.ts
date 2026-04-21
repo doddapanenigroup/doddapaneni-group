@@ -155,7 +155,7 @@ export async function POST(request: Request) {
       include: { translations: true },
     });
 
-    revalidateTag('careers-jobs', 'page');
+    revalidateTag('careers-jobs', 'max');
 
     return NextResponse.json({
       item: {

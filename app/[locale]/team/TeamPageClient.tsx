@@ -5,21 +5,22 @@ import { useEffect } from 'react';
 import type { ComponentProps } from 'react';
 import { useTranslations } from '@/lib/dictionary-react';
 
-const FOUNDER_IMAGE = '/founder.png';
+const FOUNDER_IMAGE = '/founder.webp';
 
 /** Deters casual save/drag on images; cannot block OS screenshots or screen recording (browser limitation). */
 const TEAM_IMG_CLASS = 'select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]';
 
 const DEVELOPERS = [
-  { id: 'lokesh', image: '/lokesh.jpeg' },
-  { id: 'nikitha', image: '/nikitha.jpeg' },
-  { id: 'richa', image: '/richa.jpeg' },
-  { id: 'snigdha', image: '/snigdha.jpeg' },
+  { id: 'lokesh', image: '/lokesh.webp' },
+  { id: 'nikitha', image: '/nikitha.webp' },
+  { id: 'richa', image: '/richa.webp' },
+  { id: 'snigdha', image: '/snigdha.webp' },
+  { id: 'ramakrishna', image: '/ramakrishna.webp' },
 ] as const;
 
 const MARKETERS = [
-  { id: 'rajitha', image: '/rajitha.jpeg' },
-  { id: 'vijay', image: '/vijay.jpeg' },
+  { id: 'rajitha', image: '/rajitha.webp' },
+  { id: 'vijay', image: '/vijay.webp' },
 ] as const;
 
 function blockImageDragStart(e: React.DragEvent) {
@@ -57,17 +58,19 @@ function MemberCard({
   const alt = t(`${memberId}.imageAlt`);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative aspect-[4/3] w-full bg-slate-100">
-        <TeamImage
-          src={imageSrc}
-          alt={alt}
-          fill
-          className="object-cover object-top"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+    <article className="flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white text-center shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex w-full justify-center px-6 pt-8 pb-2">
+        <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-2 ring-slate-200/90 sm:h-40 sm:w-40 md:h-44 md:w-44">
+          <TeamImage
+            src={imageSrc}
+            alt={alt}
+            fill
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 176px, 192px"
+          />
+        </div>
       </div>
-      <div className="flex flex-1 flex-col p-5 md:p-6">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-2 md:px-6 md:pb-8">
         <h3 className="text-lg font-bold text-slate-900 md:text-xl">{name}</h3>
         <p className="mt-1 text-sm font-semibold text-blue-800">{role}</p>
         <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">{bio}</p>
@@ -133,7 +136,7 @@ export default function TeamPageClient() {
       <section className="border-t border-slate-100 bg-slate-50/80 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">{t('developersTitle')}</h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {DEVELOPERS.map(({ id, image }) => (
               <MemberCard key={id} memberId={id} imageSrc={image} t={t} />
             ))}
@@ -144,7 +147,7 @@ export default function TeamPageClient() {
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">{t('marketersTitle')}</h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
             {MARKETERS.map(({ id, image }) => (
               <MemberCard key={id} memberId={id} imageSrc={image} t={t} />
             ))}

@@ -24,7 +24,7 @@ function isAdminRole(role: unknown) {
 /** So division pages and layouts drop stale RSC/HTML within a second of toggling `isLive`. */
 function revalidateSectorPublicRoutes() {
   try {
-    revalidateTag('sectors-public', 'page');
+    revalidateTag('sectors-public', 'max');
     revalidatePath('/', 'layout');
     for (const slug of COMPANY_DIVISION_SLUGS) {
       revalidatePath(`/${slug}`, 'layout');

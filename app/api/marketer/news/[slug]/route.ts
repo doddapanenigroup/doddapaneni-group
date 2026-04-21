@@ -15,6 +15,7 @@ import {
   parseTranslationPatches,
 } from '@/lib/marketer-news-fields';
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
+import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -81,7 +82,12 @@ export async function GET(
       user: null,
     });
     console.error('Marketer blog(slug) GET error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? { message: 'Server error', debug: error.message }
+        : { message: 'Server error' },
+      { status: 500 },
+    );
   }
 }
 
@@ -245,6 +251,12 @@ export async function PATCH(
 
     return NextResponse.json({ item: out });
   } catch (error) {
+    if (isNewsSlugUniqueViolation(error)) {
+      return NextResponse.json(
+        { message: 'Another post already uses this slug. Choose a different slug.' },
+        { status: 409 },
+      );
+    }
     await captureErrorToDb({
       error,
       request,
@@ -253,7 +265,12 @@ export async function PATCH(
       user: null,
     });
     console.error('Marketer blog(slug) PATCH error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? { message: 'Server error', debug: error.message }
+        : { message: 'Server error' },
+      { status: 500 },
+    );
   }
 }
 
@@ -323,7 +340,12 @@ export async function DELETE(
       user: null,
     });
     console.error('Marketer blog(slug) DELETE error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? { message: 'Server error', debug: error.message }
+        : { message: 'Server error' },
+      { status: 500 },
+    );
   }
 }
 

@@ -15,7 +15,8 @@ import {
   parseNewsStatus,
 } from '@/lib/marketer-news-fields';
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
-import type { Prisma } from '@/lib/prisma-generated';
+import { Prisma } from '@/lib/prisma-generated';
+import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
 
 /** List view: omit heavy HTML bodies so the dashboard can load many posts without huge JSON or OOM/timeouts. */
 const marketerNewsListSelect = {
@@ -170,7 +171,12 @@ export async function GET(request: Request) {
       user: null,
     });
     console.error('Marketer blog GET error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? { message: 'Server error', debug: error.message }
+        : { message: 'Server error' },
+      { status: 500 },
+    );
   }
 }
 
@@ -310,6 +316,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ item: doc });
   } catch (error) {
+    if (isNewsSlugUniqueViolation(error)) {
+      return NextResponse.json(
+        { message: 'A blog with this slug already exists. Change the slug and try again.' },
+        { status: 409 },
+      );
+    }
     await captureErrorToDb({
       error,
       request,
@@ -318,7 +330,12 @@ export async function POST(request: Request) {
       user: null,
     });
     console.error('Marketer blog POST error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? { message: 'Server error', debug: error.message }
+        : { message: 'Server error' },
+      { status: 500 },
+    );
   }
 }
 

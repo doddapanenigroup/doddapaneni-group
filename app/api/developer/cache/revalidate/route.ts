@@ -78,9 +78,8 @@ export async function POST(request: Request) {
 
     for (const t of tags) {
       try {
-        // Next.js 16 expects a second argument for revalidateTag.
-        // Use "page" as a safe default scope.
-        revalidateTag(t, 'page');
+        // Next.js 16+ cache profile: use "max" (see next.config cacheLife; "page" is invalid unless configured).
+        revalidateTag(t, 'max');
         results.tags.push({ tag: t, ok: true });
       } catch {
         results.tags.push({ tag: t, ok: false });

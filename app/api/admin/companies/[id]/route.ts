@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { revalidatePathMax } from '@/lib/revalidate-path-max';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
@@ -28,10 +29,10 @@ function revalidateCompanyPublicRoutes(sectorSlugs: string[], companySlugs: stri
 
     const normalizedCompanies = [...new Set(companySlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
     for (const companySlug of normalizedCompanies) {
-      revalidatePath(`/companies/${companySlug}`, 'page');
+      revalidatePathMax(`/companies/${companySlug}`);
       for (const loc of routing.locales) {
         if (loc === routing.defaultLocale) continue;
-        revalidatePath(`/${loc}/companies/${companySlug}`, 'page');
+        revalidatePathMax(`/${loc}/companies/${companySlug}`);
       }
     }
 

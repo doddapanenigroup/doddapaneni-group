@@ -1,8 +1,9 @@
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { routing } from '@/i18n/routing';
 import { DEFAULT_LOCALE } from '@/i18n/locales';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
+import { revalidatePathMax } from '@/lib/revalidate-path-max';
 
 /**
  * On-demand revalidation for public routes after marketer CMS writes.
@@ -11,12 +12,12 @@ import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
  */
 export function revalidateCmsPublicSurfaces() {
   try {
-    revalidatePath('/', 'page');
-    revalidatePath('/news', 'page');
-    revalidateTag('page-seo', 'page');
+    revalidatePathMax('/');
+    revalidatePathMax('/news');
+    revalidateTag('page-seo', 'max');
     for (const locale of routing.locales) {
       if (locale === DEFAULT_LOCALE) continue;
-      revalidatePath(`/${locale}/news`, 'page');
+      revalidatePathMax(`/${locale}/news`);
     }
   } catch {
     /* revalidate is best-effort */
@@ -56,9 +57,9 @@ export function revalidateNewsPostPublicPaths(args: BlogPathArgs) {
   try {
     for (const { sector, article } of pairs.values()) {
       for (const locale of routing.locales) {
-        revalidatePath(publicPathForLocale(locale, newsArticlePath(sector, article)), 'page');
-        revalidatePath(publicPathForLocale(locale, newsSectorListPath(sector)), 'page');
-        revalidatePath(publicPathForLocale(locale, `/${sector}/${article}`), 'page');
+        revalidatePathMax(publicPathForLocale(locale, newsArticlePath(sector, article)));
+        revalidatePathMax(publicPathForLocale(locale, newsSectorListPath(sector)));
+        revalidatePathMax(publicPathForLocale(locale, `/${sector}/${article}`));
       }
     }
   } catch {
