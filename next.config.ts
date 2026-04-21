@@ -230,6 +230,20 @@ const nextConfig: NextConfig = {
     ] as const;
 
     return [
+      {
+        source: '/sitemap.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+        ],
+      },
+      {
+        source: '/robots.txt',
+        headers: [
+          { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+        ],
+      },
       { source: '/login', headers: [...loginNoStore] },
       ...APP_LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((loc) => ({
         source: `/${loc}/login`,

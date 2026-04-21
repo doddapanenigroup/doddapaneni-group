@@ -1,5 +1,5 @@
 /**
- * Canonical site origin for sitemaps, robots, and absolute URLs.
+ * Canonical site origin for robots (`Sitemap:`), static `/sitemap.xml` in `public/`, and absolute URLs.
  * Configure with NEXT_PUBLIC_SITE_URL or SITE_URL (with or without protocol).
  */
 export function getSiteOrigin(): string {

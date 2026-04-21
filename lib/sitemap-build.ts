@@ -1,4 +1,3 @@
-import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { DEFAULT_LOCALE } from '@/i18n/locales';
 
@@ -40,25 +39,4 @@ export function alternateLanguagesForPathname(
   }
   map['x-default'] = absoluteUrlForLocale(origin, routing.defaultLocale, fixed);
   return map;
-}
-
-export function sitemapEntry(
-  origin: string,
-  pathname: string,
-  options: {
-    lastModified?: Date;
-    changeFrequency?: MetadataRoute.Sitemap[0]['changeFrequency'];
-    priority?: number;
-  } = {},
-): MetadataRoute.Sitemap[0] {
-  const fixed = fixPathname(pathname);
-  const url = absoluteUrlForLocale(origin, routing.defaultLocale, fixed);
-
-  return {
-    url,
-    lastModified: options.lastModified ?? new Date(),
-    changeFrequency: options.changeFrequency ?? 'weekly',
-    priority: options.priority,
-    alternates: { languages: alternateLanguagesForPathname(origin, fixed) },
-  };
 }

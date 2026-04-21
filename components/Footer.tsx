@@ -238,12 +238,6 @@ export default function Footer() {
               <Link href="/disclaimer" className="hover:text-white transition-colors">
                 {t('disclaimer')}
               </Link>
-              <span className="text-blue-600" aria-hidden>
-                |
-              </span>
-              <a href="/sitemap.xml" className="hover:text-white transition-colors">
-                {t('sitemap')}
-              </a>
             </div>
           </div>
         </div>

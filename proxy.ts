@@ -65,5 +65,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
+  /**
+   * Skip Next internals, API, and paths whose first segment contains a dot
+   * (`/robots.txt`, static assets) so locale rewrites never turn them into HTML.
+   */
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
