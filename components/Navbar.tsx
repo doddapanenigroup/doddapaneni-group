@@ -324,24 +324,24 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 inset-x-0 z-50 overflow-visible transition-all duration-300 ${navbarClasses}`}>
-      <div className={`flex h-16 w-full items-center justify-between gap-2 md:h-20 md:gap-3 ${inset}`}>
+      <div className={`flex h-15 w-full items-center justify-between gap-2 md:h-18 md:gap-3 ${inset}`}>
         <div className="flex shrink-0 items-center">
           <Link
             href="/"
-            className="group flex h-16 shrink-0 items-center md:h-20"
+            className="group flex h-15 shrink-0 items-center md:h-18"
             onClick={handleLogoClick}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; `h-14`–`h-20` by breakpoint (see HomeHero). */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- public brandmark; bar uses `h-15` / `md:h-18`. */}
             <img
               src={brandLogoSrc(480)}
               srcSet={brandLogoSrcSet}
-              sizes="(max-width: 768px) min(calc(100vw - 8rem), 220px), 360px"
+              sizes="(max-width: 768px) min(calc(100vw - 8rem), 200px), 320px"
               alt={companyName}
               width={BRAND_LOGO_INTRINSIC.width}
               height={BRAND_LOGO_INTRINSIC.height}
               decoding="async"
               fetchPriority="low"
-              className="block h-14 w-auto max-w-[calc(100vw-7.5rem)] shrink-0 object-contain object-left sm:h-16 sm:max-w-[calc(100vw-9rem)] md:h-20 md:max-w-[min(92vw,42rem)] lg:max-w-[52rem]"
+              className="block h-11 w-auto max-h-15 max-w-[calc(100vw-7.5rem)] shrink-0 object-contain object-left sm:h-12 sm:max-w-[calc(100vw-9rem)] md:max-h-18 md:h-14 md:max-w-[min(92vw,36rem)] lg:max-w-[44rem]"
             />
           </Link>
         </div>
