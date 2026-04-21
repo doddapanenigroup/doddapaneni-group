@@ -2,6 +2,15 @@ import dns from 'dns';
 import nodemailer from 'nodemailer';
 import { formatDateISTAndET } from '@/lib/date-timezones';
 
+/**
+ * Yahoo Mail SMTP is `smtp.mail.yahoo.com`. `smtp.yahoo.com` does not resolve (ENOTFOUND) and is a common misconfiguration.
+ */
+function normalizeSmtpHost(raw: string): string {
+  const h = raw.trim();
+  if (/^smtp\.yahoo\.com$/i.test(h)) return 'smtp.mail.yahoo.com';
+  return h;
+}
+
 /** Some hosts truncate env values at `#`; base64 avoids that. Set `SMTP_DNS_IPV4_FIRST=1` if SMTP hangs (IPv6 issues). */
 function maybePreferIpv4ForSmtp(): void {
   if (process.env.SMTP_DNS_IPV4_FIRST !== '1' && process.env.SMTP_DNS_IPV4_FIRST !== 'true') return;
@@ -69,8 +78,12 @@ export function createMailTransporter(): nodemailer.Transporter | null {
   const pass = getSmtpPassword();
   if (!user || !pass) return null;
 
-  const host = process.env.SMTP_HOST?.trim();
-  if (host) {
+  const hostRaw = process.env.SMTP_HOST?.trim();
+  if (hostRaw) {
+    const host = normalizeSmtpHost(hostRaw);
+    if (host !== hostRaw) {
+      console.warn(`[email] SMTP_HOST "${hostRaw}" is invalid for mail; using "${host}"`);
+    }
     maybePreferIpv4ForSmtp();
     const port = Number(process.env.SMTP_PORT || '587');
     const secureFlag = process.env.SMTP_SECURE;
@@ -134,7 +147,10 @@ export function smtpFailureUserMessage(err: unknown): string {
     combined.includes('greeting timeout') ||
     combined.includes('timeout')
   ) {
-    return 'Email could not be sent: the app could not reach the mail server. Try SMTP_PORT=587 and SMTP_SECURE=false, or set SMTP_DNS_IPV4_FIRST=1.';
+    const yahooHint = combined.includes('yahoo')
+      ? ' For Yahoo Mail, set SMTP_HOST=smtp.mail.yahoo.com (not smtp.yahoo.com).'
+      : '';
+    return `Email could not be sent: the app could not reach the mail server. Check SMTP_HOST spelling, try SMTP_PORT=587 with SMTP_SECURE=false, or set SMTP_DNS_IPV4_FIRST=1 if the host resolves but hangs.${yahooHint}`;
   }
   if (
     combined.includes('certificate') ||
@@ -143,7 +159,7 @@ export function smtpFailureUserMessage(err: unknown): string {
   ) {
     return 'Email could not be sent: TLS error connecting to SMTP. Try SMTP_PORT=587 and SMTP_SECURE=false.';
   }
-  return 'Could not send verification email.';
+  return 'Email could not be sent. Please try again in a few minutes.';
 }
 
 /**

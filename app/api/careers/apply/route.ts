@@ -3,6 +3,7 @@ import {
   createMailTransporter,
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
+  smtpFailureUserMessage,
 } from '@/lib/email';
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
@@ -267,10 +268,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Application sent successfully' }, { status: 200 });
   } catch (error) {
     console.error('[careers/apply]', error);
-    const errMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { message: `Could not send email: ${errMessage}. If using Gmail, use an App Password (not your normal password).` },
-      { status: 500 },
-    );
+    const base = smtpFailureUserMessage(error);
+    const msgLower = error instanceof Error ? error.message.toLowerCase() : '';
+    const gmailHint =
+      msgLower.includes('535') ||
+      msgLower.includes('invalid login') ||
+      msgLower.includes('authentication unsuccessful')
+        ? ' If you use Gmail, use an App Password (not your normal account password).'
+        : '';
+    return NextResponse.json({ message: `${base}${gmailHint}` }, { status: 500 });
   }
 }
