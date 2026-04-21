@@ -99,15 +99,15 @@ export default function TeamPageClient() {
         if (e.target instanceof HTMLImageElement) e.preventDefault();
       }}
     >
-      <section className="border-b border-slate-200 bg-slate-50 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
+      <section className="border-b border-blue-950/50 bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-2xl font-bold uppercase tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
+          <h1 className="text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl md:text-4xl">
             {t('heroTitle')}
           </h1>
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
+      <section className="border-t border-blue-100/80 bg-white px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-10 lg:gap-12">
             <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-2 ring-slate-200/90 sm:h-32 sm:w-32 md:h-36 md:w-36">

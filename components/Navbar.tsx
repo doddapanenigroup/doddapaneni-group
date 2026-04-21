@@ -18,7 +18,6 @@ import {
   activeCompanyDivisionSlugFromPathname,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
-import { stripLocalePrefixFromPathname } from '@/lib/locale-from-path';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
 import {
   BRAND_LOGO_INTRINSIC,
@@ -82,13 +81,6 @@ export default function Navbar() {
   const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
-  /**
-   * Routes whose first hero band is light (not dark blue) under the fixed bar — white “transparent”
-   * nav text would disappear. `/careers` uses a dark blue hero to the top; keep default transparent nav.
-   */
-  const strippedPath = stripLocalePrefixFromPathname(pathname);
-  const lightHeroUnderNav = strippedPath === '/team';
-
   const activeDivisionSlug = useMemo(
     () => activeCompanyDivisionSlugFromPathname(pathname),
     [pathname],
@@ -210,8 +202,10 @@ export default function Navbar() {
     };
   }, [companiesOpen, updateMegaMenuPosition]);
 
-  const isTransparent = !scrolled && !lightHeroUnderNav;
-  const navbarClasses = isTransparent ? 'bg-transparent border-transparent' : 'bg-transparent backdrop-blur-xl shadow-none';
+  const isTransparent = !scrolled;
+  const navbarClasses = isTransparent
+    ? 'bg-transparent border-transparent'
+    : 'bg-transparent backdrop-blur-xl shadow-none';
 
   const mobileButtonClass = isTransparent
     ? 'text-white hover:bg-white/10'
