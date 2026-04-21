@@ -36,6 +36,27 @@ function simpleEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
+/** Local testing only: save applications without SMTP. Never enable in production. */
+function isCareersApplyDevSkipEmail(): boolean {
+  return (
+    process.env.NODE_ENV === 'development' &&
+    (process.env.CAREERS_APPLY_DEV_NO_EMAIL === '1' || process.env.CAREERS_APPLY_DEV_NO_EMAIL === 'true')
+  );
+}
+
+function isLikelyDatabaseError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  const ctor =
+    error != null && typeof error === 'object' && 'constructor' in error
+      ? String((error as { constructor?: { name?: string } }).constructor?.name ?? '')
+      : '';
+  const blob = `${msg} ${ctor}`;
+  return (
+    /PrismaClient(Initialization|KnownRequest|RustPanic)Error/.test(ctor) ||
+    /Can't reach database server|P1001|P1000|P1017|P1013|Invalid.*prisma/i.test(blob)
+  );
+}
+
 export async function POST(request: Request) {
   try {
     recordApiRequest({ request, userId: null });
@@ -137,20 +158,22 @@ export async function POST(request: Request) {
     const jobTitle = tr.title;
     const jobSubtitle = tr.subtitle;
 
-    if (!isLoginEmailDeliveryConfigured()) {
+    const skipEmailDev = isCareersApplyDevSkipEmail() && !isLoginEmailDeliveryConfigured();
+
+    if (!isLoginEmailDeliveryConfigured() && !skipEmailDev) {
       console.error('[careers/apply] Email not configured');
       return NextResponse.json(
         {
           message:
-            'Email is not configured on the server. Set EMAIL_USER, EMAIL_PASS, and SMTP_* if using Hostinger SMTP.',
+            'Email is not configured on the server. Set EMAIL_USER and EMAIL_PASS (and SMTP_HOST / SMTP_PORT / SMTP_SECURE for custom SMTP). For local testing without mail, set NODE_ENV=development and CAREERS_APPLY_DEV_NO_EMAIL=1.',
         },
         { status: 500 },
       );
     }
 
     const fromAddr = getSmtpUser();
-    const transporter = createMailTransporter();
-    if (!transporter || !fromAddr) {
+    const transporter = skipEmailDev ? null : createMailTransporter();
+    if (!skipEmailDev && (!transporter || !fromAddr)) {
       return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
     }
 
@@ -201,6 +224,17 @@ export async function POST(request: Request) {
     } catch (dbErr) {
       console.error('[careers/apply] DB save failed', dbErr);
       return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+    }
+
+    if (skipEmailDev) {
+      console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
+      return NextResponse.json(
+        {
+          message:
+            'Application saved (development mode: email not sent). Remove CAREERS_APPLY_DEV_NO_EMAIL or set EMAIL_USER + EMAIL_PASS to test delivery.',
+        },
+        { status: 200 },
+      );
     }
 
     const row = (label: string, val: string) =>
@@ -263,11 +297,20 @@ export async function POST(request: Request) {
         </div>`,
     };
 
-    await Promise.all([transporter.sendMail(userMailOptions), transporter.sendMail(adminMailOptions)]);
+    await Promise.all([transporter!.sendMail(userMailOptions), transporter!.sendMail(adminMailOptions)]);
 
     return NextResponse.json({ message: 'Application sent successfully' }, { status: 200 });
   } catch (error) {
     console.error('[careers/apply]', error);
+    if (isLikelyDatabaseError(error)) {
+      return NextResponse.json(
+        {
+          message:
+            'Could not reach the database. Check DATABASE_URL and that Postgres is running (e.g. `docker compose up` or Neon).',
+        },
+        { status: 503 },
+      );
+    }
     const base = smtpFailureUserMessage(error);
     const msgLower = error instanceof Error ? error.message.toLowerCase() : '';
     const gmailHint =

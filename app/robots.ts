@@ -2,24 +2,30 @@ import { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { getSiteOrigin } from '@/lib/site-origin';
 
+/**
+ * Disallow paths aligned with public `robots.txt` policy (dashboard, auth, API, previews).
+ * Order is stable for readability; crawlers treat these as a set of rules, not sequence-sensitive.
+ */
 function disallowPathsForIndexing(): string[] {
-  const out = new Set<string>(['/api/', '/private/']);
-
-  /** Prefixed locale URLs plus legacy `/en/…` paths; English canonical paths are unprefixed (`/login`, …). */
+  const localeDisallows: string[] = [];
   for (const locale of routing.locales) {
-    out.add(`/${locale}/dashboard`);
-    out.add(`/${locale}/login`);
-    out.add(`/${locale}/preview`);
-    out.add(`/${locale}/invite`);
+    localeDisallows.push(
+      `/${locale}/dashboard`,
+      `/${locale}/login`,
+      `/${locale}/invite`,
+      `/${locale}/preview`,
+    );
   }
 
-  /** Proxy may redirect these to `/{defaultLocale}/…`; disallow to avoid indexing duplicate paths. */
-  out.add('/dashboard');
-  out.add('/login');
-  out.add('/preview');
-  out.add('/invite');
-
-  return [...out].sort((a, b) => a.localeCompare(b));
+  return [
+    '/api/',
+    '/private/',
+    '/dashboard',
+    '/login',
+    '/invite',
+    '/preview',
+    ...localeDisallows,
+  ];
 }
 
 export default function robots(): MetadataRoute.Robots {
@@ -27,7 +33,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/',
+      allow: ['/', '/*.js$', '/*.css$'],
       disallow: disallowPathsForIndexing(),
     },
     sitemap: `${origin}/sitemap.xml`,

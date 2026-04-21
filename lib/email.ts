@@ -140,6 +140,16 @@ export function smtpFailureUserMessage(err: unknown): string {
   ) {
     return 'Email could not be sent: SMTP login failed. Check EMAIL_USER and password. If the password contains # or special characters, set EMAIL_PASS_B64 (base64 of the password) in Hostinger or change the mailbox password.';
   }
+  /** After AUTH; DATA rejected — wrong From, bad recipient, relay policy, or attachment rules. */
+  if (
+    combined.includes('550') ||
+    combined.includes('mailbox unavailable') ||
+    combined.includes('user unknown') ||
+    combined.includes('recipient address rejected') ||
+    combined.includes('relay access denied')
+  ) {
+    return 'Email could not be sent: the mail server rejected the message (often SMTP 550). Use an EMAIL_USER / From address that matches the mailbox you authenticate with; ensure the applicant email is valid; and check your provider’s limits on attachments or outbound mail.';
+  }
   if (
     combined.includes('etimedout') ||
     combined.includes('econnrefused') ||

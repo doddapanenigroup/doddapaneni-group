@@ -18,18 +18,21 @@ export const revalidate = 300;
 
 type ChangeFreq = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>;
 
-/** Public marketing & legal URLs (default-locale paths; `sitemapEntry` adds locale alternates). */
+/**
+ * Public marketing & legal URLs (default-locale paths; `sitemapEntry` adds locale alternates).
+ * Priorities follow the live site sitemap policy (~1.0 home, ~0.8 hub pages, ~0.64 sector news listing).
+ */
 const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFreq }[] = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
-  { path: '/about', priority: 0.9, changeFrequency: 'monthly' },
-  { path: '/news', priority: 0.9, changeFrequency: 'daily' },
-  { path: '/contact', priority: 0.85, changeFrequency: 'monthly' },
-  { path: '/team', priority: 0.83, changeFrequency: 'monthly' },
-  { path: '/careers', priority: 0.82, changeFrequency: 'monthly' },
-  { path: '/privacy-policy', priority: 0.5, changeFrequency: 'yearly' },
-  { path: '/terms', priority: 0.5, changeFrequency: 'yearly' },
-  { path: '/disclaimer', priority: 0.5, changeFrequency: 'yearly' },
-  { path: '/faq', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/about', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/news', priority: 0.8, changeFrequency: 'daily' },
+  { path: '/contact', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/team', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/careers', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/privacy-policy', priority: 0.8, changeFrequency: 'yearly' },
+  { path: '/terms', priority: 0.8, changeFrequency: 'yearly' },
+  { path: '/disclaimer', priority: 0.8, changeFrequency: 'yearly' },
+  { path: '/faq', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/doddapaneni/news', priority: 0.8, changeFrequency: 'weekly' },
 ];
 
@@ -154,7 +157,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       seenPaths.add(sectorPath);
       entries.push(
         sitemapEntry(origin, sectorPath, {
-          priority: 0.72,
+          priority: 0.64,
           changeFrequency: 'weekly',
           lastModified: now,
         }),
@@ -184,7 +187,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push(
         sitemapEntry(origin, hubPath, {
           lastModified: hubMod,
-          priority: 0.85,
+          priority: 0.8,
           changeFrequency: 'weekly',
         }),
       );
@@ -199,7 +202,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push(
         sitemapEntry(origin, path, {
           lastModified,
-          priority: 0.78,
+          priority: 0.8,
           changeFrequency: 'monthly',
         }),
       );
@@ -214,7 +217,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push(
         sitemapEntry(origin, sectorNewsPath, {
           lastModified: lm,
-          priority: 0.82,
+          priority: 0.64,
           changeFrequency: 'weekly',
         }),
       );
