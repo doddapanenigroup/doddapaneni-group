@@ -15,6 +15,75 @@ import {
   parseNewsStatus,
 } from '@/lib/marketer-news-fields';
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
+import type { Prisma } from '@/lib/prisma-generated';
+
+/** List view: omit heavy HTML bodies so the dashboard can load many posts without huge JSON or OOM/timeouts. */
+const marketerNewsListSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  excerpt: true,
+  featuredImage: true,
+  featuredImageAlt: true,
+  bannerImage: true,
+  galleryImageUrls: true,
+  embeddedVideoUrl: true,
+  infographicUrls: true,
+  authorId: true,
+  authorDisplayName: true,
+  authorBio: true,
+  sectorId: true,
+  status: true,
+  publishedAt: true,
+  scheduledPublishAt: true,
+  metaTitle: true,
+  metaDescription: true,
+  keywords: true,
+  focusKeyword: true,
+  secondaryKeywords: true,
+  canonicalUrl: true,
+  breadcrumbTitle: true,
+  metaRobots: true,
+  categorySlugs: true,
+  tags: true,
+  subCategory: true,
+  contentType: true,
+  ogTitle: true,
+  ogDescription: true,
+  ogImage: true,
+  viewCount: true,
+  likeCount: true,
+  shareCount: true,
+  commentsEnabled: true,
+  readingTimeMinutes: true,
+  articleSchemaJson: true,
+  faqSchemaJson: true,
+  howToSchemaJson: true,
+  relatedPostSlugs: true,
+  pillarSlug: true,
+  outboundLinksJson: true,
+  createdAt: true,
+  updatedAt: true,
+  author: { select: { id: true, email: true, name: true } },
+  sector: { select: { id: true, name: true, slug: true } },
+  translations: {
+    select: {
+      id: true,
+      newsId: true,
+      locale: true,
+      title: true,
+      excerpt: true,
+      translatedSlug: true,
+      hreflangJson: true,
+      metaTitle: true,
+      metaDescription: true,
+      ogTitle: true,
+      ogDescription: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+} satisfies Prisma.NewsSelect;
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -69,6 +138,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
+    await connectDb();
+
     const url = new URL(request.url);
     const status = strOrNull(url.searchParams.get('status'));
     const sectorIdFilter = await resolveSectorIdFilter(url.searchParams.get('sectorId'));
@@ -76,7 +147,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: sectorIdFilter.message }, { status: sectorIdFilter.status });
     }
 
-    await connectDb();
     const blogs = await prisma.news.findMany({
       where: {
         ...(status === 'draft' ||
@@ -88,11 +158,7 @@ export async function GET(request: Request) {
         ...(sectorIdFilter.sectorId ? { sectorId: sectorIdFilter.sectorId } : {}),
       },
       orderBy: [{ updatedAt: 'desc' }],
-      include: {
-        author: { select: { id: true, email: true, name: true } },
-        sector: { select: { id: true, name: true, slug: true } },
-        translations: true,
-      },
+      select: marketerNewsListSelect,
     });
     return NextResponse.json({ items: blogs });
   } catch (error) {

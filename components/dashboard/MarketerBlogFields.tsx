@@ -73,7 +73,9 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         : emptyLoc();
     }
     setLocDrafts(next);
-  }, [activeBlog?.id]);
+    // Depend on `activeBlog`, not only `id`, so a lazy-loaded row (list omits bodies) still
+    // hydrates translation tabs after `GET /api/marketer/news/[slug]` merges full content.
+  }, [activeBlog]);
 
   const relatedOptions = useMemo(
     () => blogs.filter((b) => b.slug && b.slug !== blogForm.slug).map((b) => ({ slug: b.slug, title: b.title })),

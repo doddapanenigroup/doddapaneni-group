@@ -54,7 +54,7 @@ export function SafeResponsiveChart({
       style={{ height, minHeight: height }}
     >
       {ready ? (
-        <ResponsiveContainer width="100%" height="100%" debounce={32}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={32}>
           {children}
         </ResponsiveContainer>
       ) : loadingFallback ? (

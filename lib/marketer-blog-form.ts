@@ -7,7 +7,8 @@ export type BlogContentTypeForm = 'blog' | 'case_study' | 'news' | 'guide';
 export type BlogTranslationRow = {
   locale: string;
   title: string;
-  content: string;
+  /** Omitted on list API responses to keep payloads small; present on single-post fetch. */
+  content?: string;
   excerpt: string | null;
   translatedSlug: string | null;
   hreflangJson: string | null;
@@ -19,7 +20,8 @@ export type BlogListRow = {
   id: string;
   title: string;
   slug: string;
-  content: string;
+  /** Omitted on list API responses to keep payloads small; present on single-post fetch / create. */
+  content?: string;
   excerpt?: string | null;
   sectorId: string | null;
   sector?: { id: string; name: string; slug: string } | null;

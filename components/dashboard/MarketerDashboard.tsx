@@ -789,7 +789,7 @@ export default function MarketerDashboard({
         const items = (d?.items ?? []) as BlogListRow[];
         setBlogs(items);
         if (items[0]) {
-          selectBlog(items[0]);
+          void selectBlog(items[0]);
         } else {
           setSelectedBlogSlug('');
           setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
@@ -836,9 +836,25 @@ export default function MarketerDashboard({
     });
   }
 
-  function selectBlog(blog: BlogListRow) {
+  async function selectBlog(blog: BlogListRow) {
     setSelectedBlogSlug(blog.slug);
-    setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
+    if (typeof blog.content === 'string') {
+      setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
+      return;
+    }
+    try {
+      const res = await fetch(`/api/marketer/news/${encodeURIComponent(blog.slug)}`);
+      const data = (await res.json().catch(() => ({}))) as { item?: BlogListRow; message?: string };
+      if (!res.ok || !data.item) {
+        setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
+        return;
+      }
+      const item = data.item;
+      setBlogs((prev) => prev.map((b) => (b.id === item.id ? { ...b, ...item } : b)));
+      setBlogForm(blogFromApiToForm(item, item.sectorId ?? blogSectorFilter));
+    } catch {
+      setBlogForm(blogFromApiToForm(blog, blog.sectorId ?? blogSectorFilter));
+    }
   }
 
   async function savePageSeo() {
@@ -1009,7 +1025,7 @@ export default function MarketerDashboard({
     const remaining = blogs.filter((b) => b.slug !== selectedBlogSlug);
     setBlogs(remaining);
 
-    if (remaining[0]) selectBlog(remaining[0]);
+    if (remaining[0]) void selectBlog(remaining[0]);
     else {
       setSelectedBlogSlug('');
       setBlogForm(emptyBlogForm());
@@ -1046,7 +1062,7 @@ export default function MarketerDashboard({
       }
       const item = data.item;
       setBlogs((prev) => [item, ...prev]);
-      selectBlog(item);
+      void selectBlog(item);
     } catch {
       alert('Create failed (network or server error).');
     }
@@ -1522,7 +1538,7 @@ export default function MarketerDashboard({
               ) : (
                 <div className="max-h-[420px] overflow-auto space-y-2">
                   {blogs.map((b) => (
-                    <button key={b.id} type="button" onClick={() => selectBlog(b)} className={`w-full text-left p-3 rounded-lg border ${selectedBlogSlug === b.slug ? 'border-slate-700 bg-slate-100' : 'border-slate-200 bg-white'}`}>
+                    <button key={b.id} type="button" onClick={() => void selectBlog(b)} className={`w-full text-left p-3 rounded-lg border ${selectedBlogSlug === b.slug ? 'border-slate-700 bg-slate-100' : 'border-slate-200 bg-white'}`}>
                       <p className="text-sm font-medium text-slate-900">{b.title}</p>
                       <p className="text-xs text-slate-500">/{b.slug}</p>
                       {b.sector?.name ? (
