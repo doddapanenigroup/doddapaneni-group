@@ -23,6 +23,9 @@ const MARKETERS = [
   { id: 'vijay', image: '/vijay.webp' },
 ] as const;
 
+/** Slight upward shift in the square crop (faces sit a bit higher). */
+const TEAM_PHOTO_NUDGE_UP = new Set(['nikitha', 'richa', 'snigdha', 'vijay']);
+
 function blockImageDragStart(e: React.DragEvent) {
   if (e.target instanceof HTMLImageElement) e.preventDefault();
 }
@@ -43,6 +46,7 @@ function TeamImage(props: ComponentProps<typeof Image>) {
   );
 }
 
+/** Team roster cards — square photo tile with softly curved outer corners. */
 function MemberCard({
   memberId,
   imageSrc,
@@ -56,24 +60,28 @@ function MemberCard({
   const role = t(`${memberId}.role`);
   const bio = t(`${memberId}.bio`);
   const alt = t(`${memberId}.imageAlt`);
+  const nudgePhotoUp = TEAM_PHOTO_NUDGE_UP.has(memberId);
 
   return (
-    <article className="flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white text-center shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex w-full justify-center px-6 pt-8 pb-2">
-        <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-2 ring-slate-200/90 sm:h-40 sm:w-40 md:h-44 md:w-44">
-          <TeamImage
-            src={imageSrc}
-            alt={alt}
-            fill
-            className="object-cover object-top"
-            sizes="(max-width: 768px) 176px, 192px"
-          />
-        </div>
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border-2 border-slate-300 bg-white text-center shadow-sm transition-shadow hover:border-slate-400 hover:shadow-md dark:border-slate-600 dark:bg-slate-950 dark:hover:border-slate-500">
+      <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-t-2xl bg-slate-100 dark:bg-slate-800">
+        <TeamImage
+          src={imageSrc}
+          alt={alt}
+          fill
+          className={[
+            'object-cover object-top',
+            nudgePhotoUp ? 'scale-[1.08] -translate-y-[5%]' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px"
+        />
       </div>
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-2 md:px-6 md:pb-8">
-        <h3 className="text-lg font-bold text-slate-900 md:text-xl">{name}</h3>
-        <p className="mt-1 text-sm font-semibold text-blue-800">{role}</p>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">{bio}</p>
+      <div className="flex flex-1 flex-col border-t border-slate-200 px-5 py-5 md:px-6 md:py-6 dark:border-slate-700">
+        <h3 className="text-lg font-bold text-slate-900 md:text-xl dark:text-slate-100">{name}</h3>
+        <p className="mt-1 text-sm font-semibold text-blue-800 dark:text-blue-300">{role}</p>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-slate-400">{bio}</p>
       </div>
     </article>
   );
@@ -136,7 +144,11 @@ export default function TeamPageClient() {
       <section className="border-t border-slate-100 bg-slate-50/80 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">{t('developersTitle')}</h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {/*
+            Exactly 4 cards per row on large screens; the 5th wraps to row 2 under the 1st.
+            Smaller breakpoints: 2 cols (5th sits under 1st in the third row).
+          */}
+          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {DEVELOPERS.map(({ id, image }) => (
               <MemberCard key={id} memberId={id} imageSrc={image} t={t} />
             ))}
