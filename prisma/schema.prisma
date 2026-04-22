@@ -543,6 +543,37 @@ model StoredImage {
   @@map("stored_image")
 }
 
+/// Public `/team` roster (founder + developers + marketers). Managed from admin dashboard.
+enum TeamMemberSection {
+  FOUNDER
+  DEVELOPER
+  MARKETER
+}
+
+model TeamMember {
+  id                 String             @id @default(cuid())
+  section            TeamMemberSection  @map("section")
+  sortOrder          Int                @default(0) @map("sort_order")
+  name               String
+  designation        String             @map("designation")
+  /// Main bio (max 200 words enforced in API).
+  description        String             @map("description") @db.Text
+  /// Optional second paragraph (e.g. founder).
+  descriptionExtra   String?            @map("description_extra") @db.Text
+  /// Public image URL: `/founder.webp` or `/api/media/...` from StoredImage.
+  imageUrl           String             @map("image_url")
+  imageAlt           String?            @map("image_alt")
+  /// Pan / zoom in the square holder (percent and scale).
+  imageOffsetX       Float              @default(0) @map("image_offset_x")
+  imageOffsetY       Float              @default(0) @map("image_offset_y")
+  imageScale         Float              @default(1) @map("image_scale")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  @@index([section, sortOrder])
+  @@map("team_member")
+}
+
 model FeatureToggle {
   id          String   @id @default(cuid())
   name        String   @unique

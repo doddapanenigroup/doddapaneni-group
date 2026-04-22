@@ -1,18 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, BarChart3, Globe, Megaphone, Timer } from 'lucide-react';
+import { BarChart3, Globe, Megaphone, Timer } from 'lucide-react';
 
 type Insights = {
-  recentLogins: {
-    id: string;
-    loggedAt: string;
-    loggedOutAt: string | null;
-    userEmail: string;
-    userName: string | null;
-    userUsername: string | null;
-    userRole: string;
-  }[];
   contentEdits: {
     id: string;
     createdAt: string;
@@ -36,35 +27,9 @@ type Insights = {
   webVitals7d: { name: string; avgValue: number | null; samples: number }[];
 };
 
-type ActiveSessionsResponse = {
-  activeByUser: {
-    userId: string;
-    userEmail: string;
-    userName: string | null;
-    userUsername: string | null;
-    userRole: string;
-    deviceUserAgent: string | null;
-    activeSessions: { id: string; loggedAt: string }[];
-  }[];
-};
-
-function toDeviceLabel(ua: string | null) {
-  if (!ua) return 'Unknown device';
-  const s = ua.toLowerCase();
-  if (s.includes('iphone') || s.includes('ipad')) return 'iOS (Safari/Browser)';
-  if (s.includes('android')) return 'Android (Browser)';
-  if (s.includes('mac os') || s.includes('macintosh')) return 'macOS (Browser)';
-  if (s.includes('windows')) return 'Windows (Browser)';
-  if (s.includes('linux')) return 'Linux (Browser)';
-  return 'Browser';
-}
-
 export default function AdminOpsInsights() {
   const [data, setData] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [sessions, setSessions] = useState<ActiveSessionsResponse | null>(null);
-  const [sessionsError, setSessionsError] = useState<string | null>(null);
-  const [logoutBusyUserId, setLogoutBusyUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/dashboard/admin-insights')
@@ -72,38 +37,9 @@ export default function AdminOpsInsights() {
         if (!r.ok) throw new Error('Failed to load');
         return r.json();
       })
-      .then(setData)
+      .then((json: unknown) => setData(json as Insights))
       .catch(() => setError('Could not load admin insights'));
   }, []);
-
-  useEffect(() => {
-    fetch('/api/admin/sessions?activeOnly=1&take=200')
-      .then(async (r) => {
-        if (!r.ok) throw new Error('Failed to load');
-        return (await r.json()) as ActiveSessionsResponse;
-      })
-      .then(setSessions)
-      .catch(() => setSessionsError('Could not load active sessions'));
-  }, []);
-
-  async function forceLogoutUser(userId: string) {
-    setLogoutBusyUserId(userId);
-    try {
-      const r = await fetch('/api/admin/sessions/force-logout', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
-      if (!r.ok) throw new Error('Failed');
-      const refreshed = await fetch('/api/admin/sessions?activeOnly=1&take=200');
-      if (!refreshed.ok) throw new Error('Failed');
-      setSessions((await refreshed.json()) as ActiveSessionsResponse);
-    } catch {
-      setSessionsError('Force logout failed');
-    } finally {
-      setLogoutBusyUserId(null);
-    }
-  }
 
   if (error) {
     return (
@@ -120,60 +56,6 @@ export default function AdminOpsInsights() {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
-          <Activity size={20} className="text-slate-600" />
-          Active sessions
-        </h2>
-        {sessionsError ? (
-          <p className="p-4 text-sm text-red-600">{sessionsError}</p>
-        ) : !sessions ? (
-          <p className="p-4 text-sm text-slate-500">Loading active sessions…</p>
-        ) : sessions.activeByUser.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">No active sessions right now.</p>
-        ) : (
-          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-            {sessions.activeByUser.map((u) => (
-              <li key={u.userId} className="p-4 text-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium text-slate-900">
-                      {u.userName?.trim() ? (
-                        <span>{u.userName.trim()}</span>
-                      ) : (
-                        <span className="text-slate-500">No display name</span>
-                      )}
-                      {u.userUsername?.trim() ? (
-                        <span className="text-slate-600"> · @{u.userUsername.trim()}</span>
-                      ) : null}
-                    </p>
-                    <p className="text-slate-600">
-                      <span className="font-medium text-slate-800">{u.userRole}</span>
-                      {' · '}
-                      {u.userEmail}
-                      {' · '}
-                      {toDeviceLabel(u.deviceUserAgent)}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Latest login:{' '}
-                      {new Date(u.activeSessions[0]?.loggedAt ?? Date.now()).toLocaleString()}
-                      {' · '}Active sessions: {u.activeSessions.length}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => forceLogoutUser(u.userId)}
-                    disabled={logoutBusyUserId === u.userId}
-                    className="text-xs px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-60"
-                  >
-                    {logoutBusyUserId === u.userId ? 'Logging out…' : 'Force logout'}
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
       <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
         <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
           <BarChart3 size={20} className="text-slate-600" />
@@ -213,37 +95,6 @@ export default function AdminOpsInsights() {
             </ul>
           </div>
         )}
-      </section>
-
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
-          <Activity size={20} className="text-slate-600" />
-          Recent logins
-        </h2>
-        <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto">
-          {data.recentLogins.length === 0 ? (
-            <li className="p-4 text-sm text-slate-500">No login records yet.</li>
-          ) : (
-            data.recentLogins.map((l) => (
-              <li key={l.id} className="p-4 text-sm">
-                <p className="font-medium text-slate-900">
-                  {l.userName?.trim() ? l.userName.trim() : <span className="text-slate-500">No display name</span>}
-                  {l.userUsername?.trim() ? (
-                    <span className="font-normal text-slate-600"> · @{l.userUsername.trim()}</span>
-                  ) : null}
-                  <span className="ml-2 inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                    {l.userRole}
-                  </span>
-                </p>
-                <p className="mt-0.5 text-xs text-slate-600">{l.userEmail}</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  In: {new Date(l.loggedAt).toLocaleString()}
-                  {l.loggedOutAt ? ` · Out: ${new Date(l.loggedOutAt).toLocaleString()}` : ' · Still active'}
-                </p>
-              </li>
-            ))
-          )}
-        </ul>
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">

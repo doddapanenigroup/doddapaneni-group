@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, UserCog, UserCircle, Pencil, BarChart3 } from 'lucide-react';
+import { Users, UserCog, UserCircle, Pencil, BarChart3, Contact } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
@@ -10,6 +10,7 @@ import { isSuperAdmin } from '@/lib/role-utils';
 import VisitStatsLazy from './VisitStatsLazy';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
+import AdminSessionsLoginsColumn from './AdminSessionsLoginsColumn';
 import AdminBackupsPanel from './AdminBackupsPanel';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
@@ -110,6 +111,13 @@ export default function AdminDashboard({
               <BarChart3 size={18} />
               Analytics
             </Link>
+            <Link
+              href={publicPathForLocale(locale, '/dashboard/admin/team')}
+              className={dashboardHeaderActionSecondary}
+            >
+              <Contact size={18} />
+              Public team roster
+            </Link>
           </>
         }
       />
@@ -128,6 +136,10 @@ export default function AdminDashboard({
           onClose={() => setShowManageModal(false)}
         />
       )}
+
+      <div className="space-y-8 xl:hidden">
+        <AdminSessionsLoginsColumn />
+      </div>
 
       <CareersJobsPanel locale={locale} />
 
