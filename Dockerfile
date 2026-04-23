@@ -4,18 +4,16 @@
 # match `output: "standalone"` — see package.json `"start"` (runs `node .next/standalone/server.js`).
 # Do not use bare `next start` unless the full `next` CLI is installed in the runtime image.
 #
-# Prisma requires DATABASE_URL + DIRECT_DATABASE_URL in the environment for:
-#   - `npm ci` (postinstall: prisma generate)
-#   - `npm run build` (prebuild + Next SSG, which runs real DB queries)
-# DigitalOcean App Platform: mark both as encrypted secrets and enable "Available at build time".
-# Your Postgres/Neon must allow connections from DO build workers (often public + SSL).
+# Turso + Prisma: pass the same `libsql://…` URL and `TURSO_AUTH_TOKEN` at **build** and **run** time.
+# The builder runs `npx prisma db push` so tables exist before `next build` (SSG runs real DB queries).
+# DigitalOcean App Platform: mark secrets as encrypted and enable "Available at build time".
 #
 # Build:  docker build \
 #   --build-arg AUTH_SECRET="$(openssl rand -base64 32)" \
-#   --build-arg DATABASE_URL="postgresql://..." \
-#   --build-arg DIRECT_DATABASE_URL="postgresql://..." \
+#   --build-arg DATABASE_URL="libsql://your-db-....turso.io" \
+#   --build-arg TURSO_AUTH_TOKEN="..." \
 #   -t doddapaneni-group .
-# Run:    docker run --rm -p 3000:3000 -e DATABASE_URL=... -e DIRECT_DATABASE_URL=... -e AUTH_SECRET=... -e NEXTAUTH_URL=https://your.domain \
+# Run:    docker run --rm -p 3000:3000 -e DATABASE_URL=libsql://... -e TURSO_AUTH_TOKEN=... -e AUTH_SECRET=... -e NEXTAUTH_URL=https://your.domain \
 #           -e EMAIL_USER=... -e EMAIL_PASS=... [-e SMTP_*] doddapaneni-group
 
 # syntax=docker/dockerfile:1
@@ -27,12 +25,13 @@ RUN apt-get update \
 FROM base AS deps
 WORKDIR /app
 ARG DATABASE_URL
-ARG DIRECT_DATABASE_URL
+ARG TURSO_AUTH_TOKEN
 ENV DATABASE_URL=$DATABASE_URL
-ENV DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL
+ENV TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
 COPY package.json package-lock.json ./
 # postinstall / prepare run `prisma generate` — schema must exist before `npm ci`
 COPY prisma ./prisma
+COPY prisma.config.ts ./prisma.config.ts
 RUN npm ci
 
 FROM base AS builder
@@ -40,12 +39,14 @@ WORKDIR /app
 ARG AUTH_SECRET=replace-with-openssl-rand-base64-32-at-build
 ENV AUTH_SECRET=$AUTH_SECRET
 ARG DATABASE_URL
-ARG DIRECT_DATABASE_URL
+ARG TURSO_AUTH_TOKEN
 ENV DATABASE_URL=$DATABASE_URL
-ENV DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL
+ENV TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Apply schema to Turso (or local file) so SSG queries do not hit empty DBs.
+RUN npx prisma db push
 RUN npm run build
 
 FROM base AS runner

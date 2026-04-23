@@ -6,9 +6,8 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  // Literal `file:` is required for Prisma 6 schema validation. Real connections (local file
-  // or remote Turso) come from `prisma.config.ts` (engine `js` + LibSQL adapter) and from
-  // `lib/create-libsql-prisma.ts` at runtime via `DATABASE_URL` / `TURSO_*`.
+  // Required by Prisma schema validation. With `prisma.config.ts` + LibSQL adapter, CLI/runtime
+  // connections use the adapter — this `url` is not the active Turso URL (ignore the “dev.db” label).
   url = "file:./dev.db"
 }
 

@@ -4,8 +4,9 @@
 
 1. **Turso (LibSQL)** — Create a database and token; set `DATABASE_URL=libsql://…` and `TURSO_AUTH_TOKEN` on the server (see `.env.example`). Schema tooling uses `prisma.config.ts` (LibSQL adapter); `schema.prisma` keeps a fixed `file:./dev.db` URL for Prisma 6 validation only.
 2. **Schema** — On the server (or CI), from the project root:
-   - `npx prisma db push` (with Turso env vars above).
+   - `npx prisma db push` (with Turso env vars above). **Required before the first `npm run build`** if the build runs static generation that queries the DB (otherwise you see `no such table` during deploy).
    - If you use a **local** `DATABASE_URL=file:./dev.db` on your laptop, push to Turso with **`npm run db:push:turso`** (`TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`).
+   - **Docker / DigitalOcean App Platform:** the repo `Dockerfile` runs `npx prisma db push` in the **builder** stage before `npm run build`; provide `DATABASE_URL` (libsql) and `TURSO_AUTH_TOKEN` as **build-time** secrets so the remote DB has tables before SSG.
    - **`npm run media:seed`** — copies every image under `public/` into the `stored_image` table so `/api/media/...` works (required for logos, blog images, etc.).
    - Optional first data: `npm run db:seed` (set seed env vars first; see `.env.example`).
 3. **Secrets** — Set `AUTH_SECRET` (32+ random bytes, e.g. `openssl rand -base64 32`).

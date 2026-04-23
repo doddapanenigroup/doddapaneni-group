@@ -69,9 +69,6 @@
     "web-vitals": "^5.1.0",
     "zod": "^4.3.6"
   },
-  "prisma": {
-    "seed": "node scripts/seed.mjs"
-  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",

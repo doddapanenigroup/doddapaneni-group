@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@/lib/prisma-generated';
 import { prisma } from '@/lib/prisma';
+
+function isMissingTableOrSchemaError(e: unknown): boolean {
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2021') {
+    return true;
+  }
+  const msg = e instanceof Error ? e.message : String(e);
+  return /no such table/i.test(msg);
+}
 
 type FeatureName =
   | 'scheduling'
@@ -44,14 +53,22 @@ async function getFeatureToggle(name: FeatureName): Promise<boolean> {
     return existing.enabled;
   }
 
-  const row = await prisma.featureToggle.findUnique({
-    where: { name: String(name) },
-    select: { enabled: true },
-  });
+  try {
+    const row = await prisma.featureToggle.findUnique({
+      where: { name: String(name) },
+      select: { enabled: true },
+    });
 
-  const enabled = !!row?.enabled; // Default is disabled when row is missing.
-  cache.set(String(name), { enabled, fetchedAt: Date.now() });
-  return enabled;
+    const enabled = !!row?.enabled; // Default is disabled when row is missing.
+    cache.set(String(name), { enabled, fetchedAt: Date.now() });
+    return enabled;
+  } catch (e) {
+    // Fresh DB / schema not applied yet (e.g. `next build` before first `prisma db push`).
+    if (!isMissingTableOrSchemaError(e)) throw e;
+    const enabled = false;
+    cache.set(String(name), { enabled, fetchedAt: Date.now() });
+    return enabled;
+  }
 }
 
 /**

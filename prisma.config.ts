@@ -24,6 +24,9 @@ function resolveSqliteFileUrl(url: string): string {
 
 export default defineConfig({
   schema: path.join("prisma", "schema.prisma"),
+  migrations: {
+    seed: "node scripts/seed.mjs",
+  },
   experimental: {
     adapter: true,
   },

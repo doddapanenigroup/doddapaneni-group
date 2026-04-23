@@ -48,6 +48,10 @@ if (!token) {
   process.exit(1);
 }
 
+console.info(
+  '[db-push:turso] Prisma may show "SQLite database dev.db" and warn that schema `url` is ignored — that is expected: the LibSQL adapter uses TURSO_DATABASE_URL for this run.',
+);
+
 const prismaArgs = ['prisma', 'db', 'push', ...process.argv.slice(2)];
 const r = spawnSync('npx', prismaArgs, {
   cwd: root,
