@@ -23,7 +23,7 @@ export async function publishScheduledContent(
 ): Promise<PublishScheduledContentResult> {
   // This function performs DB writes (updates + per-blog translation sync scheduling).
   // During dev, Next can call server components/metadata multiple times per request,
-  // which can hammer Postgres and lead to connection churn.
+  // which can hammer the database and lead to connection churn.
   //
   // Throttle per process to reduce load while keeping behavior effectively “real-time”
   // for public pages (our route revalidate is ~120s).

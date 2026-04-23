@@ -56,17 +56,18 @@ export async function POST(req: Request) {
   const fileName = `${base}-${suffix}.webp`;
   const storageKey = `uploads/${fileName}`;
 
+  const data = new Uint8Array(webp);
   await connectDb();
   await prisma.storedImage.upsert({
     where: { key: storageKey },
     create: {
       key: storageKey,
       mimeType: 'image/webp',
-      data: webp,
+      data,
     },
     update: {
       mimeType: 'image/webp',
-      data: webp,
+      data,
     },
   });
 

@@ -48,7 +48,7 @@ export async function GET(request: Request) {
   try {
     await connectDb();
 
-    const pattern = { contains: q, mode: 'insensitive' as const };
+    const pattern = { contains: q };
     const admin = hasAdminAccess(role as any);
 
     const [users, pages, newsArticles, sectors, companies] = await Promise.all([

@@ -8,14 +8,14 @@
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from '../lib/create-libsql-prisma';
 import { DODDAPANENI_NEWS_SECTORS, type NewsArticle } from '../lib/doddapaneni-news';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 config({ path: path.join(__dirname, '..', '.env.local') });
 config({ path: path.join(__dirname, '..', '.env') });
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 function escapeHtml(s: string): string {
   return s

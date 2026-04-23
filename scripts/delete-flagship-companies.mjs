@@ -7,7 +7,7 @@
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
@@ -16,7 +16,7 @@ config({ path: path.join(projectRoot, '.env') });
 
 const SLUGS = ['dlsin', 'dealsmedi', 'janatha-mirror'];
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 async function main() {
   const result = await prisma.company.deleteMany({

@@ -19,9 +19,9 @@ const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 async function getOrCreateDefaultSector() {
   const primary = await prisma.sector.findUnique({

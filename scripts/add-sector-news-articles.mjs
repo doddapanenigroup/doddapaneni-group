@@ -15,14 +15,14 @@
 import { config } from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 function mediaFromPublicKey(publicKey) {
   // api/media serves public/ first (and falls back to StoredImage in DB).

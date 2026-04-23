@@ -58,7 +58,7 @@ export async function listPublicSectorsBySlugs(
   const normalized = [...new Set(slugs.map((s) => s.trim().toLowerCase()))];
   const rows = await prisma.sector.findMany({
     where: {
-      OR: normalized.map((slug) => ({ slug: { equals: slug, mode: 'insensitive' as const } })),
+      OR: normalized.map((slug) => ({ slug: { equals: slug } })),
     },
     select: sectorPublicSelect,
   });

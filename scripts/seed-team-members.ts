@@ -3,10 +3,10 @@
  * Usage: `npx tsx scripts/seed-team-members.ts`
  */
 import 'dotenv/config';
-import { PrismaClient } from '../lib/prisma-generated';
+import { createLibsqlPrismaClient } from '../lib/create-libsql-prisma';
 import { TEAM_MEMBER_DEFAULT_ROWS } from '../lib/team-default-seed';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 async function main() {
   await prisma.$transaction([

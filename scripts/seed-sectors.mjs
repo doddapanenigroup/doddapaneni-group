@@ -15,10 +15,10 @@ const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 import { SECTOR_SEEDS } from './sector-seeds.mjs';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 async function main() {
   for (const row of SECTOR_SEEDS) {

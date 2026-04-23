@@ -23,7 +23,14 @@ const INFRA_KEYS = new Set([
 function isSensitiveName(key: string): boolean {
   if (key === 'AUTH_TRUST_HOST' || key === 'NEXTAUTH_URL' || key === 'AUTH_URL') return false;
   if (SENSITIVE_KEY.test(key)) return true;
-  if (key === 'DATABASE_URL' || key === 'DIRECT_URL' || key === 'POSTGRES_URL') return true;
+  if (
+    key === 'DATABASE_URL' ||
+    key === 'TURSO_DATABASE_URL' ||
+    key === 'DIRECT_URL' ||
+    key === 'POSTGRES_URL'
+  ) {
+    return true;
+  }
   return false;
 }
 

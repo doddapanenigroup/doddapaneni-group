@@ -2,9 +2,10 @@
 
 ## Before you deploy
 
-1. **PostgreSQL** — Create a database and user; set `DATABASE_URL` on the server.
+1. **Turso (LibSQL)** — Create a database and token; set `DATABASE_URL=libsql://…` and `TURSO_AUTH_TOKEN` on the server (see `.env.example`). Schema tooling uses `prisma.config.ts` (LibSQL adapter); `schema.prisma` keeps a fixed `file:./dev.db` URL for Prisma 6 validation only.
 2. **Schema** — On the server (or CI), from the project root:
-   - `npx prisma db push`
+   - `npx prisma db push` (with Turso env vars above).
+   - If you use a **local** `DATABASE_URL=file:./dev.db` on your laptop, push to Turso with **`npm run db:push:turso`** (`TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`).
    - **`npm run media:seed`** — copies every image under `public/` into the `stored_image` table so `/api/media/...` works (required for logos, blog images, etc.).
    - Optional first data: `npm run db:seed` (set seed env vars first; see `.env.example`).
 3. **Secrets** — Set `AUTH_SECRET` (32+ random bytes, e.g. `openssl rand -base64 32`).
@@ -19,7 +20,8 @@ Nginx + TLS example: `docs/nginx-doddapaneni-group.conf`.
 
 ```bash
 npm ci
-export DATABASE_URL="postgresql://..."
+export DATABASE_URL="libsql://your-db.turso.io"
+export TURSO_AUTH_TOKEN="..."
 export AUTH_SECRET="..."
 export NEXTAUTH_URL="https://your-domain.com"
 # plus email / SMTP variables
@@ -51,7 +53,8 @@ Run with production env (at minimum `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL
 
 ```bash
 docker run --rm -p 3000:3000 \
-  -e DATABASE_URL="postgresql://..." \
+  -e DATABASE_URL="libsql://your-db.turso.io" \
+  -e TURSO_AUTH_TOKEN="..." \
   -e AUTH_SECRET="..." \
   -e NEXTAUTH_URL="https://your-domain.com" \
   -e EMAIL_USER="..." \
@@ -66,7 +69,7 @@ Put TLS on Nginx or your cloud load balancer in front of the container.
 
 ## Option C — Vercel (or similar)
 
-Connect the Git repo, set the same environment variables in the project settings, and deploy. Use a hosted PostgreSQL instance for `DATABASE_URL`. Vercel runs `npm run build` from `vercel.json`; `output: 'standalone'` in `next.config.ts` is normal and does not prevent Vercel from deploying.
+Connect the Git repo, set the same environment variables in the project settings, and deploy. Use Turso (or another LibSQL host) for `DATABASE_URL` plus `TURSO_AUTH_TOKEN`. Vercel runs `npm run build` from `vercel.json`; `output: 'standalone'` in `next.config.ts` is normal and does not prevent Vercel from deploying.
 
 ## After deploy
 

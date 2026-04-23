@@ -10,14 +10,14 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 const seeds = JSON.parse(
   readFileSync(path.join(projectRoot, 'lib/data/canonical-sectors.json'), 'utf8'),
 );

@@ -13,19 +13,35 @@ export type UserRow = {
   passwordHash: string;
 };
 
+type SqlUserRow = {
+  id: string;
+  email: string;
+  username: string | null;
+  name: string | null;
+  role: string;
+  passwordHash: string;
+};
+
 export async function getUserByLoginIdentifier(raw: string): Promise<UserRow | null> {
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
-  // Case-insensitive match: legacy rows may not be normalized; PG unique is case-sensitive on text.
-  const doc = trimmed.includes('@')
-    ? await prisma.user.findFirst({
-        where: { email: { equals: trimmed, mode: 'insensitive' } },
-      })
-    : await prisma.user.findFirst({
-        where: { username: { equals: trimmed, mode: 'insensitive' } },
-      });
+  // SQLite has no Prisma `mode: insensitive` on `equals`; use case-insensitive SQL.
+  const rows = trimmed.includes('@')
+    ? await prisma.$queryRaw<SqlUserRow[]>`
+        SELECT id, email, username, name, role, password_hash AS "passwordHash"
+        FROM User
+        WHERE LOWER(email) = LOWER(${trimmed})
+        LIMIT 1
+      `
+    : await prisma.$queryRaw<SqlUserRow[]>`
+        SELECT id, email, username, name, role, password_hash AS "passwordHash"
+        FROM User
+        WHERE username IS NOT NULL AND LOWER(username) = LOWER(${trimmed})
+        LIMIT 1
+      `;
 
+  const doc = rows[0];
   if (!doc) return null;
   return {
     id: doc.id,

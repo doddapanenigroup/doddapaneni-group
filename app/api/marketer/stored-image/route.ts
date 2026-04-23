@@ -72,19 +72,20 @@ export async function POST(req: Request) {
     const seoNote = strOrNull(form.get('seoNote'));
 
     await connectDb();
+    const data = new Uint8Array(webp);
     const saved = await prisma.storedImage.upsert({
       where: { key: storageKey },
       create: {
         key: storageKey,
         mimeType: 'image/webp',
-        data: webp,
+        data,
         altText,
         fileName,
         size: webp.byteLength,
       },
       update: {
         mimeType: 'image/webp',
-        data: webp,
+        data,
         altText,
         fileName,
         size: webp.byteLength,

@@ -1,7 +1,7 @@
 /**
  * Seed one user per role if not present (4 distinct emails).
  * Run: node scripts/seed.mjs   OR   npm run db:seed
- * Requires DATABASE_URL (PostgreSQL) in .env.local.
+ * Requires DATABASE_URL (Turso libsql://…) and TURSO_AUTH_TOKEN in .env.local (or .env).
  */
 
 import { config } from 'dotenv';
@@ -12,11 +12,11 @@ const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 import bcrypt from 'bcryptjs';
 import { SECTOR_SEEDS } from './sector-seeds.mjs';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 const DEFAULT_PASSWORD = String(process.env.SEED_PASSWORD ?? '123').trim();
 const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL ?? 'lk8772000@gmail.com';
@@ -162,7 +162,7 @@ async function main() {
       console.warn(
         [
           'Careers tables are missing (migrations not applied yet).',
-          'Run: npx prisma migrate deploy',
+          'Run: npx prisma db push',
           'Then run: npm run db:seed   (to add default job listings)',
         ].join('\n'),
       );

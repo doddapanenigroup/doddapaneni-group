@@ -114,25 +114,14 @@ export async function GET(request: Request) {
   try {
     await connectDb();
 
-    const [
-      pageViewsTotal,
-      dailyRows,
-      pathGroups,
-      vitalsByMetric,
-      blogLcpAgg,
-    ] = await Promise.all([
+    const [pageViewsTotal, visitsForSeries, pathGroups, vitalsByMetric, blogLcpAgg] = await Promise.all([
       prisma.visit.count({
         where: { visitedAt: { gte: since, lte: untilDay } },
       }),
-      prisma.$queryRaw<Array<{ d: Date; c: bigint }>>`
-        SELECT (date_trunc('day', visited_at AT TIME ZONE 'UTC'))::date AS d,
-               COUNT(*)::bigint AS c
-        FROM "Visit"
-        WHERE visited_at >= ${since}
-          AND visited_at <= ${untilDay}
-        GROUP BY 1
-        ORDER BY 1 ASC
-      `,
+      prisma.visit.findMany({
+        where: { visitedAt: { gte: since, lte: untilDay } },
+        select: { visitedAt: true },
+      }),
       prisma.visit.groupBy({
         by: ['pagePath'],
         where: {
@@ -153,10 +142,7 @@ export async function GET(request: Request) {
         where: {
           createdAt: { gte: since, lte: untilDay },
           name: 'LCP',
-          OR: [
-            { pagePath: { contains: '/news/', mode: 'insensitive' } },
-            { pagePath: { contains: '/blog/', mode: 'insensitive' } },
-          ],
+          OR: [{ pagePath: { contains: '/news/' } }, { pagePath: { contains: '/blog/' } }],
         },
         _avg: { value: true },
         _count: { id: true },
@@ -177,9 +163,9 @@ export async function GET(request: Request) {
     const blogTotalViews = blogRows.reduce((s, r) => s + r.views, 0);
 
     const dailyMap = new Map<string, number>();
-    for (const row of dailyRows) {
-      const key = row.d.toISOString().slice(0, 10);
-      dailyMap.set(key, Number(row.c));
+    for (const v of visitsForSeries) {
+      const key = v.visitedAt.toISOString().slice(0, 10);
+      dailyMap.set(key, (dailyMap.get(key) ?? 0) + 1);
     }
 
     const series: { date: string; views: number }[] = [];

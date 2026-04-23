@@ -1,5 +1,5 @@
 /**
- * Public images are stored in PostgreSQL (StoredImage) and served from /api/media/...
+ * Public images are stored in Turso/SQLite (`StoredImage`) and served from /api/media/...
  * Use mediaUrl() anywhere you previously used a path like "/doddapaneni-logo.png".
  */
 export function mediaUrl(pathFromPublic: string): string {

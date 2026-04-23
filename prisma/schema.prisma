@@ -5,11 +5,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // Neon/pgBouncer pooler URLs (transaction pooling) can break Prisma migrate advisory locks.
-  // Set DIRECT_DATABASE_URL to the non-pooler connection string for migrations.
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider = "sqlite"
+  // Literal `file:` is required for Prisma 6 schema validation. Real connections (local file
+  // or remote Turso) come from `prisma.config.ts` (engine `js` + LibSQL adapter) and from
+  // `lib/create-libsql-prisma.ts` at runtime via `DATABASE_URL` / `TURSO_*`.
+  url = "file:./dev.db"
 }
 
 enum Role {
@@ -26,7 +26,7 @@ model User {
   username          String?   @unique @map("username")
   passwordHash      String    @map("password_hash")
   name              String?
-  /// All dashboard and API access; enforced in application code. PostgreSQL `Role` enum in DB.
+  /// All dashboard and API access; enforced in application code.
   role              Role      @default(DEVELOPER)
   createdById       String?   @map("created_by_id")
   createdAtIST      String?   @map("created_at_ist")
@@ -73,9 +73,9 @@ model Notification {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
   title     String
-  body      String?   @db.Text
+  body      String?  
   /// Optional short line (e.g. push-style); if null, clients may use `title` and `body`.
-  message   String?   @db.Text
+  message   String?  
   linkHref  String?   @map("link_href")
   read      Boolean   @default(false) @map("read")
   readAt    DateTime? @map("read_at")
@@ -98,7 +98,7 @@ model AuditLog {
   targetLabel   String?  @map("target_label")
   ipAddress     String?  @map("ip_address")
   userAgent     String?  @map("user_agent")
-  payloadJson   String?  @map("payload_json") @db.Text
+  payloadJson   String?  @map("payload_json")
   createdAt     DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])
@@ -118,7 +118,7 @@ model DbBackup {
   includeMedia  Boolean  @default(false) @map("include_media")
   sha256        String
   sizeBytes     Int      @map("size_bytes")
-  dataJson      String   @db.Text @map("data_json")
+  dataJson      String   @map("data_json")
 
   @@index([createdAt])
   @@index([createdById, createdAt])
@@ -213,7 +213,7 @@ model PageContent {
   slug      String   @unique
   locale    String   @default("en")
   title     String
-  body      String   @db.Text
+  body      String  
   status    PageStatus @default(published)
   scheduledPublishAt DateTime? @map("scheduled_publish_at")
   metaTitle       String? @map("meta_title")
@@ -251,7 +251,7 @@ model CareerJobTranslation {
   locale      String
   title       String
   subtitle    String
-  description String    @db.Text
+  description String   
   applyLabel  String    @default("Apply") @map("apply_label")
   applyUrl    String    @map("apply_url")
 
@@ -283,18 +283,18 @@ model News {
   id              String     @id @default(cuid())
   title           String
   slug            String     @unique
-  content         String     @db.Text
-  excerpt         String?    @db.Text
+  content         String    
+  excerpt         String?   
   featuredImage   String?    @map("featured_image")
   featuredImageAlt String?  @map("featured_image_alt")
   bannerImage     String?    @map("banner_image")
-  galleryImageUrls String?   @map("gallery_image_urls") @db.Text
+  galleryImageUrls String?   @map("gallery_image_urls")
   embeddedVideoUrl String?   @map("embedded_video_url")
-  infographicUrls String?    @map("infographic_urls") @db.Text
+  infographicUrls String?    @map("infographic_urls")
   authorId        String     @map("author_id")
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorDisplayName String?  @map("author_display_name")
-  authorBio       String?    @map("author_bio") @db.Text
+  authorBio       String?    @map("author_bio")
   sectorId        String?    @map("sector_id")
   sector          Sector?    @relation(fields: [sectorId], references: [id], onDelete: SetNull)
   status          NewsStatus @default(draft)
@@ -304,12 +304,12 @@ model News {
   metaDescription String?    @map("meta_description")
   keywords        String?
   focusKeyword    String?    @map("focus_keyword")
-  secondaryKeywords String?  @map("secondary_keywords") @db.Text
+  secondaryKeywords String?  @map("secondary_keywords")
   canonicalUrl    String?    @map("canonical_url")
   breadcrumbTitle String?    @map("breadcrumb_title")
   metaRobots      String?    @map("meta_robots")
-  categorySlugs   String?    @map("category_slugs") @db.Text
-  tags            String?    @db.Text
+  categorySlugs   String?    @map("category_slugs")
+  tags            String?   
   subCategory     String?    @map("sub_category")
   contentType     NewsContentType @default(blog) @map("content_type")
   ogTitle         String?    @map("og_title")
@@ -320,12 +320,12 @@ model News {
   shareCount      Int        @default(0) @map("share_count")
   commentsEnabled Boolean  @default(true) @map("comments_enabled")
   readingTimeMinutes Int?    @map("reading_time_minutes")
-  articleSchemaJson String?  @map("article_schema_json") @db.Text
-  faqSchemaJson   String?    @map("faq_schema_json") @db.Text
-  howToSchemaJson String?    @map("how_to_schema_json") @db.Text
-  relatedPostSlugs String?   @map("related_post_slugs") @db.Text
+  articleSchemaJson String?  @map("article_schema_json")
+  faqSchemaJson   String?    @map("faq_schema_json")
+  howToSchemaJson String?    @map("how_to_schema_json")
+  relatedPostSlugs String?   @map("related_post_slugs")
   pillarSlug      String?    @map("pillar_slug")
-  outboundLinksJson String?  @map("outbound_links_json") @db.Text
+  outboundLinksJson String?  @map("outbound_links_json")
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
@@ -343,10 +343,10 @@ model NewsTranslation {
   news             News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
   locale           String
   title            String
-  content          String   @db.Text
-  excerpt          String?  @db.Text
+  content          String  
+  excerpt          String? 
   translatedSlug   String?  @map("translated_slug")
-  hreflangJson     String?  @map("hreflang_json") @db.Text
+  hreflangJson     String?  @map("hreflang_json")
   metaTitle        String?  @map("meta_title")
   metaDescription  String? @map("meta_description")
   ogTitle          String?  @map("og_title")
@@ -363,7 +363,7 @@ model Sector {
   id          String   @id @default(cuid())
   name        String   @unique
   slug        String   @unique
-  description String?  @db.Text
+  description String? 
   isLive      Boolean  @default(false) @map("is_live")
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -379,8 +379,8 @@ model Company {
   logoImage   String?  @map("logo_image")
   heroImage   String?  @map("hero_image")
   websiteUrl  String?  @map("website_url")
-  description String?  @db.Text
-  aboutContent String? @db.Text @map("about_content")
+  description String? 
+  aboutContent String? @map("about_content")
 
   facebookUrl  String? @map("facebook_url")
   instagramUrl String? @map("instagram_url")
@@ -406,7 +406,7 @@ model CompanyFormSubmission {
   sectorSlug  String?  @map("sector_slug")
   email       String
   fullName    String?  @map("full_name")
-  payloadJson String   @map("payload_json") @db.Text
+  payloadJson String   @map("payload_json")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([formType, createdAt(sort: Desc)])
@@ -460,7 +460,7 @@ model ContentEditLog {
   userRole   String   @map("user_role")
   kind       String   @map("kind")
   targetPath String   @map("target_path")
-  summary    String?  @db.Text
+  summary    String? 
   createdAt  DateTime @default(now()) @map("created_at")
 }
 
@@ -473,8 +473,8 @@ model MarketingActivityLog {
   entity      String   @map("entity")
   entityId    String   @map("entity_id")
   action      String   @map("action")
-  seoNote     String?  @map("seo_note") @db.Text
-  payloadJson String?  @map("payload_json") @db.Text
+  seoNote     String?  @map("seo_note")
+  payloadJson String?  @map("payload_json")
   createdAt   DateTime @default(now()) @map("created_at")
 }
 
@@ -509,8 +509,8 @@ model ErrorLog {
   statusCode Int?    @map("status_code")
   errorType  String? @map("error_type")
 
-  message    String  @db.Text
-  stackTrace String? @db.Text @map("stack_trace")
+  message    String 
+  stackTrace String? @map("stack_trace")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -522,7 +522,7 @@ model ErrorLog {
 model Deployment {
   id        String   @id @default(uuid())
   status    String   @map("status")
-  logs      String   @db.Text
+  logs      String  
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([createdAt(sort: Desc)])
@@ -557,9 +557,9 @@ model TeamMember {
   name               String
   designation        String             @map("designation")
   /// Main bio (max 200 words enforced in API).
-  description        String             @map("description") @db.Text
+  description        String             @map("description")
   /// Optional second paragraph (e.g. founder).
-  descriptionExtra   String?            @map("description_extra") @db.Text
+  descriptionExtra   String?            @map("description_extra")
   /// Public image URL: `/founder.webp` or `/api/media/...` from StoredImage.
   imageUrl           String             @map("image_url")
   imageAlt           String?            @map("image_alt")
@@ -578,7 +578,7 @@ model FeatureToggle {
   id          String   @id @default(cuid())
   name        String   @unique
   enabled     Boolean  @default(false)
-  description String?  @db.Text
+  description String? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -596,4 +596,12 @@ model RoleModulePermission {
   @@unique([role, module])
   @@index([role])
   @@map("role_module_permission")
+}
+
+/// Replaces PostgreSQL advisory locks for cron-style tasks (SQLite / Turso has no `pg_try_advisory_lock`).
+model CronTaskLock {
+  taskName    String   @id @map("task_name")
+  lockedUntil DateTime @map("locked_until")
+
+  @@map("cron_task_lock")
 }

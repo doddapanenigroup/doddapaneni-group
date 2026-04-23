@@ -1,9 +1,10 @@
-import { PrismaClient, Prisma } from "@/lib/prisma-generated";
+import { Prisma, type PrismaClient } from "@/lib/prisma-generated";
+import { createLibsqlPrismaClient } from "@/lib/create-libsql-prisma";
 import { resetConnectOncePromise, setConnectOncePromise } from "@/lib/db-connection";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType };
 
-/** True when the TCP session was dropped but the app still holds a PrismaClient (common with Neon scale-to-zero / idle timeouts). */
+/** True when the DB session was dropped but the app still holds a PrismaClient (idle timeouts, network blips). */
 function isStaleConnectionError(e: unknown): boolean {
   if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P1017") {
     return true;
@@ -14,20 +15,17 @@ function isStaleConnectionError(e: unknown): boolean {
   const msg = e instanceof Error ? e.message : String(e);
   return (
     /kind:\s*Closed/i.test(msg) ||
-    /Error in PostgreSQL connection/i.test(msg) ||
     /Server has closed the connection/i.test(msg) ||
     /ECONNRESET/i.test(msg) ||
-    /Connection terminated unexpectedly/i.test(msg)
+    /Connection terminated unexpectedly/i.test(msg) ||
+    /SQLITE_BUSY/i.test(msg) ||
+    /LIBSQL/i.test(msg)
   );
 }
 
 function isBenignDbLogMessage(message: string, target?: string): boolean {
   const blob = `${message ?? ""} ${target ?? ""}`;
-  return (
-    /kind:\s*Closed/i.test(blob) ||
-    /Error in PostgreSQL connection/i.test(blob) ||
-    /Server has closed the connection/i.test(blob)
-  );
+  return /kind:\s*Closed/i.test(blob) || /Server has closed the connection/i.test(blob);
 }
 
 type PrismaClientType = ReturnType<typeof createPrismaClient>;
@@ -56,16 +54,14 @@ async function reconnectAfterStaleSocket(base: PrismaClient): Promise<void> {
 function createPrismaClient() {
   const isDev = process.env.NODE_ENV === "development";
 
-  // Emit shapes must match `Prisma.LogDefinition` in this client build (no `stderr` emit here).
   const logLevels: Prisma.LogDefinition[] = isDev
     ? [
         { level: "warn", emit: "stdout" },
-        // Route errors through $on so we can drop noisy idle "Closed" lines from managed Postgres (Neon).
         { level: "error", emit: "event" },
       ]
     : [{ level: "error", emit: "stdout" }];
 
-  const base = new PrismaClient({
+  const base = createLibsqlPrismaClient({
     log: logLevels,
   });
 

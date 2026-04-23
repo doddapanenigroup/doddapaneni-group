@@ -1,5 +1,5 @@
 /**
- * Load every image under public/ into StoredImage (PostgreSQL BYTEA).
+ * Load every image under public/ into StoredImage (binary blob in Turso/SQLite).
  * Run after `npx prisma db push`:  npm run media:seed
  */
 import { config } from 'dotenv';
@@ -12,9 +12,9 @@ const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 const publicDir = path.join(projectRoot, 'public');
 
 const IMAGE_EXT = /\.(webp|png|jpe?g|gif|svg|avif|ico)$/i;
@@ -83,7 +83,8 @@ async function main() {
   let n = 0;
   for (const file of files) {
     const key = toKey(file);
-    const data = await readFile(file);
+    const buf = await readFile(file);
+    const data = new Uint8Array(buf);
     const mimeType = mimeFor(file);
     await prisma.storedImage.upsert({
       where: { key },
@@ -91,7 +92,7 @@ async function main() {
       update: { mimeType, data },
     });
     n++;
-    console.log('Stored', key, `(${mimeType}, ${data.length} bytes)`);
+    console.log('Stored', key, `(${mimeType}, ${buf.length} bytes)`);
   }
   console.log(`Done. Upserted ${n} image(s).`);
 }

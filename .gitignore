@@ -39,6 +39,8 @@ lib/prisma-generated/
 
 # local DB
 prisma/*.db
+# Accidental empty DB if `file:./dev.db` was opened from repo root (app uses prisma/dev.db)
+/dev.db
 
 # vercel
 .vercel

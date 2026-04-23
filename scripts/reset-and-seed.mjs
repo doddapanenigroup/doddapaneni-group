@@ -1,5 +1,5 @@
 /**
- * Reset PostgreSQL data (all app tables), then create one Super Admin user.
+ * Reset Turso/SQLite app tables, then create one Super Admin user.
  * Run: node scripts/reset-and-seed.mjs   OR   npm run db:reset
  *
  * Default Super Admin: lk8772000@gmail.com, username lokesh, password Lokesh@0317
@@ -15,10 +15,10 @@ const projectRoot = path.resolve(__dirname, '..');
 config({ path: path.join(projectRoot, '.env.local') });
 config({ path: path.join(projectRoot, '.env') });
 
-import { PrismaClient } from '../lib/prisma-generated/index.js';
+import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const prisma = createLibsqlPrismaClient();
 
 const SUPER_ADMIN_EMAIL = (
   process.env.SUPER_ADMIN_EMAIL ?? 'lk8772000@gmail.com'
@@ -72,14 +72,15 @@ function formatInET(date) {
 }
 
 async function main() {
-  const url = process.env.DATABASE_URL;
+  const url = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
   if (!url) {
-    console.error('DATABASE_URL is required in .env.local');
+    console.error('DATABASE_URL (or TURSO_DATABASE_URL) is required in .env.local');
     process.exit(1);
   }
-  console.log('Connecting to PostgreSQL…', url.replace(/:[^:@]+@/, ':****@'));
+  console.log('Connecting to database…', url.replace(/:[^:@]+@/, ':****@'));
 
   await prisma.$transaction(async (tx) => {
+    await tx.cronTaskLock.deleteMany();
     await tx.storedImage.deleteMany();
     await tx.adminEmployeeCreateOtp.deleteMany();
     await tx.developerPageView.deleteMany();
