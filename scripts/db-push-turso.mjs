@@ -18,8 +18,8 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-config({ path: path.join(root, '.env.local') });
-config({ path: path.join(root, '.env') });
+config({ path: path.join(root, '.env.local'), quiet: true });
+config({ path: path.join(root, '.env'), quiet: true });
 
 const tursoUrl = (process.env.TURSO_DATABASE_URL || '').trim();
 const token = (process.env.TURSO_AUTH_TOKEN || '').trim();

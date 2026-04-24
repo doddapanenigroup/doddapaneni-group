@@ -5,7 +5,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { isLoginEmailDeliveryConfigured, sendUserInviteEmail } from '@/lib/email';
 import { generateInviteToken, hashInviteToken, inviteExpiresAt } from '@/lib/user-invite-token';
 import * as z from 'zod';
-import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
+import { hasAdminAccess } from '@/lib/role-utils';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 const bodySchema = z.object({
   email: z.string().email(),
@@ -19,7 +19,6 @@ function isAdminRole(role: unknown) {
 }
 
 const ROLE_LABEL: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
   ADMIN: 'Admin',
   DEVELOPER: 'Developer',
   DIGITAL_MARKETER: 'Digital Marketer',
@@ -50,11 +49,6 @@ export async function POST(request: Request) {
     const parsed = bodySchema.safeParse(raw);
     if (!parsed.success) {
       return NextResponse.json({ message: 'Invalid input', errors: parsed.error.issues }, { status: 400 });
-    }
-
-    // Only SUPER_ADMIN can invite ADMIN.
-    if (parsed.data.role === 'ADMIN' && !isSuperAdmin(requesterRole as any)) {
-      return NextResponse.json({ message: 'Only SUPER_ADMIN can invite ADMIN users.' }, { status: 403 });
     }
 
     const email = parsed.data.email.trim().toLowerCase();

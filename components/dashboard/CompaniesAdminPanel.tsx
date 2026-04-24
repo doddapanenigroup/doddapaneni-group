@@ -20,6 +20,7 @@ type CompanyRow = {
   xUrl: string | null;
   youtubeUrl: string | null;
   pinterestUrl: string | null;
+  linkedinUrl: string | null;
   sector: { id: string; name: string; slug: string } | null;
 };
 
@@ -37,6 +38,7 @@ type FormState = {
   xUrl: string;
   youtubeUrl: string;
   pinterestUrl: string;
+  linkedinUrl: string;
 };
 
 type ApiMessage = { message?: string };
@@ -55,6 +57,7 @@ const EMPTY_FORM: FormState = {
   xUrl: '',
   youtubeUrl: '',
   pinterestUrl: '',
+  linkedinUrl: '',
 };
 
 export default function CompaniesAdminPanel() {
@@ -190,6 +193,7 @@ export default function CompaniesAdminPanel() {
           xUrl: form.xUrl || null,
           youtubeUrl: form.youtubeUrl || null,
           pinterestUrl: form.pinterestUrl || null,
+          linkedinUrl: form.linkedinUrl || null,
         }),
       });
       const json = (await res.json().catch(() => ({}))) as ApiMessage;
@@ -235,6 +239,7 @@ export default function CompaniesAdminPanel() {
       xUrl: c.xUrl ?? '',
       youtubeUrl: c.youtubeUrl ?? '',
       pinterestUrl: c.pinterestUrl ?? '',
+      linkedinUrl: c.linkedinUrl ?? '',
     };
   }
 
@@ -270,6 +275,7 @@ export default function CompaniesAdminPanel() {
           xUrl: editForm.xUrl || null,
           youtubeUrl: editForm.youtubeUrl || null,
           pinterestUrl: editForm.pinterestUrl || null,
+          linkedinUrl: editForm.linkedinUrl || null,
         }),
       });
       const json = (await res.json().catch(() => ({}))) as { message?: string };
@@ -508,6 +514,15 @@ export default function CompaniesAdminPanel() {
             />
           </label>
           <label className="block">
+            <span className="text-xs font-semibold text-slate-700">LinkedIn</span>
+            <input
+              value={form.linkedinUrl}
+              onChange={(e) => setForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="https://linkedin.com/company/…"
+            />
+          </label>
+          <label className="block">
             <span className="text-xs font-semibold text-slate-700">Pinterest</span>
             <input
               value={form.pinterestUrl}
@@ -625,6 +640,12 @@ export default function CompaniesAdminPanel() {
                         onChange={(e) => setEditForm((f) => ({ ...f, youtubeUrl: e.target.value }))}
                         className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                         placeholder="YouTube URL"
+                      />
+                      <input
+                        value={editForm.linkedinUrl}
+                        onChange={(e) => setEditForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        placeholder="LinkedIn URL"
                       />
                       <input
                         value={editForm.pinterestUrl}

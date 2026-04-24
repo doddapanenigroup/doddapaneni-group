@@ -25,16 +25,6 @@ export default function CareersPageClient({ jobs, locale }: { jobs: PublicCareer
         </div>
       </section>
 
-      <section className="border-b border-slate-100 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">{t('cultureTitle')}</h2>
-          <div className="mt-6 grid gap-8 md:grid-cols-2 md:gap-12">
-            <p className="text-slate-600 leading-relaxed">{t('cultureP1')}</p>
-            <p className="text-slate-600 leading-relaxed">{t('cultureP2')}</p>
-          </div>
-        </div>
-      </section>
-
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">{t('rolesTitle')}</h2>

@@ -34,6 +34,7 @@
     "db:push": "prisma db push",
     "db:push:turso": "node scripts/db-push-turso.mjs",
     "db:seed:turso": "node scripts/db-seed-turso.mjs",
+    "db:turso:init": "node scripts/db-init-turso.mjs",
     "db:seed:team": "npx tsx scripts/seed-team-members.ts",
     "media:seed": "node scripts/seed-stored-images.mjs",
     "images:optimize": "node scripts/convert-images-to-webp.mjs",

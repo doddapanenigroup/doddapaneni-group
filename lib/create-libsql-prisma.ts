@@ -15,6 +15,16 @@ export function createLibsqlPrismaClient(options?: PrismaClientOptions): PrismaC
       "Set DATABASE_URL to your libsql://… Turso URL or file:./dev.db (see .env.example). Optional fallback: TURSO_DATABASE_URL.",
     );
   }
+  if (
+    process.env.NODE_ENV === "production" &&
+    rawUrl.toLowerCase().startsWith("file:") &&
+    process.env.PRISMA_ALLOW_FILE_DATABASE_IN_PRODUCTION !== "1"
+  ) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[prisma] DATABASE_URL points at a local file in production. Dashboard writes (new users, etc.) will not appear in Turso. Prefer libsql://… + TURSO_AUTH_TOKEN, or set PRISMA_ALLOW_FILE_DATABASE_IN_PRODUCTION=1 to silence this warning.",
+    );
+  }
   const url = resolveLibsqlDatabaseUrl(rawUrl);
   const authToken = process.env.TURSO_AUTH_TOKEN?.trim();
   const adapter = new PrismaLibSQL({

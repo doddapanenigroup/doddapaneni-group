@@ -19,8 +19,8 @@ import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
-config({ path: path.join(projectRoot, '.env.local') });
-config({ path: path.join(projectRoot, '.env') });
+config({ path: path.join(projectRoot, '.env.local'), quiet: true });
+config({ path: path.join(projectRoot, '.env'), quiet: true });
 
 const prisma = createLibsqlPrismaClient();
 
@@ -47,12 +47,12 @@ async function main() {
       select: { id: true },
     })) ??
     (await prisma.user.findFirst({
-      where: { role: 'SUPER_ADMIN' },
+      where: { role: 'ADMIN' },
       select: { id: true },
     }));
 
   if (!author) {
-    console.error('No DIGITAL_MARKETER or SUPER_ADMIN user found. Run `npm run db:seed` first.');
+    console.error('No DIGITAL_MARKETER or ADMIN user found. Run `npm run db:seed` first.');
     process.exit(1);
   }
 

@@ -77,6 +77,25 @@ const nextAuth = NextAuth({
         session.user.name = typeof token.name === 'string' ? token.name : null;
         session.user.role = (typeof token.role === 'string' ? token.role : 'DEVELOPER') as Role;
         session.user.sessionIssuedAt = typeof token.iat === 'number' ? token.iat : undefined;
+
+        // JWT fields are fixed at sign-in; merge latest profile from DB so dashboard + header
+        // stay in sync when names/roles are updated in the database (or by another admin).
+        if (session.user.id) {
+          try {
+            await connectDb();
+            const fresh = await prisma.user.findUnique({
+              where: { id: session.user.id },
+              select: { email: true, name: true, role: true },
+            });
+            if (fresh) {
+              session.user.email = fresh.email;
+              session.user.name = fresh.name;
+              session.user.role = fresh.role as Role;
+            }
+          } catch {
+            // Keep token-backed values if the database is unavailable.
+          }
+        }
       }
       return session;
     },

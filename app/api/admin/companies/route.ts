@@ -26,6 +26,7 @@ function revalidateCompanyPublicRoutes(targetSectorSlug?: string | null, targetC
       : [...COMPANY_DIVISION_SLUGS];
     for (const slug of sectorSlugs) {
       revalidatePath(`/${slug}`, 'layout');
+      revalidatePath(`/${slug}/companies`, 'page');
     }
     if (targetCompanySlug?.trim()) {
       const companySlug = targetCompanySlug.trim().toLowerCase();
@@ -41,6 +42,7 @@ function revalidateCompanyPublicRoutes(targetSectorSlug?: string | null, targetC
       revalidatePath(`/${loc}/companies`, 'layout');
       for (const slug of sectorSlugs) {
         revalidatePath(`/${loc}/${slug}`, 'layout');
+        revalidatePath(`/${loc}/${slug}/companies`, 'page');
       }
     }
   } catch {
@@ -62,6 +64,7 @@ const createSchema = z.object({
   xUrl: z.string().max(500).optional().nullable(),
   youtubeUrl: z.string().max(500).optional().nullable(),
   pinterestUrl: z.string().max(500).optional().nullable(),
+  linkedinUrl: z.string().max(500).optional().nullable(),
 });
 
 export async function GET(request: Request) {
@@ -93,6 +96,7 @@ export async function GET(request: Request) {
         xUrl: true,
         youtubeUrl: true,
         pinterestUrl: true,
+        linkedinUrl: true,
         createdAt: true,
         updatedAt: true,
         sector: { select: { id: true, name: true, slug: true } },
@@ -149,6 +153,7 @@ export async function POST(request: Request) {
         xUrl: parsed.data.xUrl?.trim() || null,
         youtubeUrl: parsed.data.youtubeUrl?.trim() || null,
         pinterestUrl: parsed.data.pinterestUrl?.trim() || null,
+        linkedinUrl: parsed.data.linkedinUrl?.trim() || null,
       },
       select: { id: true, name: true, slug: true },
     });

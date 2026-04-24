@@ -3,58 +3,27 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
-import type {
-  ContentEditLog,
-  MarketingActivityLog,
-  Prisma,
-  Role,
-} from '@/lib/prisma-generated';
+import type { ContentEditLog, MarketingActivityLog, Prisma, Role } from '@/lib/prisma-generated';
 
 type LoginWithUser = Prisma.LoginLogGetPayload<{
   include: { user: { select: { email: true; name: true; username: true; role: true } } };
 }>;
 
-type DashboardVisitByRole = {
-  role: Role;
-  _count: { id: number };
-};
-
-type WebVitalGroupRow = {
-  name: string;
-  _avg: { value: number | null };
-  _count: { id: number };
-};
-
 export async function GET() {
   const session = await auth();
   const role = session?.user?.role;
 
-  console.info('[dashboard/admin-insights] auth check', {
-    hasSession: Boolean(session?.user?.id),
-    userId: session?.user?.id ?? null,
-    role: role ?? null,
-  });
-
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
-  if (!hasAdminAccess(role as any)) {
+  if (!hasAdminAccess(role as Role | null | undefined)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
   try {
     await connectDb();
-    const since = new Date();
-    since.setDate(since.getDate() - 7);
 
-    const [
-      recentLogins,
-      contentEdits,
-      marketingActivity,
-      visitCount7d,
-      dashboardVisits7d,
-      webVitals,
-    ] = await Promise.all([
+    const [recentLogins, contentEdits, marketingActivity] = await Promise.all([
       prisma.loginLog.findMany({
         take: 40,
         orderBy: { loggedAt: 'desc' },
@@ -70,21 +39,9 @@ export async function GET() {
         take: 40,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.visit.count({ where: { visitedAt: { gte: since } } }),
-      prisma.dashboardVisit.groupBy({
-        by: ['role'],
-        where: { visitedAt: { gte: since } },
-        _count: { id: true },
-      }),
-      prisma.webVitalReport.groupBy({
-        by: ['name'],
-        where: { createdAt: { gte: since } },
-        _avg: { value: true },
-        _count: { id: true },
-      }),
     ]);
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       recentLogins: (recentLogins as LoginWithUser[]).map((l) => ({
         id: l.id,
         loggedAt: l.loggedAt.toISOString(),
@@ -113,17 +70,9 @@ export async function GET() {
         entityId: m.entityId,
         seoNote: m.seoNote,
       })),
-      visitsLast7Days: visitCount7d,
-      dashboardVisitsByRole: (dashboardVisits7d as DashboardVisitByRole[]).map((d) => ({
-        role: d.role,
-        count: d._count.id,
-      })),
-      webVitals7d: (webVitals as WebVitalGroupRow[]).map((w) => ({
-        name: w.name,
-        avgValue: w._avg.value,
-        samples: w._count.id,
-      })),
     });
+    res.headers.set('Cache-Control', 'private, no-store');
+    return res;
   } catch (error) {
     await captureErrorToDb({
       error,

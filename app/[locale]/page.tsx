@@ -9,6 +9,7 @@ import ContentPageBoundary from '@/components/ContentPageBoundary';
 import HomeHero from '@/components/home/HomeHero';
 import type { HomeHeroCopy } from '@/components/home/HomeHero';
 import HomePage from '@/components/home/HomePage';
+import HomeDivisionsGrid from '@/components/home/HomeDivisionsGrid';
 import { findPublishedPageContent } from '@/lib/public-page-content';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { routing } from '@/i18n/routing';
@@ -25,6 +26,12 @@ type Props = { params: Promise<{ locale: string }> };
 async function HomePageWithDivisions({ locale }: { locale: string }) {
   const divisions = await getBusinessDivisionsForHome(locale);
   return <HomePage divisions={divisions} />;
+}
+
+/** CMS home replaces hero + below-fold, but sector cards still come from `Sector.isLive` in the DB. */
+async function HomeDivisionsSection({ locale }: { locale: string }) {
+  const divisions = await getBusinessDivisionsForHome(locale);
+  return <HomeDivisionsGrid divisions={divisions} />;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -75,6 +82,17 @@ export default async function Page({ params }: Props) {
         <ContentPageBoundary pageKey="home" locale={locale} cms={cms}>
           {null}
         </ContentPageBoundary>
+        <Suspense
+          fallback={
+            <div
+              className="min-h-[48rem] border-b border-slate-100 bg-slate-50/80"
+              aria-busy="true"
+              aria-label="Loading"
+            />
+          }
+        >
+          <HomeDivisionsSection locale={locale} />
+        </Suspense>
         <Suspense fallback={null}>
           <HomepageOrganizationJsonLd locale={locale} />
         </Suspense>

@@ -7,14 +7,11 @@ import EditContentModal from './EditContentModal';
 import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
-import DeveloperObservabilityPanel from './DeveloperObservabilityPanel';
 import DeveloperErrorsPanel from './DeveloperErrorsPanel';
-import DeveloperRequestMonitorPanel from './DeveloperRequestMonitorPanel';
 import DeveloperBuildDeploymentsPanel from './DeveloperBuildDeploymentsPanel';
 import DeveloperEnvPanel from './DeveloperEnvPanel';
 import DeveloperCachePanel from './DeveloperCachePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
-import FeatureGate from '@/components/FeatureGate';
 import DashboardPageHeader from './DashboardPageHeader';
 import CareersJobsPanel from './CareersJobsPanel';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
@@ -269,15 +266,7 @@ export default function DeveloperDashboard({
         </button>
         {toolsOpen ? (
           <div className="space-y-3 border-t border-slate-200/80 p-2 sm:space-y-2 sm:p-2">
-            <FeatureGate feature="analyticsDashboard">
-              <DeveloperObservabilityPanel />
-            </FeatureGate>
-            <FeatureGate feature="errorMonitoring">
-              <DeveloperErrorsPanel />
-            </FeatureGate>
-            <FeatureGate feature="analyticsDashboard">
-              <DeveloperRequestMonitorPanel />
-            </FeatureGate>
+            <DeveloperErrorsPanel />
             <DeveloperBuildDeploymentsPanel />
             <DeveloperEnvPanel />
             <DeveloperCachePanel />

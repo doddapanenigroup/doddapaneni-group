@@ -1,7 +1,6 @@
 import DivisionLayoutServer from '@/components/divisions/DivisionLayoutServer';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { generateCompanySegmentStaticParams } from '@/lib/company-route-static';
-import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
 
 /** Twelve division URLs are generated at build; other sector slugs remain request-rendered. */
 export const dynamicParams = true;
@@ -20,7 +19,7 @@ type Props = {
 
 /**
  * Nested layout for sector/division URLs (`/[locale]/software-it-ai`, etc.).
- * Twelve primary divisions get the shared shell (header band + services/about/contact sub-nav).
+ * Twelve primary divisions get the shared shell (header band + about / services / companies / contact).
  * Other sector slugs still resolve here but only render page content (no division chrome).
  */
 export default async function CompanySectionLayout({ children, params }: Props) {
@@ -28,13 +27,6 @@ export default async function CompanySectionLayout({ children, params }: Props) 
   const slug = company.trim().toLowerCase();
 
   if (!isCompanyDivisionSlug(slug)) {
-    return <>{children}</>;
-  }
-
-  // Live toggle is stored in the DB; when live, render the page content directly
-  // (no division chrome / “Coming soon” shell).
-  const sector = await getPublicSectorBySlug(slug);
-  if (sector?.isLive) {
     return <>{children}</>;
   }
 

@@ -42,7 +42,7 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
       subtitle: 'Administration, sectors, employees',
       href: dash(locale, '/dashboard/admin'),
       searchBlob:
-        'admin administration companies sectors employees super admin superadmin feature flags backup',
+        'admin administration companies sectors employees feature flags backup',
     });
   }
   if (canAccessDeveloperDashboard(role)) {
@@ -58,9 +58,9 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
     hits.push({
       id: 'nav:marketer',
       title: MARKETING_DASHBOARD_NAV_LABEL,
-      subtitle: 'Pages, blogs, campaigns (admins & digital marketers)',
+      subtitle: 'Pages, blogs, and media (admins & digital marketers)',
       href: dash(locale, '/dashboard/marketer'),
-      searchBlob: 'marketer marketing digital blog content seo media campaigns links news pages',
+      searchBlob: 'marketer marketing digital blog content seo media news pages',
     });
   }
   if (canAccessEmployeesDashboard(role)) {

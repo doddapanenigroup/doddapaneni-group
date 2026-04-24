@@ -18,7 +18,7 @@ export const NOTIFICATION_TYPES = {
 export type NotificationType =
   (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
 
-const OPS_ROLES: Role[] = ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER'];
+const OPS_ROLES: Role[] = ['ADMIN', 'DEVELOPER'];
 
 function dashBase() {
   return `/${routing.defaultLocale}/dashboard`;
@@ -177,7 +177,7 @@ export async function notifyAdminsBackupCreated(args: {
     .filter(Boolean)
     .join('\n');
   await notifyUsersByRoles({
-    roles: ['SUPER_ADMIN', 'ADMIN'],
+    roles: ['ADMIN'],
     type: NOTIFICATION_TYPES.USER_ACTION,
     title: 'Database backup created',
     body: body.slice(0, 8000),
@@ -195,7 +195,7 @@ export async function notifyAdminsUserCreated(args: {
   const by = args.createdByEmail?.trim() || 'Unknown';
   const body = `New account: ${args.newUserEmail} (${args.newUserRole})\nCreated by: ${by}`;
   await notifyUsersByRoles({
-    roles: ['SUPER_ADMIN', 'ADMIN'],
+    roles: ['ADMIN'],
     excludeUserId: args.excludeUserId,
     type: NOTIFICATION_TYPES.USER_ACTION,
     title: 'New team member added',

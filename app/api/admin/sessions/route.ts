@@ -8,8 +8,6 @@ function isAdminRole(role: unknown) {
   return hasAdminAccess(role as any);
 }
 
-type LatestUaRow = { userId: string; userAgent: string | null; visitedAt: Date };
-
 export async function GET(request: Request) {
   const session = await auth();
   const role = (session as { user?: { role?: string } } | null | undefined)?.user?.role;
@@ -37,21 +35,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const userIds = Array.from(new Set(logs.map((l) => l.userId)));
     const uaByUserId = new Map<string, string | null>();
-    if (userIds.length > 0) {
-      // Best-effort "device": use the most recent DashboardVisit user-agent per user.
-      // (Avoids raw SQL + keeps it portable across Prisma runtimes.)
-      const visits = await prisma.dashboardVisit.findMany({
-        where: { userId: { in: userIds } },
-        orderBy: { visitedAt: 'desc' },
-        take: Math.min(userIds.length * 10, 5000),
-        select: { userId: true, userAgent: true, visitedAt: true },
-      });
-      for (const v of visits as LatestUaRow[]) {
-        if (!uaByUserId.has(v.userId)) uaByUserId.set(v.userId, v.userAgent);
-      }
-    }
 
     const sessions = logs.map((l) => ({
       id: l.id,
@@ -94,12 +78,14 @@ export async function GET(request: Request) {
       byUser[s.userId].activeSessions.push({ id: s.id, loggedAt: s.loggedAt });
     }
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       sessions,
       activeByUser: Object.values(byUser).sort(
         (a, b) => b.activeSessions.length - a.activeSessions.length
       ),
     });
+    res.headers.set('Cache-Control', 'private, no-store');
+    return res;
   } catch (err) {
     await captureErrorToDb({
       error: err,

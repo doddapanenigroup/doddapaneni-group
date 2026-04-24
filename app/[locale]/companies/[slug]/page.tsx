@@ -54,6 +54,7 @@ export default async function CompanyDynamicPage({ params }: Props) {
   const socials = [
     { label: 'Facebook', href: company.facebookUrl },
     { label: 'Instagram', href: company.instagramUrl },
+    { label: 'LinkedIn', href: company.linkedinUrl },
     { label: 'X', href: company.xUrl },
     { label: 'YouTube', href: company.youtubeUrl },
     { label: 'Pinterest', href: company.pinterestUrl },

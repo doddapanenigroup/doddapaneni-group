@@ -22,19 +22,19 @@ function dashboardItems(locale: string): DashboardMenuItem[] {
       href: publicPathForLocale(locale, '/dashboard/admin'),
       label: getDashboardTitle('ADMIN'),
       icon: Users,
-      roles: ['SUPER_ADMIN', 'ADMIN'],
+      roles: ['ADMIN'],
     },
     {
       href: publicPathForLocale(locale, '/dashboard/developer'),
       label: getDashboardTitle('DEVELOPER'),
       icon: Code2,
-      roles: ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER'],
+      roles: ['ADMIN', 'DEVELOPER'],
     },
     {
       href: publicPathForLocale(locale, '/dashboard/marketer'),
       label: MARKETING_DASHBOARD_NAV_LABEL,
       icon: Megaphone,
-      roles: ['SUPER_ADMIN', 'ADMIN', 'DIGITAL_MARKETER'],
+      roles: ['ADMIN', 'DIGITAL_MARKETER'],
     },
   ];
 }

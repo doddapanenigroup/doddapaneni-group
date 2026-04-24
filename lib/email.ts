@@ -21,10 +21,9 @@ function maybePreferIpv4ForSmtp(): void {
   }
 }
 
-const ROLES_FOR_LOGIN_EMAIL = ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'] as const;
+const ROLES_FOR_LOGIN_EMAIL = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'] as const;
 
 const ROLE_LABEL: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
   ADMIN: 'Admin',
   DEVELOPER: 'Developer',
   DIGITAL_MARKETER: 'Digital Marketer',
@@ -173,7 +172,7 @@ export function smtpFailureUserMessage(err: unknown): string {
 }
 
 /**
- * Send "Login successful" email to the user. Used for Admin, Super Admin, Developer, Digital Marketer.
+ * Send "Login successful" email to the user. Used for Admin, Developer, Digital Marketer.
  * Does nothing if EMAIL_USER/EMAIL_PASS are not set.
  */
 export async function sendLoginSuccessEmail(
@@ -252,7 +251,7 @@ export async function sendUserInviteEmail(args: {
 }
 
 /**
- * Send email to the creator (e.g. Super Admin or Admin) when they create a new role.
+ * Send email to the creator (Admin) when they create a new role.
  * Content: "[Role] was created by [creator role] at [date and time IST/ET]."
  */
 export async function sendRoleCreatedEmailToCreator(
@@ -334,7 +333,7 @@ export async function sendRoleCreatedEmailToNewUser(
 }
 
 /**
- * Send email to the deleter (Admin or Super Admin) when they delete a user.
+ * Send email to the deleter (Admin) when they delete a user.
  * Content: "[Role] was deleted by [deleter role] at [date and time IST/ET]. Deleted user: email (name)."
  */
 export async function sendRoleDeletedEmailToDeleter(

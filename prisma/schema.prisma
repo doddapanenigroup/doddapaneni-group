@@ -12,7 +12,6 @@ datasource db {
 }
 
 enum Role {
-  SUPER_ADMIN
   ADMIN
   DEVELOPER
   DIGITAL_MARKETER
@@ -41,11 +40,9 @@ model User {
   newsPosts                  News[]
   invitesCreated             UserInvite[]             @relation("InviteCreator")
   notifications              Notification[]
-  dashboardVisits            DashboardVisit[]
   contentEditLogs            ContentEditLog[]
   marketingActivityLogs      MarketingActivityLog[]
   errorLogs                  ErrorLog[]
-  webVitalReports            WebVitalReport[]
 }
 
 model UserInvite {
@@ -106,24 +103,6 @@ model AuditLog {
   @@map("audit_log")
 }
 
-model DbBackup {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now()) @map("created_at")
-  createdById   String?  @map("created_by_id")
-  createdByEmail String? @map("created_by_email")
-  createdByRole String?  @map("created_by_role")
-  label         String?  // optional note (e.g. "pre-restore", "manual")
-  format        String   @default("json") // future-proof
-  includeMedia  Boolean  @default(false) @map("include_media")
-  sha256        String
-  sizeBytes     Int      @map("size_bytes")
-  dataJson      String   @map("data_json")
-
-  @@index([createdAt])
-  @@index([createdById, createdAt])
-  @@map("db_backup")
-}
-
 /// Pending employee row + OTP emailed to admin before POST /api/users finalizes create.
 model AdminEmployeeCreateOtp {
   id           String   @id @default(cuid())
@@ -152,8 +131,6 @@ model LoginLog {
   loggedOutAt   DateTime? @map("logged_out_at")
   loggedOutAtIST String?  @map("logged_out_at_ist")
   loggedOutAtET String?   @map("logged_out_at_et")
-
-  developerPageViews DeveloperPageView[]
 }
 
 model PasswordChangeLog {
@@ -165,45 +142,6 @@ model PasswordChangeLog {
   changedAt    DateTime @default(now()) @map("changed_at")
   changedAtIST String  @map("changed_at_ist")
   changedAtET  String  @map("changed_at_et")
-}
-
-model Visit {
-  id           String   @id @default(cuid())
-  visitedAt    DateTime @map("visited_at")
-  visitedAtIST String   @map("visited_at_ist")
-  visitedAtET  String   @map("visited_at_et")
-  ipAddress    String?  @map("ip_address")
-  pagePath     String?  @map("page_path")
-  userAgent    String?  @map("user_agent")
-
-  @@index([visitedAt(sort: Desc)])
-  @@index([pagePath, visitedAt])
-}
-
-model DashboardVisit {
-  id           String   @id @default(cuid())
-  userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  path         String
-  role         Role
-  visitedAt    DateTime @map("visited_at")
-  visitedAtIST String   @map("visited_at_ist")
-  visitedAtET  String   @map("visited_at_et")
-  userAgent    String?  @map("user_agent")
-
-  @@index([userId, visitedAt])
-}
-
-model DeveloperPageView {
-  id           String    @id @default(cuid())
-  userId       String    @map("user_id")
-  loginLogId   String?   @map("login_log_id")
-  loginLog     LoginLog? @relation(fields: [loginLogId], references: [id], onDelete: SetNull)
-  path         String
-  visitedAt    DateTime  @map("visited_at")
-  visitedAtIST String    @map("visited_at_ist")
-  visitedAtET  String    @map("visited_at_et")
-  userAgent    String?   @map("user_agent")
 }
 
 model PageContent {
@@ -386,6 +324,7 @@ model Company {
   xUrl         String? @map("x_url")
   youtubeUrl   String? @map("youtube_url")
   pinterestUrl String? @map("pinterest_url")
+  linkedinUrl  String? @map("linkedin_url")
 
   sectorId String @map("sector_id")
   sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
@@ -413,44 +352,6 @@ model CompanyFormSubmission {
   @@map("company_form_submission")
 }
 
-enum CampaignStatus {
-  draft
-  active
-  paused
-  ended
-}
-
-model Campaign {
-  id          String          @id @default(cuid())
-  name        String
-  description String          @default("")
-  url         String
-  status      CampaignStatus  @default(draft)
-  startDate   DateTime?       @map("start_date")
-  endDate     DateTime?       @map("end_date")
-  createdById String?         @map("created_by_id")
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-}
-
-enum MarketingLinkType {
-  tool
-  integration
-  resource
-  other
-}
-
-model MarketingLink {
-  id          String            @id @default(cuid())
-  name        String
-  url         String
-  description String            @default("")
-  type        MarketingLinkType @default(resource)
-  createdById String?           @map("created_by_id")
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-}
-
 model ContentEditLog {
   id         String   @id @default(cuid())
   userId     String   @map("user_id")
@@ -475,24 +376,6 @@ model MarketingActivityLog {
   seoNote     String?  @map("seo_note")
   payloadJson String?  @map("payload_json")
   createdAt   DateTime @default(now()) @map("created_at")
-}
-
-model WebVitalReport {
-  id             String   @id @default(cuid())
-  name           String
-  value          Float
-  rating         String?
-  delta          Float?
-  idMetric       String?  @map("id_metric")
-  navigationType String?  @map("navigation_type")
-  pagePath       String?  @map("page_path")
-  userId         String?  @map("user_id")
-  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userAgent      String?  @map("user_agent")
-  createdAt      DateTime @default(now()) @map("created_at")
-
-  @@index([createdAt(sort: Desc)])
-  @@index([name, createdAt])
 }
 
 model ErrorLog {
@@ -571,30 +454,6 @@ model TeamMember {
 
   @@index([section, sortOrder])
   @@map("team_member")
-}
-
-model FeatureToggle {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  enabled     Boolean  @default(false)
-  description String? 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("feature_toggle")
-}
-
-model RoleModulePermission {
-  id        String   @id @default(cuid())
-  role      Role
-  module    String
-  allowed   Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@unique([role, module])
-  @@index([role])
-  @@map("role_module_permission")
 }
 
 /// Replaces PostgreSQL advisory locks for cron-style tasks (SQLite / Turso has no `pg_try_advisory_lock`).

@@ -7,7 +7,7 @@ import type { DivisionSubpage } from '@/lib/company-division-subpages';
 import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import CompanyDivisionTopicNav from '@/components/divisions/CompanyDivisionTopicNav';
 
-const SUBPAGES: DivisionSubpage[] = ['about', 'services', 'contact'];
+const SUBPAGES: DivisionSubpage[] = ['about', 'services', 'companies', 'contact'];
 
 function stripLocalePrefix(segments: string[]): string[] {
   if (segments.length === 0) return segments;
@@ -41,6 +41,8 @@ export default function CompanyDivisionShell({
         return t('divisionSubpageAbout');
       case 'services':
         return t('divisionSubpageServices');
+      case 'companies':
+        return t('divisionSubpageCompanies');
       case 'contact':
         return t('divisionSubpageContact');
       default:

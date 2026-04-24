@@ -28,19 +28,21 @@ export default function CompanyDivisionSubPageContent({
 
   return (
     <MotionLazy>
-      <section className={`bg-blue-900 px-4 sm:px-6 lg:px-8 ${heroVertical}`}>
-        <div className="mx-auto max-w-3xl text-center">
+      <section
+        className={`border-b border-blue-950/20 bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 px-4 sm:px-6 lg:px-8 ${heroVertical}`}
+      >
+        <div className="mx-auto max-w-4xl text-center">
           <m.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl"
+            className="font-serif text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-[2rem]"
           >
             {heading}
           </m.h1>
         </div>
       </section>
-      <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <div className="mx-auto max-w-3xl space-y-4">
+      <section className="border-b border-slate-100 bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-3xl space-y-5">
           {paragraphs.map((text, i) => (
             <m.p
               key={i}
@@ -48,12 +50,12 @@ export default function CompanyDivisionSubPageContent({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="text-sm leading-relaxed text-slate-700 sm:text-base"
+              className="text-[15px] leading-[1.7] text-slate-700 sm:text-base"
             >
               {text}
             </m.p>
           ))}
-          <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500">
+          <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/90 px-4 py-3.5 text-xs leading-relaxed text-slate-500">
             {cmsKeyHint} <span className="font-mono text-slate-700">{pageKey}</span>
             <span className="mt-2 block text-slate-500">{cmsKeyNote}</span>
           </p>

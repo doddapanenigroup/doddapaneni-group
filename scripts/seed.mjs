@@ -1,5 +1,5 @@
 /**
- * Seed one user per role if not present (4 distinct emails).
+ * Seed dashboard users (Admin + Developer + Digital Marketer; optional second Admin via ADMIN_EMAIL).
  * Run: node scripts/seed.mjs   OR   npm run db:seed
  * Requires DATABASE_URL (Turso libsql://…) and TURSO_AUTH_TOKEN in .env.local (or .env).
  */
@@ -9,8 +9,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
-config({ path: path.join(projectRoot, '.env.local') });
-config({ path: path.join(projectRoot, '.env') });
+config({ path: path.join(projectRoot, '.env.local'), quiet: true });
+config({ path: path.join(projectRoot, '.env'), quiet: true });
 
 import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 import bcrypt from 'bcryptjs';
@@ -18,63 +18,138 @@ import { SECTOR_SEEDS } from './sector-seeds.mjs';
 
 const prisma = createLibsqlPrismaClient();
 
+async function migrateLegacySuperAdminToAdmin() {
+  try {
+    await prisma.$executeRawUnsafe(
+      `UPDATE "User" SET role = 'ADMIN' WHERE role = 'SUPER_ADMIN'`,
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn('[seed] legacy SUPER_ADMIN→ADMIN migration:', msg);
+  }
+}
+
 const DEFAULT_PASSWORD = String(process.env.SEED_PASSWORD ?? '123').trim();
-const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL ?? 'lk8772000@gmail.com';
+const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL ?? 'lk8772000@gmail.com').trim().toLowerCase();
 const SUPER_ADMIN_USERNAME = (process.env.SUPER_ADMIN_USERNAME ?? 'lokesh').trim().toLowerCase();
 const SUPER_ADMIN_PASSWORD = String(
   process.env.SUPER_ADMIN_PASSWORD ?? 'Lokesh@0317'
 ).trim();
 
-const SEED_USERS = [
-  {
-    email: SUPER_ADMIN_EMAIL,
-    username: SUPER_ADMIN_USERNAME,
-    name: 'Lokesh',
-    role: 'SUPER_ADMIN',
-    password: SUPER_ADMIN_PASSWORD,
-  },
-  {
-    email: process.env.ADMIN_EMAIL ?? 'admin@doddapaneni-group.com',
-    username: 'admin',
-    name: 'Admin',
-    role: 'ADMIN',
-    password: DEFAULT_PASSWORD,
-  },
-  {
-    email: process.env.DEVELOPER_EMAIL ?? 'developer@doddapaneni-group.com',
-    username: 'developer',
-    name: 'Developer',
-    role: 'DEVELOPER',
-    password: DEFAULT_PASSWORD,
-  },
-  {
-    email: process.env.MARKETER_EMAIL ?? 'marketer@doddapaneni-group.com',
-    username: 'marketer',
-    name: 'Digital Marketer',
-    role: 'DIGITAL_MARKETER',
-    password: DEFAULT_PASSWORD,
-  },
-];
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL ?? 'admin@doddapaneni-group.com').trim().toLowerCase();
+/** Must differ from `SUPER_ADMIN_USERNAME` when both seed rows exist — default avoids clashing with common `admin` handle. */
+const ADMIN_USERNAME = (process.env.ADMIN_USERNAME ?? 'doddapaneni-admin').trim().toLowerCase();
 
-async function main() {
-  for (const u of SEED_USERS) {
-    const passwordHash = await bcrypt.hash(u.password, 10);
-    await prisma.user.upsert({
-      where: { email: u.email },
-      create: {
-        email: u.email,
-        username: u.username,
-        passwordHash,
-        name: u.name,
-        role: u.role,
-      },
-      update: {
+function buildSeedUsers() {
+  const rows = [
+    {
+      email: SUPER_ADMIN_EMAIL,
+      username: SUPER_ADMIN_USERNAME,
+      name: process.env.SUPER_ADMIN_NAME?.trim() || 'Lokesh',
+      role: 'ADMIN',
+      password: SUPER_ADMIN_PASSWORD,
+    },
+  ];
+  if (ADMIN_EMAIL && ADMIN_EMAIL !== SUPER_ADMIN_EMAIL) {
+    rows.push({
+      email: ADMIN_EMAIL,
+      username: ADMIN_USERNAME,
+      name: 'Admin',
+      role: 'ADMIN',
+      password: DEFAULT_PASSWORD,
+    });
+  }
+  rows.push(
+    {
+      email: (process.env.DEVELOPER_EMAIL ?? 'developer@doddapaneni-group.com').trim().toLowerCase(),
+      username: 'developer',
+      name: 'Developer',
+      role: 'DEVELOPER',
+      password: DEFAULT_PASSWORD,
+    },
+    {
+      email: (process.env.MARKETER_EMAIL ?? 'marketer@doddapaneni-group.com').trim().toLowerCase(),
+      username: 'marketer',
+      name: 'Digital Marketer',
+      role: 'DIGITAL_MARKETER',
+      password: DEFAULT_PASSWORD,
+    }
+  );
+
+  const seen = new Set();
+  const out = [];
+  for (const u of rows) {
+    if (seen.has(u.email)) continue;
+    seen.add(u.email);
+    out.push(u);
+  }
+  const usedUsernames = new Set();
+  for (const u of out) {
+    if (usedUsernames.has(u.username)) {
+      throw new Error(
+        `[seed] Duplicate username "${u.username}" in seed config. Set a unique ADMIN_USERNAME (and SUPER_ADMIN_USERNAME).`
+      );
+    }
+    usedUsernames.add(u.username);
+  }
+  return out;
+}
+
+const SEED_USERS = buildSeedUsers();
+
+/**
+ * Upsert by email. If another row already uses this seed `username`, rename that row so
+ * we never hit P2002 on the global `username` unique constraint.
+ */
+async function upsertSeedUser(u) {
+  const passwordHash = await bcrypt.hash(u.password, 10);
+  const byEmail = await prisma.user.findUnique({ where: { email: u.email } });
+
+  async function ensureUsernameAvailable(exceptUserId) {
+    const blocker = await prisma.user.findFirst({
+      where: exceptUserId
+        ? { username: u.username, NOT: { id: exceptUserId } }
+        : { username: u.username },
+      select: { id: true, username: true },
+    });
+    if (!blocker) return;
+    const suffix = blocker.id.replace(/[^a-z0-9]/gi, '').slice(0, 10) || 'x';
+    const next = `${String(blocker.username ?? 'user')}_seed_${suffix}`.slice(0, 48);
+    await prisma.user.update({ where: { id: blocker.id }, data: { username: next } });
+    console.warn('[seed] renamed conflicting username to', next, 'for user id', blocker.id);
+  }
+
+  if (byEmail) {
+    await ensureUsernameAvailable(byEmail.id);
+    await prisma.user.update({
+      where: { id: byEmail.id },
+      data: {
         username: u.username,
         passwordHash,
         name: u.name,
         role: u.role,
       },
     });
+    return;
+  }
+
+  await ensureUsernameAvailable(null);
+
+  await prisma.user.create({
+    data: {
+      email: u.email,
+      username: u.username,
+      passwordHash,
+      name: u.name,
+      role: u.role,
+    },
+  });
+}
+
+async function main() {
+  await migrateLegacySuperAdminToAdmin();
+  for (const u of SEED_USERS) {
+    await upsertSeedUser(u);
     console.log('Upserted', u.role, 'user:', u.email, '(@' + u.username + ')');
   }
 

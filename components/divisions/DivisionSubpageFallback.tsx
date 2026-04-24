@@ -8,7 +8,7 @@ import {
 
 type Props = {
   sectorSlug: string;
-  subpage: DivisionSubpage;
+  subpage: Exclude<DivisionSubpage, 'companies'>;
   sectorName: string;
   locale: string;
   /** When true, `CompanyDivisionShell` sits above — hero only needs a modest gap under the division band. */

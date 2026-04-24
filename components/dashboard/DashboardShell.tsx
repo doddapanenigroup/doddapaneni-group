@@ -4,8 +4,6 @@ import type { Role } from '@/lib/constants';
 import { DashboardThemeProvider } from '@/components/dashboard/DashboardThemeProvider';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
-import RecordDeveloperPage from '@/components/dashboard/RecordDeveloperPage';
-import RecordDashboardVisit from '@/components/dashboard/RecordDashboardVisit';
 import AutoLogoutOnUnauthenticated from '@/components/dashboard/AutoLogoutOnUnauthenticated';
 import { DashboardShortcutsProvider } from '@/components/dashboard/DashboardShortcutsProvider';
 
@@ -22,8 +20,6 @@ export default function DashboardShell({
     <DashboardThemeProvider>
       <DashboardShortcutsProvider>
         <div className="min-h-screen bg-[#eef1f6] dark:bg-slate-950">
-          <RecordDeveloperPage locale={locale} />
-          <RecordDashboardVisit />
           <AutoLogoutOnUnauthenticated locale={locale} />
           <DashboardHeader user={user} locale={locale} />
           <div className="mx-auto flex w-full max-w-[1400px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-10 xl:px-14">

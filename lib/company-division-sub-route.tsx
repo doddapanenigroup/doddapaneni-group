@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ContentPageBoundary from '@/components/ContentPageBoundary';
 import DivisionSubpageFallback from '@/components/divisions/DivisionSubpageFallback';
+import DivisionSectorCompaniesSection from '@/components/divisions/DivisionSectorCompaniesSection';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { divisionContentPageKey, type DivisionSubpage } from '@/lib/company-division-subpages';
@@ -32,6 +33,29 @@ export function divisionSubPage(sub: DivisionSubpage) {
       notFound();
     }
     const pageKey = divisionContentPageKey(slug, sub);
+    if (sub === 'companies') {
+      const grid = (
+        <DivisionSectorCompaniesSection
+          sectorSlug={slug}
+          sectorName={sector.name}
+          locale={locale}
+          embeddedInDivisionShell
+          showIntro={false}
+        />
+      );
+      return (
+        <ContentPageBoundary pageKey={pageKey} locale={locale} belowPublishedBody={grid}>
+          <DivisionSectorCompaniesSection
+            sectorSlug={slug}
+            sectorName={sector.name}
+            locale={locale}
+            embeddedInDivisionShell
+            showIntro
+          />
+        </ContentPageBoundary>
+      );
+    }
+
     return (
       <ContentPageBoundary pageKey={pageKey} locale={locale}>
         <DivisionSubpageFallback
@@ -39,7 +63,7 @@ export function divisionSubPage(sub: DivisionSubpage) {
           subpage={sub}
           sectorName={sector.name}
           locale={locale}
-          embeddedInDivisionShell={!sector.isLive}
+          embeddedInDivisionShell
         />
       </ContentPageBoundary>
     );

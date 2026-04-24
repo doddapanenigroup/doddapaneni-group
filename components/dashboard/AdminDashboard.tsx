@@ -1,23 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, UserCog, UserCircle, Pencil, BarChart3, Contact } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Users, UserCog, UserCircle, Pencil, Contact } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
-import { isSuperAdmin } from '@/lib/role-utils';
-import VisitStatsLazy from './VisitStatsLazy';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
 import AdminSessionsLoginsColumn from './AdminSessionsLoginsColumn';
-import AdminBackupsPanel from './AdminBackupsPanel';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import DashboardPageHeader from './DashboardPageHeader';
 import CareersJobsPanel from './CareersJobsPanel';
-import PermissionMatrixPanel from './PermissionMatrixPanel';
-import FeatureFlagsPanel from './FeatureFlagsPanel';
 import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
@@ -33,27 +29,27 @@ type UserRow = {
   createdBy?: { email: string; name: string | null } | null;
 };
 
-const EMPLOYEE_ROLES_SUPER: Role[] = ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
-const EMPLOYEE_ROLES_ADMIN: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+const EMPLOYEE_ROLES: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 
 export default function AdminDashboard({
   users: initialUsers,
   locale,
   currentUserId,
-  viewerRole,
 }: {
   users: UserRow[];
   locale: string;
   currentUserId: string;
-  viewerRole: Role;
 }) {
+  const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [showManageModal, setShowManageModal] = useState(false);
-  const superViewer = isSuperAdmin(viewerRole);
-  const employeeRoles = superViewer ? EMPLOYEE_ROLES_SUPER : EMPLOYEE_ROLES_ADMIN;
-  const allowedRolesForPasswordChange: Role[] = superViewer
-    ? ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
-    : ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
+  const employeeRoles = EMPLOYEE_ROLES;
+  const creatableRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+  const allowedRolesForPasswordChange: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 
   const employees = users
     .filter((u) => employeeRoles.includes(u.role))
@@ -61,11 +57,12 @@ export default function AdminDashboard({
 
   async function handleDeleteEmployee(id: string) {
     const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+    const json = (await res.json().catch(() => ({}))) as { message?: string };
     if (!res.ok) {
-      const json = await res.json();
-      throw new Error(json.message ?? 'Failed to delete');
+      throw new Error(typeof json.message === 'string' ? json.message : 'Failed to delete');
     }
     setUsers((prev) => prev.filter((u) => u.id !== id));
+    router.refresh();
   }
 
   async function handleChangePassword(id: string, newPassword: string) {
@@ -83,7 +80,7 @@ export default function AdminDashboard({
       <DashboardPageHeader
         icon={Users}
         title={getDashboardTitle('ADMIN')}
-        description="Manage users, view visit statistics, and monitor developer and marketer activity."
+        description="Manage users, sector visibility, companies, and monitor developer and marketer activity."
         actions={
           <>
             <button type="button" onClick={() => setShowManageModal(true)} className={dashboardHeaderActionPrimary}>
@@ -105,13 +102,6 @@ export default function AdminDashboard({
               Blogs &amp; SEO
             </Link>
             <Link
-              href={publicPathForLocale(locale, '/dashboard/analytics')}
-              className={dashboardHeaderActionSecondary}
-            >
-              <BarChart3 size={18} />
-              Analytics
-            </Link>
-            <Link
               href={publicPathForLocale(locale, '/dashboard/admin/team')}
               className={dashboardHeaderActionSecondary}
             >
@@ -126,11 +116,13 @@ export default function AdminDashboard({
         <ManageEmployeesModal
           employees={employees}
           allowedRoles={employeeRoles}
+          creatableRoles={creatableRoles}
           currentUserId={currentUserId}
           allowedRolesForPasswordChange={allowedRolesForPasswordChange}
-          onEmployeeCreated={(user) =>
-            setUsers((prev) => [{ ...user, createdBy: { email: 'You', name: 'You' } }, ...prev])
-          }
+          onEmployeeCreated={(user) => {
+            setUsers((prev) => [{ ...user, createdBy: { email: 'You', name: 'You' } }, ...prev]);
+            router.refresh();
+          }}
           onDelete={handleDeleteEmployee}
           onChangePassword={handleChangePassword}
           onClose={() => setShowManageModal(false)}
@@ -145,20 +137,9 @@ export default function AdminDashboard({
 
       <AdminOpsInsights />
 
-      {superViewer ? (
-        <>
-          <PermissionMatrixPanel />
-          <FeatureFlagsPanel />
-        </>
-      ) : null}
-
-      <AdminBackupsPanel />
-
       <SectorStatusPanel />
 
       <CompaniesAdminPanel />
-
-      <VisitStatsLazy />
     </div>
   );
 }

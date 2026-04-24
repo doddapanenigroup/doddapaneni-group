@@ -2,7 +2,13 @@
  * Idempotent: replaces all `team_member` rows with the default roster (English copy + public image paths).
  * Usage: `npx tsx scripts/seed-team-members.ts`
  */
-import 'dotenv/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { config } from 'dotenv';
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+config({ path: path.join(projectRoot, '.env.local'), quiet: true });
+config({ path: path.join(projectRoot, '.env'), quiet: true });
 import { createLibsqlPrismaClient } from '../lib/create-libsql-prisma';
 import { TEAM_MEMBER_DEFAULT_ROWS } from '../lib/team-default-seed';
 

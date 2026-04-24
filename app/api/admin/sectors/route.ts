@@ -28,12 +28,14 @@ function revalidateSectorPublicRoutes() {
     revalidatePath('/', 'layout');
     for (const slug of COMPANY_DIVISION_SLUGS) {
       revalidatePath(`/${slug}`, 'layout');
+      revalidatePath(`/${slug}/companies`, 'page');
     }
     for (const loc of routing.locales) {
       if (loc === routing.defaultLocale) continue;
       revalidatePath(`/${loc}`, 'layout');
       for (const slug of COMPANY_DIVISION_SLUGS) {
         revalidatePath(`/${loc}/${slug}`, 'layout');
+        revalidatePath(`/${loc}/${slug}/companies`, 'page');
       }
     }
   } catch {

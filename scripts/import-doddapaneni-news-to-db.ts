@@ -2,7 +2,7 @@
  * Imports articles from `lib/doddapaneni-news.ts` into the `news` table with sector links.
  *
  * Run: npx tsx scripts/import-doddapaneni-news-to-db.ts
- * Requires DATABASE_URL and seeded sectors + a DIGITAL_MARKETER or SUPER_ADMIN user.
+ * Requires DATABASE_URL and seeded sectors + a DIGITAL_MARKETER or ADMIN user.
  */
 
 import { config } from 'dotenv';
@@ -12,8 +12,8 @@ import { createLibsqlPrismaClient } from '../lib/create-libsql-prisma';
 import { DODDAPANENI_NEWS_SECTORS, type NewsArticle } from '../lib/doddapaneni-news';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-config({ path: path.join(__dirname, '..', '.env.local') });
-config({ path: path.join(__dirname, '..', '.env') });
+config({ path: path.join(__dirname, '..', '.env.local'), quiet: true });
+config({ path: path.join(__dirname, '..', '.env'), quiet: true });
 
 const prisma = createLibsqlPrismaClient();
 
@@ -44,9 +44,9 @@ async function main() {
 
   const author =
     (await prisma.user.findFirst({ where: { role: 'DIGITAL_MARKETER' }, select: { id: true } })) ??
-    (await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' }, select: { id: true } }));
+    (await prisma.user.findFirst({ where: { role: 'ADMIN' }, select: { id: true } }));
   if (!author) {
-    console.error('No DIGITAL_MARKETER or SUPER_ADMIN user. Run npm run db:seed first.');
+    console.error('No DIGITAL_MARKETER or ADMIN user. Run npm run db:seed first.');
     process.exit(1);
   }
 

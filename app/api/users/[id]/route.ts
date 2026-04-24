@@ -6,7 +6,7 @@ import { sendRoleDeletedEmailToDeleter, sendRoleDeletedEmailToDeletedUser } from
 import bcrypt from 'bcryptjs';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { writeAuditLog } from '@/lib/audit';
-import { canSetPasswordForTarget, hasAdminAccess, isAdmin, isSuperAdmin } from '@/lib/role-utils';
+import { canSetPasswordForTarget, hasAdminAccess } from '@/lib/role-utils';
 import type { Role } from '@/lib/constants';
 
 export async function PATCH(
@@ -106,7 +106,6 @@ export async function DELETE(
     const session = await auth();
     const role = session?.user?.role;
     const currentUserId = session?.user?.id;
-    const isAdminUser = isAdmin(role as any);
 
     if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
@@ -127,18 +126,15 @@ export async function DELETE(
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const targetRole = user.role as string;
-    if (isSuperAdmin(targetRole as any)) {
-      return NextResponse.json({ message: 'Cannot delete Super Admin' }, { status: 403 });
-    }
-    if (
-      isAdminUser &&
-      (isAdmin(targetRole as any) || isSuperAdmin(targetRole as any))
-    ) {
-      return NextResponse.json(
-        { message: 'Admin can only delete Developer or Digital Marketer' },
-        { status: 403 }
-      );
+    const targetRole = user.role as Role;
+    if (targetRole === 'ADMIN') {
+      const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+      if (adminCount <= 1) {
+        return NextResponse.json(
+          { message: 'Cannot delete the last Admin account' },
+          { status: 403 }
+        );
+      }
     }
 
     const deletedUserEmail = user.email;
@@ -149,11 +145,8 @@ export async function DELETE(
       await tx.passwordChangeLog.deleteMany({
         where: { OR: [{ targetUserId: id }, { changedById: id }] },
       });
-      await tx.developerPageView.deleteMany({ where: { userId: id } });
-      await tx.dashboardVisit.deleteMany({ where: { userId: id } });
       await tx.marketingActivityLog.deleteMany({ where: { userId: id } });
       await tx.contentEditLog.deleteMany({ where: { userId: id } });
-      await tx.webVitalReport.deleteMany({ where: { userId: id } });
       await tx.loginLog.deleteMany({ where: { userId: id } });
       await tx.user.delete({ where: { id } });
     });

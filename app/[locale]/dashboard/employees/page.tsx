@@ -3,13 +3,7 @@ import { redirect } from 'next/navigation';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { canAccessEmployeesDashboard } from '@/lib/dashboard-access';
-import { isSuperAdmin } from '@/lib/role-utils';
-import type {
-  DeveloperPageView,
-  LoginLog,
-  Role as PrismaRole,
-  User as DbUser,
-} from '@/lib/prisma-generated';
+import type { LoginLog, Role as PrismaRole, User as DbUser } from '@/lib/prisma-generated';
 import { getRoleOrder } from '@/lib/constants';
 import EmployeesPageView from '../../../../components/dashboard/EmployeesPageView';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
@@ -43,10 +37,7 @@ export default async function EmployeesPage({ params }: Props) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
-  const employeeRoles: Role[] =
-    isSuperAdmin(role as any)
-      ? ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']
-      : ['DEVELOPER', 'DIGITAL_MARKETER'];
+  const employeeRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
 
   await connectDb();
 
@@ -62,26 +53,6 @@ export default async function EmployeesPage({ params }: Props) {
     take: 200,
   });
 
-  const developerLogIds = loginLogDocs.map((l: LoginLog) => l.id);
-  const pageViews =
-    developerLogIds.length > 0
-      ? await prisma.developerPageView.findMany({
-          where: { loginLogId: { in: developerLogIds } },
-          orderBy: { visitedAt: 'asc' },
-        })
-      : [];
-
-  const pageViewsByLogId = pageViews.reduce(
-    (acc: Record<string, { path: string; visitedAt: string }[]>, pv: DeveloperPageView) => {
-      if (!pv.loginLogId) return acc;
-      const id = pv.loginLogId;
-      if (!acc[id]) acc[id] = [];
-      acc[id].push({ path: pv.path, visitedAt: pv.visitedAt.toISOString() });
-      return acc;
-    },
-    {} as Record<string, { path: string; visitedAt: string }[]>
-  );
-
   const logsByUserId = loginLogDocs.reduce(
     (acc: Record<string, EmployeeSession[]>, log: LoginLog) => {
       const uid = String(log.userId);
@@ -94,7 +65,7 @@ export default async function EmployeesPage({ params }: Props) {
         loggedAt: log.loggedAt.toISOString(),
         loggedOutAt: log.loggedOutAt ? log.loggedOutAt.toISOString() : null,
         timeOnlineMinutes,
-        pageViews: pageViewsByLogId[log.id] ?? [],
+        pageViews: [] as { path: string; visitedAt: string }[],
       });
       return acc;
     },

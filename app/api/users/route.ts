@@ -8,8 +8,9 @@ import * as z from 'zod';
 import type { Role } from '@/lib/constants';
 import type { Role as DbRole } from '@/lib/prisma-generated';
 import { captureErrorToDb } from '@/lib/error-monitor';
-import { hasAdminAccess, isSuperAdmin } from '@/lib/role-utils';
+import { hasAdminAccess } from '@/lib/role-utils';
 import { notifyAdminsUserCreated } from '@/lib/notify';
+import { resolveLibsqlDatabaseUrl } from '@/lib/resolve-libsql-database-url';
 
 const usernameSchema = z
   .string()
@@ -18,15 +19,7 @@ const usernameSchema = z
   .regex(/^[a-zA-Z0-9._-]+$/, 'Username: use letters, numbers, dot, underscore, hyphen only')
   .transform((s) => s.trim().toLowerCase());
 
-const createUserSchemaAdmin = z.object({
-  email: z.string().email(),
-  username: usernameSchema,
-  password: z.string().min(6),
-  name: z.string().optional(),
-  role: z.enum(['DEVELOPER', 'DIGITAL_MARKETER']),
-});
-
-const createUserSchemaSuperAdmin = z.object({
+const createUserSchema = z.object({
   email: z.string().email(),
   username: usernameSchema,
   password: z.string().min(6),
@@ -38,18 +31,25 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     const role = session?.user?.role;
-    const isSuperAdminUser = isSuperAdmin(role as any);
     if (!session?.user || !hasAdminAccess(role as any)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const parsed = isSuperAdminUser
-      ? createUserSchemaSuperAdmin.safeParse(body)
-      : createUserSchemaAdmin.safeParse(body);
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ message: 'Request body must be valid JSON' }, { status: 400 });
+    }
+    const parsed = createUserSchema.safeParse(body);
     if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      const message =
+        first?.path?.length && first.path.join('.')
+          ? `${first.path.join('.')}: ${first.message}`
+          : (first?.message ?? 'Invalid input');
       return NextResponse.json(
-        { message: 'Invalid input', errors: parsed.error.issues },
+        { message, errors: parsed.error.issues },
         { status: 400 }
       );
     }
@@ -90,6 +90,16 @@ export async function POST(request: Request) {
         createdAtET: formatInET(createdAt),
       },
     });
+
+    if (process.env.NODE_ENV === 'development') {
+      const raw = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
+      const label = raw.toLowerCase().startsWith('file:')
+        ? resolveLibsqlDatabaseUrl(raw)
+        : raw
+          ? 'remote (libsql/https)'
+          : '(unset)';
+      console.info('[api/users] created', doc.email, '→ DB:', label);
+    }
 
     const user = {
       id: doc.id,

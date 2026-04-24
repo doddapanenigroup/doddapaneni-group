@@ -222,7 +222,9 @@ export async function sectorSubpageMetadata(
       ? tBlog('divisionSubpageAbout')
       : sub === 'services'
         ? tBlog('divisionSubpageServices')
-        : tBlog('divisionSubpageContact');
+        : sub === 'companies'
+          ? tBlog('divisionSubpageCompanies')
+          : tBlog('divisionSubpageContact');
   const servicesWord = tBlog('divisionSubpageServices');
   const origin = getSiteOrigin();
   const pathRel = publicPathWithLocale(locale, row.slug, sub);

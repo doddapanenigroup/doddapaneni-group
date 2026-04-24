@@ -7,6 +7,8 @@
    - `npx prisma db push` (with Turso env vars above). **Required before the first `npm run build`** if the build runs static generation that queries the DB (otherwise you see `no such table` during deploy).
    - If you use a **local** `DATABASE_URL=file:./dev.db` on your laptop, push to Turso with **`npm run db:push:turso`** (`TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`).
    - **Docker / DigitalOcean App Platform:** the repo `Dockerfile` runs `npx prisma db push` in the **builder** stage before `npm run build`; provide `DATABASE_URL` (libsql) and `TURSO_AUTH_TOKEN` as **build-time** secrets so the remote DB has tables before SSG.
+   - **After the first `db push` on Turso**, load app data (otherwise news/team/careers/nav look empty and sectors show “Coming soon”): **`npm run db:turso:init`** (remote push + seed users/sectors/careers + team). For images in DB, temporarily set `DATABASE_URL` to your Turso URL and run `npm run media:seed`, or add a matching CI step.
+   - **Login bounce (dashboard → login):** set `NEXTAUTH_URL` to the exact public origin you use in the browser (e.g. `https://www.example.com`, no trailing slash). Mismatch breaks the session cookie and `/api/auth/session` stays empty.
    - **`npm run media:seed`** — copies every image under `public/` into the `stored_image` table so `/api/media/...` works (required for logos, blog images, etc.).
    - Optional first data: `npm run db:seed` (set seed env vars first; see `.env.example`).
 3. **Secrets** — Set `AUTH_SECRET` (32+ random bytes, e.g. `openssl rand -base64 32`).

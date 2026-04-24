@@ -51,30 +51,6 @@ function EditsBlock({ data }: { data: ActivityPayload }) {
   );
 }
 
-function PageViewsBlock({ data }: { data: ActivityPayload }) {
-  return (
-    <div>
-      <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-        Pages opened in dashboard
-      </h3>
-      <ul className="text-sm space-y-1 max-h-56 overflow-y-auto font-mono text-xs">
-        {data.pageViews.length === 0 ? (
-          <li className="text-slate-500 dark:text-slate-400">No page views recorded.</li>
-        ) : (
-          data.pageViews.map((p, i) => (
-            <li key={i} className="text-slate-700 dark:text-slate-200">
-              {p.path}{' '}
-              <span className="text-slate-400 dark:text-slate-500">
-                {new Date(p.visitedAt).toLocaleString()}
-              </span>
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-}
-
 function MarketingBlock({ data }: { data: ActivityPayload }) {
   return (
     <>
@@ -118,8 +94,7 @@ export default function MyActivityPanel() {
 
   if (!data) return null;
 
-  const showDevGrid =
-    hasDeveloperAccess(data.role) || data.contentEdits.length > 0 || data.pageViews.length > 0;
+  const showDevGrid = hasDeveloperAccess(data.role) || data.contentEdits.length > 0;
 
   const showMarketing = hasMarketerAccess(data.role) || data.marketingActivity.length > 0;
 
@@ -139,9 +114,8 @@ export default function MyActivityPanel() {
             <History size={20} className="text-slate-600 dark:text-slate-400" />
             Your recent activity
           </h2>
-          <div className="p-5 grid gap-6 lg:grid-cols-2">
+          <div className="p-5">
             <EditsBlock data={data} />
-            <PageViewsBlock data={data} />
           </div>
         </section>
       ) : null}

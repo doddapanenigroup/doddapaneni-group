@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, UserCircle, Clock, FileCode } from 'lucide-react';
 import type { Role } from '@/lib/constants';
@@ -25,7 +25,6 @@ type EmployeeWithStats = {
 };
 
 const roleBadgeClass: Record<string, string> = {
-  SUPER_ADMIN: 'bg-slate-200 text-slate-800',
   ADMIN: 'bg-slate-200 text-slate-800',
   DEVELOPER: 'bg-slate-200 text-slate-800',
   DIGITAL_MARKETER: 'bg-slate-200 text-slate-800',
@@ -42,6 +41,13 @@ export default function EmployeesPageView({
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(employees[0]?.id ?? null);
   const selected = employees.find((e) => e.id === selectedId);
+
+  useEffect(() => {
+    setSelectedId((prev) => {
+      if (prev && employees.some((e) => e.id === prev)) return prev;
+      return employees[0]?.id ?? null;
+    });
+  }, [employees]);
 
   return (
     <div className="space-y-6">

@@ -9,9 +9,17 @@ type Props = {
   children: ReactNode;
   /** When provided (including `null`), skips a duplicate CMS lookup — use after parallel fetch on hot paths. */
   cms?: PublishedPageSnapshot;
+  /** Rendered below the CMS article when published body replaces default children (e.g. sector companies list). */
+  belowPublishedBody?: ReactNode;
 };
 
-export default async function ContentPageBoundary({ pageKey, locale, children, cms }: Props) {
+export default async function ContentPageBoundary({
+  pageKey,
+  locale,
+  children,
+  cms,
+  belowPublishedBody,
+}: Props) {
   const content = cms !== undefined ? cms : await findPublishedPageContent(pageKey, locale);
   if (content && (content.title || content.body)) {
     return (
@@ -29,6 +37,7 @@ export default async function ContentPageBoundary({ pageKey, locale, children, c
             />
           ) : null}
         </article>
+        {belowPublishedBody}
       </div>
     );
   }

@@ -53,7 +53,7 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
   const [logoutBusyUserId, setLogoutBusyUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/dashboard/admin-insights')
+    fetch('/api/dashboard/admin-insights', { cache: 'no-store' })
       .then(async (r) => {
         if (!r.ok) throw new Error('Failed to load');
         return r.json();
@@ -81,7 +81,7 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
         body: JSON.stringify({ userId }),
       });
       if (!r.ok) throw new Error('Failed');
-      const refreshed = await fetch('/api/admin/sessions?activeOnly=1&take=200');
+      const refreshed = await fetch('/api/admin/sessions?activeOnly=1&take=200', { cache: 'no-store' });
       if (!refreshed.ok) throw new Error('Failed');
       setSessions((await refreshed.json()) as ActiveSessionsResponse);
     } catch {

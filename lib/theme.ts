@@ -5,7 +5,6 @@ import type { Role } from './constants';
  * Used by RoleThemeProvider and for any role-based styling.
  */
 export const ROLE_THEMES: Record<Role, string> = {
-  SUPER_ADMIN: 'superadmin',
   ADMIN: 'admin',
   DEVELOPER: 'developer',
   DIGITAL_MARKETER: 'marketer',

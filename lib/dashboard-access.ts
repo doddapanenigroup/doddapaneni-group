@@ -18,7 +18,7 @@ export function canAccessMarketerDashboard(role: Role | null | undefined): boole
   return hasMarketerAccess(role);
 }
 
-/** Primary admin UI: `ADMIN` and `SUPER_ADMIN` (same route; super-only tools are gated in the page). */
+/** Primary admin UI: `ADMIN`. */
 export function canAccessAdminDashboard(role: Role | null | undefined): boolean {
   return hasAdminAccess(role);
 }

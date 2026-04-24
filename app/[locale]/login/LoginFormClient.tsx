@@ -49,12 +49,15 @@ type SessionResponse =
   | { user: unknown; expires: string }
   | null;
 
-async function waitForSessionReady(timeoutMs = 4000): Promise<boolean> {
+async function waitForSessionReady(timeoutMs = 10000): Promise<boolean> {
   const started = Date.now();
   let delay = 150;
   while (Date.now() - started < timeoutMs) {
     try {
-      const res = await fetch('/api/auth/session', { cache: 'no-store' });
+      const res = await fetch('/api/auth/session', {
+        cache: 'no-store',
+        credentials: 'include',
+      });
       if (res.ok) {
         const json = (await res.json().catch(() => null)) as SessionResponse;
         if (json && typeof json === 'object' && 'user' in json && (json as { user?: unknown }).user) {
@@ -158,13 +161,23 @@ export default function LoginFormClient({
         setError('Wrong credentials entered');
         return;
       }
-      // Production hosts can have a short delay before the session cookie is readable by server components.
-      // Wait briefly to avoid a login->dashboard->login bounce.
+      // Wait until `/api/auth/session` sees the cookie — redirecting earlier causes dashboard → login bounce.
       setInfo('Signing you in…');
-      const ready = await waitForSessionReady(5000);
+      let ready = await waitForSessionReady(10_000);
+      if (!ready) {
+        await new Promise((r) => setTimeout(r, 400));
+        ready = await waitForSessionReady(5_000);
+      }
       authDebug('post-login session check', { ready });
 
-      // Do not rely on `useSession` for redirect. Navigate explicitly after success.
+      if (!ready) {
+        setInfo('');
+        setError(
+          'The server did not confirm your session (common causes: NEXTAUTH_URL must exactly match this site URL, including https and no trailing slash; or AUTH_SECRET missing on the server). Fix env vars, redeploy, then try again.',
+        );
+        return;
+      }
+
       authDebug('redirect-after-login', { to: callbackUrl });
       window.location.href = `${window.location.origin}${callbackUrl}`;
     } catch {

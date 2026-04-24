@@ -5,8 +5,8 @@ import { defineConfig } from "prisma/config";
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 // Prisma skips default `.env` loading when `prisma.config.ts` exists — restore it for CLI + adapter.
-loadEnv({ path: path.join(process.cwd(), ".env.local") });
-loadEnv({ path: path.join(process.cwd(), ".env") });
+loadEnv({ path: path.join(process.cwd(), ".env.local"), quiet: true });
+loadEnv({ path: path.join(process.cwd(), ".env"), quiet: true });
 
 /** Match `lib/resolve-libsql-database-url.ts`: Prisma CLI resolves `file:./…` from `prisma/`. */
 function resolveSqliteFileUrl(url: string): string {

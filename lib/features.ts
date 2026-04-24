@@ -1,14 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Prisma } from '@/lib/prisma-generated';
-import { prisma } from '@/lib/prisma';
-
-function isMissingTableOrSchemaError(e: unknown): boolean {
-  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2021') {
-    return true;
-  }
-  const msg = e instanceof Error ? e.message : String(e);
-  return /no such table/i.test(msg);
-}
 
 type FeatureName =
   | 'scheduling'
@@ -18,82 +8,51 @@ type FeatureName =
   | 'analyticsDashboard'
   | (string & {});
 
-/** Built-in flags shown in Super Admin UI (order preserved). */
+/** Kept for UI copy only; feature toggles were removed from the product. */
 export const FEATURE_FLAG_DEFINITIONS: ReadonlyArray<{
   name: string;
   label: string;
   description: string;
-}> = [
-  { name: 'scheduling', label: 'Scheduling', description: 'Scheduled publish for pages and blogs' },
-  { name: 'seoScore', label: 'SEO score', description: 'SEO score and suggestions in marketer dashboard' },
-  { name: 'previewSharing', label: 'Preview sharing', description: 'Token-based draft preview links' },
-  { name: 'errorMonitoring', label: 'Error monitoring', description: 'Developer error log panel' },
-  {
-    name: 'analyticsDashboard',
-    label: 'Developer request & observability',
-    description:
-      'Request monitor and Observability panels on the developer dashboard. (Public traffic / charts: /dashboard/analytics — not this flag.)',
-  },
-];
+}> = [];
 
-type FeatureCacheEntry = { enabled: boolean; fetchedAt: number };
+/** No-op: legacy callers after DB feature_toggle removal. */
+export function invalidateFeatureFlagCache(_name?: string): void {}
 
-const CACHE_TTL_MS = 30_000;
-const cache: Map<string, FeatureCacheEntry> = new Map();
-
-/** Call after toggles change so server reads fresh DB state immediately. */
-export function invalidateFeatureFlagCache(name?: string): void {
-  if (name) cache.delete(String(name));
-  else cache.clear();
-}
-
-async function getFeatureToggle(name: FeatureName): Promise<boolean> {
-  const existing = cache.get(name);
-  if (existing && Date.now() - existing.fetchedAt < CACHE_TTL_MS) {
-    return existing.enabled;
-  }
-
-  try {
-    const row = await prisma.featureToggle.findUnique({
-      where: { name: String(name) },
-      select: { enabled: true },
-    });
-
-    const enabled = !!row?.enabled; // Default is disabled when row is missing.
-    cache.set(String(name), { enabled, fetchedAt: Date.now() });
-    return enabled;
-  } catch (e) {
-    // Fresh DB / schema not applied yet (e.g. `next build` before first `prisma db push`).
-    if (!isMissingTableOrSchemaError(e)) throw e;
-    const enabled = false;
-    cache.set(String(name), { enabled, fetchedAt: Date.now() });
-    return enabled;
+function defaultEnabled(name: FeatureName): boolean {
+  switch (name) {
+    case 'analyticsDashboard':
+      return false;
+    case 'scheduling':
+    case 'seoScore':
+    case 'previewSharing':
+    case 'errorMonitoring':
+      return true;
+    default:
+      return false;
   }
 }
 
 /**
- * Returns whether a feature flag is enabled.
- * Default behavior: if the toggle row does not exist, the feature is DISABLED.
+ * Feature gates without database rows (feature toggles removed).
+ * Extend `defaultEnabled` if you need to hide a module again.
  */
 export async function isFeatureEnabled(name: FeatureName): Promise<boolean> {
-  return getFeatureToggle(name);
+  return defaultEnabled(name);
 }
 
 /**
- * Marketer APIs: block non-null `scheduledPublishAt` when Scheduling is off.
- * `null` always allowed (clears a schedule).
+ * When scheduling is disabled, forbid creating/updating with a future `scheduledPublishAt`.
+ * Scheduling is enabled by default (no DB flag).
  */
 export async function schedulingForbiddenIfScheduled(
   scheduledPublishAt: Date | null,
 ): Promise<NextResponse | null> {
-  if (scheduledPublishAt == null) return null;
-  if (await isFeatureEnabled('scheduling')) return null;
-  return NextResponse.json(
-    {
-      message:
-        'Scheduling is disabled. Enable "Scheduling" in Super Admin → Feature flags, or clear the scheduled publish time.',
-    },
-    { status: 403 },
-  );
+  if (!scheduledPublishAt) return null;
+  if (!(await isFeatureEnabled('scheduling'))) {
+    return NextResponse.json(
+      { message: 'Scheduled publishing is disabled for this deployment.' },
+      { status: 403 },
+    );
+  }
+  return null;
 }
-

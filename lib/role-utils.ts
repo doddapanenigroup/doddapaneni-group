@@ -1,9 +1,5 @@
 import type { Role } from '@/lib/constants';
 
-export function isSuperAdmin(role: Role | null | undefined): boolean {
-  return role === 'SUPER_ADMIN';
-}
-
 export function isAdmin(role: Role | null | undefined): boolean {
   return role === 'ADMIN';
 }
@@ -17,7 +13,7 @@ export function isMarketer(role: Role | null | undefined): boolean {
 }
 
 export function hasAdminAccess(role: Role | null | undefined): boolean {
-  return isSuperAdmin(role) || isAdmin(role);
+  return isAdmin(role);
 }
 
 export function hasDeveloperAccess(role: Role | null | undefined): boolean {
@@ -25,7 +21,7 @@ export function hasDeveloperAccess(role: Role | null | undefined): boolean {
 }
 
 /**
- * Super admin, admin, and digital marketer — not developers.
+ * Admin and digital marketer — not developers.
  * Use for: `/dashboard/marketer`, `/dashboard/analytics`, `GET /api/dashboard/analytics`, and ⌘K “Analytics” (same policy).
  */
 export function hasMarketerAccess(role: Role | null | undefined): boolean {
@@ -34,12 +30,7 @@ export function hasMarketerAccess(role: Role | null | undefined): boolean {
 
 /** Any signed-in back-office role (incl. developers) — e.g. dashboard visit logging, my-activity, search shell. */
 export function isDashboardRole(role: Role | null | undefined): boolean {
-  return (
-    role === 'SUPER_ADMIN' ||
-    role === 'ADMIN' ||
-    role === 'DEVELOPER' ||
-    role === 'DIGITAL_MARKETER'
-  );
+  return role === 'ADMIN' || role === 'DEVELOPER' || role === 'DIGITAL_MARKETER';
 }
 
 /** Who may reset another user’s password via `PATCH /api/users/[id]` (not self; self uses `/api/account/password`). */
@@ -47,20 +38,11 @@ export function canSetPasswordForTarget(
   actorRole: Role,
   targetRole: Role
 ): { ok: true } | { ok: false; message: string } {
-  if (isSuperAdmin(actorRole)) {
-    if (isSuperAdmin(targetRole) || isAdmin(targetRole) || isDeveloper(targetRole) || isMarketer(targetRole)) {
-      return { ok: true };
-    }
-    return { ok: false, message: 'Not a dashboard user' };
+  if (!isAdmin(actorRole)) {
+    return { ok: false, message: 'Not allowed to change this user password' };
   }
-  if (isAdmin(actorRole)) {
-    if (isSuperAdmin(targetRole)) {
-      return { ok: false, message: 'Admins cannot change a Super Admin password' };
-    }
-    if (isAdmin(targetRole) || isDeveloper(targetRole) || isMarketer(targetRole)) {
-      return { ok: true };
-    }
-    return { ok: false, message: 'Not a dashboard user' };
+  if (isAdmin(targetRole) || isDeveloper(targetRole) || isMarketer(targetRole)) {
+    return { ok: true };
   }
-  return { ok: false, message: 'Not allowed to change this user password' };
+  return { ok: false, message: 'Not a dashboard user' };
 }

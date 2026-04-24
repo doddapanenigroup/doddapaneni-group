@@ -34,11 +34,6 @@ export default async function AdminDashboardPage({ params }: Props) {
   }));
 
   return (
-    <AdminDashboard
-      users={users}
-      locale={locale}
-      currentUserId={session.user.id}
-      viewerRole={session.user.role as Role}
-    />
+    <AdminDashboard users={users} locale={locale} currentUserId={session.user.id} />
   );
 }

@@ -25,16 +25,6 @@
   --corporate-muted: 100 116 139;
 }
 
-/* Super Admin: violet / authority */
-[data-theme="superadmin"] {
-  --theme-primary: 124 58 237;
-  --theme-primary-foreground: 255 255 255;
-  --theme-background: 245 243 255;
-  --theme-background-muted: 238 242 255;
-  --theme-accent: 139 92 246;
-  --theme-accent-muted: 196 181 253;
-}
-
 /* Admin: amber / management */
 [data-theme="admin"] {
   --theme-primary: 217 119 6;

@@ -6,7 +6,7 @@ import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type Props = { params: Promise<{ locale: string }> };
 
-/** Legacy URL: admin UI lives at `/dashboard/admin` for both ADMIN and SUPER_ADMIN. */
+/** Legacy URL: admin UI lives at `/dashboard/admin`. */
 export default async function SuperAdminDashboardRedirect({ params }: Props) {
   const session = await auth();
   const { locale } = await params;

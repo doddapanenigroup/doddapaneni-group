@@ -1,4 +1,4 @@
-export const DIVISION_SUBPAGES = ['about', 'services', 'contact'] as const;
+export const DIVISION_SUBPAGES = ['about', 'services', 'companies', 'contact'] as const;
 
 export type DivisionSubpage = (typeof DIVISION_SUBPAGES)[number];
 

@@ -1,9 +1,10 @@
 /**
- * Reset Turso/SQLite app tables, then create one Super Admin user.
+ * Reset Turso/SQLite app tables, then create one Admin user (role ADMIN).
  * Run: node scripts/reset-and-seed.mjs   OR   npm run db:reset
  *
- * Default Super Admin: lk8772000@gmail.com, username lokesh, password Lokesh@0317
+ * Default account: lk8772000@gmail.com, username lokesh, password Lokesh@0317
  * Override in .env.local: SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME, SUPER_ADMIN_PASSWORD, SUPER_ADMIN_NAME
+ * (env names kept for backward compatibility — user role is ADMIN.)
  * Requires DATABASE_URL in .env.local.
  */
 
@@ -12,8 +13,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
-config({ path: path.join(projectRoot, '.env.local') });
-config({ path: path.join(projectRoot, '.env') });
+config({ path: path.join(projectRoot, '.env.local'), quiet: true });
+config({ path: path.join(projectRoot, '.env'), quiet: true });
 
 import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 import bcrypt from 'bcryptjs';
@@ -83,17 +84,11 @@ async function main() {
     await tx.cronTaskLock.deleteMany();
     await tx.storedImage.deleteMany();
     await tx.adminEmployeeCreateOtp.deleteMany();
-    await tx.developerPageView.deleteMany();
     await tx.loginLog.deleteMany();
     await tx.passwordChangeLog.deleteMany();
-    await tx.dashboardVisit.deleteMany();
-    await tx.webVitalReport.deleteMany();
     await tx.marketingActivityLog.deleteMany();
     await tx.contentEditLog.deleteMany();
-    await tx.visit.deleteMany();
     await tx.pageContent.deleteMany();
-    await tx.campaign.deleteMany();
-    await tx.marketingLink.deleteMany();
     await tx.user.deleteMany();
   });
 
@@ -102,20 +97,20 @@ async function main() {
   const createdAt = new Date();
   const passwordHash = await bcrypt.hash(String(SUPER_ADMIN_PASSWORD), 10);
 
-  console.log('Creating Super Admin user:', maskEmail(SUPER_ADMIN_EMAIL));
+  console.log('Creating Admin user:', maskEmail(SUPER_ADMIN_EMAIL));
   await prisma.user.create({
     data: {
       email: SUPER_ADMIN_EMAIL,
       username: SUPER_ADMIN_USERNAME,
       passwordHash,
       name: SUPER_ADMIN_NAME,
-      role: 'SUPER_ADMIN',
+      role: 'ADMIN',
       createdAtIST: formatInIST(createdAt),
       createdAtET: formatInET(createdAt),
     },
   });
 
-  console.log('Done. Database has been reset with 1 user (Super Admin).');
+  console.log('Done. Database has been reset with 1 user (Admin).');
   console.log(
     'Sign in with email or username:',
     SUPER_ADMIN_EMAIL,

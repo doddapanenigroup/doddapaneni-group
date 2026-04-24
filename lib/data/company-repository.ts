@@ -14,6 +14,7 @@ export type PublicCompany = {
   xUrl: string | null;
   youtubeUrl: string | null;
   pinterestUrl: string | null;
+  linkedinUrl: string | null;
   sector: { id: string; name: string; slug: string };
 };
 
@@ -39,6 +40,7 @@ export async function listCompaniesBySectorSlug(
       xUrl: true,
       youtubeUrl: true,
       pinterestUrl: true,
+      linkedinUrl: true,
       sector: { select: { id: true, name: true, slug: true } },
     },
   });
@@ -66,6 +68,7 @@ export async function getCompanyBySlug(
       xUrl: true,
       youtubeUrl: true,
       pinterestUrl: true,
+      linkedinUrl: true,
       sector: { select: { id: true, name: true, slug: true } },
     },
   });

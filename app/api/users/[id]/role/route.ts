@@ -4,9 +4,10 @@ import { connectDb, prisma } from '@/lib/db';
 import type { Role as DbRole } from '@/lib/prisma-generated';
 import { writeAuditLog } from '@/lib/audit';
 import { captureErrorToDb } from '@/lib/error-monitor';
+import { hasAdminAccess } from '@/lib/role-utils';
 
 function isRole(value: unknown): value is DbRole {
-  return value === 'SUPER_ADMIN' || value === 'ADMIN' || value === 'DEVELOPER' || value === 'DIGITAL_MARKETER';
+  return value === 'ADMIN' || value === 'DEVELOPER' || value === 'DIGITAL_MARKETER';
 }
 
 export const runtime = 'nodejs';
@@ -15,9 +16,7 @@ export const dynamic = 'force-dynamic';
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const actorRole = session?.user?.role as string | undefined;
-  const isSuperAdmin = actorRole === 'SUPER_ADMIN';
-  const isAdmin = actorRole === 'ADMIN';
-  if (!session?.user || (!isSuperAdmin && !isAdmin)) {
+  if (!session?.user || !hasAdminAccess(actorRole as any)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
@@ -34,21 +33,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ message: 'Invalid role' }, { status: 400 });
     }
 
-    // Admin can only set DEVELOPER / DIGITAL_MARKETER.
-    if (isAdmin && !(nextRole === 'DEVELOPER' || nextRole === 'DIGITAL_MARKETER')) {
-      return NextResponse.json({ message: 'Admin can only assign Developer or Digital Marketer' }, { status: 403 });
-    }
-
     await connectDb();
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
     const prevRole = user.role as string;
-    if (prevRole === 'SUPER_ADMIN') {
-      return NextResponse.json({ message: 'Cannot change Super Admin role' }, { status: 403 });
-    }
-    if (isAdmin && (prevRole === 'ADMIN' || prevRole === 'SUPER_ADMIN')) {
-      return NextResponse.json({ message: 'Admin cannot change Admin/Super Admin roles' }, { status: 403 });
+    if (prevRole === 'ADMIN' && nextRole !== 'ADMIN') {
+      const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+      if (adminCount <= 1) {
+        return NextResponse.json({ message: 'Cannot demote the last Admin' }, { status: 403 });
+      }
     }
 
     if (prevRole === nextRole) return NextResponse.json({ ok: true });
@@ -71,4 +65,3 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
-

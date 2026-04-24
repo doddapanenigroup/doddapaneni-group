@@ -20,7 +20,6 @@ type UserRow = {
 };
 
 const roleBadgeClass: Record<string, string> = {
-  SUPER_ADMIN: 'bg-slate-200 text-slate-800',
   ADMIN: 'bg-slate-200 text-slate-800',
   DEVELOPER: 'bg-slate-200 text-slate-800',
   DIGITAL_MARKETER: 'bg-slate-200 text-slate-800',
@@ -29,6 +28,7 @@ const roleBadgeClass: Record<string, string> = {
 export default function ManageEmployeesModal({
   employees,
   allowedRoles,
+  creatableRoles,
   currentUserId,
   allowedRolesForPasswordChange,
   onEmployeeCreated,
@@ -41,6 +41,8 @@ export default function ManageEmployeesModal({
 }: {
   employees: UserRow[];
   allowedRoles: Role[];
+  /** Roles shown in “Add employee” (must match POST /api/users for this viewer). Defaults to allowedRoles. */
+  creatableRoles?: Role[];
   currentUserId: string;
   /** Roles whose password the current user is allowed to change (e.g. Admin: Developer, Digital Marketer) */
   allowedRolesForPasswordChange?: Role[];
@@ -61,7 +63,12 @@ export default function ManageEmployeesModal({
     () => [...allowedRoles].sort((a, b) => getRoleOrder(a) - getRoleOrder(b)),
     [allowedRoles]
   );
-  const canAdd = Boolean(showAddEmployee && onEmployeeCreated && sortedAllowedRoles.length > 0);
+  const sortedCreatableRoles = useMemo(() => {
+    const source =
+      creatableRoles && creatableRoles.length > 0 ? creatableRoles : allowedRoles;
+    return [...source].sort((a, b) => getRoleOrder(a) - getRoleOrder(b));
+  }, [creatableRoles, allowedRoles]);
+  const canAdd = Boolean(showAddEmployee && onEmployeeCreated && sortedCreatableRoles.length > 0);
   const sortedEmployees = useMemo(
     () =>
       [...employees].sort(
@@ -77,7 +84,7 @@ export default function ManageEmployeesModal({
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState<Role>(() => sortedAllowedRoles[0] ?? allowedRoles[0]);
+  const [role, setRole] = useState<Role>(() => sortedCreatableRoles[0] ?? allowedRoles[0]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -91,7 +98,7 @@ export default function ManageEmployeesModal({
     setUsername('');
     setPassword('');
     setName('');
-    setRole(sortedAllowedRoles[0] ?? allowedRoles[0]);
+    setRole(sortedCreatableRoles[0] ?? allowedRoles[0]);
   }
 
   async function handleCreateEmployee(e: React.FormEvent) {
@@ -115,7 +122,13 @@ export default function ManageEmployeesModal({
         user?: UserRow;
       };
       if (!res.ok) {
-        setMessage(typeof json.message === 'string' ? json.message : 'Could not create employee.');
+        const msg =
+          typeof json.message === 'string'
+            ? json.message
+            : Array.isArray((json as { errors?: { message?: string }[] }).errors)
+              ? String((json as { errors: { message?: string }[] }).errors[0]?.message ?? '')
+              : '';
+        setMessage(msg || 'Could not create employee.');
         return;
       }
       if (json.user) {
@@ -136,11 +149,12 @@ export default function ManageEmployeesModal({
   async function handleDelete(id: string) {
     if (!onDelete) return;
     if (id === currentUserId) return;
+    setMessage('');
     setDeletingId(id);
     try {
       await onDelete(id);
-    } catch {
-      // ignore
+    } catch (err: unknown) {
+      setMessage(err instanceof Error ? err.message : 'Could not delete this user.');
     }
     setDeletingId(null);
   }
@@ -278,7 +292,7 @@ export default function ManageEmployeesModal({
                         onChange={(e) => setRole(e.target.value as Role)}
                         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
                       >
-                        {sortedAllowedRoles.map((r) => (
+                        {sortedCreatableRoles.map((r) => (
                           <option key={r} value={r}>{getRoleLabel(r)}</option>
                         ))}
                       </select>

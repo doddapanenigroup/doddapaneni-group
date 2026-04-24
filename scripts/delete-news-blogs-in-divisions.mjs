@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
-config({ path: path.join(projectRoot, '.env.local') });
-config({ path: path.join(projectRoot, '.env') });
+config({ path: path.join(projectRoot, '.env.local'), quiet: true });
+config({ path: path.join(projectRoot, '.env'), quiet: true });
 
 import { createLibsqlPrismaClient } from './create-libsql-prisma.mjs';
 

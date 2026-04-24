@@ -4,6 +4,9 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
+/** Session + DB-backed shell must not be served from a shared static shell. */
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardLayout({
   children,
   params,

@@ -25,6 +25,7 @@ function revalidateCompanyPublicRoutes(sectorSlugs: string[], companySlugs: stri
     const uniqueSectors = [...new Set(normalizedSectors.length ? normalizedSectors : [...COMPANY_DIVISION_SLUGS])];
     for (const slug of uniqueSectors) {
       revalidatePath(`/${slug}`, 'layout');
+      revalidatePath(`/${slug}/companies`, 'page');
     }
 
     const normalizedCompanies = [...new Set(companySlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
@@ -42,6 +43,7 @@ function revalidateCompanyPublicRoutes(sectorSlugs: string[], companySlugs: stri
       revalidatePath(`/${loc}/companies`, 'layout');
       for (const slug of uniqueSectors) {
         revalidatePath(`/${loc}/${slug}`, 'layout');
+        revalidatePath(`/${loc}/${slug}/companies`, 'page');
       }
     }
   } catch {
@@ -63,6 +65,7 @@ const patchSchema = z.object({
   xUrl: z.string().max(500).optional().nullable(),
   youtubeUrl: z.string().max(500).optional().nullable(),
   pinterestUrl: z.string().max(500).optional().nullable(),
+  linkedinUrl: z.string().max(500).optional().nullable(),
 });
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -95,6 +98,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       xUrl?: string | null;
       youtubeUrl?: string | null;
       pinterestUrl?: string | null;
+      linkedinUrl?: string | null;
       sectorId?: string;
     } = {};
     if (parsed.data.name != null) data.name = parsed.data.name.trim();
@@ -109,6 +113,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if ('xUrl' in parsed.data) data.xUrl = parsed.data.xUrl?.trim() || null;
     if ('youtubeUrl' in parsed.data) data.youtubeUrl = parsed.data.youtubeUrl?.trim() || null;
     if ('pinterestUrl' in parsed.data) data.pinterestUrl = parsed.data.pinterestUrl?.trim() || null;
+    if ('linkedinUrl' in parsed.data) data.linkedinUrl = parsed.data.linkedinUrl?.trim() || null;
 
     await connectDb();
     const existing = await prisma.company.findUnique({

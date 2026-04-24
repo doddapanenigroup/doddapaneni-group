@@ -24,7 +24,7 @@ export async function logMarketingActivity(params: {
   userId: string;
   userEmail: string;
   userRole: string;
-  entity: "campaign" | "marketing_link" | "page_content" | "blog" | "stored_image";
+  entity: "page_content" | "blog" | "stored_image";
   entityId: string;
   action: "create" | "update" | "delete";
   seoNote?: string | null;
