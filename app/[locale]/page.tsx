@@ -20,6 +20,8 @@ import { getSiteOrigin } from '@/lib/site-origin';
 
 /** Sector live flags refresh via `unstable_cache` + `revalidateTag('sectors-public')` on admin toggle. */
 export const revalidate = 60;
+/** Avoid build-time DB fetches during static prerender on deploy workers. */
+export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ locale: string }> };
 
