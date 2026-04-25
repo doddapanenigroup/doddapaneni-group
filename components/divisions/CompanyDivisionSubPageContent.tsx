@@ -23,8 +23,8 @@ export default function CompanyDivisionSubPageContent({
 }: Props) {
   const heroVertical =
     embeddedInDivisionShell === true
-      ? 'pt-8 pb-8 sm:pt-10 sm:pb-10'
-      : 'pt-24 pb-8 sm:pt-28 sm:pb-10';
+      ? 'pt-3 pb-3 sm:pt-4 sm:pb-4'
+      : 'pt-16 pb-5 sm:pt-16 sm:pb-6 md:pt-20 md:pb-7';
 
   return (
     <MotionLazy>
@@ -35,13 +35,23 @@ export default function CompanyDivisionSubPageContent({
           <m.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-[2rem]"
+            className={
+              embeddedInDivisionShell
+                ? 'font-serif text-base font-bold tracking-tight text-white sm:text-lg md:text-xl'
+                : 'font-serif text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl'
+            }
           >
             {heading}
           </m.h1>
         </div>
       </section>
-      <section className="border-b border-slate-100 bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section
+        className={
+          embeddedInDivisionShell
+            ? 'border-b border-slate-100 bg-white px-4 py-8 sm:px-6 sm:py-10 lg:px-8'
+            : 'border-b border-slate-100 bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8'
+        }
+      >
         <div className="mx-auto max-w-3xl space-y-5">
           {paragraphs.map((text, i) => (
             <m.p

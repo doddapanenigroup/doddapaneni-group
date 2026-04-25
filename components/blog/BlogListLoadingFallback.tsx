@@ -2,7 +2,7 @@
 export default function BlogListLoadingFallback() {
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+      <section className="bg-blue-900 px-4 py-8 sm:px-6 md:py-10 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-4 text-center">
           <div className="mx-auto h-10 max-w-md animate-pulse rounded-lg bg-blue-800/50" />
           <div className="mx-auto h-6 max-w-2xl animate-pulse rounded-lg bg-blue-800/40" />

@@ -19,6 +19,7 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
   const [cEmail, setCEmail] = useState('');
   const [cMessage, setCMessage] = useState('');
   const [cStatus, setCStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
+  const [cEmailSent, setCEmailSent] = useState(true);
 
   const inputClass =
     'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-800/30';
@@ -31,6 +32,7 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
       return;
     }
     setCStatus('sending');
+    setCEmailSent(true);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -44,10 +46,12 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
           companyPageLabel: companyDisplayName,
         }),
       });
+      const json = (await res.json().catch(() => ({}))) as { emailSent?: boolean };
       if (!res.ok) {
         setCStatus('err');
         return;
       }
+      setCEmailSent(json.emailSent !== false);
       setCStatus('ok');
       setCName('');
       setCEmail('');
@@ -127,7 +131,13 @@ export default function CompanyPageForms({ companySlug, sectorSlug, companyDispl
             >
               {cStatus === 'sending' ? t('submitting') : t('contactSubmit')}
             </button>
-            {cStatus === 'ok' ? <p className="text-sm font-medium text-emerald-700">{t('contactSuccess')}</p> : null}
+            {cStatus === 'ok' ? (
+              <p
+                className={`text-sm font-medium ${cEmailSent ? 'text-emerald-700' : 'text-amber-900'}`}
+              >
+                {cEmailSent ? t('contactSuccess') : t('contactSuccessNoEmail')}
+              </p>
+            ) : null}
             {cStatus === 'err' ? <p className="text-sm font-medium text-red-600">{t('contactError')}</p> : null}
           </form>
           </div>

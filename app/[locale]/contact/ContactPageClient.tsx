@@ -18,6 +18,8 @@ const CONTACT_EMAIL_FALLBACK = 'doddapanenigroup@yahoo.com';
 export default function ContactPageClient() {
   const t = useTranslations('ContactPage');
   const [showSuccess, setShowSuccess] = useState(false);
+  /** False when submission was stored but outbound SMTP did not send (see server env). */
+  const [successEmailSent, setSuccessEmailSent] = useState(true);
   const contactEmail = t('emailAddress').trim() || CONTACT_EMAIL_FALLBACK;
 
   const contactSchema = z.object({
@@ -45,8 +47,10 @@ export default function ContactPageClient() {
         body: JSON.stringify(data),
       });
       if (response.ok) {
+        const json = (await response.json().catch(() => ({}))) as { emailSent?: boolean };
+        setSuccessEmailSent(json.emailSent !== false);
         setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 5000);
+        setTimeout(() => setShowSuccess(false), 8000);
         reset();
       } else {
         alert('Failed to send message. Please try again.');
@@ -63,19 +67,16 @@ export default function ContactPageClient() {
   return (
       <MotionLazy>
       <div className="min-h-screen bg-white">
-        <section className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-12 md:pt-28 md:pb-14 lg:px-8">
+        <section className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 pt-20 pb-7 sm:px-6 sm:pt-20 sm:pb-8 md:pt-20 md:pb-10 lg:px-8">
           <div className="mx-auto max-w-6xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300 sm:text-xs">
               Doddapaneni Group
             </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-white sm:mt-2 md:text-2xl lg:text-3xl">
               {t('headerTitle')}
             </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100 sm:text-base md:text-lg">
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-blue-100 sm:mt-3 sm:text-base">
               {t('headerSubtitle')}
-            </p>
-            <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-relaxed text-blue-200/95 sm:text-sm md:text-center">
-              {t('headerIntro')}
             </p>
           </div>
         </section>
@@ -180,7 +181,9 @@ export default function ContactPageClient() {
                       <CheckCircle2 className="h-6 w-6 text-blue-800" strokeWidth={1.75} aria-hidden />
                     </div>
                     <h3 className="text-lg font-bold">{t('successTitle')}</h3>
-                    <p className="mt-2 text-sm font-medium">{t('successMessage')}</p>
+                    <p className="mt-2 text-sm font-medium">
+                      {successEmailSent ? t('successMessage') : t('successMessageNoEmail')}
+                    </p>
                   </m.div>
                 ) : (
                   <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>

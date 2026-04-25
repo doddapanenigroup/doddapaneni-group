@@ -38,7 +38,7 @@ export default function HomeHero({ locale, copy }: Props) {
   } = copy;
 
   return (
-    <section className="relative min-h-[22rem] overflow-hidden px-4 pt-20 pb-14 text-white sm:min-h-[26rem] sm:px-6 sm:pt-24 sm:pb-16 md:min-h-[28rem] md:pt-28 md:pb-20 lg:px-8">
+    <section className="relative min-h-[18rem] overflow-hidden px-4 pt-20 pb-10 text-white sm:min-h-[20rem] sm:px-6 sm:pt-20 sm:pb-12 md:min-h-[22rem] md:pt-20 md:pb-14 lg:px-8">
       <div className="absolute inset-0 z-0 bg-slate-900">
         <img
           src={HERO_SRC_DEFAULT}
@@ -62,11 +62,11 @@ export default function HomeHero({ locale, copy }: Props) {
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="home-hero-enter max-w-4xl">
-          <h1 className="mb-4 font-serif text-4xl font-bold tracking-tight text-white sm:mb-5 sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="mb-3 font-serif text-3xl font-bold tracking-tight text-white sm:mb-4 sm:text-4xl md:text-5xl lg:text-6xl">
             {hubHeroTitle}
           </h1>
-          <p className="mb-3 text-lg font-medium tracking-wide text-blue-200/95 sm:text-xl md:text-2xl">{hubHeroSubtitle}</p>
-          <p className="mb-8 max-w-2xl text-base leading-relaxed text-slate-300 sm:mb-10 sm:text-lg md:text-xl">{hubHeroLead}</p>
+          <p className="mb-2 text-base font-medium tracking-wide text-blue-200/95 sm:text-lg md:text-xl">{hubHeroSubtitle}</p>
+          <p className="mb-6 max-w-2xl text-sm leading-relaxed text-slate-300 sm:mb-8 sm:text-base md:text-lg">{hubHeroLead}</p>
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <a
               href="#business-divisions"

@@ -4,6 +4,7 @@ import {
   createMailTransporter,
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
+  smtpFailureUserMessage,
 } from '@/lib/email';
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
@@ -39,25 +40,6 @@ export async function POST(request: Request) {
       .join(' · ');
     const contextHtml = contextLine ? esc(contextLine) : '';
 
-    if (!isLoginEmailDeliveryConfigured()) {
-      console.error(
-        'Email is not configured. Set EMAIL_USER + EMAIL_PASS (and optional SMTP_HOST/SMTP_PORT/SMTP_SECURE for Hostinger).'
-      );
-      return NextResponse.json(
-        {
-          message:
-            'Email is not configured on the server. Set EMAIL_USER, EMAIL_PASS, and SMTP_* if using Hostinger SMTP.',
-        },
-        { status: 500 }
-      );
-    }
-
-    const fromAddr = getSmtpUser();
-    const transporter = createMailTransporter();
-    if (!transporter || !fromAddr) {
-      return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
-    }
-
     await connectDb();
     try {
       await prisma.companyFormSubmission.create({
@@ -80,6 +62,15 @@ export async function POST(request: Request) {
     } catch (dbErr) {
       console.error('[contact] DB save failed', dbErr);
       return NextResponse.json({ message: 'Could not save submission.' }, { status: 500 });
+    }
+
+    const fromAddr = getSmtpUser();
+    const transporter = createMailTransporter();
+    if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
+      console.warn(
+        '[contact] Submission stored; outbound email not configured or transport unavailable (set EMAIL_USER + EMAIL_PASS or SMTP_*).',
+      );
+      return NextResponse.json({ ok: true, message: 'Received', emailSent: false }, { status: 200 });
     }
 
     const safeName = esc(name);
@@ -142,19 +133,16 @@ export async function POST(request: Request) {
       `,
     };
 
-    // Send both emails
-    await Promise.all([
-      transporter.sendMail(userMailOptions),
-      transporter.sendMail(adminMailOptions)
-    ]);
+    try {
+      await Promise.all([transporter.sendMail(userMailOptions), transporter.sendMail(adminMailOptions)]);
+    } catch (mailErr) {
+      console.error('[contact] sendMail failed (submission already stored):', smtpFailureUserMessage(mailErr));
+      return NextResponse.json({ ok: true, message: 'Received', emailSent: false }, { status: 200 });
+    }
 
-    return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
+    return NextResponse.json({ ok: true, message: 'Email sent successfully', emailSent: true }, { status: 200 });
   } catch (error) {
-    console.error('Error sending email:', error);
-    const errMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { message: `Could not send email: ${errMessage}. If using Gmail, use an App Password (not your normal password).` },
-      { status: 500 }
-    );
+    console.error('Error in contact POST:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }

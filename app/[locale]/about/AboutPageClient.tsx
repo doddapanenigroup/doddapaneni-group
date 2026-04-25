@@ -26,15 +26,15 @@ export default function About() {
   return (
       <MotionLazy>
       <div className="min-h-screen bg-white">
-        <section className="bg-blue-900 px-4 pt-24 pb-6 sm:px-6 sm:pt-28 sm:pb-8 md:pt-28 md:pb-10 lg:px-8">
+        <section className="bg-blue-900 px-4 pt-20 pb-5 sm:px-6 sm:pt-20 sm:pb-6 md:pt-20 md:pb-8 lg:px-8">
           <div className="mx-auto max-w-6xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300 sm:text-xs">
               Doddapaneni Group
             </p>
-            <h1 className="mt-2 text-xl font-bold text-white sm:mt-3 sm:text-2xl md:text-3xl lg:text-4xl">
+            <h1 className="mt-1.5 text-lg font-bold text-white sm:mt-2 sm:text-xl md:text-2xl lg:text-3xl">
               {t('headerTitle')}
             </h1>
-            <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-blue-100 sm:mt-4 sm:text-base md:text-lg">
+            <p className="mx-auto mt-2 max-w-3xl text-sm leading-relaxed text-blue-100 sm:mt-3 sm:text-base">
               {t('headerSubtitle')}
             </p>
           </div>

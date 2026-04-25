@@ -64,11 +64,11 @@ export default async function SectorNewsListPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-blue-950 px-4 py-12 text-white sm:px-6 md:py-14 lg:px-8">
+      <section className="bg-blue-950 px-4 py-8 text-white sm:px-6 md:py-10 lg:px-8">
         <div className="mx-auto w-full max-w-5xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">Sector</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">{sector.name}</h1>
-          <p className="mt-3 text-sm text-blue-100 sm:text-base">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{sector.name}</h1>
+          <p className="mt-2 text-sm text-blue-100 sm:text-base">
             Browse latest news in a quick, line-wise feed.
           </p>
         </div>

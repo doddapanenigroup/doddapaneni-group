@@ -46,9 +46,12 @@ function getSmtpPassword(): string | undefined {
   if (b64) {
     try {
       const decoded = Buffer.from(b64, 'base64').toString('utf8');
-      return decoded || undefined;
+      // Non-empty B64 wins. If it decodes to empty (bad line in .env) or fails, use plain
+      // `EMAIL_PASS` / `SMTP_PASS` / `GMAIL_APP_PASSWORD` — otherwise many setups look "stuck" with
+      // a stale B64 placeholder while the real password below is never read.
+      if (decoded) return decoded;
     } catch {
-      return undefined;
+      /* fall through to plain */
     }
   }
   const p =

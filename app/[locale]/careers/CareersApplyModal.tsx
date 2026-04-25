@@ -29,6 +29,7 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
   const [errorMessage, setErrorMessage] = useState('');
   /** Shown under success copy when the API returns an extra note (e.g. dev mode without SMTP). */
   const [successNote, setSuccessNote] = useState('');
+  const [successEmailDelivered, setSuccessEmailDelivered] = useState(true);
   /** Languages offered for this role → candidate multi-select */
   const [langPick, setLangPick] = useState<Record<string, boolean>>({});
 
@@ -61,6 +62,7 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
     setStatus('idle');
     setErrorMessage('');
     setSuccessNote('');
+    setSuccessEmailDelivered(true);
     onClose();
   };
 
@@ -69,6 +71,7 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
     setStatus('sending');
     setErrorMessage('');
     setSuccessNote('');
+    setSuccessEmailDelivered(true);
     const form = e.currentTarget;
     const fd = new FormData(form);
     fd.set('jobSlug', job.slug);
@@ -89,15 +92,21 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
         method: 'POST',
         body: fd,
       });
-      const data = (await res.json().catch(() => ({}))) as { message?: string };
+      const data = (await res.json().catch(() => ({}))) as { message?: string; emailSent?: boolean };
       if (!res.ok) {
         setStatus('error');
         setErrorMessage(data.message || t('applyFormError'));
         return;
       }
       form.reset();
+      const mailOk = data.emailSent !== false;
+      setSuccessEmailDelivered(mailOk);
       const msg = (data.message || '').trim();
-      setSuccessNote(msg && msg !== 'Application sent successfully' ? msg : '');
+      if (!mailOk) {
+        setSuccessNote(msg || t('applyFormSuccessNoEmailNote'));
+      } else {
+        setSuccessNote(msg && msg !== 'Application sent successfully' ? msg : '');
+      }
       setStatus('success');
     } catch {
       setStatus('error');
@@ -140,7 +149,9 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
         {status === 'success' ? (
           <div className="overflow-y-auto px-5 py-12 text-center sm:px-8">
             <p className="text-lg font-semibold text-slate-900">{t('applyFormSuccessTitle')}</p>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600">{t('applyFormSuccessBody')}</p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600">
+              {successEmailDelivered ? t('applyFormSuccessBody') : t('applyFormSuccessBodyNoEmail')}
+            </p>
             {successNote ? (
               <p className="mx-auto mt-4 max-w-lg rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-left text-xs leading-relaxed text-amber-950">
                 {successNote}

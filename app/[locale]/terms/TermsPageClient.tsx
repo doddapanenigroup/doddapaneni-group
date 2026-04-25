@@ -19,19 +19,19 @@ export default function TermsPageClient() {
 
   return (
       <article className="min-h-screen bg-white">
-        <header className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+        <header className="bg-gradient-to-b from-blue-950 to-blue-900 px-4 py-6 sm:px-6 md:py-8 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
-                <FileText className="text-white" size={32} aria-hidden />
+            <div className="mb-3 flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
+                <FileText className="text-white" size={26} aria-hidden />
               </div>
             </div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300 sm:text-xs">
               Doddapaneni Group
             </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">{t('title')}</h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100 sm:text-base">{t('subtitle')}</p>
-            <p className="mt-3 text-xs text-blue-200/90 sm:text-sm">{t('lastUpdated')}</p>
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-white md:text-2xl lg:text-3xl">{t('title')}</h1>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-blue-100 sm:text-base">{t('subtitle')}</p>
+            <p className="mt-2 text-xs text-blue-200/90 sm:text-sm">{t('lastUpdated')}</p>
           </div>
         </header>
 

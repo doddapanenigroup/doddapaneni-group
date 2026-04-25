@@ -94,7 +94,7 @@ export default function BlogPostClient({
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 pt-24 pb-6 sm:px-6 sm:pt-28 sm:pb-8 md:pt-28 md:pb-9 lg:pb-10">
+      <section className="bg-blue-900 px-4 pt-20 pb-5 sm:px-6 sm:pt-20 sm:pb-6 md:pt-20 md:pb-7 lg:pb-8">
         <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
@@ -111,7 +111,7 @@ export default function BlogPostClient({
               </span>
             </div>
           )}
-          <h1 className="mb-3 text-2xl font-bold leading-snug tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.35rem]">
+          <h1 className="mb-2 text-xl font-bold leading-snug tracking-tight text-white sm:text-2xl md:text-3xl">
             {title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-white/90 sm:text-sm">
@@ -136,7 +136,7 @@ export default function BlogPostClient({
       {sectorNavSlug ? (
         <div className="mt-6 border-t border-blue-100/80 px-5 pb-16 sm:mt-8 sm:px-8 lg:px-0">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
-            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-24 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
+            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-20 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
               <NewsSectorNewsNav
                 locale={locale}
                 currentSlug={sectorNavSlug}

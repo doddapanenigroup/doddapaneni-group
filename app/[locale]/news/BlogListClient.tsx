@@ -24,19 +24,14 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
   return (
     <MotionLazy>
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+      <section className="bg-blue-900 px-4 py-8 sm:px-6 md:py-10 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h1 className="mb-2 text-2xl font-bold text-white md:text-3xl lg:text-4xl">
             {blog.title}
           </h1>
-          <p className="text-blue-200 text-lg md:text-xl max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-sm text-blue-200 md:text-base">
             {blog.subtitle}
           </p>
-          {blog.intro ? (
-            <p className="mt-6 max-w-3xl mx-auto text-left text-sm leading-relaxed text-blue-100/95 sm:text-base md:text-center">
-              {blog.intro}
-            </p>
-          ) : null}
         </div>
       </section>
 

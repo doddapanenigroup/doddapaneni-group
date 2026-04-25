@@ -22,14 +22,14 @@ export default async function SectorUnavailable({ locale, slug }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-blue-900 px-4 py-16 sm:px-6 md:py-20 lg:px-8">
+      <section className="bg-blue-900 px-4 py-10 sm:px-6 md:py-12 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-white">
-            <Building2 className="h-8 w-8" aria-hidden />
+          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white">
+            <Building2 className="h-7 w-7" aria-hidden />
           </div>
           <p className="text-xs font-semibold uppercase tracking-widest text-blue-200">Doddapaneni Group</p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">{label}</h1>
-          <p className="mt-4 text-base leading-relaxed text-blue-100 sm:text-lg">
+          <h1 className="mt-1.5 text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">{label}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">
             This division hub is being prepared. The page will go live once the sector is published in our systems.
             Meanwhile, you can browse {t('title').toLowerCase()} or return to the homepage.
           </p>

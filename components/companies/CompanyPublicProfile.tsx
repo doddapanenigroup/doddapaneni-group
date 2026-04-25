@@ -46,7 +46,7 @@ export default function CompanyPublicProfile({
 
   return (
     <>
-      <section className="bg-blue-900 pt-24 pb-8 md:pt-24 md:pb-10 px-4 sm:px-6 lg:px-8">
+      <section className="bg-blue-900 px-4 pt-20 pb-6 sm:px-6 md:pb-8 lg:px-8">
         <div className="mx-auto max-w-6xl text-center">
           <div className="relative mx-auto h-12 w-[160px] overflow-hidden rounded">
             {logoSrc ? (

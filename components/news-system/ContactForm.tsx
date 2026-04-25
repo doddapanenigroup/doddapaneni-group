@@ -32,6 +32,7 @@ const inputClass =
 
 export default function ContactForm({ sector, articleTitle, articleSlug, articlePath }: Props) {
   const [success, setSuccess] = useState(false);
+  const [emailSent, setEmailSent] = useState(true);
   const {
     register,
     handleSubmit,
@@ -44,6 +45,7 @@ export default function ContactForm({ sector, articleTitle, articleSlug, article
 
   const onSubmit = handleSubmit(async (form) => {
     setSuccess(false);
+    setEmailSent(true);
     const response = await fetch('/api/public/doddapaneni-news-forms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,7 +60,9 @@ export default function ContactForm({ sector, articleTitle, articleSlug, article
       }),
     });
 
+    const json = (await response.json().catch(() => ({}))) as { emailSent?: boolean };
     if (response.ok) {
+      setEmailSent(json.emailSent !== false);
       setSuccess(true);
       reset();
       return;
@@ -72,8 +76,14 @@ export default function ContactForm({ sector, articleTitle, articleSlug, article
       <p className="mt-1 text-sm text-slate-600">Have questions? Send us a message.</p>
 
       {success ? (
-        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
-          Thank you. We will get back to you soon.
+        <p
+          className={`mt-4 rounded-lg px-3 py-2 text-sm font-medium ${
+            emailSent ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-950'
+          }`}
+        >
+          {emailSent
+            ? 'Thank you. We will get back to you soon.'
+            : 'Your message was received, but email could not be sent from this server. Our team can still see your submission—please reach out via the main contact page if you need a reply urgently.'}
         </p>
       ) : null}
 

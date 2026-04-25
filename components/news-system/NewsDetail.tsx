@@ -11,11 +11,11 @@ type Props = {
 export default function NewsDetail({ sector, article, articlePath }: Props) {
   return (
     <div className="bg-white">
-      <section className="bg-blue-950 px-4 py-12 text-white sm:px-6 md:py-14 lg:px-8">
+      <section className="bg-blue-950 px-4 py-8 text-white sm:px-6 md:py-10 lg:px-8">
         <div className="mx-auto w-full max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">{sector.name}</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">{article.title}</h1>
-          <p className="mt-3 text-sm text-blue-200">{article.readTime}</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{article.title}</h1>
+          <p className="mt-2 text-sm text-blue-200">{article.readTime}</p>
         </div>
       </section>
 

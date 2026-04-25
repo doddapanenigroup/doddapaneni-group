@@ -4,6 +4,7 @@ import {
   createMailTransporter,
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
+  smtpFailureUserMessage,
 } from '@/lib/email';
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
@@ -100,10 +101,6 @@ export async function POST(request: Request) {
     }
     const d = parsed.data;
 
-    if (!isLoginEmailDeliveryConfigured()) {
-      return NextResponse.json({ message: 'Email is not configured on the server.' }, { status: 500 });
-    }
-
     await connectDb();
     try {
       await prisma.companyFormSubmission.create({
@@ -123,8 +120,9 @@ export async function POST(request: Request) {
 
     const fromAddr = getSmtpUser();
     const transporter = createMailTransporter();
-    if (!transporter || !fromAddr) {
-      return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
+    if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
+      console.warn('[company-lead] Submission stored; email not configured or transport unavailable.');
+      return NextResponse.json({ message: 'ok', emailSent: false }, { status: 200 });
     }
 
     const lines: [string, string][] = [
@@ -182,16 +180,17 @@ export async function POST(request: Request) {
         <table style="width:100%;border-collapse:collapse;margin-top:12px;">${rowsHtml}</table>
       </div>`;
 
-    await transporter.sendMail({
-      from: `"DG Company Lead" <${fromAddr}>`,
-      to: fromAddr,
-      replyTo: d.email,
-      subject: `Lead [${d.variant}] ${d.fullName} — ${d.companySlug}`,
-      text: textBody,
-      html: htmlBody,
-    });
+    try {
+      await transporter.sendMail({
+        from: `"DG Company Lead" <${fromAddr}>`,
+        to: fromAddr,
+        replyTo: d.email,
+        subject: `Lead [${d.variant}] ${d.fullName} — ${d.companySlug}`,
+        text: textBody,
+        html: htmlBody,
+      });
 
-    const confirmText = [
+      const confirmText = [
       `Hello ${d.fullName},`,
       '',
       'Thank you for your inquiry. Below is a copy of what you submitted. Our team will review your details and contact you shortly.',
@@ -209,16 +208,20 @@ export async function POST(request: Request) {
         <p style="margin-top:16px;color:#555;">— Doddapaneni Group</p>
       </div>`;
 
-    await transporter.sendMail({
-      from: `"Doddapaneni Group" <${fromAddr}>`,
-      to: d.email,
-      replyTo: fromAddr,
-      subject: `Copy of your request — ${d.companyDisplayName || d.companySlug}`,
-      text: confirmText,
-      html: confirmHtml,
-    });
+      await transporter.sendMail({
+        from: `"Doddapaneni Group" <${fromAddr}>`,
+        to: d.email,
+        replyTo: fromAddr,
+        subject: `Copy of your request — ${d.companyDisplayName || d.companySlug}`,
+        text: confirmText,
+        html: confirmHtml,
+      });
+    } catch (mailErr) {
+      console.error('[company-lead] sendMail failed (submission stored):', smtpFailureUserMessage(mailErr));
+      return NextResponse.json({ message: 'ok', emailSent: false }, { status: 200 });
+    }
 
-    return NextResponse.json({ message: 'ok' }, { status: 200 });
+    return NextResponse.json({ message: 'ok', emailSent: true }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });

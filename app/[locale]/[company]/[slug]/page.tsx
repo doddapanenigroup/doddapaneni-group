@@ -23,5 +23,5 @@ export default async function LegacySectorBlogRedirect({ params }: Props) {
   const row = await fetchPublishedSectorBlogPost(sectorSlug, slug, locale);
   if (!row) notFound();
 
-  permanentRedirect(publicPathWithLocale(locale, 'news', sectorSlug, slug.trim()));
+  permanentRedirect(publicPathWithLocale(locale, 'news', sectorSlug, row.slug));
 }

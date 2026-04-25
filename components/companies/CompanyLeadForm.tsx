@@ -66,6 +66,7 @@ export default function CompanyLeadForm({
 }: Props) {
   const t = useTranslations('CompanyForms');
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
+  const [leadEmailSent, setLeadEmailSent] = useState(true);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -140,10 +141,12 @@ export default function CompanyLeadForm({
           consentTcpa,
         }),
       });
+      const json = (await res.json().catch(() => ({}))) as { emailSent?: boolean };
       if (!res.ok) {
         setStatus('err');
         return;
       }
+      setLeadEmailSent(json.emailSent !== false);
       setStatus('ok');
       setFullName('');
       setEmail('');
@@ -537,7 +540,11 @@ export default function CompanyLeadForm({
         {status === 'sending' ? t('submitting') : t('submitLead')}
       </button>
 
-      {status === 'ok' ? <p className="text-sm font-medium text-emerald-700">{t('leadSuccess')}</p> : null}
+      {status === 'ok' ? (
+        <p className={`text-sm font-medium ${leadEmailSent ? 'text-emerald-700' : 'text-amber-900'}`}>
+          {leadEmailSent ? t('leadSuccess') : t('leadSuccessNoEmail')}
+        </p>
+      ) : null}
       {status === 'err' ? <p className="text-sm font-medium text-red-600">{t('leadError')}</p> : null}
     </form>
   );

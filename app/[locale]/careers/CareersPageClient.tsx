@@ -13,15 +13,15 @@ export default function CareersPageClient({ jobs, locale }: { jobs: PublicCareer
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
+      <section className="bg-blue-900 px-4 pt-20 pb-7 sm:px-6 sm:pt-20 sm:pb-10 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-5 flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15">
-              <Briefcase className="text-white" size={32} aria-hidden />
+          <div className="mb-3 flex justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
+              <Briefcase className="text-white" size={26} aria-hidden />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white md:text-4xl">{t('heroTitle')}</h1>
-          <p className="mt-4 text-base leading-relaxed text-blue-100 md:text-lg">{t('heroSubtitle')}</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{t('heroTitle')}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-blue-100 md:text-base">{t('heroSubtitle')}</p>
         </div>
       </section>
 

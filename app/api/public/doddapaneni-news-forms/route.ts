@@ -4,7 +4,9 @@ import {
   createMailTransporter,
   getSmtpUser,
   isLoginEmailDeliveryConfigured,
+  smtpFailureUserMessage,
 } from '@/lib/email';
+import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 
 const leadSchema = z.object({
@@ -60,6 +62,23 @@ function kvTableHtml(rows: Array<[string, string]>) {
     .join('');
 }
 
+async function persistDoddapaneniNewsForm(payload: z.infer<typeof leadSchema> | z.infer<typeof contactSchema>) {
+  await connectDb();
+  const formType =
+    payload.kind === 'lead' ? 'doddapaneni_news_lead' : 'doddapaneni_news_contact';
+  const fullName = payload.kind === 'lead' ? payload.fullName : payload.name;
+  await prisma.companyFormSubmission.create({
+    data: {
+      formType,
+      companySlug: null,
+      sectorSlug: payload.sectorSlug.trim().toLowerCase(),
+      email: payload.email,
+      fullName,
+      payloadJson: JSON.stringify(payload),
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
     recordApiRequest({ request, userId: null });
@@ -73,16 +92,23 @@ export async function POST(request: Request) {
     }
     const payload = parsed.data;
 
-    if (!isLoginEmailDeliveryConfigured()) {
-      return NextResponse.json(
-        { message: 'Email is not configured on this server.' },
-        { status: 500 },
-      );
+    try {
+      await persistDoddapaneniNewsForm(payload);
+    } catch (dbErr) {
+      console.error('[doddapaneni-news-forms] DB save failed', dbErr);
+      return NextResponse.json({ message: 'Could not save submission.' }, { status: 500 });
     }
+
     const fromAddr = getSmtpUser();
     const transporter = createMailTransporter();
-    if (!transporter || !fromAddr) {
-      return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
+    const canSend =
+      isLoginEmailDeliveryConfigured() && !!transporter && !!fromAddr;
+
+    if (!canSend) {
+      console.warn(
+        '[doddapaneni-news-forms] Stored submission; outbound email not configured or transport unavailable.',
+      );
+      return NextResponse.json({ ok: true, emailSent: false }, { status: 200 });
     }
 
     const articleRows: Array<[string, string]> = [
@@ -117,14 +143,22 @@ export async function POST(request: Request) {
         <table style="border-collapse:collapse;">${kvTableHtml(rows)}</table>
       </div>`;
 
-      await transporter.sendMail({
-        from: `"DG News Lead" <${fromAddr}>`,
-        to: fromAddr,
-        replyTo: payload.email,
-        subject: `Lead: ${payload.sectorName} - ${payload.articleSlug}`,
-        text,
-        html,
-      });
+      try {
+        await transporter.sendMail({
+          from: `"DG News Lead" <${fromAddr}>`,
+          to: fromAddr,
+          replyTo: payload.email,
+          subject: `Lead: ${payload.sectorName} - ${payload.articleSlug}`,
+          text,
+          html,
+        });
+      } catch (mailErr) {
+        console.error(
+          '[doddapaneni-news-forms] sendMail failed (submission stored):',
+          smtpFailureUserMessage(mailErr),
+        );
+        return NextResponse.json({ ok: true, emailSent: false }, { status: 200 });
+      }
     } else {
       const rows: Array<[string, string]> = [
         ...articleRows,
@@ -139,17 +173,25 @@ export async function POST(request: Request) {
         <table style="border-collapse:collapse;">${kvTableHtml(rows)}</table>
       </div>`;
 
-      await transporter.sendMail({
-        from: `"DG News Contact" <${fromAddr}>`,
-        to: fromAddr,
-        replyTo: payload.email,
-        subject: `Contact: ${payload.sectorName} - ${payload.articleSlug}`,
-        text,
-        html,
-      });
+      try {
+        await transporter.sendMail({
+          from: `"DG News Contact" <${fromAddr}>`,
+          to: fromAddr,
+          replyTo: payload.email,
+          subject: `Contact: ${payload.sectorName} - ${payload.articleSlug}`,
+          text,
+          html,
+        });
+      } catch (mailErr) {
+        console.error(
+          '[doddapaneni-news-forms] sendMail failed (submission stored):',
+          smtpFailureUserMessage(mailErr),
+        );
+        return NextResponse.json({ ok: true, emailSent: false }, { status: 200 });
+      }
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true, emailSent: true }, { status: 200 });
   } catch (error) {
     console.error('doddapaneni-news-forms POST failed', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });

@@ -19,7 +19,9 @@ type Props = {
 export default function NewsPostEngagement({ articleSlug, articleTitle, articlePathname }: Props) {
   const t = useTranslations('Blog');
   const [leadOk, setLeadOk] = useState(false);
+  const [leadEmailSent, setLeadEmailSent] = useState(true);
   const [commentOk, setCommentOk] = useState(false);
+  const [commentEmailSent, setCommentEmailSent] = useState(true);
 
   const leadSchema = z.object({
     name: z.string().min(1),
@@ -54,7 +56,9 @@ export default function NewsPostEngagement({ articleSlug, articleTitle, articleP
         ...data,
       }),
     });
+    const json = (await res.json().catch(() => ({}))) as { emailSent?: boolean };
     if (res.ok) {
+      setLeadEmailSent(json.emailSent !== false);
       setLeadOk(true);
       leadForm.reset();
     } else {
@@ -77,7 +81,9 @@ export default function NewsPostEngagement({ articleSlug, articleTitle, articleP
         comment: data.comment,
       }),
     });
+    const json = (await res.json().catch(() => ({}))) as { emailSent?: boolean };
     if (res.ok) {
+      setCommentEmailSent(json.emailSent !== false);
       setCommentOk(true);
       commentForm.reset();
     } else {
@@ -100,9 +106,17 @@ export default function NewsPostEngagement({ articleSlug, articleTitle, articleP
             <h3 className="text-lg font-bold text-blue-950">{t('engagementLeadTitle')}</h3>
             <p className="mt-1 text-sm text-blue-900/75">{t('engagementLeadSubtitle')}</p>
             {leadOk ? (
-              <p className="mt-4 rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-900">
-                {t('engagementSuccessLead')}
-              </p>
+              <div className="mt-4 space-y-2">
+                <p
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    leadEmailSent
+                      ? 'border-blue-200 bg-white text-blue-900'
+                      : 'border-amber-200 bg-amber-50 text-amber-950'
+                  }`}
+                >
+                  {leadEmailSent ? t('engagementSuccessLead') : t('engagementSuccessLeadNoEmail')}
+                </p>
+              </div>
             ) : null}
             <form className="mt-6 space-y-4" onSubmit={postLead} noValidate>
               <div>
@@ -168,8 +182,14 @@ export default function NewsPostEngagement({ articleSlug, articleTitle, articleP
             <h3 className="text-lg font-bold text-blue-950">{t('engagementCommentTitle')}</h3>
             <p className="mt-1 text-sm text-blue-900/75">{t('engagementCommentSubtitle')}</p>
             {commentOk ? (
-              <p className="mt-4 rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-900">
-                {t('engagementSuccessComment')}
+              <p
+                className={`mt-4 rounded-xl border px-3 py-2 text-sm font-semibold ${
+                  commentEmailSent
+                    ? 'border-blue-200 bg-white text-blue-900'
+                    : 'border-amber-200 bg-amber-50 text-amber-950'
+                }`}
+              >
+                {commentEmailSent ? t('engagementSuccessComment') : t('engagementSuccessCommentNoEmail')}
               </p>
             ) : null}
             <form className="mt-6 space-y-4" onSubmit={postComment} noValidate>

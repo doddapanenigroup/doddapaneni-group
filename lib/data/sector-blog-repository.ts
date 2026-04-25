@@ -6,7 +6,21 @@ import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publishedBlogWhere, publishedBlogWhereForSector } from '@/lib/data/published-blog';
 import { getPublicSectorBySlug, type PublicSector } from '@/lib/data/sector-repository';
 
+/** URL segment may not match `News.slug` (translation slugs, or “…-on-…” vs “…-…”). */
+function articleSlugLookupVariants(raw: string): string[] {
+  const t = raw.trim();
+  if (!t) return [];
+  const set = new Set<string>([t]);
+  const withoutOn = t.replace(/-on-/g, '-');
+  if (withoutOn !== t) set.add(withoutOn);
+  // Reverse: DB may use `money-on-outdated` while the link uses `money-outdated`.
+  const withMoneyOn = t.replace(/-money-outdated-/g, '-money-on-outdated-');
+  if (withMoneyOn !== t) set.add(withMoneyOn);
+  return [...set];
+}
+
 const sectorBlogPostSelect = {
+  slug: true,
   title: true,
   content: true,
   featuredImage: true,
@@ -30,6 +44,8 @@ const translationSelect = {
 } as const;
 
 export type PublishedSectorBlogPost = {
+  /** Canonical URL segment (always `news.slug`). */
+  slug: string;
   title: string;
   content: string;
   featuredImage: string | null;
@@ -68,11 +84,15 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
 
   // Resolve by sector slug on the relation (do not require a separate sector preload).
   // This matches how URLs are built and avoids extra failure modes from `getPublicSectorBySlug`.
+  const variants = articleSlugLookupVariants(blogSlug);
   const post = await prisma.news.findFirst({
     where: {
-      slug: blogSlug.trim(),
       ...publishedBlogWhere(now),
       sector: { slug: sectorSlug.trim().toLowerCase() },
+      OR: [
+        { slug: { in: variants } },
+        { translations: { some: { translatedSlug: { in: variants } } } },
+      ],
     },
     select: {
       ...sectorBlogPostSelect,
@@ -107,8 +127,8 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
 
 export type PublishedArticleRouteHint =
   | { status: 'missing' }
-  | { status: 'no_sector' }
-  | { status: 'ok'; sectorSlug: string };
+  | { status: 'no_sector'; canonicalNewsSlug: string }
+  | { status: 'ok'; sectorSlug: string; canonicalNewsSlug: string };
 
 /**
  * Where a published article “lives” in URL space. Used to fix
@@ -120,14 +140,22 @@ export async function resolvePublishedArticleRoute(
 ): Promise<PublishedArticleRouteHint> {
   await connectDb();
   await publishScheduledContent(now);
+  const variants = articleSlugLookupVariants(articleSlug);
   const row = await prisma.news.findFirst({
-    where: { slug: articleSlug.trim(), ...publishedBlogWhere(now) },
-    select: { sector: { select: { slug: true } } },
+    where: {
+      ...publishedBlogWhere(now),
+      OR: [
+        { slug: { in: variants } },
+        { translations: { some: { translatedSlug: { in: variants } } } },
+      ],
+    },
+    select: { slug: true, sector: { select: { slug: true } } },
   });
   if (!row) return { status: 'missing' };
   const s = row.sector?.slug?.trim().toLowerCase();
-  if (!s) return { status: 'no_sector' };
-  return { status: 'ok', sectorSlug: s };
+  const canonicalNewsSlug = row.slug;
+  if (!s) return { status: 'no_sector', canonicalNewsSlug };
+  return { status: 'ok', sectorSlug: s, canonicalNewsSlug };
 }
 
 export async function listPublishedBlogsForSectorPage(args: {

@@ -27,8 +27,8 @@ export default async function DivisionSectorCompaniesSection({
 
   const heroVertical =
     embeddedInDivisionShell === true
-      ? 'pt-8 pb-8 sm:pt-10 sm:pb-10'
-      : 'pt-24 pb-10 sm:pt-28 sm:pb-12';
+      ? 'pt-3 pb-3 sm:pt-4 sm:pb-4'
+      : 'pt-20 pb-7 sm:pt-20 sm:pb-9';
 
   const desc = (raw: string | null | undefined) => {
     const s = raw?.trim();
@@ -46,10 +46,22 @@ export default async function DivisionSectorCompaniesSection({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90">
               {t('divisionCompaniesEyebrow')}
             </p>
-            <h1 className="mt-3 font-serif text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
+            <h1
+              className={
+                embeddedInDivisionShell
+                  ? 'mt-1 font-serif text-base font-bold tracking-tight text-white sm:text-lg md:text-xl'
+                  : 'mt-2 font-serif text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl'
+              }
+            >
               {t('divisionCompaniesHeading', { sectorName })}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-200 sm:text-base">
+            <p
+              className={
+                embeddedInDivisionShell
+                  ? 'mx-auto mt-1 max-w-2xl text-xs leading-relaxed text-slate-200 sm:text-sm'
+                  : 'mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-200 sm:text-base'
+              }
+            >
               {t('divisionCompaniesLead')}
             </p>
           </div>

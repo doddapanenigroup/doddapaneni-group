@@ -35,11 +35,11 @@ export default async function DoddapaneniNewsHubPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-blue-950 px-4 py-12 text-white sm:px-6 md:py-14 lg:px-8">
+      <section className="bg-blue-950 px-4 py-8 text-white sm:px-6 md:py-10 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">Doddapaneni</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">News by Sector</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-blue-100 sm:text-base">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">News by Sector</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-blue-100 sm:text-base">
             Choose a sector to read focused updates, operational insights, and practical guidance.
           </p>
         </div>

@@ -160,23 +160,6 @@ export async function POST(request: Request) {
 
     const skipEmailDev = isCareersApplyDevSkipEmail() && !isLoginEmailDeliveryConfigured();
 
-    if (!isLoginEmailDeliveryConfigured() && !skipEmailDev) {
-      console.error('[careers/apply] Email not configured');
-      return NextResponse.json(
-        {
-          message:
-            'Email is not configured on the server. Set EMAIL_USER and EMAIL_PASS (and SMTP_HOST / SMTP_PORT / SMTP_SECURE for custom SMTP). For local testing without mail, set NODE_ENV=development and CAREERS_APPLY_DEV_NO_EMAIL=1.',
-        },
-        { status: 500 },
-      );
-    }
-
-    const fromAddr = getSmtpUser();
-    const transporter = skipEmailDev ? null : createMailTransporter();
-    if (!skipEmailDev && (!transporter || !fromAddr)) {
-      return NextResponse.json({ message: 'Email transport could not be created.' }, { status: 500 });
-    }
-
     const resumeBuffer = Buffer.from(await resume.arrayBuffer());
     const safeResumeName = resume.name.replace(/[^\w.\-()+ ]/g, '_').slice(0, 180) || 'resume.pdf';
     const attachment = {
@@ -230,8 +213,25 @@ export async function POST(request: Request) {
       console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
       return NextResponse.json(
         {
+          ok: true,
+          emailSent: false,
           message:
             'Application saved (development mode: email not sent). Remove CAREERS_APPLY_DEV_NO_EMAIL or set EMAIL_USER + EMAIL_PASS to test delivery.',
+        },
+        { status: 200 },
+      );
+    }
+
+    const fromAddr = getSmtpUser();
+    const transporter = createMailTransporter();
+    if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
+      console.warn('[careers/apply] Application saved; outbound email not configured or transport unavailable.');
+      return NextResponse.json(
+        {
+          ok: true,
+          emailSent: false,
+          message:
+            'Application received. Confirmation email could not be sent (server mail not configured). Our team can still review your application.',
         },
         { status: 200 },
       );
@@ -297,9 +297,31 @@ export async function POST(request: Request) {
         </div>`,
     };
 
-    await Promise.all([transporter!.sendMail(userMailOptions), transporter!.sendMail(adminMailOptions)]);
+    try {
+      await Promise.all([transporter.sendMail(userMailOptions), transporter.sendMail(adminMailOptions)]);
+    } catch (mailErr) {
+      console.error('[careers/apply] sendMail failed after save:', smtpFailureUserMessage(mailErr));
+      const msgLower = mailErr instanceof Error ? mailErr.message.toLowerCase() : '';
+      const gmailHint =
+        msgLower.includes('535') ||
+        msgLower.includes('invalid login') ||
+        msgLower.includes('authentication unsuccessful')
+          ? ' If you use Gmail, use an App Password (not your normal account password).'
+          : '';
+      return NextResponse.json(
+        {
+          ok: true,
+          emailSent: false,
+          message: `${smtpFailureUserMessage(mailErr)}${gmailHint}`,
+        },
+        { status: 200 },
+      );
+    }
 
-    return NextResponse.json({ message: 'Application sent successfully' }, { status: 200 });
+    return NextResponse.json(
+      { ok: true, emailSent: true, message: 'Application sent successfully' },
+      { status: 200 },
+    );
   } catch (error) {
     console.error('[careers/apply]', error);
     if (isLikelyDatabaseError(error)) {
@@ -311,14 +333,6 @@ export async function POST(request: Request) {
         { status: 503 },
       );
     }
-    const base = smtpFailureUserMessage(error);
-    const msgLower = error instanceof Error ? error.message.toLowerCase() : '';
-    const gmailHint =
-      msgLower.includes('535') ||
-      msgLower.includes('invalid login') ||
-      msgLower.includes('authentication unsuccessful')
-        ? ' If you use Gmail, use an App Password (not your normal account password).'
-        : '';
-    return NextResponse.json({ message: `${base}${gmailHint}` }, { status: 500 });
+    return NextResponse.json({ message: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

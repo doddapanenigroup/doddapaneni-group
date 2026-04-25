@@ -33,11 +33,11 @@ export default async function SectorCompaniesOnlyView({ locale, sectorSlug }: Pr
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 py-12 sm:px-6 lg:px-8">
+      <section className="bg-blue-900 px-4 py-8 sm:px-6 sm:py-9 lg:px-8">
         <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sectorTitle}</h1>
+          <h1 className="text-2xl font-bold text-white md:text-3xl lg:text-4xl">{sectorTitle}</h1>
           {heroDescription ? (
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
+            <p className="mx-auto mt-2 max-w-3xl text-base text-blue-200 md:text-lg">{heroDescription}</p>
           ) : null}
         </div>
       </section>

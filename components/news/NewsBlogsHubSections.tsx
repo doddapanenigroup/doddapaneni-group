@@ -42,18 +42,18 @@ function HubPostCard({
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md">
       <Link href={newsArticlePath(sectorSlug, post.slug)} locale={locale} className="flex h-full flex-col">
-        <div className="relative h-28 w-full shrink-0 overflow-hidden bg-slate-100 sm:h-32">
+        <div className="flex w-full shrink-0 justify-center bg-slate-100 leading-none">
           {post.image ? (
             <Image
               src={post.image}
               alt={post.title}
-              width={640}
-              height={360}
+              width={1200}
+              height={800}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+              className="h-auto w-full max-h-48 max-w-full object-contain object-center transition duration-300 group-hover:opacity-95 sm:max-h-52"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
+            <div className="flex min-h-32 w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 sm:min-h-36">
               <span className="text-xs font-semibold uppercase tracking-wider text-white/90">{sectorLabel}</span>
             </div>
           )}

@@ -29,15 +29,15 @@ export default function FaqPageClient() {
       <MotionLazy>
         <div className="min-h-screen bg-white">
           {/* Page heading */}
-          <section className="bg-blue-900 py-8 md:py-10 px-4 sm:px-6 lg:px-8">
+          <section className="bg-blue-900 px-4 py-6 sm:px-6 md:py-8 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                  <HelpCircle className="text-white" size={32} />
+              <div className="mb-3 flex justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                  <HelpCircle className="text-white" size={26} />
                 </div>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
-              <p className="mt-2 text-blue-200 text-sm md:text-base">{t('subtitle')}</p>
+              <h1 className="text-xl font-bold text-white md:text-2xl">{t('title')}</h1>
+              <p className="mt-1.5 text-sm text-blue-200 md:text-base">{t('subtitle')}</p>
             </div>
           </section>
 

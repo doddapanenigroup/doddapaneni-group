@@ -93,9 +93,9 @@ export default function TeamPageClient({ team }: Props) {
         if (e.target instanceof HTMLImageElement) e.preventDefault();
       }}
     >
-      <section className="border-b border-blue-950/50 bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8">
+      <section className="border-b border-blue-950/50 bg-blue-900 px-4 pt-20 pb-7 sm:px-6 sm:pt-20 sm:pb-10 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl md:text-4xl">
+          <h1 className="text-xl font-bold uppercase tracking-tight text-white sm:text-2xl md:text-3xl">
             {t('heroTitle')}
           </h1>
         </div>

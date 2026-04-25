@@ -108,7 +108,7 @@ export default async function NewsHubPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="relative overflow-hidden border-b border-blue-950/20 bg-blue-900 px-4 pt-24 pb-9 sm:px-6 sm:pt-28 sm:pb-11 md:pt-28 md:pb-12 lg:px-8">
+      <header className="relative overflow-hidden border-b border-blue-950/20 bg-blue-900 px-4 pt-20 pb-6 sm:px-6 sm:pt-20 sm:pb-8 md:pt-20 md:pb-8 lg:px-8">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
@@ -117,11 +117,9 @@ export default async function NewsHubPage({ params }: Props) {
           aria-hidden
         />
         <div className="relative mx-auto max-w-4xl text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
             {t('title')}
           </h1>
-          <div className="mx-auto mt-3 h-0.5 w-12 rounded-full bg-white/90" aria-hidden />
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base">{t('newsHubIntro')}</p>
         </div>
       </header>
       <div className="mt-6 border-t border-blue-100/80 sm:mt-8">

@@ -64,7 +64,7 @@ export default async function HealthcareMedicalSectorLanding({ locale }: Props) 
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-teal-950 to-emerald-950 px-4 pt-24 pb-14 sm:px-6 sm:pt-28 sm:pb-16 lg:px-8 lg:pt-28 lg:pb-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-teal-950 to-emerald-950 px-4 pt-20 pb-8 sm:px-6 sm:pt-20 sm:pb-10 lg:px-8 lg:pt-20 lg:pb-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
@@ -76,14 +76,14 @@ export default async function HealthcareMedicalSectorLanding({ locale }: Props) 
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-200/90 sm:text-sm">
             {t('heroEyebrow')}
           </p>
-          <h1 className="mt-4 font-serif text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
+          <h1 className="mt-3 font-serif text-2xl font-bold leading-tight text-white md:text-3xl lg:text-4xl">
             {t('heroTitle')}
           </h1>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-teal-100/95 md:text-lg">
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-teal-100/95 md:text-base">
             {t('heroLead')}
           </p>
           {heroDescription ? (
-            <p className="mx-auto mt-6 max-w-3xl border-t border-white/10 pt-6 text-sm leading-relaxed text-slate-300 md:text-base">
+            <p className="mx-auto mt-4 max-w-3xl border-t border-white/10 pt-4 text-sm leading-relaxed text-slate-300 md:text-base">
               {heroDescription}
             </p>
           ) : null}

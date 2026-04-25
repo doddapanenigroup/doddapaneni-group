@@ -75,6 +75,7 @@ function DynamicField({ field }: { field: LeadDynamicField }) {
 export default function LeadForm({ sector, articleTitle, articleSlug, articlePath }: Props) {
   const [step, setStep] = useState<1 | 2>(1);
   const [success, setSuccess] = useState(false);
+  const [emailSent, setEmailSent] = useState(true);
   const schema = useMemo(() => schemaForSector(sector), [sector]);
 
   const {
@@ -110,6 +111,7 @@ export default function LeadForm({ sector, articleTitle, articleSlug, articlePat
 
   const onSubmit = handleSubmit(async (form) => {
     setSuccess(false);
+    setEmailSent(true);
     const response = await fetch('/api/public/doddapaneni-news-forms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -124,7 +126,9 @@ export default function LeadForm({ sector, articleTitle, articleSlug, articlePat
       }),
     });
 
+    const json = (await response.json().catch(() => ({}))) as { emailSent?: boolean };
     if (response.ok) {
+      setEmailSent(json.emailSent !== false);
       setSuccess(true);
       setStep(1);
       reset();
@@ -139,8 +143,14 @@ export default function LeadForm({ sector, articleTitle, articleSlug, articlePat
       <p className="mt-1 text-sm text-slate-600">Step {step} of 2</p>
 
       {success ? (
-        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
-          Thank you. Our team will contact you shortly.
+        <p
+          className={`mt-4 rounded-lg px-3 py-2 text-sm font-medium ${
+            emailSent ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-950'
+          }`}
+        >
+          {emailSent
+            ? 'Thank you. Our team will contact you shortly.'
+            : 'Your details were received, but email could not be sent from this server. Our team can still review your submission—use the main site contact if you need a quick follow-up.'}
         </p>
       ) : null}
 

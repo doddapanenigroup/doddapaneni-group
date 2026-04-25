@@ -44,7 +44,7 @@ export function divisionSubPage(sub: DivisionSubpage) {
         />
       );
       return (
-        <ContentPageBoundary pageKey={pageKey} locale={locale} belowPublishedBody={grid}>
+        <ContentPageBoundary pageKey={pageKey} locale={locale} belowPublishedBody={grid} underDivisionShell>
           <DivisionSectorCompaniesSection
             sectorSlug={slug}
             sectorName={sector.name}
@@ -57,7 +57,7 @@ export function divisionSubPage(sub: DivisionSubpage) {
     }
 
     return (
-      <ContentPageBoundary pageKey={pageKey} locale={locale}>
+      <ContentPageBoundary pageKey={pageKey} locale={locale} underDivisionShell>
         <DivisionSubpageFallback
           sectorSlug={slug}
           subpage={sub}

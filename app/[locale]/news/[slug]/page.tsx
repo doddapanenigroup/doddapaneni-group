@@ -214,7 +214,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
 
     return (
       <div className="min-h-screen bg-white">
-        <section className="relative overflow-hidden bg-blue-900 px-4 pt-24 pb-10 sm:px-6 sm:pt-28 sm:pb-12 md:pt-28 md:pb-12 lg:px-8">
+        <section className="relative overflow-hidden bg-blue-900 px-4 pt-20 pb-8 sm:px-6 sm:pt-20 sm:pb-10 md:pt-20 md:pb-10 lg:px-8">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.07]"
             style={{
@@ -223,10 +223,10 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
             aria-hidden
           />
           <div className="relative mx-auto max-w-4xl text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.25rem] lg:leading-tight">
+            <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
               {label}
             </h1>
-            <div className="mx-auto mt-3 h-1.5 w-20 rounded-full bg-white/90" aria-hidden />
+            <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-white/90" aria-hidden />
           </div>
         </section>
         <div className="mt-6 sm:mt-8">

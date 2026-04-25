@@ -35,20 +35,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!row) {
     const hint = await resolvePublishedArticleRoute(trimmedArticle);
     if (hint.status === 'ok' && hint.sectorSlug !== sectorSlug) {
-      row = await fetchPublishedSectorBlogPost(hint.sectorSlug, trimmedArticle, locale);
+      row = await fetchPublishedSectorBlogPost(hint.sectorSlug, hint.canonicalNewsSlug, locale);
     }
   }
   if (!row) return {};
 
+  const articleSeg = row.slug;
   const image = normalizeStoredImage(row.ogImage ?? row.featuredImage);
   const plain = row.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const dynamicDescription = plain.length > 160 ? `${plain.slice(0, 160)}...` : plain;
   const description = row.metaDescription ?? dynamicDescription;
   const title = `${row.metaTitle ?? row.title} | ${SITE_NAME}`;
   const origin = getSiteOrigin();
-  const pathRel = publicPathWithLocale(locale, 'news', row.sector.slug, trimmedArticle);
+  const pathRel = publicPathWithLocale(locale, 'news', row.sector.slug, articleSeg);
   const canonical = `${origin}${pathRel}`;
-  const pathnameForHreflang = newsArticlePath(row.sector.slug, trimmedArticle);
+  const pathnameForHreflang = newsArticlePath(row.sector.slug, articleSeg);
   return {
     title,
     description,
@@ -92,19 +93,25 @@ export default async function NewsSectorArticlePage({ params }: Props) {
     const hint = await resolvePublishedArticleRoute(trimmedArticle);
     if (hint.status === 'missing') notFound();
     if (hint.status === 'no_sector') {
-      permanentRedirect(publicPathWithLocale(locale, 'news', trimmedArticle));
+      permanentRedirect(publicPathWithLocale(locale, 'news', hint.canonicalNewsSlug));
     }
     if (hint.sectorSlug !== sectorSlug) {
-      permanentRedirect(publicPathWithLocale(locale, 'news', hint.sectorSlug, trimmedArticle));
+      permanentRedirect(
+        publicPathWithLocale(locale, 'news', hint.sectorSlug, hint.canonicalNewsSlug),
+      );
     }
-    dbPost = await fetchPublishedSectorBlogPost(sectorSlug, trimmedArticle, locale);
+    dbPost = await fetchPublishedSectorBlogPost(sectorSlug, hint.canonicalNewsSlug, locale);
     if (!dbPost) notFound();
+  }
+
+  if (dbPost.slug !== trimmedArticle) {
+    permanentRedirect(publicPathWithLocale(locale, 'news', dbPost.sector.slug, dbPost.slug));
   }
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
   const articleSectorSlug = dbPost.sector.slug;
-  const articlePath = newsArticlePath(articleSectorSlug, trimmedArticle);
+  const articlePath = newsArticlePath(articleSectorSlug, dbPost.slug);
   const sectorListPath = newsSectorListPath(articleSectorSlug);
   const initialSectorLiveMap = await getSectorLiveMapFromDb();
 
@@ -119,7 +126,7 @@ export default async function NewsSectorArticlePage({ params }: Props) {
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={articlePath}
-      articleSlug={trimmedArticle}
+      articleSlug={dbPost.slug}
       backHref={sectorListPath}
       sectorNavSlug={articleSectorSlug}
       initialSectorLiveMap={initialSectorLiveMap}

@@ -67,10 +67,10 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   if (isActiveSector) {
     return (
       <div className="min-h-screen bg-white">
-        <section className="bg-blue-900 px-4 pt-24 pb-12 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8 lg:pb-16">
+        <section className="bg-blue-900 px-4 pt-20 pb-8 sm:px-6 sm:pt-20 sm:pb-10 lg:px-8 lg:pb-12">
           <div className="mx-auto max-w-7xl text-center">
-            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">{sectorTitle}</h1>
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
+            <h1 className="text-2xl font-bold text-white md:text-3xl lg:text-4xl">{sectorTitle}</h1>
+            <p className="mx-auto mt-2 max-w-3xl text-base text-blue-200 md:text-lg">{heroDescription}</p>
           </div>
         </section>
 
@@ -131,12 +131,12 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-blue-900 px-4 pt-24 pb-12 sm:px-6 sm:pt-28 sm:pb-14 md:pb-16 lg:px-8">
+      <section className="bg-blue-900 px-4 pt-20 pb-8 sm:px-6 sm:pt-20 sm:pb-10 md:pb-12 lg:px-8">
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+          <h1 className="mb-2 text-2xl font-bold text-white md:text-3xl lg:text-4xl">
             {sectorTitle} — {newsLabel}
           </h1>
-          <p className="mx-auto max-w-3xl text-lg text-blue-200 md:text-xl">{heroDescription}</p>
+          <p className="mx-auto max-w-3xl text-base text-blue-200 md:text-lg">{heroDescription}</p>
         </div>
       </section>
 
