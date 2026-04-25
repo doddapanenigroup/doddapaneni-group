@@ -8,7 +8,7 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
-import { revalidateCmsPublicSurfaces } from '@/lib/revalidate-cms-public';
+import { revalidateCmsPublicSurfaces, revalidatePageContentPublicPaths } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -171,6 +171,7 @@ export async function PATCH(
     }
 
     revalidateCmsPublicSurfaces();
+    revalidatePageContentPublicPaths({ slug: doc.slug, previousSlug: existing.slug });
 
     return NextResponse.json({ ok: true, item: doc });
   } catch (error) {
@@ -234,6 +235,7 @@ export async function DELETE(
     });
 
     revalidateCmsPublicSurfaces();
+    revalidatePageContentPublicPaths({ slug: existing.slug });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

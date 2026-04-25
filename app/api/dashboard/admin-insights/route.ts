@@ -3,11 +3,24 @@ import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
-import type { ContentEditLog, MarketingActivityLog, Prisma, Role } from '@/lib/prisma-generated';
+import type { ContentEditLog, MarketingActivityLog, Role } from '@/lib/prisma-generated';
 
-type LoginWithUser = Prisma.LoginLogGetPayload<{
-  include: { user: { select: { email: true; name: true; username: true; role: true } } };
-}>;
+type LoginWithUserRow = {
+  id: string;
+  loggedAt: Date;
+  loggedOutAt: Date | null;
+  userEmail: string;
+  userName: string | null;
+  userUsername: string | null;
+  userRole: string;
+};
+
+function normalizeRole(raw: unknown): 'ADMIN' | 'DEVELOPER' | 'DIGITAL_MARKETER' {
+  const v = String(raw ?? '').trim().toUpperCase();
+  if (v === 'SUPER_ADMIN') return 'ADMIN';
+  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER') return v;
+  return 'DEVELOPER';
+}
 
 export async function GET() {
   const session = await auth();
@@ -24,13 +37,20 @@ export async function GET() {
     await connectDb();
 
     const [recentLogins, contentEdits, marketingActivity] = await Promise.all([
-      prisma.loginLog.findMany({
-        take: 40,
-        orderBy: { loggedAt: 'desc' },
-        include: {
-          user: { select: { email: true, name: true, username: true, role: true } },
-        },
-      }),
+      prisma.$queryRaw<LoginWithUserRow[]>`
+        SELECT
+          l.id AS id,
+          l.logged_at AS "loggedAt",
+          l.logged_out_at AS "loggedOutAt",
+          u.email AS "userEmail",
+          u.name AS "userName",
+          u.username AS "userUsername",
+          u.role AS "userRole"
+        FROM LoginLog l
+        JOIN User u ON u.id = l.user_id
+        ORDER BY l.logged_at DESC
+        LIMIT 40
+      `,
       prisma.contentEditLog.findMany({
         take: 40,
         orderBy: { createdAt: 'desc' },
@@ -42,14 +62,14 @@ export async function GET() {
     ]);
 
     const res = NextResponse.json({
-      recentLogins: (recentLogins as LoginWithUser[]).map((l) => ({
+      recentLogins: (recentLogins as LoginWithUserRow[]).map((l) => ({
         id: l.id,
         loggedAt: l.loggedAt.toISOString(),
         loggedOutAt: l.loggedOutAt ? l.loggedOutAt.toISOString() : null,
-        userEmail: l.user.email,
-        userName: l.user.name,
-        userUsername: l.user.username,
-        userRole: l.user.role,
+        userEmail: l.userEmail,
+        userName: l.userName,
+        userUsername: l.userUsername,
+        userRole: normalizeRole(l.userRole),
       })),
       contentEdits: (contentEdits as ContentEditLog[]).map((c) => ({
         id: c.id,

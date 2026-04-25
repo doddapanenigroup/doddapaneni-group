@@ -7,7 +7,7 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
-import { revalidateCmsPublicSurfaces } from '@/lib/revalidate-cms-public';
+import { revalidateCmsPublicSurfaces, revalidatePageContentPublicPaths } from '@/lib/revalidate-cms-public';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -161,6 +161,7 @@ export async function POST(request: Request) {
     }
 
     revalidateCmsPublicSurfaces();
+    revalidatePageContentPublicPaths({ slug: doc.slug });
 
     return NextResponse.json({
       item: {

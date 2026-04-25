@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
@@ -345,12 +345,10 @@ export async function POST(request: Request) {
       }).catch(() => {});
     }
 
-    after(() => {
-      revalidateCmsPublicSurfaces();
-      revalidateNewsPostPublicPaths({
-        sectorSlug: doc.sector?.slug ?? null,
-        articleSlug: doc.slug,
-      });
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: doc.sector?.slug ?? null,
+      articleSlug: doc.slug,
     });
 
     return NextResponse.json({ item: out });

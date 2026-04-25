@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logMarketingActivity } from '@/lib/audit-log';
@@ -241,14 +241,12 @@ export async function PATCH(
       }).catch(() => {});
     }
 
-    after(() => {
-      revalidateCmsPublicSurfaces();
-      revalidateNewsPostPublicPaths({
-        sectorSlug: out.sector?.slug ?? null,
-        articleSlug: out.slug,
-        previousSectorSlug: existing.sector?.slug ?? null,
-        previousArticleSlug: existing.slug,
-      });
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: out.sector?.slug ?? null,
+      articleSlug: out.slug,
+      previousSectorSlug: existing.sector?.slug ?? null,
+      previousArticleSlug: existing.slug,
     });
 
     return NextResponse.json({ item: out });
@@ -334,12 +332,10 @@ export async function DELETE(
       }),
     ]);
 
-    after(() => {
-      revalidateCmsPublicSurfaces();
-      revalidateNewsPostPublicPaths({
-        sectorSlug: existing.sector?.slug ?? null,
-        articleSlug: existing.slug,
-      });
+    revalidateCmsPublicSurfaces();
+    revalidateNewsPostPublicPaths({
+      sectorSlug: existing.sector?.slug ?? null,
+      articleSlug: existing.slug,
     });
 
     return NextResponse.json({ ok: true });

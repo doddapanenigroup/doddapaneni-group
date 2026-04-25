@@ -4,6 +4,24 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { NextResponse } from 'next/server';
 import { hasAdminAccess } from '@/lib/role-utils';
 
+type SessionRow = {
+  id: string;
+  userId: string;
+  loggedAt: Date;
+  loggedOutAt: Date | null;
+  userEmail: string;
+  userName: string | null;
+  userUsername: string | null;
+  userRole: string;
+};
+
+function normalizeRole(raw: unknown): 'ADMIN' | 'DEVELOPER' | 'DIGITAL_MARKETER' {
+  const v = String(raw ?? '').trim().toUpperCase();
+  if (v === 'SUPER_ADMIN') return 'ADMIN';
+  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER') return v;
+  return 'DEVELOPER';
+}
+
 function isAdminRole(role: unknown) {
   return hasAdminAccess(role as any);
 }
@@ -22,28 +40,36 @@ export async function GET(request: Request) {
     const take = Math.min(Math.max(Number(url.searchParams.get('take') ?? '100'), 1), 500);
     const activeOnly = url.searchParams.get('activeOnly') !== '0';
 
-    const logs = await prisma.loginLog.findMany({
-      where: activeOnly ? { loggedOutAt: null } : undefined,
-      orderBy: { loggedAt: 'desc' },
-      take,
-      select: {
-        id: true,
-        userId: true,
-        loggedAt: true,
-        loggedOutAt: true,
-        user: { select: { email: true, role: true, name: true, username: true } },
-      },
-    });
+    const whereSql = activeOnly ? 'WHERE l.logged_out_at IS NULL' : '';
+    const logs = await prisma.$queryRawUnsafe<SessionRow[]>(
+      `
+      SELECT
+        l.id AS id,
+        l.user_id AS "userId",
+        l.logged_at AS "loggedAt",
+        l.logged_out_at AS "loggedOutAt",
+        u.email AS "userEmail",
+        u.name AS "userName",
+        u.username AS "userUsername",
+        u.role AS "userRole"
+      FROM LoginLog l
+      JOIN User u ON u.id = l.user_id
+      ${whereSql}
+      ORDER BY l.logged_at DESC
+      LIMIT ?
+      `,
+      take
+    );
 
     const uaByUserId = new Map<string, string | null>();
 
     const sessions = logs.map((l) => ({
       id: l.id,
       userId: l.userId,
-      userEmail: l.user.email,
-      userName: l.user.name,
-      userUsername: l.user.username,
-      userRole: l.user.role,
+      userEmail: l.userEmail,
+      userName: l.userName,
+      userUsername: l.userUsername,
+      userRole: normalizeRole(l.userRole),
       loggedAt: l.loggedAt.toISOString(),
       loggedOutAt: l.loggedOutAt ? l.loggedOutAt.toISOString() : null,
       deviceUserAgent: uaByUserId.get(l.userId) ?? null,
