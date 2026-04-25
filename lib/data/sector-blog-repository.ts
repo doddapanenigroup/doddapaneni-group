@@ -66,13 +66,13 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
   const now = new Date();
   await publishScheduledContent(now);
 
-  const sector = await getPublicSectorBySlug(sectorSlug);
-  if (!sector) return null;
-
+  // Resolve by sector slug on the relation (do not require a separate sector preload).
+  // This matches how URLs are built and avoids extra failure modes from `getPublicSectorBySlug`.
   const post = await prisma.news.findFirst({
     where: {
       slug: blogSlug.trim(),
-      ...publishedBlogWhereForSector(sector.id, now),
+      ...publishedBlogWhere(now),
+      sector: { slug: sectorSlug.trim().toLowerCase() },
     },
     select: {
       ...sectorBlogPostSelect,
@@ -104,6 +104,31 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
   };
   return { ...merged, sector: sectorPayload };
 });
+
+export type PublishedArticleRouteHint =
+  | { status: 'missing' }
+  | { status: 'no_sector' }
+  | { status: 'ok'; sectorSlug: string };
+
+/**
+ * Where a published article “lives” in URL space. Used to fix
+ * `/news/{wrong-sector}/{slug}` by redirecting to the canonical sector path (no DB deletes).
+ */
+export async function resolvePublishedArticleRoute(
+  articleSlug: string,
+  now: Date = new Date(),
+): Promise<PublishedArticleRouteHint> {
+  await connectDb();
+  await publishScheduledContent(now);
+  const row = await prisma.news.findFirst({
+    where: { slug: articleSlug.trim(), ...publishedBlogWhere(now) },
+    select: { sector: { select: { slug: true } } },
+  });
+  if (!row) return { status: 'missing' };
+  const s = row.sector?.slug?.trim().toLowerCase();
+  if (!s) return { status: 'no_sector' };
+  return { status: 'ok', sectorSlug: s };
+}
 
 export async function listPublishedBlogsForSectorPage(args: {
   sector: PublicSector;

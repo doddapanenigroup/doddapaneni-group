@@ -1,10 +1,10 @@
 import { createTranslator } from '@/lib/translation-format';
 import { getDictionary } from '@/lib/translations';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
-import { fetchPublishedSectorBlogPost } from '@/lib/sector-blog-post';
+import { fetchPublishedSectorBlogPost, resolvePublishedArticleRoute } from '@/lib/sector-blog-post';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
@@ -14,7 +14,8 @@ import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
 import { getSectorLiveMapFromDb } from '@/lib/data/sector-repository';
 import BlogPostClient from '../BlogPostClient';
 
-export const revalidate = 120;
+/** Avoid serving a long-lived cached 404 when a post is published or its sector is corrected. */
+export const revalidate = 0;
 
 const SITE_NAME = 'Doddapaneni Group';
 
@@ -29,7 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sectorSlug = sectorParam.trim().toLowerCase();
   if (!isCompanyDivisionSlug(sectorSlug)) return {};
 
-  const row = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug, locale);
+  const trimmedArticle = articleSlug.trim();
+  let row = await fetchPublishedSectorBlogPost(sectorSlug, trimmedArticle, locale);
+  if (!row) {
+    const hint = await resolvePublishedArticleRoute(trimmedArticle);
+    if (hint.status === 'ok' && hint.sectorSlug !== sectorSlug) {
+      row = await fetchPublishedSectorBlogPost(hint.sectorSlug, trimmedArticle, locale);
+    }
+  }
   if (!row) return {};
 
   const image = normalizeStoredImage(row.ogImage ?? row.featuredImage);
@@ -38,9 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = row.metaDescription ?? dynamicDescription;
   const title = `${row.metaTitle ?? row.title} | ${SITE_NAME}`;
   const origin = getSiteOrigin();
-  const pathRel = publicPathWithLocale(locale, 'news', sectorSlug, articleSlug.trim());
+  const pathRel = publicPathWithLocale(locale, 'news', row.sector.slug, trimmedArticle);
   const canonical = `${origin}${pathRel}`;
-  const pathnameForHreflang = newsArticlePath(sectorSlug, articleSlug.trim());
+  const pathnameForHreflang = newsArticlePath(row.sector.slug, trimmedArticle);
   return {
     title,
     description,
@@ -78,13 +86,26 @@ export default async function NewsSectorArticlePage({ params }: Props) {
 
   const t = createTranslator(getDictionary(locale), 'Blog');
 
-  const dbPost = await fetchPublishedSectorBlogPost(sectorSlug, articleSlug, locale);
-  if (!dbPost) notFound();
+  const trimmedArticle = articleSlug.trim();
+  let dbPost = await fetchPublishedSectorBlogPost(sectorSlug, trimmedArticle, locale);
+  if (!dbPost) {
+    const hint = await resolvePublishedArticleRoute(trimmedArticle);
+    if (hint.status === 'missing') notFound();
+    if (hint.status === 'no_sector') {
+      permanentRedirect(publicPathWithLocale(locale, 'news', trimmedArticle));
+    }
+    if (hint.sectorSlug !== sectorSlug) {
+      permanentRedirect(publicPathWithLocale(locale, 'news', hint.sectorSlug, trimmedArticle));
+    }
+    dbPost = await fetchPublishedSectorBlogPost(sectorSlug, trimmedArticle, locale);
+    if (!dbPost) notFound();
+  }
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const readMinutes = Math.max(1, Math.ceil(plain.split(/\s+/).filter(Boolean).length / 220));
-  const articlePath = newsArticlePath(sectorSlug, articleSlug.trim());
-  const sectorListPath = newsSectorListPath(sectorSlug);
+  const articleSectorSlug = dbPost.sector.slug;
+  const articlePath = newsArticlePath(articleSectorSlug, trimmedArticle);
+  const sectorListPath = newsSectorListPath(articleSectorSlug);
   const initialSectorLiveMap = await getSectorLiveMapFromDb();
 
   return (
@@ -98,9 +119,9 @@ export default async function NewsSectorArticlePage({ params }: Props) {
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={articlePath}
-      articleSlug={articleSlug.trim()}
+      articleSlug={trimmedArticle}
       backHref={sectorListPath}
-      sectorNavSlug={sectorSlug}
+      sectorNavSlug={articleSectorSlug}
       initialSectorLiveMap={initialSectorLiveMap}
     />
   );
