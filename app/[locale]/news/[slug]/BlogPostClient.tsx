@@ -48,7 +48,7 @@ export default function BlogPostClient({
   const articleBody = (
     <>
       {image ? (
-        <section className="relative w-full overflow-hidden bg-blue-50">
+        <section className="relative w-full overflow-hidden bg-slate-100">
           <div className="relative mx-auto h-[min(52vh,560px)] w-full min-h-[220px] sm:min-h-[260px] md:min-h-[340px] md:h-[min(58vh,640px)] lg:min-h-[400px] lg:h-[min(60vh,720px)]">
             <Image
               src={image}
@@ -56,7 +56,7 @@ export default function BlogPostClient({
               sizes="(max-width: 1024px) 100vw, min(100vw, 896px)"
               width={1920}
               height={1080}
-              className="h-full w-full object-cover object-center"
+              className="h-full w-full object-contain object-center"
               loading="eager"
               fetchPriority="high"
             />
