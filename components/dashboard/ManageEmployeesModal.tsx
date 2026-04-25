@@ -248,7 +248,7 @@ export default function ManageEmployeesModal({
                         required
                         minLength={2}
                         maxLength={48}
-                        pattern="[a-zA-Z0-9._-]+"
+                        pattern="[-A-Za-z0-9._]+"
                         title="Letters, numbers, dots, underscores, hyphens"
                         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
                         placeholder="e.g. jane.doe"
