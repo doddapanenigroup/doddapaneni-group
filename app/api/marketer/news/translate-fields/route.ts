@@ -54,10 +54,16 @@ export async function POST(request: Request) {
     });
 
     const targets = translationTargetLocales();
+    const okLocales = Object.keys(locales);
+    const failedLocales = targets.filter((l) => !okLocales.includes(l));
     return NextResponse.json({
       ok: true,
       locales,
-      message: `Translated to: ${targets.join(', ')}. Save the post to persist these rows.`,
+      failedLocales,
+      message:
+        failedLocales.length > 0
+          ? `Translated: ${okLocales.join(', ') || 'none'}. Failed: ${failedLocales.join(', ')}. Save to persist successful locales.`
+          : `Translated to: ${targets.join(', ')}. Save the post to persist these rows.`,
     });
   } catch (error) {
     await captureErrorToDb({

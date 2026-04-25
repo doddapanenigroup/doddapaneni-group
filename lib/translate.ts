@@ -44,37 +44,57 @@ export async function translateText(
 
   const requestTimeoutMs = Number(process.env.TRANSLATE_FETCH_TIMEOUT_MS) || 20_000;
 
+  const retryMax = Math.max(1, Number(process.env.TRANSLATE_MAX_RETRIES) || 3);
+  const delayMs = Math.max(0, Number(process.env.TRANSLATE_DELAY_MS) || 250);
+
   for (const chunk of chunks) {
     const url = `${MYMEMORY_URL}?q=${encodeUriComponentSafe(chunk)}&langpair=${encodeURIComponent(langpair)}`;
-    const controller = new AbortController();
-    const t = setTimeout(() => controller.abort(), requestTimeoutMs);
-    let res: Response;
-    try {
-      res = await fetch(url, { method: 'GET', signal: controller.signal });
-    } catch (e) {
-      clearTimeout(t);
-      if (e instanceof Error && e.name === 'AbortError') {
-        throw new Error('Translation request timed out (MyMemory slow or unreachable)');
+    let translatedChunk: string | null = null;
+
+    for (let attempt = 1; attempt <= retryMax; attempt += 1) {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), requestTimeoutMs);
+      try {
+        const res = await fetch(url, { method: 'GET', signal: controller.signal });
+        if (!res.ok) {
+          if (res.status >= 500 || res.status === 429) {
+            if (attempt < retryMax) {
+              await delay(delayMs * attempt);
+              continue;
+            }
+          }
+          throw new Error(`Translation failed (${res.status})`);
+        }
+
+        const data = (await res.json()) as { responseData?: { translatedText?: string }; responseStatus?: number };
+        const status = data?.responseStatus;
+        if (typeof status === 'number' && status === 429) {
+          if (attempt < retryMax) {
+            await delay(delayMs * attempt);
+            continue;
+          }
+          throw new Error('Translation rate limited (429). Try again in a few seconds.');
+        }
+        translatedChunk =
+          typeof data?.responseData?.translatedText === 'string'
+            ? data.responseData.translatedText
+            : chunk;
+        break;
+      } catch (e) {
+        if (attempt >= retryMax) {
+          if (e instanceof Error && e.name === 'AbortError') {
+            throw new Error('Translation request timed out (MyMemory slow or unreachable)');
+          }
+          throw e;
+        }
+        await delay(delayMs * attempt);
+      } finally {
+        clearTimeout(t);
       }
-      throw e;
     }
-    clearTimeout(t);
-
-    if (!res.ok) {
-      throw new Error(`Translation failed (${res.status})`);
-    }
-
-    const data = (await res.json()) as { responseData?: { translatedText?: string }; responseStatus?: number };
-    const status = data?.responseStatus;
-    if (typeof status === 'number' && status === 429) {
-      throw new Error('Translation rate limited (429). Increase TRANSLATE_DELAY_MS or try again later.');
-    }
-    const translatedText = data?.responseData?.translatedText;
-    if (typeof translatedText === 'string') {
-      translated.push(translatedText);
-    } else {
-      translated.push(chunk);
-    }
+    if (translatedChunk == null) translatedChunk = chunk;
+    translated.push(translatedChunk);
+    if (delayMs > 0) await delay(delayMs);
   }
 
   return translated.join(chunks.length > 1 ? ' ' : '');

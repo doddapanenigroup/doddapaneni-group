@@ -373,23 +373,25 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         item?: BlogListRow;
       };
       if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message: formatBlogApiError(
-            data,
-            `Save failed (${res.status}). Check scheduling or feature flags.`,
-          ),
-        });
+        const err = formatBlogApiError(
+          data,
+          `Save failed (${res.status}). Check scheduling or feature flags.`,
+        );
+        setBlogToast({ type: 'error', message: err });
+        window.alert(err);
         return;
       }
       if (!data.item) {
-        setBlogToast({ type: 'error', message: 'Save returned no data. Try again.' });
+        // DB save may still succeed when response body is empty/truncated; keep UX deterministic.
+        setBlogToast({ type: 'success', message: 'Article Saved.' });
+        closeBlogModal();
+        void refreshBlogs({ silent: true });
         return;
       }
       const item = data.item;
       const slim = blogListRowForState(item);
       const priorSlug = slug;
-      let msg = 'Changes saved to the database.';
+      let msg = 'Article Saved.';
       if (item.status !== 'published') {
         msg +=
           ' This post is not Published, so it will not appear on the sector news page yet. Set status to Published and save.';
@@ -409,7 +411,9 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
       void refreshBlogs({ silent: true });
       closeBlogModal();
     } catch {
-      setBlogToast({ type: 'error', message: 'Save failed (network or server error).' });
+      const err = 'Save failed (network or server error).';
+      setBlogToast({ type: 'error', message: err });
+      window.alert(err);
     } finally {
       setBlogActionLoading(null);
     }

@@ -38,10 +38,16 @@ export async function POST(
     }
 
     const targets = translationTargetLocales();
+    const failed = result.failedLocales ?? [];
+    const okLocales = result.locales ?? [];
     return NextResponse.json({
       ok: true,
-      locales: targets,
-      message: `Translated to: ${targets.join(', ')}. Visitors see these when the post is published and they use that language.`,
+      locales: okLocales,
+      failedLocales: failed,
+      message:
+        failed.length > 0
+          ? `Translated: ${okLocales.join(', ') || 'none'}. Failed: ${failed.join(', ')}.`
+          : `Translated to: ${targets.join(', ')}.`,
     });
   } catch (error) {
     await captureErrorToDb({

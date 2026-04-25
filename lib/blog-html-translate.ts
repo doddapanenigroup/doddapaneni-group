@@ -58,20 +58,25 @@ export async function translateHtmlContent(
   if (!hasAngleTag) {
     return translateText(trimmed, targetLocale, sourceLocale);
   }
+  // Protect tags with stable tokens, translate once, then restore tags.
+  // This avoids hundreds of tiny API calls for rich HTML and greatly improves locale completion.
+  const tagRe = /<[^>]+>/g;
+  const tags: string[] = [];
+  const withTokens = trimmed.replace(tagRe, (tag) => {
+    const idx = tags.push(tag) - 1;
+    return `@@TAG_${idx}@@`;
+  });
 
-  // Translate text nodes between tags so rich/nested HTML keeps structure while all visible content is translated.
-  const parts = trimmed.split(/(<[^>]+>)/g);
-  const translatedParts = await Promise.all(
-    parts.map(async (part) => {
-      if (!part) return part;
-      if (part.startsWith('<') && part.endsWith('>')) return part;
-      if (!part.trim()) return part;
-      try {
-        return await translateText(part, targetLocale, sourceLocale);
-      } catch {
-        return part;
-      }
-    }),
-  );
-  return translatedParts.join('');
+  let translated = withTokens;
+  try {
+    translated = await translateText(withTokens, targetLocale, sourceLocale);
+  } catch {
+    return trimmed;
+  }
+
+  for (let i = 0; i < tags.length; i += 1) {
+    const token = new RegExp(`@@\\s*TAG_${i}\\s*@@`, 'g');
+    translated = translated.replace(token, tags[i]);
+  }
+  return translated;
 }

@@ -29,6 +29,11 @@ export type MachineTranslatedLocaleFields = {
   ogDescription: string | null;
 };
 
+export type BlogTranslationSyncResult = {
+  translatedLocales: string[];
+  failedLocales: string[];
+};
+
 async function translateOptionalFast(str: string | null, targetLocale: string): Promise<string | null> {
   if (str == null) return null;
   const t = str.trim();
@@ -44,40 +49,31 @@ export async function machineTranslateCanonicalFields(
   fields: CanonicalTranslationInput,
 ): Promise<Record<string, MachineTranslatedLocaleFields>> {
   const targets = translationTargetLocales();
-  const entries = await Promise.all(
-    targets.map(async (locale) => {
-      try {
-        const [title, metaTitle, metaDescription, ogTitle, ogDescription, excerpt, content] =
-          await Promise.all([
-            translateText(fields.title, locale, DEFAULT_LOCALE),
-            translateOptionalFast(fields.metaTitle, locale),
-            translateOptionalFast(fields.metaDescription, locale),
-            translateOptionalFast(fields.ogTitle, locale),
-            translateOptionalFast(fields.ogDescription, locale),
-            translateOptionalFast(fields.excerpt, locale),
-            translateHtmlContent(fields.content, locale, DEFAULT_LOCALE),
-          ]);
-        return [
-          locale,
-          {
-            title,
-            content,
-            excerpt,
-            metaTitle,
-            metaDescription,
-            ogTitle,
-            ogDescription,
-          } satisfies MachineTranslatedLocaleFields,
-        ] as const;
-      } catch (e) {
-        console.error(`[blog-translations] machineTranslateCanonicalFields locale=${locale}`, e);
-        return null;
-      }
-    }),
-  );
   const out: Record<string, MachineTranslatedLocaleFields> = {};
-  for (const row of entries) {
-    if (row) out[row[0]] = row[1];
+  for (const locale of targets) {
+    try {
+      const [title, metaTitle, metaDescription, ogTitle, ogDescription, excerpt, content] =
+        await Promise.all([
+          translateText(fields.title, locale, DEFAULT_LOCALE),
+          translateOptionalFast(fields.metaTitle, locale),
+          translateOptionalFast(fields.metaDescription, locale),
+          translateOptionalFast(fields.ogTitle, locale),
+          translateOptionalFast(fields.ogDescription, locale),
+          translateOptionalFast(fields.excerpt, locale),
+          translateHtmlContent(fields.content, locale, DEFAULT_LOCALE),
+        ]);
+      out[locale] = {
+        title,
+        content,
+        excerpt,
+        metaTitle,
+        metaDescription,
+        ogTitle,
+        ogDescription,
+      };
+    } catch (e) {
+      console.error(`[blog-translations] machineTranslateCanonicalFields locale=${locale}`, e);
+    }
   }
   return out;
 }
@@ -88,7 +84,9 @@ type CanonicalPostFields = CanonicalTranslationInput & { id: string };
  * Upserts `NewsTranslation` rows from the canonical (default-locale) `News` fields.
  * Safe to call for drafts (previews) or published posts.
  */
-export async function applyMachineTranslationsFromCanonicalPost(post: CanonicalPostFields): Promise<void> {
+export async function applyMachineTranslationsFromCanonicalPost(
+  post: CanonicalPostFields,
+): Promise<BlogTranslationSyncResult> {
   const byLocale = await machineTranslateCanonicalFields({
     title: post.title,
     content: post.content,
@@ -99,41 +97,45 @@ export async function applyMachineTranslationsFromCanonicalPost(post: CanonicalP
     ogDescription: post.ogDescription,
   });
 
-  await Promise.all(
-    translationTargetLocales().map(async (locale) => {
-      const payload = byLocale[locale];
-      if (!payload) return;
-      try {
-        await prisma.newsTranslation.upsert({
-          where: {
-            newsId_locale: { newsId: post.id, locale },
-          },
-          create: {
-            newsId: post.id,
-            locale,
-            title: payload.title,
-            content: payload.content,
-            excerpt: payload.excerpt,
-            metaTitle: payload.metaTitle,
-            metaDescription: payload.metaDescription,
-            ogTitle: payload.ogTitle,
-            ogDescription: payload.ogDescription,
-          },
-          update: {
-            title: payload.title,
-            content: payload.content,
-            excerpt: payload.excerpt,
-            metaTitle: payload.metaTitle,
-            metaDescription: payload.metaDescription,
-            ogTitle: payload.ogTitle,
-            ogDescription: payload.ogDescription,
-          },
-        });
-      } catch (e) {
-        console.error(`[blog-translations] upsert locale=${locale} newsId=${post.id}`, e);
-      }
-    }),
-  );
+  const translatedLocales: string[] = [];
+  const failedLocales = translationTargetLocales().filter((locale) => !byLocale[locale]);
+
+  for (const locale of translationTargetLocales()) {
+    const payload = byLocale[locale];
+    if (!payload) continue;
+    try {
+      await prisma.newsTranslation.upsert({
+        where: {
+          newsId_locale: { newsId: post.id, locale },
+        },
+        create: {
+          newsId: post.id,
+          locale,
+          title: payload.title,
+          content: payload.content,
+          excerpt: payload.excerpt,
+          metaTitle: payload.metaTitle,
+          metaDescription: payload.metaDescription,
+          ogTitle: payload.ogTitle,
+          ogDescription: payload.ogDescription,
+        },
+        update: {
+          title: payload.title,
+          content: payload.content,
+          excerpt: payload.excerpt,
+          metaTitle: payload.metaTitle,
+          metaDescription: payload.metaDescription,
+          ogTitle: payload.ogTitle,
+          ogDescription: payload.ogDescription,
+        },
+      });
+      translatedLocales.push(locale);
+    } catch (e) {
+      console.error(`[blog-translations] upsert locale=${locale} newsId=${post.id}`, e);
+      failedLocales.push(locale);
+    }
+  }
+  return { translatedLocales, failedLocales: [...new Set(failedLocales)] };
 }
 
 /**
@@ -169,7 +171,10 @@ export async function syncBlogTranslations(newsId: string): Promise<void> {
  */
 export async function translateBlogPostByIdForMarketer(
   newsId: string,
-): Promise<{ ok: true; locales: string[] } | { ok: false; message: string }> {
+): Promise<
+  | { ok: true; locales: string[]; failedLocales: string[] }
+  | { ok: false; message: string }
+> {
   if (process.env.BLOG_AUTO_TRANSLATE === '0') {
     return { ok: false, message: 'Auto-translate is off (set BLOG_AUTO_TRANSLATE unset or non-zero).' };
   }
@@ -192,8 +197,8 @@ export async function translateBlogPostByIdForMarketer(
     return { ok: false, message: 'Post not found.' };
   }
 
-  await applyMachineTranslationsFromCanonicalPost(post);
-  return { ok: true, locales: translationTargetLocales() };
+  const result = await applyMachineTranslationsFromCanonicalPost(post);
+  return { ok: true, locales: result.translatedLocales, failedLocales: result.failedLocales };
 }
 
 export function scheduleBlogTranslationSync(newsId: string): void {
