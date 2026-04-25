@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { routing } from '@/i18n/routing';
 import { DEFAULT_LOCALE } from '@/i18n/locales';
+import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 
 /** Locales that appear in the visible URL (`en` is prefixless). */
 const PREFIX_LOCALE_SET: Set<string> = new Set(
@@ -26,6 +27,40 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const segments = pathname.split('/').filter(Boolean);
   const first = segments[0];
+  const isPrefixedLocale = !!first && PREFIX_LOCALE_SET.has(first);
+  const restSegments = isPrefixedLocale ? segments.slice(1) : segments;
+  const localePrefix = isPrefixedLocale ? first : null;
+
+  // Legacy division services URL -> keyword URL, e.g. `/digital-marketing/services` -> `/digital-marketing-services`.
+  if (
+    restSegments.length === 2 &&
+    restSegments[1] === 'services' &&
+    isCompanyDivisionSlug(restSegments[0])
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = localePrefix
+      ? `/${localePrefix}/${restSegments[0]}-services`
+      : `/${restSegments[0]}-services`;
+    const res = NextResponse.redirect(url, 308);
+    applyDocumentCacheHeaders(res);
+    return res;
+  }
+
+  // Keyword services URL -> internal services route rewrite.
+  if (restSegments.length === 1 && restSegments[0].endsWith('-services')) {
+    const divisionSlug = restSegments[0].slice(0, -'-services'.length);
+    if (isCompanyDivisionSlug(divisionSlug)) {
+      const url = request.nextUrl.clone();
+      url.pathname = localePrefix
+        ? `/${localePrefix}/${divisionSlug}/services`
+        : `/${DEFAULT_LOCALE}/${divisionSlug}/services`;
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set('x-pathname', pathname);
+      const res = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
+      applyDocumentCacheHeaders(res);
+      return res;
+    }
+  }
 
   if (first === DEFAULT_LOCALE) {
     const rest = segments.slice(1);

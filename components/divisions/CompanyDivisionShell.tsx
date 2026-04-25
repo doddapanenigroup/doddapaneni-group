@@ -4,6 +4,7 @@ import { routing } from '@/i18n/routing';
 import { Link, usePathname } from '@/i18n/navigation';
 import { useTranslations } from '@/lib/dictionary-react';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
+import { divisionSubpagePublicPath } from '@/lib/company-division-subpages';
 import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import CompanyDivisionTopicNav from '@/components/divisions/CompanyDivisionTopicNav';
 
@@ -75,8 +76,10 @@ export default function CompanyDivisionShell({
               {t('divisionOverview')}
             </Link>
             {SUBPAGES.map((sub) => {
-              const href = `${base}/${sub}`;
-              const active = segments.length === 2 && segments[0] === slug && segments[1] === sub;
+              const href = divisionSubpagePublicPath(slug, sub);
+              const active =
+                (segments.length === 2 && segments[0] === slug && segments[1] === sub) ||
+                (sub === 'services' && segments.length === 1 && segments[0] === `${slug}-services`);
               return (
                 <Link
                   key={sub}

@@ -7,6 +7,7 @@ import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
+import { divisionSubpagePublicPath } from '@/lib/company-division-subpages';
 import {
   getPublicSectorBySlug,
   type PublicSector,
@@ -227,9 +228,9 @@ export async function sectorSubpageMetadata(
           : tBlog('divisionSubpageContact');
   const servicesWord = tBlog('divisionSubpageServices');
   const origin = getSiteOrigin();
-  const pathRel = publicPathWithLocale(locale, row.slug, sub);
+  const pathRel = publicPathWithLocale(locale, divisionSubpagePublicPath(row.slug, sub));
   const canonical = `${origin}${pathRel}`;
-  const pathnameForHreflang = `/${row.slug}/${sub}`;
+  const pathnameForHreflang = divisionSubpagePublicPath(row.slug, sub);
   const title = `${subLabel} | ${formatDivisionNameForSeo(row.name)} ${servicesWord} | ${SITE_NAME}`;
   const description = buildDivisionSubpageDescription(row, subLabel, servicesWord);
   const keywords =
