@@ -7,7 +7,6 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
-import { applyMachineTranslationsFromCanonicalPost } from '@/lib/blog-translations-sync';
 import { applyNewsTranslationPatches } from '@/lib/news-apply-translation-patches';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
 import {
@@ -19,6 +18,7 @@ import {
 import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/lib/revalidate-cms-public';
 import { Prisma } from '@/lib/prisma-generated';
 import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
+import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 
 /** List view: omit heavy HTML bodies so the dashboard can load many posts without huge JSON or OOM/timeouts. */
 const marketerNewsListSelect = {
@@ -285,22 +285,7 @@ export async function POST(request: Request) {
     await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
 
     let out = doc;
-    const autoOn = process.env.BLOG_AUTO_TRANSLATE !== '0';
-    let refetch = patches.length > 0;
-
-    if (autoOn && doc.status === 'published' && patches.length === 0) {
-      await applyMachineTranslationsFromCanonicalPost({
-        id: doc.id,
-        title: doc.title,
-        content: doc.content,
-        excerpt: doc.excerpt,
-        metaTitle: doc.metaTitle,
-        metaDescription: doc.metaDescription,
-        ogTitle: doc.ogTitle,
-        ogDescription: doc.ogDescription,
-      });
-      refetch = true;
-    }
+    const refetch = patches.length > 0;
 
     if (refetch) {
       const full = await prisma.news.findUnique({
@@ -313,6 +298,9 @@ export async function POST(request: Request) {
       });
       if (full) out = full;
     }
+
+    // Fire-and-forget translation sync so save/create returns quickly for UI.
+    scheduleBlogTranslationSync(doc.id);
 
     await Promise.all([
       logMarketingActivity({

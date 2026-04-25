@@ -54,23 +54,24 @@ export async function translateHtmlContent(
 ): Promise<string> {
   const trimmed = html.trim();
   if (!trimmed) return html;
-
-  const segments = parseHtmlSegments(trimmed);
-  const textSegments = segments.filter((s): s is Extract<HtmlSegment, { type: 'text' }> => s.type === 'text');
-  if (textSegments.length === 0) {
-    // Never strip tags to plain text: that destroyed rich posts in `NewsTranslation`
-    // when HTML used nested tags, unknown wrappers, or markdown pasted without angle brackets.
-    const hasAngleTag = /<[a-z?/!]/i.test(trimmed);
-    if (hasAngleTag) {
-      return trimmed;
-    }
-    const plain = trimmed.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!plain) return trimmed;
-    return translateText(plain, targetLocale, sourceLocale);
+  const hasAngleTag = /<[a-z?/!]/i.test(trimmed);
+  if (!hasAngleTag) {
+    return translateText(trimmed, targetLocale, sourceLocale);
   }
 
-  const translated = await Promise.all(
-    textSegments.map((seg) => translateText(seg.value, targetLocale, sourceLocale)),
+  // Translate text nodes between tags so rich/nested HTML keeps structure while all visible content is translated.
+  const parts = trimmed.split(/(<[^>]+>)/g);
+  const translatedParts = await Promise.all(
+    parts.map(async (part) => {
+      if (!part) return part;
+      if (part.startsWith('<') && part.endsWith('>')) return part;
+      if (!part.trim()) return part;
+      try {
+        return await translateText(part, targetLocale, sourceLocale);
+      } catch {
+        return part;
+      }
+    }),
   );
-  return buildHtmlFromSegments(segments, translated);
+  return translatedParts.join('');
 }

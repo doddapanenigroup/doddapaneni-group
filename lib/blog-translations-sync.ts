@@ -137,8 +137,7 @@ export async function applyMachineTranslationsFromCanonicalPost(post: CanonicalP
 }
 
 /**
- * Fills or updates `NewsTranslation` rows from the canonical `News` row when the post is **published**.
- * Draft / scheduled posts: skips (does not delete existing translations — supports manual “Translate languages”).
+ * Fills or updates `NewsTranslation` rows from the canonical `News` row.
  * Set `BLOG_AUTO_TRANSLATE=0` to skip entirely.
  */
 export async function syncBlogTranslations(newsId: string): Promise<void> {
@@ -158,14 +157,9 @@ export async function syncBlogTranslations(newsId: string): Promise<void> {
       metaDescription: true,
       ogTitle: true,
       ogDescription: true,
-      status: true,
     },
   });
   if (!post) return;
-
-  if (post.status !== 'published') {
-    return;
-  }
 
   await applyMachineTranslationsFromCanonicalPost(post);
 }

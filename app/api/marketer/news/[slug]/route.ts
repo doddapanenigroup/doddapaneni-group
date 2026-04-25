@@ -8,7 +8,7 @@ import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { writeAuditLog } from '@/lib/audit';
 import { notifyContentPublished } from '@/lib/notify';
 import { routing } from '@/i18n/routing';
-import { applyMachineTranslationsFromCanonicalPost } from '@/lib/blog-translations-sync';
+import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 import { applyNewsTranslationPatches } from '@/lib/news-apply-translation-patches';
 import { schedulingForbiddenIfScheduled } from '@/lib/features';
 import {
@@ -175,27 +175,8 @@ export async function PATCH(
       out = finalDoc ?? doc;
     }
 
-    if (process.env.BLOG_AUTO_TRANSLATE !== '0' && out.status === 'published') {
-      await applyMachineTranslationsFromCanonicalPost({
-        id: out.id,
-        title: out.title,
-        content: out.content,
-        excerpt: out.excerpt,
-        metaTitle: out.metaTitle,
-        metaDescription: out.metaDescription,
-        ogTitle: out.ogTitle,
-        ogDescription: out.ogDescription,
-      });
-      const synced = await prisma.news.findUnique({
-        where: { id: out.id },
-        include: {
-          author: { select: { id: true, email: true, name: true } },
-          sector: { select: { id: true, name: true, slug: true } },
-          translations: true,
-        },
-      });
-      if (synced) out = synced;
-    }
+    // Fire-and-forget translation sync so save returns quickly for the dashboard UI.
+    scheduleBlogTranslationSync(out.id);
 
     await Promise.all([
       logMarketingActivity({

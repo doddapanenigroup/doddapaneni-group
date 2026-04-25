@@ -407,6 +407,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         return next;
       });
       void refreshBlogs({ silent: true });
+      closeBlogModal();
     } catch {
       setBlogToast({ type: 'error', message: 'Save failed (network or server error).' });
     } finally {
