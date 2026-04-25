@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import FeatureGate from '@/components/FeatureGate';
 import GoogleSnippetPreview from '@/components/dashboard/GoogleSnippetPreview';
+import BlogSeoScorePanel from '@/components/dashboard/BlogSeoScorePanel';
 import {
   MarketerBlogFields,
   type MarketerBlogFieldsHandle,
@@ -801,6 +802,16 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                 description={blogForm.metaDescription}
                 url={`${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
                 ogImage={blogForm.ogImage || blogForm.featuredImage}
+              />
+              <BlogSeoScorePanel
+                title={blogForm.title}
+                slug={blogForm.slug}
+                metaTitle={blogForm.metaTitle}
+                metaDescription={blogForm.metaDescription}
+                keywords={blogForm.keywords}
+                focusKeyword={blogForm.focusKeyword}
+                content={blogForm.content}
+                ogImage={blogForm.ogImage || blogForm.featuredImage || null}
               />
             </div>
             <FeatureGate feature="previewSharing">
