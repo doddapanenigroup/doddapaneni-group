@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import { hasMarketerAccess } from '@/lib/role-utils';

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { captureErrorToDb } from '@/lib/error-monitor';
 import { isDashboardRole } from '@/lib/role-utils';

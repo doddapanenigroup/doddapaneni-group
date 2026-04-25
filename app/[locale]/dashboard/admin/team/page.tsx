@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';

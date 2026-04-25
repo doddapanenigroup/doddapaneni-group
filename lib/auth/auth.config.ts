@@ -19,8 +19,8 @@ function normalizeRole(input: unknown): Role {
 }
 
 /**
- * Shared Auth.js configuration (imported by `auth.ts`).
- * Kept separate so bundlers (e.g. Turbopack in Docker) always see stable exports from `auth.ts`.
+ * Shared Auth.js configuration (used by `lib/auth/index.ts`).
+ * Lives under `lib/auth/` so Turbopack does not treat the module as the reserved root id `auth`.
  */
 const authConfig = {
   trustHost: true,

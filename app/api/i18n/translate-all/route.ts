@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { runTranslateAll } from '@/lib/run-translate-all';
 import { hasDeveloperAccess } from '@/lib/role-utils';
 

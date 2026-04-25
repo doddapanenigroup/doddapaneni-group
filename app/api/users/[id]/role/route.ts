@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role as DbRole } from '@/lib/prisma-generated';
 import { writeAuditLog } from '@/lib/audit';

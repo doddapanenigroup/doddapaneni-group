@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { logContentEdit } from '@/lib/audit-log';
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';

@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import type { Role } from "@/lib/constants";
 import { getEnvStatus } from "@/lib/env-status";
 import { getSafeEnvSnapshot } from "@/lib/safe-env-snapshot";

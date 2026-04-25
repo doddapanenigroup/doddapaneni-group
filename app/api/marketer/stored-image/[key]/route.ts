@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { logContentEdit, logMarketingActivity } from '@/lib/audit-log';
 import { captureErrorToDb } from '@/lib/error-monitor';

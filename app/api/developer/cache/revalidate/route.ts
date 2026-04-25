@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { auth } from '@/auth';
+import { auth } from '@/lib/auth';
 import type { Role } from '@/lib/constants';
 import { hasDeveloperAccess } from '@/lib/role-utils';
 
