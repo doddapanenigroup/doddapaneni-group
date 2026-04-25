@@ -282,7 +282,12 @@ export async function POST(request: Request) {
     });
 
     const patches = parseTranslationPatches(body);
-    await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+    try {
+      await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+    } catch (e) {
+      // Do not fail article creation if locale patch rows fail.
+      console.error(`[marketer/blog] create translation patch failed newsId=${doc.id}`, e);
+    }
 
     let out = doc;
     const refetch = patches.length > 0;

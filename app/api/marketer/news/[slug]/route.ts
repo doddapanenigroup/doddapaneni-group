@@ -160,7 +160,12 @@ export async function PATCH(
     });
 
     const patches = parseTranslationPatches(body);
-    await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+    try {
+      await applyNewsTranslationPatches(doc.id, patches, { title: doc.title, content: doc.content });
+    } catch (e) {
+      // Keep article edits successful even when a locale translation row fails.
+      console.error(`[marketer/blog] patch translation patch failed newsId=${doc.id}`, e);
+    }
 
     let out = doc;
     if (patches.length > 0) {

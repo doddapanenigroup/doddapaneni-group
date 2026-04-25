@@ -709,13 +709,21 @@ export default function MarketerDashboard({
         return;
       }
 
-      const res = await fetch('/api/preview/token', {
+      const payload = JSON.stringify({ kind: 'page', slug, locale });
+      let res = await fetch('/api/preview/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'page', slug, locale }),
+        body: payload,
       });
+      if (res.status === 404) {
+        res = await fetch('/api/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+        });
+      }
 
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { message?: string; url?: string };
       if (!res.ok) {
         alert(data?.message ?? 'Failed to create preview link');
         return;

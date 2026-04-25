@@ -585,14 +585,26 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     setPreviewLoading(true);
     setPreviewLink(null);
     try {
-      const res = await fetch('/api/preview/token', {
+      const payload = JSON.stringify({ kind: 'blog', slug, locale });
+      let res = await fetch('/api/preview/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'blog', slug, locale }),
+        body: payload,
       });
-      const data = await res.json();
+      if (res.status === 404) {
+        // Backward-compatible alias for deployments that expose `/api/preview` only.
+        res = await fetch('/api/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+        });
+      }
+      const data = (await res.json().catch(() => ({}))) as { url?: string; message?: string };
       if (!res.ok) {
-        setBlogToast({ type: 'error', message: data?.message ?? 'Failed to create preview link' });
+        setBlogToast({
+          type: 'error',
+          message: data?.message ?? `Failed to create preview link (${res.status}).`,
+        });
         return;
       }
       if (data?.url) setPreviewLink(data.url);
