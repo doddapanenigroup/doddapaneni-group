@@ -14,6 +14,16 @@ if (!process.env.AUTH_SECRET) {
 
 const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 'true';
 
+function normalizeRole(input: unknown): Role {
+  const raw = String(input ?? '').trim().toUpperCase();
+  // Backward compatibility for rows/token values created before role merge.
+  if (raw === 'SUPER_ADMIN') return 'ADMIN';
+  if (raw === 'ADMIN' || raw === 'DEVELOPER' || raw === 'DIGITAL_MARKETER') {
+    return raw;
+  }
+  return 'DEVELOPER';
+}
+
 const nextAuth = NextAuth({
   /**
    * Required on self‑hosted production (e.g. DigitalOcean, Hostinger) where `NODE_ENV === "production"`
@@ -49,7 +59,7 @@ const nextAuth = NextAuth({
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role as Role,
+            role: normalizeRole(user.role),
           };
         } catch (err) {
           console.error('[auth] authorize failed (check DB connection and that user exists):', err);
@@ -75,7 +85,7 @@ const nextAuth = NextAuth({
         session.user.id = typeof token.id === 'string' ? token.id : '';
         session.user.email = typeof token.email === 'string' ? token.email : '';
         session.user.name = typeof token.name === 'string' ? token.name : null;
-        session.user.role = (typeof token.role === 'string' ? token.role : 'DEVELOPER') as Role;
+        session.user.role = normalizeRole(token.role);
         session.user.sessionIssuedAt = typeof token.iat === 'number' ? token.iat : undefined;
 
         // JWT fields are fixed at sign-in; merge latest profile from DB so dashboard + header
@@ -83,14 +93,17 @@ const nextAuth = NextAuth({
         if (session.user.id) {
           try {
             await connectDb();
-            const fresh = await prisma.user.findUnique({
-              where: { id: session.user.id },
-              select: { email: true, name: true, role: true },
-            });
+            const rows = await prisma.$queryRaw<Array<{ email: string; name: string | null; role: string }>>`
+              SELECT email, name, role
+              FROM User
+              WHERE id = ${session.user.id}
+              LIMIT 1
+            `;
+            const fresh = rows[0];
             if (fresh) {
               session.user.email = fresh.email;
               session.user.name = fresh.name;
-              session.user.role = fresh.role as Role;
+              session.user.role = normalizeRole(fresh.role);
             }
           } catch {
             // Keep token-backed values if the database is unavailable.
