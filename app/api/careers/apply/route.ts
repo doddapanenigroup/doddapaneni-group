@@ -16,6 +16,41 @@ function esc(s: string) {
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
+/**
+ * Yahoo often does not deliver a *second* SMTP message To: the same mailbox you authenticate as
+ * (inbox/spam empty). Using a plus-alias keeps the same inbox but changes RCPT TO; Yahoo supports this.
+ * @see https://help.yahoo.com/kb/SLN28705.html
+ */
+const YAHOO_STYLE_DOMAINS = new Set([
+  'yahoo.com',
+  'yahoo.co.uk',
+  'yahoo.co.in',
+  'yahoo.ca',
+  'yahoo.fr',
+  'yahoo.de',
+  'yahoo.es',
+  'yahoo.it',
+  'yahoo.com.br',
+  'yahoo.com.au',
+  'ymail.com',
+  'rocketmail.com',
+]);
+
+/** When HR notify address === SMTP login on Yahoo, rewrite to local+tag@domain for reliable delivery. */
+function careersAdminRecipientForSmtp(smtpFrom: string, notifyTo: string): string {
+  const from = smtpFrom.trim().toLowerCase();
+  const raw = notifyTo.trim();
+  const to = raw.toLowerCase();
+  if (!from || !to || from !== to) return raw;
+  const at = raw.lastIndexOf('@');
+  if (at <= 0) return raw;
+  const domain = raw.slice(at + 1).toLowerCase();
+  if (!YAHOO_STYLE_DOMAINS.has(domain)) return raw;
+  const local = raw.slice(0, at);
+  if (local.includes('+')) return raw;
+  return `${local}+dg-careers@${raw.slice(at + 1)}`;
+}
+
 function getStr(form: FormData, key: string): string {
   const v = form.get(key);
   return typeof v === 'string' ? v.trim() : '';
@@ -193,47 +228,38 @@ export async function POST(request: Request) {
       locale,
     };
 
-    try {
-      await prisma.companyFormSubmission.create({
-        data: {
-          formType: 'careers_apply',
-          companySlug: null,
-          sectorSlug: job.slug,
-          email,
-          fullName: name,
-          payloadJson: JSON.stringify(payload),
-        },
-      });
-    } catch (dbErr) {
-      console.error('[careers/apply] DB save failed', dbErr);
-      return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
-    }
-
     if (skipEmailDev) {
+      try {
+        await prisma.companyFormSubmission.create({
+          data: {
+            formType: 'careers_apply',
+            companySlug: null,
+            sectorSlug: job.slug,
+            email,
+            fullName: name,
+            payloadJson: JSON.stringify(payload),
+          },
+        });
+      } catch (dbErr) {
+        console.error('[careers/apply] DB save failed', dbErr);
+        return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+      }
       console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
-      return NextResponse.json(
-        {
-          ok: true,
-          emailSent: false,
-          message:
-            'Application saved (development mode: email not sent). Remove CAREERS_APPLY_DEV_NO_EMAIL or set EMAIL_USER + EMAIL_PASS to test delivery.',
-        },
-        { status: 200 },
-      );
+      return NextResponse.json({ ok: true }, { status: 200 });
     }
 
     const fromAddr = getSmtpUser();
     const transporter = createMailTransporter();
     if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
-      console.warn('[careers/apply] Application saved; outbound email not configured or transport unavailable.');
+      console.warn('[careers/apply] Outbound email not configured or transport unavailable.');
       return NextResponse.json(
         {
-          ok: true,
-          emailSent: false,
+          ok: false,
+          code: 'MAIL_NOT_CONFIGURED',
           message:
-            'Application received. Confirmation email could not be sent (server mail not configured). Our team can still review your application.',
+            'Online applications are temporarily unavailable. Please try again later or reach out to us directly.',
         },
-        { status: 200 },
+        { status: 503 },
       );
     }
 
@@ -281,9 +307,15 @@ export async function POST(request: Request) {
         </div>`,
     };
 
+    /** Same mailbox as SMTP login: Yahoo delivers more reliably to a plus-alias in the same inbox. */
+    const notifyTo = careersAdminRecipientForSmtp(fromAddr, fromAddr);
+    if (notifyTo !== fromAddr) {
+      console.warn(`[careers/apply] Using plus-alias (${fromAddr} → ${notifyTo}) for inbox delivery.`);
+    }
+
     const adminMailOptions = {
       from: `"DG Careers" <${fromAddr}>`,
-      to: fromAddr,
+      to: notifyTo,
       replyTo: email,
       subject: `Careers application: ${name} — ${jobTitle}`,
       attachments: [attachment],
@@ -297,31 +329,55 @@ export async function POST(request: Request) {
         </div>`,
     };
 
-    try {
-      await Promise.all([transporter.sendMail(userMailOptions), transporter.sendMail(adminMailOptions)]);
-    } catch (mailErr) {
-      console.error('[careers/apply] sendMail failed after save:', smtpFailureUserMessage(mailErr));
-      const msgLower = mailErr instanceof Error ? mailErr.message.toLowerCase() : '';
-      const gmailHint =
-        msgLower.includes('535') ||
-        msgLower.includes('invalid login') ||
-        msgLower.includes('authentication unsuccessful')
-          ? ' If you use Gmail, use an App Password (not your normal account password).'
-          : '';
+    /** Inbox first (with resume), then persist, then applicant confirmation — avoids Yahoo dropping the second self-addressed message. */
+    let lastInboxErr: unknown;
+    let inboxDelivered = false;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await transporter.sendMail(adminMailOptions);
+        inboxDelivered = true;
+        break;
+      } catch (e) {
+        lastInboxErr = e;
+        console.error(`[careers/apply] inbox sendMail attempt ${attempt + 1} failed:`, smtpFailureUserMessage(e));
+      }
+    }
+
+    if (!inboxDelivered) {
+      console.error('[careers/apply] inbox delivery failed after retries:', smtpFailureUserMessage(lastInboxErr));
       return NextResponse.json(
         {
-          ok: true,
-          emailSent: false,
-          message: `${smtpFailureUserMessage(mailErr)}${gmailHint}`,
+          ok: false,
+          code: 'INBOX_DELIVERY_FAILED',
+          message:
+            'We could not complete your submission at this time. Please try again in a few minutes, or contact us if you need assistance.',
         },
-        { status: 200 },
+        { status: 503 },
       );
     }
 
-    return NextResponse.json(
-      { ok: true, emailSent: true, message: 'Application sent successfully' },
-      { status: 200 },
-    );
+    try {
+      await prisma.companyFormSubmission.create({
+        data: {
+          formType: 'careers_apply',
+          companySlug: null,
+          sectorSlug: job.slug,
+          email,
+          fullName: name,
+          payloadJson: JSON.stringify(payload),
+        },
+      });
+    } catch (dbErr) {
+      console.error('[careers/apply] DB save failed after inbox mail succeeded', dbErr);
+    }
+
+    try {
+      await transporter.sendMail(userMailOptions);
+    } catch (e) {
+      console.error('[careers/apply] applicant confirmation sendMail failed (inbox already received application):', smtpFailureUserMessage(e));
+    }
+
+    return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     console.error('[careers/apply]', error);
     if (isLikelyDatabaseError(error)) {

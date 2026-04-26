@@ -25,12 +25,11 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
   const t = useTranslations('CareersPage');
   const titleId = useId();
   const firstFieldRef = useRef<HTMLInputElement>(null);
+  const resumeSectionRef = useRef<HTMLElement>(null);
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  /** Shown under success copy when the API returns an extra note (e.g. dev mode without SMTP). */
-  const [successNote, setSuccessNote] = useState('');
-  const [successEmailDelivered, setSuccessEmailDelivered] = useState(true);
-  /** Languages offered for this role → candidate multi-select */
+  /** Red outline on resume block when user submits without a file. */
+  const [resumeHighlight, setResumeHighlight] = useState(false);
   const [langPick, setLangPick] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -61,18 +60,31 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
   const handleClose = () => {
     setStatus('idle');
     setErrorMessage('');
-    setSuccessNote('');
-    setSuccessEmailDelivered(true);
+    setResumeHighlight(false);
     onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus('sending');
-    setErrorMessage('');
-    setSuccessNote('');
-    setSuccessEmailDelivered(true);
     const form = e.currentTarget;
+    setErrorMessage('');
+    setResumeHighlight(false);
+
+    const resumeEl = form.elements.namedItem('resume');
+    const fileInput = resumeEl instanceof HTMLInputElement ? resumeEl : null;
+    const f = fileInput?.files?.[0];
+    if (!f || f.size === 0) {
+      setStatus('error');
+      setResumeHighlight(true);
+      setErrorMessage(t('applyResumeAttachRequired'));
+      requestAnimationFrame(() => {
+        resumeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      return;
+    }
+
+    setStatus('sending');
+
     const fd = new FormData(form);
     fd.set('jobSlug', job.slug);
     fd.set('locale', locale);
@@ -92,27 +104,35 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
         method: 'POST',
         body: fd,
       });
-      const data = (await res.json().catch(() => ({}))) as { message?: string; emailSent?: boolean };
-      if (!res.ok) {
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
+      };
+
+      if (!res.ok || data.ok !== true) {
         setStatus('error');
-        setErrorMessage(data.message || t('applyFormError'));
+        if (data.code === 'INBOX_DELIVERY_FAILED') {
+          setErrorMessage(t('applyFormSubmitInboxFailed'));
+        } else if (data.code === 'MAIL_NOT_CONFIGURED') {
+          setErrorMessage(t('applyFormSubmitMailNotConfigured'));
+        } else {
+          setErrorMessage((data.message || '').trim() || t('applyFormError'));
+        }
         return;
       }
+
       form.reset();
-      const mailOk = data.emailSent !== false;
-      setSuccessEmailDelivered(mailOk);
-      const msg = (data.message || '').trim();
-      if (!mailOk) {
-        setSuccessNote(msg || t('applyFormSuccessNoEmailNote'));
-      } else {
-        setSuccessNote(msg && msg !== 'Application sent successfully' ? msg : '');
-      }
       setStatus('success');
     } catch {
       setStatus('error');
       setErrorMessage(t('applyFormError'));
     }
   };
+
+  const resumeSectionRing = resumeHighlight
+    ? 'rounded-xl ring-2 ring-red-500 ring-offset-2 ring-offset-white'
+    : 'rounded-xl';
 
   return (
     <div
@@ -149,14 +169,7 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
         {status === 'success' ? (
           <div className="overflow-y-auto px-5 py-12 text-center sm:px-8">
             <p className="text-lg font-semibold text-slate-900">{t('applyFormSuccessTitle')}</p>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600">
-              {successEmailDelivered ? t('applyFormSuccessBody') : t('applyFormSuccessBodyNoEmail')}
-            </p>
-            {successNote ? (
-              <p className="mx-auto mt-4 max-w-lg rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-left text-xs leading-relaxed text-amber-950">
-                {successNote}
-              </p>
-            ) : null}
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600">{t('applyFormSuccessSimpleBody')}</p>
             <button
               type="button"
               onClick={handleClose}
@@ -284,7 +297,7 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                 </div>
               </section>
 
-              <section>
+              <section ref={resumeSectionRef} className={`scroll-mt-4 ${resumeSectionRing} p-1 transition-shadow`}>
                 <SectionTitle>{t('applySectionResume')}</SectionTitle>
                 <div>
                   <label htmlFor="ca-resume" className={labelClass}>
@@ -294,8 +307,8 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                     id="ca-resume"
                     name="resume"
                     type="file"
-                    required
                     accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    onChange={() => setResumeHighlight(false)}
                     className="mt-1.5 block w-full cursor-pointer text-sm text-slate-700 file:mr-4 file:cursor-pointer file:rounded-lg file:border file:border-slate-300 file:bg-slate-100 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-slate-800 file:transition hover:file:bg-slate-200"
                   />
                   <p className="mt-2 text-xs text-slate-500">{t('applyResumeHint')}</p>
