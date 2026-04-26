@@ -74,11 +74,23 @@ function mailFromHeader(): string {
   return `"Doddapaneni Group" <${user}>`;
 }
 
+/** Optional timeouts for routes that send large attachments (e.g. careers) without exceeding serverless limits. */
+export type CreateMailTransporterOptions = {
+  connectionTimeoutMs?: number;
+  greetingTimeoutMs?: number;
+  /** Caps idle time on the socket during DATA (large uploads to SMTP). */
+  socketTimeoutMs?: number;
+};
+
 /** Nodemailer transport for Gmail (no SMTP_HOST) or custom SMTP (SMTP_HOST set). Returns null if creds missing. */
-export function createMailTransporter(): nodemailer.Transporter | null {
+export function createMailTransporter(opts?: CreateMailTransporterOptions): nodemailer.Transporter | null {
   const user = getSmtpUser();
   const pass = getSmtpPassword();
   if (!user || !pass) return null;
+
+  const connectionTimeout = opts?.connectionTimeoutMs ?? 25_000;
+  const greetingTimeout = opts?.greetingTimeoutMs ?? 25_000;
+  const socketTimeout = opts?.socketTimeoutMs;
 
   const hostRaw = process.env.SMTP_HOST?.trim();
   if (hostRaw) {
@@ -98,8 +110,9 @@ export function createMailTransporter(): nodemailer.Transporter | null {
       port,
       secure,
       auth: { user, pass },
-      connectionTimeout: 25_000,
-      greetingTimeout: 25_000,
+      connectionTimeout,
+      greetingTimeout,
+      ...(socketTimeout != null ? { socketTimeout } : {}),
       requireTLS: !secure && port === 587,
       tls: { minVersion: 'TLSv1.2' },
     });
@@ -112,6 +125,9 @@ export function createMailTransporter(): nodemailer.Transporter | null {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: { user: gmailUser, pass: gmailPass },
+    connectionTimeout,
+    greetingTimeout,
+    ...(socketTimeout != null ? { socketTimeout } : {}),
   });
 }
 

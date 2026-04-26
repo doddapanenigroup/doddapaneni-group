@@ -5,6 +5,13 @@ import {
   isLoginEmailDeliveryConfigured,
   smtpFailureUserMessage,
 } from '@/lib/email';
+
+/**
+ * Careers sends two SMTP messages (inbox + attachment, then applicant). On Vercel, this raises the
+ * serverless limit; on self-hosted (e.g. DigitalOcean + nginx), ensure proxy timeouts exceed this path
+ * (e.g. proxy_read_timeout 120s or higher for `/api/careers/apply`).
+ */
+export const maxDuration = 120;
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import { routing } from '@/i18n/routing';
@@ -249,7 +256,11 @@ export async function POST(request: Request) {
     }
 
     const fromAddr = getSmtpUser();
-    const transporter = createMailTransporter();
+    const transporter = createMailTransporter({
+      connectionTimeoutMs: 22_000,
+      greetingTimeoutMs: 22_000,
+      socketTimeoutMs: 90_000,
+    });
     if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
       console.warn('[careers/apply] Outbound email not configured or transport unavailable.');
       return NextResponse.json(
