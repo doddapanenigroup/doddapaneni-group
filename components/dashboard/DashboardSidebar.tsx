@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Code2, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Users, Code2, Megaphone, Briefcase } from 'lucide-react';
 import type { Role } from '@/lib/constants';
-import { getDashboardTitle, MARKETING_DASHBOARD_NAV_LABEL } from '@/lib/dashboard-title';
+import { getDashboardTitle, HR_DASHBOARD_NAV_LABEL, MARKETING_DASHBOARD_NAV_LABEL } from '@/lib/dashboard-title';
 import { hasAdminAccess } from '@/lib/role-utils';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import AdminSessionsLoginsColumn from '@/components/dashboard/AdminSessionsLoginsColumn';
@@ -35,6 +35,12 @@ function dashboardItems(locale: string): DashboardMenuItem[] {
       label: MARKETING_DASHBOARD_NAV_LABEL,
       icon: Megaphone,
       roles: ['ADMIN', 'DIGITAL_MARKETER'],
+    },
+    {
+      href: publicPathForLocale(locale, '/dashboard/hr'),
+      label: HR_DASHBOARD_NAV_LABEL,
+      icon: Briefcase,
+      roles: ['ADMIN', 'HR'],
     },
   ];
 }

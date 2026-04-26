@@ -1,5 +1,6 @@
 import type { Role } from '@/lib/constants';
 import {
+  canViewCareerApplications,
   hasAdminAccess,
   hasDeveloperAccess,
   hasMarketerAccess,
@@ -25,4 +26,9 @@ export function canAccessAdminDashboard(role: Role | null | undefined): boolean 
 
 export function canAccessEmployeesDashboard(role: Role | null | undefined): boolean {
   return hasAdminAccess(role);
+}
+
+/** People ops: list/download career applications and resumes. */
+export function canAccessHRCareerDashboard(role: Role | null | undefined): boolean {
+  return canViewCareerApplications(role);
 }

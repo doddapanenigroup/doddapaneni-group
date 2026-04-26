@@ -12,6 +12,10 @@ export function isMarketer(role: Role | null | undefined): boolean {
   return role === 'DIGITAL_MARKETER';
 }
 
+export function isHR(role: Role | null | undefined): boolean {
+  return role === 'HR';
+}
+
 export function hasAdminAccess(role: Role | null | undefined): boolean {
   return isAdmin(role);
 }
@@ -30,7 +34,9 @@ export function hasMarketerAccess(role: Role | null | undefined): boolean {
 
 /** Any signed-in back-office role (incl. developers) — e.g. dashboard visit logging, my-activity, search shell. */
 export function isDashboardRole(role: Role | null | undefined): boolean {
-  return role === 'ADMIN' || role === 'DEVELOPER' || role === 'DIGITAL_MARKETER';
+  return (
+    role === 'ADMIN' || role === 'DEVELOPER' || role === 'DIGITAL_MARKETER' || role === 'HR'
+  );
 }
 
 /** Who may reset another user’s password via `PATCH /api/users/[id]` (not self; self uses `/api/account/password`). */
@@ -41,8 +47,15 @@ export function canSetPasswordForTarget(
   if (!isAdmin(actorRole)) {
     return { ok: false, message: 'Not allowed to change this user password' };
   }
-  if (isAdmin(targetRole) || isDeveloper(targetRole) || isMarketer(targetRole)) {
+  if (isAdmin(targetRole) || isDeveloper(targetRole) || isMarketer(targetRole) || isHR(targetRole)) {
     return { ok: true };
   }
   return { ok: false, message: 'Not a dashboard user' };
+}
+
+/** View career applications and resumes in `/dashboard/hr` and related APIs. */
+export function canViewCareerApplications(role: Role | null | undefined): boolean {
+  if (!role) return false;
+  if (hasAdminAccess(role)) return true;
+  return isHR(role);
 }

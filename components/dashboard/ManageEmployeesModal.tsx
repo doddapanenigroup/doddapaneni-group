@@ -23,6 +23,7 @@ const roleBadgeClass: Record<string, string> = {
   ADMIN: 'bg-slate-200 text-slate-800',
   DEVELOPER: 'bg-slate-200 text-slate-800',
   DIGITAL_MARKETER: 'bg-slate-200 text-slate-800',
+  HR: 'bg-rose-100 text-rose-900 dark:bg-rose-950/50 dark:text-rose-100',
 };
 
 export default function ManageEmployeesModal({

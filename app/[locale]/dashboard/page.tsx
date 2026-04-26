@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import type { Role } from '@/lib/constants';
-import { hasAdminAccess, isDeveloper, isMarketer } from '@/lib/role-utils';
+import { hasAdminAccess, isDeveloper, isHR, isMarketer } from '@/lib/role-utils';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type Props = { params: Promise<{ locale: string }> };
@@ -18,6 +18,7 @@ export default async function DashboardPage({ params }: Props) {
   const role = (session.user.role ?? 'DEVELOPER') as Role;
 
   if (hasAdminAccess(role)) redirect(publicPathForLocale(locale, '/dashboard/admin'));
+  if (isHR(role)) redirect(publicPathForLocale(locale, '/dashboard/hr'));
   if (isDeveloper(role)) redirect(publicPathForLocale(locale, '/dashboard/developer'));
   if (isMarketer(role)) redirect(publicPathForLocale(locale, '/dashboard/marketer'));
 

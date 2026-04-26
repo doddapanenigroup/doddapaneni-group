@@ -8,6 +8,7 @@ export const ROLE_THEMES: Record<Role, string> = {
   ADMIN: 'admin',
   DEVELOPER: 'developer',
   DIGITAL_MARKETER: 'marketer',
+  HR: 'hr',
 } as const;
 
 export type ThemeId = (typeof ROLE_THEMES)[keyof typeof ROLE_THEMES];

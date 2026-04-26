@@ -12,7 +12,7 @@ const AUTH_DEBUG = process.env.AUTH_DEBUG === '1' || process.env.AUTH_DEBUG === 
 function normalizeRole(input: unknown): Role {
   const raw = String(input ?? '').trim().toUpperCase();
   if (raw === 'SUPER_ADMIN') return 'ADMIN';
-  if (raw === 'ADMIN' || raw === 'DEVELOPER' || raw === 'DIGITAL_MARKETER') {
+  if (raw === 'ADMIN' || raw === 'DEVELOPER' || raw === 'DIGITAL_MARKETER' || raw === 'HR') {
     return raw;
   }
   return 'DEVELOPER';

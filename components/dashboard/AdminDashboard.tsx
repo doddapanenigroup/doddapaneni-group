@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Users, UserCog, UserCircle, Pencil, Contact } from 'lucide-react';
+import { Users, UserCog, UserCircle, Pencil, Contact, Briefcase } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
@@ -29,7 +29,7 @@ type UserRow = {
   createdBy?: { email: string; name: string | null } | null;
 };
 
-const EMPLOYEE_ROLES: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+const EMPLOYEE_ROLES: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
 
 export default function AdminDashboard({
   users: initialUsers,
@@ -48,8 +48,8 @@ export default function AdminDashboard({
     setUsers(initialUsers);
   }, [initialUsers]);
   const employeeRoles = EMPLOYEE_ROLES;
-  const creatableRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
-  const allowedRolesForPasswordChange: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+  const creatableRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
+  const allowedRolesForPasswordChange: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
 
   const employees = users
     .filter((u) => employeeRoles.includes(u.role))
@@ -107,6 +107,13 @@ export default function AdminDashboard({
             >
               <Contact size={18} />
               Public team roster
+            </Link>
+            <Link
+              href={publicPathForLocale(locale, '/dashboard/hr')}
+              className={dashboardHeaderActionSecondary}
+            >
+              <Briefcase size={18} />
+              Career applications
             </Link>
           </>
         }

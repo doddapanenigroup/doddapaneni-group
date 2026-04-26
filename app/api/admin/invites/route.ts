@@ -9,7 +9,7 @@ import { hasAdminAccess } from '@/lib/role-utils';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 const bodySchema = z.object({
   email: z.string().email(),
-  role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']),
+  role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR']),
   expiresInHours: z.number().int().min(1).max(168).optional(), // up to 7 days
   locale: z.enum(['en', 'te', 'hi', 'es']).optional(),
 });
@@ -22,6 +22,7 @@ const ROLE_LABEL: Record<string, string> = {
   ADMIN: 'Admin',
   DEVELOPER: 'Developer',
   DIGITAL_MARKETER: 'Digital Marketer',
+  HR: 'HR',
 };
 
 export const runtime = 'nodejs';

@@ -21,12 +21,13 @@ function maybePreferIpv4ForSmtp(): void {
   }
 }
 
-const ROLES_FOR_LOGIN_EMAIL = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'] as const;
+const ROLES_FOR_LOGIN_EMAIL = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'] as const;
 
 const ROLE_LABEL: Record<string, string> = {
   ADMIN: 'Admin',
   DEVELOPER: 'Developer',
   DIGITAL_MARKETER: 'Digital Marketer',
+  HR: 'HR',
 };
 
 export function shouldSendLoginSuccessEmail(role: string): boolean {

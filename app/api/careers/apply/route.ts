@@ -23,12 +23,16 @@ function esc(s: string) {
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
+/** `next dev` only — never true on a normal production build (`next start` / Docker). */
+function isCareersDevRelaxed(): boolean {
+  return process.env.NODE_ENV === 'development';
+}
+
 /**
- * Yahoo often does not deliver a *second* SMTP message To: the same mailbox you authenticate as
- * (inbox/spam empty). Using a plus-alias keeps the same inbox but changes RCPT TO; Yahoo supports this.
- * @see https://help.yahoo.com/kb/SLN28705.html
+ * Some providers (Yahoo, Gmail) drop or hide mail To: the same address you SMTP-auth as. A plus-alias
+ * delivers to the same inbox with a different envelope recipient.
  */
-const YAHOO_STYLE_DOMAINS = new Set([
+const SAME_MAILBOX_PLUS_ALIAS_DOMAINS = new Set([
   'yahoo.com',
   'yahoo.co.uk',
   'yahoo.co.in',
@@ -41,9 +45,11 @@ const YAHOO_STYLE_DOMAINS = new Set([
   'yahoo.com.au',
   'ymail.com',
   'rocketmail.com',
+  'gmail.com',
+  'googlemail.com',
 ]);
 
-/** When HR notify address === SMTP login on Yahoo, rewrite to local+tag@domain for reliable delivery. */
+/** When applications inbox === SMTP login on a supported domain, rewrite to local+tag@domain. */
 function careersAdminRecipientForSmtp(smtpFrom: string, notifyTo: string): string {
   const from = smtpFrom.trim().toLowerCase();
   const raw = notifyTo.trim();
@@ -52,7 +58,7 @@ function careersAdminRecipientForSmtp(smtpFrom: string, notifyTo: string): strin
   const at = raw.lastIndexOf('@');
   if (at <= 0) return raw;
   const domain = raw.slice(at + 1).toLowerCase();
-  if (!YAHOO_STYLE_DOMAINS.has(domain)) return raw;
+  if (!SAME_MAILBOX_PLUS_ALIAS_DOMAINS.has(domain)) return raw;
   const local = raw.slice(0, at);
   if (local.includes('+')) return raw;
   return `${local}+dg-careers@${raw.slice(at + 1)}`;
@@ -235,18 +241,25 @@ export async function POST(request: Request) {
       locale,
     };
 
+    const contentType = (attachment.contentType || 'application/octet-stream').trim().slice(0, 200);
+    const persistSubmission = () =>
+      prisma.companyFormSubmission.create({
+        data: {
+          formType: 'careers_apply',
+          companySlug: null,
+          sectorSlug: job.slug,
+          email,
+          fullName: name,
+          payloadJson: JSON.stringify(payload),
+          resumeData: resumeBuffer,
+          resumeContentType: contentType,
+          resumeDataPresent: true,
+        },
+      });
+
     if (skipEmailDev) {
       try {
-        await prisma.companyFormSubmission.create({
-          data: {
-            formType: 'careers_apply',
-            companySlug: null,
-            sectorSlug: job.slug,
-            email,
-            fullName: name,
-            payloadJson: JSON.stringify(payload),
-          },
-        });
+        await persistSubmission();
       } catch (dbErr) {
         console.error('[careers/apply] DB save failed', dbErr);
         return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
@@ -263,6 +276,18 @@ export async function POST(request: Request) {
     });
     if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
       console.warn('[careers/apply] Outbound email not configured or transport unavailable.');
+      if (isCareersDevRelaxed()) {
+        console.warn(
+          '[careers/apply] DEV only: saving application without email (set EMAIL_USER + EMAIL_PASS + SMTP_* to test SMTP).',
+        );
+        try {
+          await persistSubmission();
+        } catch (dbErr) {
+          console.error('[careers/apply] DB save failed', dbErr);
+          return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+        }
+        return NextResponse.json({ ok: true }, { status: 200 });
+      }
       return NextResponse.json(
         {
           ok: false,
@@ -318,10 +343,11 @@ export async function POST(request: Request) {
         </div>`,
     };
 
-    /** Same mailbox as SMTP login: Yahoo delivers more reliably to a plus-alias in the same inbox. */
-    const notifyTo = careersAdminRecipientForSmtp(fromAddr, fromAddr);
-    if (notifyTo !== fromAddr) {
-      console.warn(`[careers/apply] Using plus-alias (${fromAddr} → ${notifyTo}) for inbox delivery.`);
+    /** Inbox for applications + resume. Defaults to EMAIL_USER; override with CAREERS_ADMIN_NOTIFY_EMAIL (e.g. Gmail). */
+    const notifyToRaw = process.env.CAREERS_ADMIN_NOTIFY_EMAIL?.trim() || fromAddr;
+    const notifyTo = careersAdminRecipientForSmtp(fromAddr, notifyToRaw);
+    if (notifyTo !== notifyToRaw) {
+      console.warn(`[careers/apply] Using plus-alias for applications inbox (${notifyToRaw} → ${notifyTo}).`);
     }
 
     const adminMailOptions = {
@@ -368,16 +394,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await prisma.companyFormSubmission.create({
-        data: {
-          formType: 'careers_apply',
-          companySlug: null,
-          sectorSlug: job.slug,
-          email,
-          fullName: name,
-          payloadJson: JSON.stringify(payload),
-        },
-      });
+      await persistSubmission();
     } catch (dbErr) {
       console.error('[careers/apply] DB save failed after inbox mail succeeded', dbErr);
     }

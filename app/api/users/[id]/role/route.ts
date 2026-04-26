@@ -7,7 +7,9 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
 
 function isRole(value: unknown): value is DbRole {
-  return value === 'ADMIN' || value === 'DEVELOPER' || value === 'DIGITAL_MARKETER';
+  return (
+    value === 'ADMIN' || value === 'DEVELOPER' || value === 'DIGITAL_MARKETER' || value === 'HR'
+  );
 }
 
 export const runtime = 'nodejs';

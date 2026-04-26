@@ -15,10 +15,10 @@ type SessionRow = {
   userRole: string;
 };
 
-function normalizeRole(raw: unknown): 'ADMIN' | 'DEVELOPER' | 'DIGITAL_MARKETER' {
+function normalizeRole(raw: unknown): 'ADMIN' | 'DEVELOPER' | 'DIGITAL_MARKETER' | 'HR' {
   const v = String(raw ?? '').trim().toUpperCase();
   if (v === 'SUPER_ADMIN') return 'ADMIN';
-  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER') return v;
+  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER' || v === 'HR') return v;
   return 'DEVELOPER';
 }
 

@@ -22,7 +22,7 @@ type AdminUserRow = {
 function normalizeRole(raw: unknown): Role {
   const v = String(raw ?? '').trim().toUpperCase();
   if (v === 'SUPER_ADMIN') return 'ADMIN';
-  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER') return v;
+  if (v === 'ADMIN' || v === 'DEVELOPER' || v === 'DIGITAL_MARKETER' || v === 'HR') return v;
   return 'DEVELOPER';
 }
 

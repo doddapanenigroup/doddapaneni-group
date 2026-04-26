@@ -24,7 +24,7 @@ const createUserSchema = z.object({
   username: usernameSchema,
   password: z.string().min(6),
   name: z.string().optional(),
-  role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER']),
+  role: z.enum(['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR']),
 });
 
 export async function POST(request: Request) {

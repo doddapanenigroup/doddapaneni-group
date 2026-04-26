@@ -55,6 +55,16 @@
   --theme-accent-muted: 110 231 183;
 }
 
+/* HR: rose / people */
+[data-theme="hr"] {
+  --theme-primary: 190 18 60;
+  --theme-primary-foreground: 255 255 255;
+  --theme-background: 255 241 242;
+  --theme-background-muted: 254 205 211;
+  --theme-accent: 244 63 94;
+  --theme-accent-muted: 253 164 175;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

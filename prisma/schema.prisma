@@ -15,6 +15,7 @@ enum Role {
   ADMIN
   DEVELOPER
   DIGITAL_MARKETER
+  HR
 }
 
 model User {
@@ -345,6 +346,12 @@ model CompanyFormSubmission {
   email       String
   fullName    String?  @map("full_name")
   payloadJson String   @map("payload_json")
+  /// Resume file bytes for HR/Admin download (careers only). Older rows may be null.
+  resumeData        Bytes?  @map("resume_data")
+  /// MIME type for `Content-Type` when downloading the resume.
+  resumeContentType String? @map("resume_content_type")
+  /// Avoid loading large blobs in list queries.
+  resumeDataPresent Boolean @default(false) @map("resume_data_present")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([formType, createdAt(sort: Desc)])

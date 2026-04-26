@@ -37,7 +37,7 @@ export default async function EmployeesPage({ params }: Props) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
-  const employeeRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER'];
+  const employeeRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
 
   await connectDb();
 

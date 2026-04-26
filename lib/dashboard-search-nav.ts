@@ -1,9 +1,14 @@
 import type { Role } from '@/lib/constants';
-import { getDashboardTitle, MARKETING_DASHBOARD_NAV_LABEL } from '@/lib/dashboard-title';
+import {
+  getDashboardTitle,
+  HR_DASHBOARD_NAV_LABEL,
+  MARKETING_DASHBOARD_NAV_LABEL,
+} from '@/lib/dashboard-title';
 import {
   canAccessAdminDashboard,
   canAccessDeveloperDashboard,
   canAccessEmployeesDashboard,
+  canAccessHRCareerDashboard,
   canAccessMarketerDashboard,
 } from '@/lib/dashboard-access';
 import { hasMarketerAccess } from '@/lib/role-utils';
@@ -61,6 +66,15 @@ export function dashboardNavSearchHits(locale: string, role: Role): DashboardNav
       subtitle: 'Pages, blogs, and media (admins & digital marketers)',
       href: dash(locale, '/dashboard/marketer'),
       searchBlob: 'marketer marketing digital blog content seo media news pages',
+    });
+  }
+  if (canAccessHRCareerDashboard(role)) {
+    hits.push({
+      id: 'nav:hr',
+      title: HR_DASHBOARD_NAV_LABEL,
+      subtitle: getDashboardTitle('HR'),
+      href: dash(locale, '/dashboard/hr'),
+      searchBlob: 'hr human resources careers apply applications resumes hiring recruitment jobs',
     });
   }
   if (canAccessEmployeesDashboard(role)) {
