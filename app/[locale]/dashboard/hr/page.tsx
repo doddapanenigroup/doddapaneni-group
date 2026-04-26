@@ -5,8 +5,6 @@ import type { Role } from '@/lib/constants';
 import { canAccessHRCareerDashboard } from '@/lib/dashboard-access';
 import { getDashboardTitle } from '@/lib/dashboard-title';
 import HrCareerApplicationsClient from '@/components/dashboard/HrCareerApplicationsClient';
-import { Briefcase } from 'lucide-react';
-import DashboardPageHeader from '@/components/dashboard/DashboardPageHeader';
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -26,12 +24,15 @@ export default async function HrDashboardPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <DashboardPageHeader
-        icon={Briefcase}
-        title={getDashboardTitle('HR')}
-        description="Review applications from the public careers form and download stored resumes. Admins and HR see the same data."
-        actions={null}
-      />
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
+          {getDashboardTitle('HR')}
+        </h1>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          Review applications from the public careers form and download stored resumes. Admins and HR see the same
+          data.
+        </p>
+      </div>
       <HrCareerApplicationsClient />
     </div>
   );

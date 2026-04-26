@@ -19,6 +19,7 @@ import {
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 import {
   BRAND_LOGO_INTRINSIC,
   brandLogoSrc,
@@ -81,6 +82,8 @@ export default function Navbar() {
   const tDivision = useTranslations('DivisionLabels');
   const companyName = 'Doddapaneni Group';
   const pathname = usePathname();
+  const hideLanguageSwitcher =
+    pathname === '/news' || pathname.startsWith('/news/');
   const activeDivisionSlug = useMemo(
     () => activeCompanyDivisionSlugFromPathname(pathname),
     [pathname],
@@ -217,12 +220,13 @@ export default function Navbar() {
     }
   };
 
-  const navLinks = [
+  type NavLinkItem = { href: string; label: string; linkLocale?: string };
+  const navLinks: NavLinkItem[] = [
     { href: '/', label: t('home') },
     { href: '/about', label: t('about') },
     { href: '/team', label: t('team') },
     { href: '/careers', label: t('careers') },
-    { href: '/news', label: t('blog') },
+    { href: '/news', label: t('blog'), linkLocale: DEFAULT_LOCALE },
     { href: '/contact', label: t('contact') },
   ];
   const navBeforeMega = navLinks.slice(0, 2);
@@ -343,7 +347,12 @@ export default function Navbar() {
           {navBeforeMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
-              <Link key={link.href} href={link.href} className={linkBaseClass}>
+              <Link
+                key={link.href}
+                href={link.href}
+                {...(link.linkLocale ? { locale: link.linkLocale } : {})}
+                className={linkBaseClass}
+              >
                 {link.label}
               </Link>
             ))}
@@ -393,14 +402,19 @@ export default function Navbar() {
           {navAfterMega
             .filter((link) => link.href !== pathname)
             .map((link) => (
-              <Link key={link.href} href={link.href} className={linkBaseClass}>
+              <Link
+                key={link.href}
+                href={link.href}
+                {...(link.linkLocale ? { locale: link.linkLocale } : {})}
+                className={linkBaseClass}
+              >
                 {link.label}
               </Link>
             ))}
-          <LanguageSwitcher isTransparent={isTransparent} />
+          {!hideLanguageSwitcher ? <LanguageSwitcher isTransparent={isTransparent} /> : null}
         </div>
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-3 md:hidden">
-          <LanguageSwitcher isTransparent={isTransparent} />
+          {!hideLanguageSwitcher ? <LanguageSwitcher isTransparent={isTransparent} /> : null}
           <button
             type="button"
             onClick={() => {
@@ -427,6 +441,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  {...(link.linkLocale ? { locale: link.linkLocale } : {})}
                   className="block rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900 sm:px-3 sm:py-2.5 sm:text-base"
                   onClick={() => setIsOpen(false)}
                 >
@@ -469,6 +484,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  {...(link.linkLocale ? { locale: link.linkLocale } : {})}
                   className="block rounded-md px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-900 sm:px-3 sm:py-2.5 sm:text-base"
                   onClick={() => setIsOpen(false)}
                 >

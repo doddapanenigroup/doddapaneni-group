@@ -160,12 +160,13 @@ const nextConfig: NextConfig = {
       ...LOCALES.flatMap((loc) => [
         {
           source: `/${loc}/blog`,
-          destination: loc === DEFAULT_LOCALE ? '/news' : `/${loc}/news`,
+          /** Public news is English-only URLs (`/news`, not `/{locale}/news`). */
+          destination: '/news',
           permanent: true as const,
         },
         {
           source: `/${loc}/blog/:slug`,
-          destination: loc === DEFAULT_LOCALE ? '/news/:slug' : `/${loc}/news/:slug`,
+          destination: '/news/:slug',
           permanent: true as const,
         },
         {

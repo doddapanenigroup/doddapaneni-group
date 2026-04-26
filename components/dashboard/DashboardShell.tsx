@@ -12,7 +12,7 @@ export default function DashboardShell({
   locale,
   children,
 }: {
-  user: { email: string; name: string | null; role: Role };
+  user: { email: string; name: string | null; username?: string | null; role: Role };
   locale: string;
   children: React.ReactNode;
 }) {

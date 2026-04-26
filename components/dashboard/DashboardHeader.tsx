@@ -17,7 +17,7 @@ export default function DashboardHeader({
   user,
   locale,
 }: {
-  user: { email: string; name: string | null; role: Role };
+  user: { email: string; name: string | null; username?: string | null; role: Role };
   locale: string;
 }) {
   return (
@@ -46,10 +46,16 @@ export default function DashboardHeader({
         {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-2.5 lg:shrink-0">
           <span
-            className="mr-1 hidden max-w-[14rem] truncate text-xs text-slate-600 dark:text-slate-400 xl:inline"
-            title={user.email}
+            className="mr-1 hidden max-w-[22rem] truncate text-xs text-slate-600 dark:text-slate-400 xl:inline"
+            title={[user.name, user.username ? `@${user.username}` : null, user.email].filter(Boolean).join(' · ')}
           >
-            {user.email}
+            {user.name ? <span className="text-slate-800 dark:text-slate-200">{user.name}</span> : null}
+            {user.name && (user.username || user.email) ? <span className="mx-1 text-slate-400">·</span> : null}
+            {user.username ? (
+              <span className="font-mono text-slate-700 dark:text-slate-300">@{user.username}</span>
+            ) : null}
+            {(user.name || user.username) && user.email ? <span className="mx-1 text-slate-400">·</span> : null}
+            <span>{user.email}</span>
           </span>
 
           <DashboardNotificationBell />

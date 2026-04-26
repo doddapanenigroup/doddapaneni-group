@@ -19,6 +19,7 @@ import {
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
 import { newsArticlePath } from '@/lib/news-paths';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
 import { sectorHeroSubtitleForLocale, sectorPublicName } from '@/lib/sector-localized-copy';
 
@@ -248,7 +249,7 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                 <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">{tBlog('emptySectorBody')}</p>
                 <Link
                   href={allNewsHref}
-                  locale={locale}
+                  locale={NEWS_PUBLIC_LINK_LOCALE}
                   className="mt-6 inline-flex items-center rounded-lg bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800"
                 >
                   {tBlog('browseAllNews')}
@@ -266,7 +267,11 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                       key={post.slug}
                       className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
                     >
-                      <Link href={newsArticlePath(sector.slug, post.slug)} locale={locale} prefetch>
+                      <Link
+                        href={newsArticlePath(sector.slug, post.slug)}
+                        locale={NEWS_PUBLIC_LINK_LOCALE}
+                        prefetch
+                      >
                         <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                           {imageSrc ? (
                             <Image

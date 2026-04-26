@@ -4,6 +4,7 @@ import { Calendar, ArrowLeft, Clock } from 'lucide-react';
 import NewsPostEngagement from '@/components/news/NewsPostEngagement';
 import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
 import { prepareBlogBodyHtml } from '@/lib/blog-content-display';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 
 type Props = {
   locale: string;
@@ -81,7 +82,7 @@ export default function BlogPostClient({
         <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
-            locale={locale}
+            locale={NEWS_PUBLIC_LINK_LOCALE}
             className="inline-flex items-center text-base font-bold text-blue-900 transition-colors hover:text-blue-950"
           >
             <ArrowLeft size={20} className="mr-2 shrink-0" aria-hidden />
@@ -98,7 +99,7 @@ export default function BlogPostClient({
         <div className="mx-auto max-w-4xl">
           <Link
             href={backLink}
-            locale={locale}
+            locale={NEWS_PUBLIC_LINK_LOCALE}
             className="mb-3 inline-flex items-center text-sm font-semibold text-white/90 transition-colors hover:text-white"
           >
             <ArrowLeft size={18} className="mr-2 shrink-0" aria-hidden />

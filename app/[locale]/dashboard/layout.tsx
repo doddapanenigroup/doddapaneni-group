@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
+import type { Role } from '@/lib/constants';
+import { loadDashboardShellUserRow } from '@/lib/admin-dashboard-users';
 
 /** Session + DB-backed shell must not be served from a shared static shell. */
 export const dynamic = 'force-dynamic';
@@ -43,8 +45,35 @@ export default async function DashboardLayout({
     // Best-effort: if DB is temporarily unavailable, do not block dashboard rendering here.
   }
 
+  /** JWT can lag behind `User` after direct DB edits; read the row so header + role match the database. */
+  let shellUser: {
+    email: string;
+    name: string | null;
+    username: string | null;
+    role: Role;
+  } = {
+    email: session.user.email,
+    name: session.user.name,
+    username: null,
+    role: session.user.role as Role,
+  };
+  try {
+    await connectDb();
+    const fresh = await loadDashboardShellUserRow(session.user.id);
+    if (fresh) {
+      shellUser = {
+        email: fresh.email,
+        name: fresh.name,
+        username: fresh.username,
+        role: fresh.role,
+      };
+    }
+  } catch {
+    /* keep session-backed shellUser */
+  }
+
   return (
-    <DashboardShell user={session.user} locale={locale}>
+    <DashboardShell user={shellUser} locale={locale}>
       {children}
     </DashboardShell>
   );

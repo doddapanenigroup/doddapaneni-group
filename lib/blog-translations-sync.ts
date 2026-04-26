@@ -139,71 +139,28 @@ export async function applyMachineTranslationsFromCanonicalPost(
 }
 
 /**
- * Fills or updates `NewsTranslation` rows from the canonical `News` row.
- * Set `BLOG_AUTO_TRANSLATE=0` to skip entirely.
+ * Public `/news` is English-only; `NewsTranslation` rows are not maintained.
  */
-export async function syncBlogTranslations(newsId: string): Promise<void> {
-  if (process.env.BLOG_AUTO_TRANSLATE === '0') {
-    return;
-  }
-
-  await connectDb();
-  const post = await prisma.news.findUnique({
-    where: { id: newsId },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      excerpt: true,
-      metaTitle: true,
-      metaDescription: true,
-      ogTitle: true,
-      ogDescription: true,
-    },
-  });
-  if (!post) return;
-
-  await applyMachineTranslationsFromCanonicalPost(post);
+export async function syncBlogTranslations(_newsId: string): Promise<void> {
+  return;
 }
 
 /**
- * Marketer-triggered full machine translate (draft or published). Respects `BLOG_AUTO_TRANSLATE=0`.
+ * Disabled: `/news` articles are not machine-translated into locale rows.
  */
 export async function translateBlogPostByIdForMarketer(
-  newsId: string,
+  _newsId: string,
 ): Promise<
   | { ok: true; locales: string[]; failedLocales: string[] }
   | { ok: false; message: string }
 > {
-  if (process.env.BLOG_AUTO_TRANSLATE === '0') {
-    return { ok: false, message: 'Auto-translate is off (set BLOG_AUTO_TRANSLATE unset or non-zero).' };
-  }
-
-  await connectDb();
-  const post = await prisma.news.findUnique({
-    where: { id: newsId },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      excerpt: true,
-      metaTitle: true,
-      metaDescription: true,
-      ogTitle: true,
-      ogDescription: true,
-    },
-  });
-  if (!post) {
-    return { ok: false, message: 'Post not found.' };
-  }
-
-  const result = await applyMachineTranslationsFromCanonicalPost(post);
-  return { ok: true, locales: result.translatedLocales, failedLocales: result.failedLocales };
+  return {
+    ok: false,
+    message:
+      'News translations are disabled. Public /news shows the English article only; use site i18n for other pages.',
+  };
 }
 
-export function scheduleBlogTranslationSync(newsId: string): void {
-  if (process.env.BLOG_AUTO_TRANSLATE === '0') return;
-  void syncBlogTranslations(newsId).catch((e) => {
-    console.error(`[blog-translations] scheduleBlogTranslationSync failed newsId=${newsId}`, e);
-  });
+export function scheduleBlogTranslationSync(_newsId: string): void {
+  return;
 }

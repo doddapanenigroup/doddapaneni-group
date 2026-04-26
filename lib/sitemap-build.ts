@@ -40,3 +40,18 @@ export function alternateLanguagesForPathname(
   map['x-default'] = absoluteUrlForLocale(origin, routing.defaultLocale, fixed);
   return map;
 }
+
+/**
+ * `/news` is English-only (no per-locale article content). Advertise a single canonical URL for SEO.
+ */
+export function alternateLanguagesNewsCanonicalOnly(
+  origin: string,
+  pathname: string,
+): Record<string, string> {
+  const fixed = fixPathname(pathname);
+  const canonical = absoluteUrlForLocale(origin, DEFAULT_LOCALE, fixed);
+  return {
+    [DEFAULT_LOCALE]: canonical,
+    'x-default': canonical,
+  };
+}

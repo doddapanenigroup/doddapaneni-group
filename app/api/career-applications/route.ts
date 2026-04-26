@@ -26,6 +26,8 @@ export async function GET() {
     }
 
     await connectDb();
+
+    // Core columns only — avoids 500 when the DB was not migrated with `resume_data*` / `resume_data_present`.
     const rows = await prisma.companyFormSubmission.findMany({
       where: { formType: 'careers_apply' },
       orderBy: { createdAt: 'desc' },
@@ -37,9 +39,22 @@ export async function GET() {
         sectorSlug: true,
         payloadJson: true,
         createdAt: true,
-        resumeDataPresent: true,
       },
     });
+
+    const idsWithResume = new Set<string>();
+    try {
+      const flagged = await prisma.$queryRaw<Array<{ id: string }>>`
+        SELECT id FROM company_form_submission
+        WHERE form_type = 'careers_apply'
+          AND resume_data IS NOT NULL
+          AND LENGTH(resume_data) > 0
+        LIMIT 500
+      `;
+      for (const row of flagged) idsWithResume.add(row.id);
+    } catch (probeErr) {
+      console.warn('[career-applications/GET] resume_data column probe failed (ok on older DBs):', probeErr);
+    }
 
     const items = rows.map((r) => {
       let p: PayloadShape = {};
@@ -56,7 +71,7 @@ export async function GET() {
         jobTitle: p.jobTitle ?? null,
         positionApplied: p.positionApplied ?? null,
         resumeFileName: p.resumeFileName ?? null,
-        resumeDataPresent: r.resumeDataPresent,
+        resumeDataPresent: idsWithResume.has(r.id),
         createdAt: r.createdAt.toISOString(),
         details: p,
       };

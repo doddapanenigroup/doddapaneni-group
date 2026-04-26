@@ -235,16 +235,16 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                 <SectionTitle>{t('applySectionJob')}</SectionTitle>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="ca-position" className={labelClass}>
+                    <p id="ca-position-label" className={labelClass}>
                       {t('applyFieldPosition')}
-                    </label>
-                    <input
-                      id="ca-position"
-                      name="positionApplied"
-                      required
-                      defaultValue={job.title}
-                      className={inputClass}
-                    />
+                    </p>
+                    <input type="hidden" name="positionApplied" value={job.title} />
+                    <div
+                      className={`${inputClass} cursor-default bg-slate-50 text-slate-900`}
+                      aria-labelledby="ca-position-label"
+                    >
+                      {job.title}
+                    </div>
                   </div>
                   <div>
                     <p className={labelClass}>{t('applySectionLanguages')}</p>
@@ -322,14 +322,15 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                     <label htmlFor="ca-exp" className={labelClass}>
                       {t('applyFieldExperience')}
                     </label>
-                    <select id="ca-exp" name="experienceYears" className={inputClass}>
-                      <option value="">{t('applyExperienceSelect')}</option>
-                      <option value="0–1 years">{t('applyExp01')}</option>
-                      <option value="2–3 years">{t('applyExp23')}</option>
-                      <option value="4–5 years">{t('applyExp45')}</option>
-                      <option value="6–10 years">{t('applyExp610')}</option>
-                      <option value="10+ years">{t('applyExp10p')}</option>
-                    </select>
+                    <input
+                      id="ca-exp"
+                      name="experienceYears"
+                      type="text"
+                      inputMode="decimal"
+                      autoComplete="off"
+                      placeholder={t('applyFieldExperiencePlaceholder')}
+                      className={inputClass}
+                    />
                   </div>
                   <div>
                     <label htmlFor="ca-skills" className={labelClass}>
@@ -371,6 +372,9 @@ export default function CareersApplyModal({ job, locale, onClose }: Props) {
                     {t('applyFieldStartDate')}
                   </label>
                   <input id="ca-start" name="startDate" type="date" className={inputClass} />
+                  <p className="mt-1.5 text-xs font-normal normal-case text-slate-500">
+                    {t('applyFieldStartDateFormatHint')}
+                  </p>
                 </div>
               </section>
 

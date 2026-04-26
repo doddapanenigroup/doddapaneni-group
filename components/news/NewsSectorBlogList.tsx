@@ -8,6 +8,7 @@ import { useTranslations } from '@/lib/dictionary-react';
 import MotionLazy from '@/components/motion/MotionLazy';
 import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
 import { newsArticlePath } from '@/lib/news-paths';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 
 export type NewsSectorPostItem = {
   slug: string;
@@ -67,7 +68,11 @@ export default function NewsSectorBlogList({
                   transition={{ delay: index * 0.04 }}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border-2 border-blue-100 bg-white shadow-[0_2px_12px_rgba(30,58,138,0.06)] transition hover:border-blue-900 hover:shadow-[0_8px_30px_rgba(30,58,138,0.12)]"
                 >
-                  <Link href={newsArticlePath(sectorSlug, post.slug)} locale={locale} className="flex h-full flex-col">
+                  <Link
+                    href={newsArticlePath(sectorSlug, post.slug)}
+                    locale={NEWS_PUBLIC_LINK_LOCALE}
+                    className="flex h-full flex-col"
+                  >
                     <div className="relative h-52 w-full shrink-0 overflow-hidden bg-blue-50">
                       {post.image ? (
                         <Image

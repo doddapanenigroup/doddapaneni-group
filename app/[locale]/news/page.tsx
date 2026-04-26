@@ -3,10 +3,12 @@ import { getDictionary } from '@/lib/translations';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { DEFAULT_LOCALE } from '@/i18n/locales';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
-import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
-import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
+import { normalizeStoredImage } from '@/lib/sector-landing';
+import { alternateLanguagesNewsCanonicalOnly } from '@/lib/sitemap-build';
 import { canonicalDivisionDisplayName, orderedCompanyDivisionSlugsForBlogHub } from '@/lib/company-divisions';
 import { getCompanyDivisionSectorsMap } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
@@ -29,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${t('title')} | Doddapaneni Group`;
   const description = t('subtitle');
   const origin = getSiteOrigin();
-  const path = publicPathWithLocale(locale, 'news');
+  const path = publicPathForLocale(DEFAULT_LOCALE, '/news');
   const canonical = `${origin}${path}`;
 
   return {
@@ -38,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical,
-      languages: alternateLanguagesForPathname(origin, '/news'),
+      languages: alternateLanguagesNewsCanonicalOnly(origin, '/news'),
     },
     openGraph: {
       title,

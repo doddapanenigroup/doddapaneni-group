@@ -382,6 +382,19 @@ export async function POST(request: Request) {
 
     if (!inboxDelivered) {
       console.error('[careers/apply] inbox delivery failed after retries:', smtpFailureUserMessage(lastInboxErr));
+      /** Local dev: bad or blocked SMTP is common; still persist so forms can be tested without a working inbox. */
+      if (isCareersDevRelaxed()) {
+        console.warn(
+          '[careers/apply] DEV: inbox SMTP failed after retries; saving application without email. Fix EMAIL_*/SMTP_* or set CAREERS_APPLY_DEV_NO_EMAIL=1 to skip sending intentionally.',
+        );
+        try {
+          await persistSubmission();
+        } catch (dbErr) {
+          console.error('[careers/apply] DB save failed after SMTP failure', dbErr);
+          return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+        }
+        return NextResponse.json({ ok: true }, { status: 200 });
+      }
       return NextResponse.json(
         {
           ok: false,

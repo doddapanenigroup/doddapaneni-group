@@ -11,6 +11,46 @@ import { captureErrorToDb } from '@/lib/error-monitor';
 import { hasAdminAccess } from '@/lib/role-utils';
 import { notifyAdminsUserCreated } from '@/lib/notify';
 import { resolveLibsqlDatabaseUrl } from '@/lib/resolve-libsql-database-url';
+import { loadAdminDashboardUserRows } from '@/lib/admin-dashboard-users';
+import { unstable_noStore } from 'next/cache';
+
+export const dynamic = 'force-dynamic';
+
+/** List users for admin dashboards (Manage employees, etc.). Always fresh — not cached by CDN. */
+export async function GET(request: Request) {
+  try {
+    unstable_noStore();
+    const session = await auth();
+    const role = session?.user?.role;
+    if (!session?.user || !hasAdminAccess(role as Role)) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+    if (process.env.NODE_ENV === 'development') {
+      const raw = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
+      const label = raw.toLowerCase().startsWith('file:') ? `local file (${raw.slice(0, 48)}…)` : 'remote libsql';
+      console.info('[api/users GET] reading users from', label);
+    }
+    const users = await loadAdminDashboardUserRows();
+    return NextResponse.json(
+      { users },
+      {
+        headers: {
+          'Cache-Control': 'private, no-store, max-age=0',
+        },
+      },
+    );
+  } catch (error) {
+    await captureErrorToDb({
+      error,
+      request,
+      statusCode: 500,
+      context: 'users/GET',
+      user: null,
+    });
+    console.error('List users error:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+  }
+}
 
 const usernameSchema = z
   .string()

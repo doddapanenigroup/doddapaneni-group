@@ -1,6 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 import { useTranslations } from '@/lib/dictionary-react';
 import {
   BRAND_LOGO_INTRINSIC,
@@ -86,7 +87,12 @@ export default function Footer() {
             <p className="mt-1 text-[11px] leading-relaxed text-blue-300 sm:mt-1.5 sm:text-xs md:text-sm">{t('tagline')}</p>
             <nav aria-label={t('footerSiteLinksAria')} className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1.5 sm:mt-2.5 sm:gap-x-2 sm:gap-y-2">
               {siteLinks.map(({ href, label }) => (
-                <Link key={href} href={href} className={siteLinkChipClass}>
+                <Link
+                  key={href}
+                  href={href}
+                  {...(href === '/news' ? { locale: NEWS_PUBLIC_LINK_LOCALE } : {})}
+                  className={siteLinkChipClass}
+                >
                   {label}
                 </Link>
               ))}

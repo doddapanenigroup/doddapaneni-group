@@ -30,12 +30,40 @@ export async function GET(_req: Request, { params }: Params) {
     }
 
     await connectDb();
-    const row = await prisma.companyFormSubmission.findFirst({
-      where: { id, formType: 'careers_apply' },
-      select: { payloadJson: true, resumeData: true, resumeContentType: true },
-    });
+    let row: {
+      payloadJson: string;
+      resumeData: Uint8Array | Buffer | null;
+      resumeContentType: string | null;
+    } | null;
+    try {
+      row = await prisma.companyFormSubmission.findFirst({
+        where: { id, formType: 'careers_apply' },
+        select: { payloadJson: true, resumeData: true, resumeContentType: true },
+      });
+    } catch (dbErr) {
+      console.error('[career-applications/resume/GET] DB query failed', dbErr);
+      return NextResponse.json(
+        {
+          message:
+            'Resume download requires an up-to-date database schema (run prisma db push / your Turso push script).',
+        },
+        { status: 503 },
+      );
+    }
 
-    if (!row?.resumeData?.length) {
+    if (!row) {
+      return NextResponse.json({ message: 'Not found' }, { status: 404 });
+    }
+
+    const bytes = row.resumeData;
+    if (bytes == null) {
+      return NextResponse.json(
+        { message: 'No resume on file for this application.' },
+        { status: 404 },
+      );
+    }
+    const byteLen = Buffer.isBuffer(bytes) ? bytes.length : bytes.byteLength;
+    if (byteLen === 0) {
       return NextResponse.json(
         { message: 'No resume on file for this application.' },
         { status: 404 },
@@ -53,7 +81,8 @@ export async function GET(_req: Request, { params }: Params) {
     }
 
     const ct = row.resumeContentType?.trim() || 'application/octet-stream';
-    return new NextResponse(new Uint8Array(row.resumeData), {
+    const body = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
+    return new NextResponse(new Uint8Array(body), {
       status: 200,
       headers: {
         'Content-Type': ct,

@@ -24,11 +24,7 @@ import {
 import FeatureGate from '@/components/FeatureGate';
 import GoogleSnippetPreview from '@/components/dashboard/GoogleSnippetPreview';
 import BlogSeoScorePanel from '@/components/dashboard/BlogSeoScorePanel';
-import {
-  MarketerBlogFields,
-  type MarketerBlogFieldsHandle,
-  type TranslationDraftHydration,
-} from '@/components/dashboard/MarketerBlogFields';
+import { MarketerBlogFields, type MarketerBlogFieldsHandle } from '@/components/dashboard/MarketerBlogFields';
 import {
   blogFromApiToForm,
   emptyBlogForm,
@@ -128,7 +124,6 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
   const [previewLink, setPreviewLink] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [domReady, setDomReady] = useState(false);
-  const [autoTranslateRunning, setAutoTranslateRunning] = useState(false);
 
   useEffect(() => {
     setDomReady(true);
@@ -449,133 +444,6 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     }
   }
 
-  const handleAutoTranslateLocales = useCallback(async () => {
-    if (blogModalMode === 'edit') {
-      const slug = editingNewsSlug;
-      if (!slug) return;
-      setAutoTranslateRunning(true);
-      try {
-        const res = await fetch(`/api/marketer/news/${encodeURIComponent(slug)}/translate-locales`, {
-          method: 'POST',
-        });
-        const data = (await res.json().catch(() => ({}))) as { message?: string; ok?: boolean };
-        if (!res.ok) {
-          setBlogToast({
-            type: 'error',
-            message:
-              typeof data.message === 'string' && data.message.trim()
-                ? data.message.trim()
-                : 'Translation failed.',
-          });
-          return;
-        }
-        const gr = await fetch(`/api/marketer/news/${encodeURIComponent(slug)}`);
-        const gd = (await gr.json().catch(() => ({}))) as { item?: BlogListRow };
-        if (gr.ok && gd.item) {
-          const item = gd.item;
-          setBlogs((prev) =>
-            prev.map((b) =>
-              b.slug === slug ? { ...blogListRowForState(item), translations: item.translations } : b,
-            ),
-          );
-        }
-        setBlogToast({
-          type: 'success',
-          message:
-            typeof data.message === 'string' && data.message.trim()
-              ? data.message.trim()
-              : 'Translations updated from English.',
-        });
-      } catch {
-        setBlogToast({ type: 'error', message: 'Translation request failed.' });
-      } finally {
-        setAutoTranslateRunning(false);
-      }
-      return;
-    }
-
-    if (blogModalMode !== 'create') return;
-    if (!blogForm.title.trim() || !blogForm.content.trim()) {
-      setBlogToast({
-        type: 'error',
-        message: 'Add English title and article body before translating.',
-      });
-      return;
-    }
-    setAutoTranslateRunning(true);
-    try {
-      const res = await fetch('/api/marketer/news/translate-fields', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: blogForm.title.trim(),
-          content: blogForm.content,
-          excerpt: blogForm.excerpt?.trim() ? blogForm.excerpt.trim() : null,
-          metaTitle: blogForm.metaTitle?.trim() ? blogForm.metaTitle.trim() : null,
-          metaDescription: blogForm.metaDescription?.trim() ? blogForm.metaDescription.trim() : null,
-          ogTitle: blogForm.ogTitle?.trim() ? blogForm.ogTitle.trim() : null,
-          ogDescription: blogForm.ogDescription?.trim() ? blogForm.ogDescription.trim() : null,
-        }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        message?: string;
-        locales?: Record<
-          string,
-          {
-            title: string;
-            content: string;
-            excerpt: string | null;
-            metaTitle: string | null;
-            metaDescription: string | null;
-          }
-        >;
-      };
-      if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message:
-            typeof data.message === 'string' && data.message.trim()
-              ? data.message.trim()
-              : 'Translation failed.',
-        });
-        return;
-      }
-      const byLocale: TranslationDraftHydration = {};
-      for (const [loc, p] of Object.entries(data.locales ?? {})) {
-        if (!p) continue;
-        byLocale[loc] = {
-          title: p.title,
-          content: p.content,
-          excerpt: p.excerpt ?? '',
-          metaTitle: p.metaTitle ?? '',
-          metaDescription: p.metaDescription ?? '',
-        };
-      }
-      blogFieldsRef.current?.hydrateTranslationDrafts(byLocale);
-      setBlogToast({
-        type: 'success',
-        message:
-          typeof data.message === 'string' && data.message.trim()
-            ? data.message.trim()
-            : 'Translation fields filled from English. Save the post to persist.',
-      });
-    } catch {
-      setBlogToast({ type: 'error', message: 'Translation request failed.' });
-    } finally {
-      setAutoTranslateRunning(false);
-    }
-  }, [
-    blogModalMode,
-    editingNewsSlug,
-    blogForm.title,
-    blogForm.content,
-    blogForm.excerpt,
-    blogForm.metaTitle,
-    blogForm.metaDescription,
-    blogForm.ogTitle,
-    blogForm.ogDescription,
-  ]);
-
   async function createPreviewLinkForBlog() {
     const slug = editingNewsSlug || blogForm.slug.trim();
     if (!slug) {
@@ -689,13 +557,6 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                   ? (blogs.find((x) => x.slug === editingNewsSlug) ?? null)
                   : null
               }
-              autoTranslateEligible={
-                (blogModalMode === 'edit' && !!editingNewsSlug) ||
-                (blogModalMode === 'create' && !!blogForm.title.trim() && !!blogForm.content.trim())
-              }
-              autoTranslateRunning={autoTranslateRunning}
-              autoTranslateBlocked={blogActionLoading !== null}
-              onAutoTranslateLocales={handleAutoTranslateLocales}
               onUploadFeatured={async (file: File) => {
                 setUploading(true);
                 try {

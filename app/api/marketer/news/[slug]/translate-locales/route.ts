@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import { connectDb, prisma } from '@/lib/db';
 import { allowMarketerModule } from '@/app/api/marketer/_permissions';
 import { captureErrorToDb } from '@/lib/error-monitor';
-import { translateBlogPostByIdForMarketer, translationTargetLocales } from '@/lib/blog-translations-sync';
+import { translateBlogPostByIdForMarketer } from '@/lib/blog-translations-sync';
 
 export const maxDuration = 300;
 
@@ -34,21 +34,9 @@ export async function POST(
 
     const result = await translateBlogPostByIdForMarketer(row.id);
     if (!result.ok) {
-      return NextResponse.json({ message: result.message }, { status: 400 });
+      return NextResponse.json({ message: result.message }, { status: 410 });
     }
-
-    const targets = translationTargetLocales();
-    const failed = result.failedLocales ?? [];
-    const okLocales = result.locales ?? [];
-    return NextResponse.json({
-      ok: true,
-      locales: okLocales,
-      failedLocales: failed,
-      message:
-        failed.length > 0
-          ? `Translated: ${okLocales.join(', ') || 'none'}. Failed: ${failed.join(', ')}.`
-          : `Translated to: ${targets.join(', ')}.`,
-    });
+    return NextResponse.json({ ok: true, locales: [], failedLocales: [] });
   } catch (error) {
     await captureErrorToDb({
       error,

@@ -9,6 +9,7 @@ import {
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { newsSectorListPath } from '@/lib/news-paths';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 import {
   EMPTY_SECTOR_LIVE_MAP,
   NEWS_SECTOR_LIVE_FIRST_POLL_MS,
@@ -23,7 +24,7 @@ type Props = {
   initialSectorLiveMap?: Record<string, boolean>;
 };
 
-export default function NewsSectorNewsNav({ locale, currentSlug, initialSectorLiveMap }: Props) {
+export default function NewsSectorNewsNav({ locale: _pageLocale, currentSlug, initialSectorLiveMap }: Props) {
   const t = useTranslations('Blog');
   const tNav = useTranslations('Navbar');
   const normalized = currentSlug.trim().toLowerCase();
@@ -73,7 +74,7 @@ export default function NewsSectorNewsNav({ locale, currentSlug, initialSectorLi
       </p>
       <Link
         href="/news"
-        locale={locale}
+        locale={NEWS_PUBLIC_LINK_LOCALE}
         className="mt-3 block rounded-xl border-2 border-blue-200 bg-white px-3 py-2.5 text-sm font-bold text-blue-900 transition hover:border-blue-900 hover:bg-blue-50"
       >
         {t('browseAllNews')}
@@ -96,7 +97,7 @@ export default function NewsSectorNewsNav({ locale, currentSlug, initialSectorLi
               <li key={slug}>
                 <Link
                   href={newsSectorListPath(slug)}
-                  locale={locale}
+                  locale={NEWS_PUBLIC_LINK_LOCALE}
                   className={active ? activeLive : inactiveLink}
                   aria-current={active ? 'page' : undefined}
                 >

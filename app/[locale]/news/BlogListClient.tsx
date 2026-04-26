@@ -6,6 +6,7 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import type { BlogMessages } from '@/lib/messages';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 
 type BlogListItem = {
   slug: string;
@@ -48,7 +49,7 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
                 >
-                  <Link href={post.href ?? `/news/${post.slug}`} locale={locale}>
+                  <Link href={post.href ?? `/news/${post.slug}`} locale={NEWS_PUBLIC_LINK_LOCALE}>
                     <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                       {post.image ? (
                         <Image

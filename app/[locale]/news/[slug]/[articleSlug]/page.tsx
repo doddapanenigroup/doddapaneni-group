@@ -7,7 +7,7 @@ import { routing } from '@/i18n/routing';
 import { fetchPublishedSectorBlogPost, resolvePublishedArticleRoute } from '@/lib/sector-blog-post';
 import { localeFromRouteParam } from '@/lib/locale-from-path';
 import { normalizeStoredImage, publicPathWithLocale } from '@/lib/sector-landing';
-import { alternateLanguagesForPathname } from '@/lib/sitemap-build';
+import { alternateLanguagesNewsCanonicalOnly } from '@/lib/sitemap-build';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: row.keywords ?? undefined,
     alternates: {
       canonical,
-      languages: alternateLanguagesForPathname(origin, pathnameForHreflang),
+      languages: alternateLanguagesNewsCanonicalOnly(origin, pathnameForHreflang),
     },
     openGraph: {
       title: row.ogTitle ?? title,

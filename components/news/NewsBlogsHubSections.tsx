@@ -2,6 +2,7 @@ import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import type { TranslateValues } from '@/lib/translation-format';
 import { newsArticlePath, newsSectorListPath } from '@/lib/news-paths';
+import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
 export type NewsHubSectionPayload = {
@@ -41,7 +42,11 @@ function HubPostCard({
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md">
-      <Link href={newsArticlePath(sectorSlug, post.slug)} locale={locale} className="flex h-full flex-col">
+      <Link
+        href={newsArticlePath(sectorSlug, post.slug)}
+        locale={NEWS_PUBLIC_LINK_LOCALE}
+        className="flex h-full flex-col"
+      >
         <div className="flex w-full shrink-0 justify-center bg-slate-100 leading-none">
           {post.image ? (
             <Image
@@ -118,7 +123,7 @@ export default function NewsBlogsHubSections({ locale, sections, t }: Props) {
             <div className="mt-5">
               <Link
                 href={newsSectorListPath(section.slug)}
-                locale={locale}
+                locale={NEWS_PUBLIC_LINK_LOCALE}
                 className="inline-flex text-xs font-semibold text-blue-800 underline decoration-2 underline-offset-4 transition hover:text-blue-950 sm:text-sm"
               >
                 {t('hubViewAll', { label: section.label })}

@@ -1,39 +1,14 @@
 'use client';
 
-import { useEffect, useImperativeHandle, useState, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef } from 'react';
 import type { TranslationPatch } from '@/lib/marketer-news-fields';
-import {
-  BLOG_LOCALES_FOR_TRANSLATIONS,
-  type BlogFormState,
-  type BlogListRow,
-} from '@/lib/marketer-blog-form';
-import { Loader2 } from 'lucide-react';
+import type { BlogFormState, BlogListRow } from '@/lib/marketer-blog-form';
 import { BlogRichContentField } from '@/components/dashboard/BlogRichContentField';
 
 type SectorOption = { id: string; name: string; slug: string };
 
-type LocDraft = {
-  title: string;
-  content: string;
-  excerpt: string;
-  metaTitle: string;
-  metaDescription: string;
-  translatedSlug: string;
-  hreflangJson: string;
-};
-
-const emptyLoc = (): LocDraft => ({
-  title: '',
-  content: '',
-  excerpt: '',
-  metaTitle: '',
-  metaDescription: '',
-  translatedSlug: '',
-  hreflangJson: '',
-});
-
-/** Partial locale drafts returned from `POST /api/marketer/news/translate-fields` for create mode. */
-export type TranslationDraftHydration = Record<string, Partial<LocDraft>>;
+/** Legacy shape for no-op `hydrateTranslationDrafts` (news is English-only on `/news`). */
+export type TranslationDraftHydration = Record<string, Record<string, unknown>>;
 
 export type MarketerBlogFieldsHandle = {
   getTranslationPatches: () => TranslationPatch[];
@@ -49,13 +24,6 @@ type Props = {
   uploading: boolean;
   activeBlog: BlogListRow | null;
   onUploadFeatured: (file: File) => Promise<void>;
-  /** Saved post in edit mode (slug exists in the database). */
-  autoTranslateEligible?: boolean;
-  autoTranslateRunning?: boolean;
-  /** True while save/create/delete is in progress — translation button waits. */
-  autoTranslateBlocked?: boolean;
-  /** Machine-translate from English into te, hi, es and refresh translation fields. */
-  onAutoTranslateLocales?: () => Promise<void>;
 };
 
 const fieldClass =
@@ -77,77 +45,15 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
     uploading,
     activeBlog,
     onUploadFeatured,
-    autoTranslateEligible = false,
-    autoTranslateRunning = false,
-    autoTranslateBlocked = false,
-    onAutoTranslateLocales,
   }: Props,
   ref,
 ) {
-  const [locDrafts, setLocDrafts] = useState<Record<string, LocDraft>>({});
-
-  useEffect(() => {
-    const next: Record<string, LocDraft> = {};
-    for (const loc of BLOG_LOCALES_FOR_TRANSLATIONS) {
-      const row = activeBlog?.translations?.find((t) => t.locale === loc);
-      next[loc] = row
-        ? {
-            title: row.title ?? '',
-            content: row.content ?? '',
-            excerpt: row.excerpt ?? '',
-            metaTitle: row.metaTitle ?? '',
-            metaDescription: row.metaDescription ?? '',
-            translatedSlug: row.translatedSlug ?? '',
-            hreflangJson: row.hreflangJson ?? '',
-          }
-        : emptyLoc();
-    }
-    setLocDrafts(next);
-    // Depend on `activeBlog`, not only `id`, so a lazy-loaded row (list omits bodies) still
-    // hydrates translation tabs after `GET /api/marketer/news/[slug]` merges full content.
-  }, [activeBlog]);
-
   useImperativeHandle(ref, () => ({
-    getTranslationPatches: () => {
-      const patches: TranslationPatch[] = [];
-      for (const loc of BLOG_LOCALES_FOR_TRANSLATIONS) {
-        const d = locDrafts[loc] ?? emptyLoc();
-        const has =
-          d.title.trim() ||
-          d.content.trim() ||
-          d.excerpt.trim() ||
-          d.metaTitle.trim() ||
-          d.metaDescription.trim() ||
-          d.translatedSlug.trim() ||
-          d.hreflangJson.trim();
-        if (!has) continue;
-        patches.push({
-          locale: loc,
-          title: d.title.trim() || undefined,
-          content: d.content.trim() || undefined,
-          excerpt: d.excerpt.trim() || null,
-          metaTitle: d.metaTitle.trim() || null,
-          metaDescription: d.metaDescription.trim() || null,
-          translatedSlug: d.translatedSlug.trim() || null,
-          hreflangJson: d.hreflangJson.trim() || null,
-        });
-      }
-      return patches;
-    },
-    hydrateTranslationDrafts: (byLocale: TranslationDraftHydration) => {
-      setLocDrafts((prev) => {
-        const next = { ...prev };
-        for (const loc of Object.keys(byLocale)) {
-          next[loc] = { ...(next[loc] ?? emptyLoc()), ...byLocale[loc] };
-        }
-        return next;
-      });
+    getTranslationPatches: (): TranslationPatch[] => [],
+    hydrateTranslationDrafts: (_byLocale: TranslationDraftHydration) => {
+      /* no-op: /news is English-only */
     },
   }));
-
-  function setLoc(loc: string, partial: Partial<LocDraft>) {
-    setLocDrafts((prev) => ({ ...prev, [loc]: { ...(prev[loc] ?? emptyLoc()), ...partial } }));
-  }
 
   return (
     <div className="space-y-4">
@@ -423,107 +329,10 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <details className={detailsShell}>
-        <summary className={summaryBtn}>
-          4. Translations (non-English locales)
-        </summary>
-        <div className="border-t border-slate-100 p-4 dark:border-slate-800">
-          <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-            Machine translation uses your English (default) title, excerpt, meta fields, and article body. Saving a
-            published post re-syncs all locales before the response. Visitors in{' '}
-            <span className="font-mono">{BLOG_LOCALES_FOR_TRANSLATIONS.join(', ')}</span> see these rows when the post
-            is published.
-          </p>
-          {onAutoTranslateLocales ? (
-            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-              <button
-                type="button"
-                onClick={() => void onAutoTranslateLocales()}
-                disabled={
-                  !autoTranslateEligible || autoTranslateRunning || autoTranslateBlocked
-                }
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-violet-300 bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-700 dark:bg-violet-700 dark:hover:bg-violet-600"
-              >
-                {autoTranslateRunning ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : null}
-                Translate languages
-              </button>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {!autoTranslateEligible
-                  ? 'Add English title and body first (new post), or open an existing post with Edit.'
-                  : autoTranslateBlocked
-                    ? 'Wait for save or delete to finish.'
-                    : autoTranslateRunning
-                      ? 'Translating… locales run in parallel; large posts may still take several seconds.'
-                      : 'Uses MyMemory from English. You can still edit any locale below afterward.'}
-              </p>
-            </div>
-          ) : null}
-          <div className="space-y-4">
-            {BLOG_LOCALES_FOR_TRANSLATIONS.map((loc) => (
-              <div
-                key={loc}
-                className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 dark:border-slate-600 dark:bg-slate-950/40"
-              >
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">
-                  {loc}
-                </p>
-                <div className="grid gap-2 sm:grid-cols-2">
-                <input
-                  className={fieldClass}
-                  placeholder="Translated title"
-                  value={locDrafts[loc]?.title ?? ''}
-                  onChange={(e) => setLoc(loc, { title: e.target.value })}
-                />
-                <input
-                  className={fieldClass}
-                  placeholder="Translated slug (optional)"
-                  value={locDrafts[loc]?.translatedSlug ?? ''}
-                  onChange={(e) => setLoc(loc, { translatedSlug: e.target.value })}
-                />
-                <textarea
-                  className={`${fieldClass} sm:col-span-2`}
-                  rows={3}
-                  placeholder="Translated excerpt"
-                  value={locDrafts[loc]?.excerpt ?? ''}
-                  onChange={(e) => setLoc(loc, { excerpt: e.target.value })}
-                />
-                <div className="sm:col-span-2">
-                  <BlogRichContentField
-                    instanceKey={`blog-loc-${activeBlog?.id ?? 'new'}-${loc}`}
-                    label="Article body (formatted)"
-                    embedded
-                    showHint={false}
-                    value={locDrafts[loc]?.content ?? ''}
-                    onChange={(content) => setLoc(loc, { content })}
-                    placeholder="Translated article — same editor as English."
-                    minHeightClass="min-h-[16rem] sm:min-h-[22rem]"
-                  />
-                </div>
-                <input
-                  className={fieldClass}
-                  placeholder="Meta title"
-                  value={locDrafts[loc]?.metaTitle ?? ''}
-                  onChange={(e) => setLoc(loc, { metaTitle: e.target.value })}
-                />
-                <input
-                  className={fieldClass}
-                  placeholder="Meta description"
-                  value={locDrafts[loc]?.metaDescription ?? ''}
-                  onChange={(e) => setLoc(loc, { metaDescription: e.target.value })}
-                />
-                <textarea
-                  className={`${fieldClass} sm:col-span-2`}
-                  rows={2}
-                  placeholder='Hreflang / alternates JSON e.g. {"en":"https://…","te":"https://…"}'
-                  value={locDrafts[loc]?.hreflangJson ?? ''}
-                  onChange={(e) => setLoc(loc, { hreflangJson: e.target.value })}
-                />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </details>
+      <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+        Public <span className="font-mono">/news</span> shows this English article for all languages. Per-locale
+        article translation and alternate article URLs are disabled.
+      </p>
 
       <div className="rounded-xl border border-slate-200 bg-violet-50/30 p-4 dark:border-slate-700 dark:bg-violet-950/20">
         <label className={labelClass}>Team note (activity log only)</label>

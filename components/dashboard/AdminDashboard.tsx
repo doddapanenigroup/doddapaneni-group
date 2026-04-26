@@ -3,16 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Users, UserCog, UserCircle, Pencil, Contact, Briefcase } from 'lucide-react';
+import { UserCog, UserCircle, Pencil, Contact, Briefcase } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
-import { getDashboardTitle } from '@/lib/dashboard-title';
 import ManageEmployeesModal from './ManageEmployeesModal';
 import AdminOpsInsights from './AdminOpsInsights';
 import AdminSessionsLoginsColumn from './AdminSessionsLoginsColumn';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
-import DashboardPageHeader from './DashboardPageHeader';
 import CareersJobsPanel from './CareersJobsPanel';
 import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
@@ -43,10 +41,45 @@ export default function AdminDashboard({
   const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [showManageModal, setShowManageModal] = useState(false);
+  const [manageModalLoading, setManageModalLoading] = useState(false);
 
+  /**
+   * When the modal is open, do not copy `initialUsers` from the server shell — a `router.refresh()` can
+   * deliver a new array reference with RSC-cached rows and overwrite a fresh `GET /api/users` list.
+   */
   useEffect(() => {
+    if (showManageModal) return;
     setUsers(initialUsers);
-  }, [initialUsers]);
+  }, [initialUsers, showManageModal]);
+
+  async function openManageEmployeesModal() {
+    setManageModalLoading(true);
+    try {
+      const res = await fetch(`/api/users?_=${Date.now()}`, {
+        cache: 'no-store',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const json = (await res.json()) as { users?: UserRow[] };
+        if (Array.isArray(json.users)) {
+          setUsers(
+            json.users.map((u) => ({
+              ...u,
+              createdAt:
+                u.createdAt instanceof Date ? u.createdAt : new Date(String(u.createdAt)),
+            })),
+          );
+        }
+      } else {
+        console.warn('[AdminDashboard] GET /api/users failed:', res.status);
+      }
+    } catch (e) {
+      console.warn('[AdminDashboard] GET /api/users error:', e);
+    } finally {
+      setManageModalLoading(false);
+      setShowManageModal(true);
+    }
+  }
   const employeeRoles = EMPLOYEE_ROLES;
   const creatableRoles: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
   const allowedRolesForPasswordChange: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
@@ -77,47 +110,33 @@ export default function AdminDashboard({
 
   return (
     <div className="space-y-8">
-      <DashboardPageHeader
-        icon={Users}
-        title={getDashboardTitle('ADMIN')}
-        description="Manage users, sector visibility, companies, and monitor developer and marketer activity."
-        actions={
-          <>
-            <button type="button" onClick={() => setShowManageModal(true)} className={dashboardHeaderActionPrimary}>
-              <UserCog size={18} />
-              Manage employees
-            </button>
-            <Link
-              href={publicPathForLocale(locale, '/dashboard/employees')}
-              className={dashboardHeaderActionSecondary}
-            >
-              <UserCircle size={18} />
-              Employees
-            </Link>
-            <Link
-              href={publicPathForLocale(locale, '/dashboard/marketer')}
-              className={dashboardHeaderActionSecondary}
-            >
-              <Pencil size={18} />
-              Blogs &amp; SEO
-            </Link>
-            <Link
-              href={publicPathForLocale(locale, '/dashboard/admin/team')}
-              className={dashboardHeaderActionSecondary}
-            >
-              <Contact size={18} />
-              Public team roster
-            </Link>
-            <Link
-              href={publicPathForLocale(locale, '/dashboard/hr')}
-              className={dashboardHeaderActionSecondary}
-            >
-              <Briefcase size={18} />
-              Career applications
-            </Link>
-          </>
-        }
-      />
+      <div className="flex flex-wrap items-center gap-2 md:justify-end">
+        <button
+          type="button"
+          disabled={manageModalLoading}
+          onClick={() => void openManageEmployeesModal()}
+          className={`${dashboardHeaderActionPrimary} disabled:pointer-events-none disabled:opacity-55`}
+        >
+          <UserCog size={18} />
+          {manageModalLoading ? 'Loading…' : 'Manage employees'}
+        </button>
+        <Link href={publicPathForLocale(locale, '/dashboard/employees')} className={dashboardHeaderActionSecondary}>
+          <UserCircle size={18} />
+          Employees
+        </Link>
+        <Link href={publicPathForLocale(locale, '/dashboard/marketer')} className={dashboardHeaderActionSecondary}>
+          <Pencil size={18} />
+          Blogs &amp; SEO
+        </Link>
+        <Link href={publicPathForLocale(locale, '/dashboard/admin/team')} className={dashboardHeaderActionSecondary}>
+          <Contact size={18} />
+          Public team roster
+        </Link>
+        <Link href={publicPathForLocale(locale, '/dashboard/hr')} className={dashboardHeaderActionSecondary}>
+          <Briefcase size={18} />
+          Career applications
+        </Link>
+      </div>
 
       {showManageModal && (
         <ManageEmployeesModal
