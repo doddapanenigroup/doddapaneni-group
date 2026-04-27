@@ -13,6 +13,7 @@ import {
 import { getTranslatedDivisionTopicNavItems } from '@/lib/company-division-nav-i18n';
 import { topicAnchorIdFromHref } from '@/lib/company-division-nav';
 import {
+  divisionLandingPathSegment,
   isCompanyDivisionSlug,
   isSectorLandingContentOnlySlug,
 } from '@/lib/company-divisions';
@@ -54,8 +55,9 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
   const companies = await listCompaniesBySectorSlug(sector.slug);
   const tHome = createTranslator(getDictionary(locale), 'Home');
 
+  const landSeg = divisionLandingPathSegment(sector.slug);
   const paginationHref = (p: number) =>
-    p <= 1 ? `/${sector.slug}` : `/${sector.slug}?page=${p}`;
+    p <= 1 ? `/${landSeg}` : `/${landSeg}?page=${p}`;
 
   const sectorTitle = sectorPublicName(locale, sectorKey, sector.name);
   const heroDescription = sectorHeroSubtitleForLocale(

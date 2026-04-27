@@ -1,6 +1,7 @@
 import {
   COMPANY_DIVISION_NAV_LABELS,
   COMPANY_DIVISION_SLUGS,
+  divisionLandingPublicPath,
   type CompanyDivisionSlug,
 } from '@/lib/company-divisions';
 import { absoluteUrlForLocale } from '@/lib/sitemap-build';
@@ -33,7 +34,7 @@ export function buildHomepageOrganizationJsonLd(
     return {
       '@type': 'Organization',
       name,
-      url: absoluteUrlForLocale(origin, locale, `/${slug}`),
+      url: absoluteUrlForLocale(origin, locale, divisionLandingPublicPath(slug)),
     };
   });
 

@@ -7,7 +7,7 @@ import MotionLazy from '@/components/motion/MotionLazy';
 import { useTranslations } from '@/lib/dictionary-react';
 import { Link } from '@/i18n/navigation';
 import { mediaUrl } from '@/lib/media';
-import { getCompanyDivisionNavItems } from '@/lib/company-divisions';
+import { divisionLandingPublicPath, getCompanyDivisionNavItems } from '@/lib/company-divisions';
 
 const DIVISIONS_NAV = getCompanyDivisionNavItems();
 
@@ -147,7 +147,7 @@ export default function About() {
                     <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-600 sm:text-sm">{blurb}</p>
                     {item.active ? (
                       <Link
-                        href={`/${item.slug}`}
+                        href={divisionLandingPublicPath(item.slug)}
                         className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-800 hover:text-blue-950 sm:text-sm"
                       >
                         {t('exploreHub')}

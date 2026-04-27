@@ -33,6 +33,68 @@ export function isActiveHomeDivisionSlug(slug: string): boolean {
   return (HOME_DIVISION_ACTIVE_SLUGS as readonly string[]).includes(slug);
 }
 
+/**
+ * These divisions use `/{slug}-services` for the public **landing** URL (keyword-style path), e.g.
+ * `/software-it-ai-services`. Sub-routes like `/software-it-ai/about` still use the base sector slug.
+ */
+export const DIVISION_KEYWORD_SERVICES_LANDING_SLUGS = [
+  'software-it-ai',
+  'digital-marketing',
+  'healthcare-medical',
+] as const satisfies readonly CompanyDivisionSlug[];
+
+export function isDivisionKeywordServicesLandingSlug(
+  slug: string,
+): slug is (typeof DIVISION_KEYWORD_SERVICES_LANDING_SLUGS)[number] {
+  return (DIVISION_KEYWORD_SERVICES_LANDING_SLUGS as readonly string[]).includes(slug);
+}
+
+/** Public path segment for the division home/landing (e.g. `software-it-ai-services`). */
+export function divisionLandingPathSegment(slug: string): string {
+  const s = slug.trim().toLowerCase();
+  if (isDivisionKeywordServicesLandingSlug(s)) {
+    return `${s}-services`;
+  }
+  return s;
+}
+
+/** URL path for the public division landing, e.g. `/software-it-ai-services` or `/construction-realestate`. */
+export function divisionLandingPublicPath(slug: string): string {
+  return `/${divisionLandingPathSegment(slug)}`;
+}
+
+const KEYWORD_LANDING_SUFFIX = '-services';
+
+/**
+ * Resolves a URL first segment (maybe `software-it-ai-services`) to a canonical `CompanyDivisionSlug`
+ * when it is a division or `base-services` for keyword landings.
+ */
+export function pathSegmentToCompanyDivisionSlug(
+  seg: string | undefined,
+): CompanyDivisionSlug | null {
+  if (!seg) return null;
+  const raw = seg.trim().toLowerCase();
+  if (!raw) return null;
+  if (isCompanyDivisionSlug(raw)) return raw;
+  if (raw.endsWith(KEYWORD_LANDING_SUFFIX)) {
+    const base = raw.slice(0, -KEYWORD_LANDING_SUFFIX.length);
+    if (isCompanyDivisionSlug(base) && isDivisionKeywordServicesLandingSlug(base)) {
+      return base;
+    }
+  }
+  return null;
+}
+
+/**
+ * `[company]` dynamic segment from the URL → sector row `slug` (DB + `getPublicSectorBySlug`).
+ * Maps keyword landings like `software-it-ai-services` → `software-it-ai`; leaves other slugs as-is.
+ */
+export function resolveCompanyRouteParamToSectorSlug(companySegment: string): string {
+  const mapped = pathSegmentToCompanyDivisionSlug(companySegment);
+  if (mapped) return mapped;
+  return companySegment.trim().toLowerCase();
+}
+
 export function isCompanyDivisionSlug(s: string): s is CompanyDivisionSlug {
   return (COMPANY_DIVISION_SLUGS as readonly string[]).includes(s);
 }
@@ -129,7 +191,7 @@ export function getCompanyDivisionNavItems(): CompanyDivisionNavItem[] {
   }));
 }
 
-/** First path segment when it is a company division (e.g. /software-it-ai/services). */
+/** First path segment when it is a company division (e.g. /software-it-ai/services or /software-it-ai-services). */
 export function activeCompanyDivisionSlugFromPathname(pathname: string): CompanyDivisionSlug | null {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return null;
@@ -137,7 +199,5 @@ export function activeCompanyDivisionSlugFromPathname(pathname: string): Company
   if (routing.locales.includes(parts[0] as (typeof routing.locales)[number])) {
     i = 1;
   }
-  const seg = parts[i];
-  if (!seg || !isCompanyDivisionSlug(seg)) return null;
-  return seg;
+  return pathSegmentToCompanyDivisionSlug(parts[i]);
 }

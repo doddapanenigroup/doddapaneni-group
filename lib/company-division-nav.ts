@@ -1,5 +1,5 @@
 import type { CompanyDivisionSlug } from '@/lib/company-divisions';
-import { isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { divisionLandingPublicPath, isCompanyDivisionSlug } from '@/lib/company-divisions';
 
 export type DivisionTopicNavRef = {
   /** Hash id without `#`, e.g. `topic-commerce` */
@@ -9,19 +9,19 @@ export type DivisionTopicNavRef = {
 
 const TOPIC_NAV_BY_SLUG = {
   'software-it-ai': [
-    { topicId: 'topic-commerce', href: '/software-it-ai#topic-commerce' },
-    { topicId: 'topic-sellers', href: '/software-it-ai#topic-sellers' },
-    { topicId: 'topic-platform', href: '/software-it-ai#topic-platform' },
+    { topicId: 'topic-commerce', href: `${divisionLandingPublicPath('software-it-ai')}#topic-commerce` },
+    { topicId: 'topic-sellers', href: `${divisionLandingPublicPath('software-it-ai')}#topic-sellers` },
+    { topicId: 'topic-platform', href: `${divisionLandingPublicPath('software-it-ai')}#topic-platform` },
   ],
   'digital-marketing': [
-    { topicId: 'topic-seo', href: '/digital-marketing#topic-seo' },
-    { topicId: 'topic-ads', href: '/digital-marketing#topic-ads' },
-    { topicId: 'topic-social', href: '/digital-marketing#topic-social' },
+    { topicId: 'topic-seo', href: `${divisionLandingPublicPath('digital-marketing')}#topic-seo` },
+    { topicId: 'topic-ads', href: `${divisionLandingPublicPath('digital-marketing')}#topic-ads` },
+    { topicId: 'topic-social', href: `${divisionLandingPublicPath('digital-marketing')}#topic-social` },
   ],
   'healthcare-medical': [
-    { topicId: 'topic-clinical', href: '/healthcare-medical#topic-clinical' },
-    { topicId: 'topic-billing', href: '/healthcare-medical#topic-billing' },
-    { topicId: 'topic-supplies', href: '/healthcare-medical#topic-supplies' },
+    { topicId: 'topic-clinical', href: `${divisionLandingPublicPath('healthcare-medical')}#topic-clinical` },
+    { topicId: 'topic-billing', href: `${divisionLandingPublicPath('healthcare-medical')}#topic-billing` },
+    { topicId: 'topic-supplies', href: `${divisionLandingPublicPath('healthcare-medical')}#topic-supplies` },
   ],
   'construction-realestate': [
     { topicId: 'topic-projects', href: '/construction-realestate#topic-projects' },

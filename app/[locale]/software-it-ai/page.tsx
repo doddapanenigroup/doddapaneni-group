@@ -49,4 +49,3 @@ export default async function SoftwareItAiSectorPage({ params }: Props) {
 
   return <SoftwareItAiSectorLanding locale={locale} />;
 }
-

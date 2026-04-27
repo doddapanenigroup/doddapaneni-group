@@ -47,7 +47,7 @@ export default function LayoutWithNav({
         Skip to main content
       </a>
       <Navbar />
-      <main id="main-content" tabIndex={-1} className="flex min-h-0 w-full min-w-0 flex-1 flex-col outline-none">
+      <main id="main-content" tabIndex={-1} className="flex w-full min-w-0 flex-1 flex-col outline-none">
         {children}
       </main>
       <Footer />

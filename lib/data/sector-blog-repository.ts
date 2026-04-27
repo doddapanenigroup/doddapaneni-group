@@ -4,17 +4,33 @@ import { canonicalDivisionDisplayName } from '@/lib/company-divisions';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
 import { publishedBlogWhere, publishedBlogWhereForSector } from '@/lib/data/published-blog';
 import type { PublicSector } from '@/lib/data/sector-repository';
+import {
+  foldSlugForLooseMatch,
+  matchesLooseArticleSegment,
+  normalizeStoredNewsSlug,
+} from '@/lib/news-slug-normalize';
 
-/** URL segment may not match `News.slug` (e.g. “…-on-…” vs “…-…”). */
+/** URL segment may not match `News.slug` (spaces vs hyphens, legacy “-on-…” tweaks, etc.). */
 function articleSlugLookupVariants(raw: string): string[] {
   const t = raw.trim();
   if (!t) return [];
-  const set = new Set<string>([t]);
-  const withoutOn = t.replace(/-on-/g, '-');
-  if (withoutOn !== t) set.add(withoutOn);
-  // Reverse: DB may use `money-on-outdated` while the link uses `money-outdated`.
-  const withMoneyOn = t.replace(/-money-outdated-/g, '-money-on-outdated-');
-  if (withMoneyOn !== t) set.add(withMoneyOn);
+  const set = new Set<string>();
+  const addWithEdgeCases = (base: string) => {
+    if (!base) return;
+    set.add(base);
+    const withoutOn = base.replace(/-on-/g, '-');
+    if (withoutOn !== base) set.add(withoutOn);
+    const withMoneyOn = base.replace(/-money-outdated-/g, '-money-on-outdated-');
+    if (withMoneyOn !== base) set.add(withMoneyOn);
+  };
+
+  addWithEdgeCases(t);
+  try {
+    addWithEdgeCases(decodeURIComponent(t));
+  } catch {
+    /* ignore malformed sequences */
+  }
+  addWithEdgeCases(normalizeStoredNewsSlug(t));
   return [...set];
 }
 
@@ -75,7 +91,7 @@ export async function fetchPublishedSectorBlogPost(
   // Resolve by sector slug on the relation (do not require a separate sector preload).
   // This matches how URLs are built and avoids extra failure modes from `getPublicSectorBySlug`.
   const variants = articleSlugLookupVariants(blogSlug);
-  const post = await prisma.news.findFirst({
+  let post = await prisma.news.findFirst({
     where: {
       ...publishedBlogWhere(now),
       sector: { slug: sectorSlug.trim().toLowerCase() },
@@ -83,6 +99,26 @@ export async function fetchPublishedSectorBlogPost(
     },
     select: sectorBlogPostSelect,
   });
+
+  if (!post) {
+    const foldIn = foldSlugForLooseMatch(blogSlug);
+    if (foldIn.length >= 2) {
+      const sectorRow = await prisma.sector.findFirst({
+        where: { slug: sectorSlug.trim().toLowerCase() },
+        select: { id: true },
+      });
+      if (sectorRow) {
+        const candidates = await prisma.news.findMany({
+          where: publishedBlogWhereForSector(sectorRow.id, now),
+          select: sectorBlogPostSelect,
+        });
+        const hits = candidates.filter((p) =>
+          matchesLooseArticleSegment(blogSlug, p.slug, p.title),
+        );
+        if (hits.length === 1) post = hits[0];
+      }
+    }
+  }
 
   if (!post) return null;
   const { sector: rel, ...base } = post;
@@ -111,13 +147,26 @@ export async function resolvePublishedArticleRoute(
   await connectDb();
   await publishScheduledContent(now);
   const variants = articleSlugLookupVariants(articleSlug);
-  const row = await prisma.news.findFirst({
+  let row = await prisma.news.findFirst({
     where: {
       ...publishedBlogWhere(now),
       slug: { in: variants },
     },
-    select: { slug: true, sector: { select: { slug: true } } },
+    select: { slug: true, title: true, sector: { select: { slug: true } } },
   });
+  if (!row) {
+    const foldIn = foldSlugForLooseMatch(articleSlug);
+    if (foldIn.length >= 2) {
+      const candidates = await prisma.news.findMany({
+        where: publishedBlogWhere(now),
+        select: { slug: true, title: true, sector: { select: { slug: true } } },
+      });
+      const hits = candidates.filter((p) =>
+        matchesLooseArticleSegment(articleSlug, p.slug, p.title),
+      );
+      if (hits.length === 1) row = hits[0];
+    }
+  }
   if (!row) return { status: 'missing' };
   const s = row.sector?.slug?.trim().toLowerCase();
   const canonicalNewsSlug = row.slug;
@@ -205,4 +254,108 @@ export async function listAllPublishedBlogsWithSector(now: Date): Promise<BlogLi
         }
       : null,
   }));
+}
+
+const hubArticleFlexibleSelect = {
+  slug: true,
+  title: true,
+  content: true,
+  featuredImage: true,
+  publishedAt: true,
+  status: true,
+  scheduledPublishAt: true,
+  metaTitle: true,
+  metaDescription: true,
+  keywords: true,
+  ogTitle: true,
+  ogDescription: true,
+  ogImage: true,
+  sector: { select: { slug: true, name: true } },
+} as const;
+
+export type HubArticleFlexibleRow = {
+  slug: string;
+  title: string;
+  content: string;
+  featuredImage: string | null;
+  publishedAt: Date | null;
+  status: string;
+  scheduledPublishAt: Date | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  keywords: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  sector: { slug: string; name: string } | null;
+};
+
+/** `/news/[slug]` metadata — published posts only, flexible URL segment. */
+export async function fetchPublishedNewsForHubMetadataFlexible(
+  segment: string,
+  now: Date,
+): Promise<HubArticleFlexibleRow | null> {
+  await connectDb();
+  await publishScheduledContent(now);
+  const trimmed = segment.trim();
+  if (!trimmed) return null;
+
+  const pub = publishedBlogWhere(now);
+
+  let row = await prisma.news.findFirst({
+    where: { slug: trimmed, ...pub },
+    select: hubArticleFlexibleSelect,
+  });
+  if (row) return row;
+
+  const variants = articleSlugLookupVariants(trimmed);
+  if (variants.length) {
+    row = await prisma.news.findFirst({
+      where: { slug: { in: variants }, ...pub },
+      select: hubArticleFlexibleSelect,
+    });
+    if (row) return row;
+  }
+
+  if (foldSlugForLooseMatch(trimmed).length < 2) return null;
+
+  const candidates = await prisma.news.findMany({
+    where: pub,
+    select: hubArticleFlexibleSelect,
+  });
+  const hits = candidates.filter((p) => matchesLooseArticleSegment(trimmed, p.slug, p.title));
+  return hits.length === 1 ? hits[0] : null;
+}
+
+/**
+ * `/news/[slug]` page — any post status (matches legacy `findUnique` + fallbacks for flexible paths).
+ * Caller keeps published / scheduled gating and static JSON fallback.
+ */
+export async function fetchNewsRowForHubPageFlexible(segment: string): Promise<HubArticleFlexibleRow | null> {
+  await connectDb();
+  const trimmed = segment.trim();
+  if (!trimmed) return null;
+
+  let row = await prisma.news.findUnique({
+    where: { slug: trimmed },
+    select: hubArticleFlexibleSelect,
+  });
+  if (row) return row;
+
+  const variants = articleSlugLookupVariants(trimmed);
+  if (variants.length) {
+    row = await prisma.news.findFirst({
+      where: { slug: { in: variants } },
+      select: hubArticleFlexibleSelect,
+    });
+    if (row) return row;
+  }
+
+  if (foldSlugForLooseMatch(trimmed).length < 2) return null;
+
+  const candidates = await prisma.news.findMany({
+    select: hubArticleFlexibleSelect,
+  });
+  const hits = candidates.filter((p) => matchesLooseArticleSegment(trimmed, p.slug, p.title));
+  return hits.length === 1 ? hits[0] : null;
 }

@@ -6,6 +6,7 @@ import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
 import { useTranslations } from '@/lib/dictionary-react';
 import type { HomeDivision } from '@/lib/business-divisions-home';
+import { divisionLandingPublicPath } from '@/lib/company-divisions';
 
 type Props = { divisions: HomeDivision[] };
 
@@ -67,7 +68,7 @@ export default function HomeDivisionsGrid({ divisions }: Props) {
                   </p>
                   {d.active ? (
                     <Link
-                      href={`/${d.slug}`}
+                      href={divisionLandingPublicPath(d.slug)}
                       className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                     >
                       {t('viewCompany')}

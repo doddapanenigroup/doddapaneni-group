@@ -144,7 +144,7 @@ export default function BlogPostClient({
                 initialSectorLiveMap={initialSectorLiveMap}
               />
             </aside>
-            <div className="order-1 min-w-0 flex-1 lg:order-2 lg:pr-12 xl:pr-16">{articleBody}</div>
+            <div className="order-1 min-w-0 lg:order-2 lg:flex-1 lg:pr-12 xl:pr-16">{articleBody}</div>
           </div>
         </div>
       ) : (

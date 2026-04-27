@@ -49,4 +49,3 @@ export default async function HealthcareMedicalSectorPage({ params }: Props) {
 
   return <HealthcareMedicalSectorLanding locale={locale} />;
 }
-

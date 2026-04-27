@@ -1,5 +1,3 @@
-import DivisionLayoutServer from '@/components/divisions/DivisionLayoutServer';
-import { isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { generateCompanySegmentStaticParams } from '@/lib/company-route-static';
 
 /** Twelve division URLs are generated at build; other sector slugs remain request-rendered. */
@@ -18,21 +16,9 @@ type Props = {
 };
 
 /**
- * Nested layout for sector/division URLs (`/[locale]/software-it-ai`, etc.).
- * Twelve primary divisions get the shared shell (header band + about / services / companies / contact).
- * Other sector slugs still resolve here but only render page content (no division chrome).
+ * Sector routes render full-page content (same pattern as static `/construction-realestate`).
+ * The old division nav band (Overview / About / …) lived in `DivisionLayoutServer` and is intentionally omitted.
  */
-export default async function CompanySectionLayout({ children, params }: Props) {
-  const { company, locale } = await params;
-  const slug = company.trim().toLowerCase();
-
-  if (!isCompanyDivisionSlug(slug)) {
-    return <>{children}</>;
-  }
-
-  return (
-    <DivisionLayoutServer slug={slug} locale={locale}>
-      {children}
-    </DivisionLayoutServer>
-  );
+export default async function CompanySectionLayout({ children }: Props) {
+  return <>{children}</>;
 }

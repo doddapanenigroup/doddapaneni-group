@@ -4,7 +4,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getBlogMessages } from '@/lib/messages';
 import { routing } from '@/i18n/routing';
-import { connectDb, prisma } from '@/lib/db';
+import { connectDb } from '@/lib/db';
 import { mediaUrl } from '@/lib/media';
 import BlogPostClient from './BlogPostClient';
 import { publishScheduledContent } from '@/lib/publish-scheduled';
@@ -18,7 +18,11 @@ import {
 } from '@/lib/company-divisions';
 import { getCompanyDivisionSectorsMap } from '@/lib/data/sector-repository';
 import { sectorLiveMapFromBySlugMap } from '@/lib/sector-live-shared';
-import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
+import {
+  fetchNewsRowForHubPageFlexible,
+  fetchPublishedNewsForHubMetadataFlexible,
+  listPublishedBlogsForSectorPage,
+} from '@/lib/data/sector-blog-repository';
 import NewsSectorBlogList from '@/components/news/NewsSectorBlogList';
 import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
@@ -89,25 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (process.env.NODE_ENV === 'production') {
     await publishScheduledContent(now);
   }
-  const dbPost = await prisma.news.findFirst({
-    where: {
-      slug: trimmed,
-      status: 'published',
-      OR: [{ scheduledPublishAt: null }, { scheduledPublishAt: { lte: now } }],
-    },
-    select: {
-      title: true,
-      content: true,
-      featuredImage: true,
-      metaTitle: true,
-      metaDescription: true,
-      keywords: true,
-      ogTitle: true,
-      ogDescription: true,
-      ogImage: true,
-      sector: { select: { slug: true, name: true } },
-    },
-  });
+  const dbPost = await fetchPublishedNewsForHubMetadataFlexible(trimmed, now);
   if (!dbPost) return {};
 
   const plain = dbPost.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -117,12 +103,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const image = normalizeStoredImage(dbPost.ogImage ?? dbPost.featuredImage);
   const origin = getSiteOrigin();
   const pathRel = dbPost.sector?.slug
-    ? publicPathWithLocale(locale, 'news', dbPost.sector.slug, trimmed)
-    : publicPathWithLocale(locale, 'news', trimmed);
+    ? publicPathWithLocale(locale, 'news', dbPost.sector.slug, dbPost.slug)
+    : publicPathWithLocale(locale, 'news', dbPost.slug);
   const canonical = `${origin}${pathRel}`;
   const pathnameForHreflang = dbPost.sector?.slug
-    ? `/news/${dbPost.sector.slug}/${trimmed}`
-    : `/news/${trimmed}`;
+    ? `/news/${dbPost.sector.slug}/${dbPost.slug}`
+    : `/news/${dbPost.slug}`;
 
   return {
     title,
@@ -228,28 +214,21 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
   if (process.env.NODE_ENV === 'production') {
     await publishScheduledContent(now);
   }
-  const dbPost = await prisma.news.findUnique({
-    where: { slug: trimmed },
-    select: {
-      title: true,
-      content: true,
-      featuredImage: true,
-      publishedAt: true,
-      status: true,
-      scheduledPublishAt: true,
-      sector: { select: { slug: true } },
-    },
-  });
+  const dbPost = await fetchNewsRowForHubPageFlexible(trimmed);
   const isPublishedNow =
     !!dbPost &&
     dbPost.status === 'published' &&
     (!dbPost.scheduledPublishAt || dbPost.scheduledPublishAt <= now);
 
   if (isPublishedNow && dbPost?.sector?.slug) {
-    permanentRedirect(publicPathWithLocale(locale, 'news', dbPost.sector.slug, trimmed));
+    permanentRedirect(publicPathWithLocale(locale, 'news', dbPost.sector.slug, dbPost.slug));
   }
 
-  const hubArticlePath = `/news/${trimmed}`;
+  const hubArticlePath = dbPost
+    ? dbPost.sector?.slug
+      ? `/news/${dbPost.sector.slug}/${dbPost.slug}`
+      : `/news/${dbPost.slug}`
+    : `/news/${trimmed}`;
 
   if (!dbPost || dbPost.status !== 'published' || (dbPost.scheduledPublishAt && dbPost.scheduledPublishAt > now)) {
     const messagePost = blog.posts[trimmed];
@@ -285,7 +264,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
       image={normalizeStoredImage(dbPost.featuredImage)}
       publishedAt={dbPost.publishedAt ? dbPost.publishedAt.toISOString() : null}
       articlePathname={hubArticlePath}
-      articleSlug={trimmed}
+      articleSlug={dbPost.slug}
     />
   );
 }

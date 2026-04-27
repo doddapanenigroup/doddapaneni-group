@@ -148,11 +148,25 @@ const nextConfig: NextConfig = {
       process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
   async redirects() {
+    const divisionKeywordServicesLandings = (
+      ['software-it-ai', 'digital-marketing', 'healthcare-medical'] as const
+    ).flatMap((from) => {
+      const to = `${from}-services`;
+      return [
+        { source: `/${from}`, destination: `/${to}`, permanent: true as const },
+        ...LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((loc) => ({
+          source: `/${loc}/${from}`,
+          destination: `/${loc}/${to}`,
+          permanent: true as const,
+        })),
+      ];
+    });
     return [
       ...apexToWwwDoddapaneniGroupRedirect(),
       ...legacyFaviconRedirects(),
       ...hostCanonicalRedirects(),
       ...removedLocaleRedirects(),
+      ...divisionKeywordServicesLandings,
       { source: '/blog', destination: '/news', permanent: true },
       { source: '/blog/:slug', destination: '/news/:slug', permanent: true },
       { source: '/terms-conditions', destination: '/terms', permanent: true },

@@ -17,6 +17,7 @@ import {
   COMPANY_DIVISION_SLUGS,
   activeCompanyDivisionSlugFromPathname,
   type CompanyDivisionSlug,
+  divisionLandingPublicPath,
 } from '@/lib/company-divisions';
 import { EMPTY_SECTOR_LIVE_MAP, sectorLiveMapFromApiPayload } from '@/lib/sector-live-shared';
 import { DEFAULT_LOCALE } from '@/i18n/locales';
@@ -278,7 +279,7 @@ export default function Navbar() {
             return (
               <li key={slug} className={mobile ? undefined : 'min-w-0'}>
                 <Link
-                  href={`/${slug}`}
+                  href={divisionLandingPublicPath(slug)}
                   onClick={() => {
                     setCompaniesOpen(false);
                     onNavigate?.();

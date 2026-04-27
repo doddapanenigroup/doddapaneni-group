@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { divisionLandingPublicPath } from '@/lib/company-divisions';
 import { ExternalLink } from 'lucide-react';
 
 export type CompanySocialLink = { label: string; href: string };
@@ -78,7 +79,11 @@ export default function CompanyPublicProfile({
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 tracking-tight text-left">{companyName}</h1>
           <p className="text-sm text-slate-600 mb-6 text-left">
             Sector:{' '}
-            <Link href={`/${sectorSlug}`} locale={locale} className="font-semibold text-blue-900 hover:underline">
+            <Link
+              href={divisionLandingPublicPath(sectorSlug)}
+              locale={locale}
+              className="font-semibold text-blue-900 hover:underline"
+            >
               {sectorName}
             </Link>
           </p>

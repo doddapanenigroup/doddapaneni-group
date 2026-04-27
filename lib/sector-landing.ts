@@ -14,7 +14,7 @@ import {
 } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
-import { isCompanyDivisionSlug } from '@/lib/company-divisions';
+import { divisionLandingPathSegment, isCompanyDivisionSlug } from '@/lib/company-divisions';
 import { DIVISION_SERVICES_KEYWORDS_BLOG_KEYS } from '@/lib/division-services-meta-keywords';
 
 export { publicPathWithLocale };
@@ -156,9 +156,10 @@ export async function sectorLandingMetadata(
   const title = buildCompanyDivisionTitle(row.name);
   const description = buildCompanyDivisionDescription(row);
   const origin = getSiteOrigin();
-  const pathRel = publicPathWithLocale(locale, row.slug);
+  const landSeg = divisionLandingPathSegment(row.slug);
+  const pathRel = publicPathWithLocale(locale, landSeg);
   const canonical = `${origin}${pathRel}`;
-  const pathnameForHreflang = `/${row.slug}`;
+  const pathnameForHreflang = `/${landSeg}`;
 
   return {
     title,

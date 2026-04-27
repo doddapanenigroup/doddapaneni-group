@@ -46,22 +46,6 @@ export function proxy(request: NextRequest) {
     return res;
   }
 
-  // Keyword services URL -> internal services route rewrite.
-  if (restSegments.length === 1 && restSegments[0].endsWith('-services')) {
-    const divisionSlug = restSegments[0].slice(0, -'-services'.length);
-    if (isCompanyDivisionSlug(divisionSlug)) {
-      const url = request.nextUrl.clone();
-      url.pathname = localePrefix
-        ? `/${localePrefix}/${divisionSlug}/services`
-        : `/${DEFAULT_LOCALE}/${divisionSlug}/services`;
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-pathname', pathname);
-      const res = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
-      applyDocumentCacheHeaders(res);
-      return res;
-    }
-  }
-
   if (first === DEFAULT_LOCALE) {
     const rest = segments.slice(1);
     const targetPath = rest.length ? `/${rest.join('/')}` : '/';

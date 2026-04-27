@@ -1,4 +1,5 @@
 import type { Prisma } from '@/lib/prisma-generated';
+import { normalizeStoredNewsSlug } from '@/lib/news-slug-normalize';
 
 function strOrNull(v: unknown): string | null {
   if (typeof v !== 'string') return null;
@@ -46,7 +47,10 @@ export function newsPatchDataFromBody(body: Record<string, unknown>): Prisma.New
   const data: Prisma.NewsUpdateInput = {};
 
   if (typeof body.title === 'string' && body.title.trim()) data.title = body.title.trim();
-  if (typeof body.slug === 'string' && body.slug.trim()) data.slug = body.slug.trim();
+  if (typeof body.slug === 'string' && body.slug.trim()) {
+    const n = normalizeStoredNewsSlug(body.slug);
+    if (n) data.slug = n;
+  }
   if (typeof body.content === 'string') {
     data.content = body.content;
     data.readingTimeMinutes = estimateReadingMinutesFromHtml(body.content);

@@ -49,4 +49,3 @@ export default async function DigitalMarketingSectorPage({ params }: Props) {
 
   return <DigitalMarketingSectorLanding locale={locale} />;
 }
-

@@ -5,6 +5,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { useTranslations } from '@/lib/dictionary-react';
 import type { DivisionSubpage } from '@/lib/company-division-subpages';
 import { divisionSubpagePublicPath } from '@/lib/company-division-subpages';
+import { divisionLandingPathSegment } from '@/lib/company-divisions';
 import type { DivisionTopicNavItem } from '@/lib/company-division-nav-i18n';
 import CompanyDivisionTopicNav from '@/components/divisions/CompanyDivisionTopicNav';
 
@@ -31,10 +32,11 @@ export default function CompanyDivisionShell({
   const t = useTranslations('Blog');
   const pathname = usePathname();
   const { slug } = sector;
-  const base = `/${slug}`;
+  const landingSeg = divisionLandingPathSegment(slug);
+  const base = `/${landingSeg}`;
 
   const segments = stripLocalePrefix(pathname.split('/').filter(Boolean));
-  const isOverview = segments.length === 1 && segments[0] === slug;
+  const isOverview = segments.length === 1 && (segments[0] === landingSeg || segments[0] === slug);
 
   const subpageLabel = (sub: DivisionSubpage): string => {
     switch (sub) {

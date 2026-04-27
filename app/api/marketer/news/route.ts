@@ -19,6 +19,7 @@ import { revalidateCmsPublicSurfaces, revalidateNewsPostPublicPaths } from '@/li
 import { Prisma } from '@/lib/prisma-generated';
 import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
+import { normalizeStoredNewsSlug } from '@/lib/news-slug-normalize';
 
 /** List view: omit heavy HTML bodies so the dashboard can load many posts without huge JSON or OOM/timeouts. */
 const marketerNewsListSelect = {
@@ -197,10 +198,14 @@ export async function POST(request: Request) {
     }
 
     const title = strOrNull(body.title);
-    const slug = strOrNull(body.slug);
+    const rawSlug = strOrNull(body.slug);
+    const slug = rawSlug ? normalizeStoredNewsSlug(rawSlug) : null;
     const articleBody = typeof body.content === 'string' ? body.content : '';
     if (!title || !slug || !articleBody.trim()) {
-      return NextResponse.json({ message: 'title, slug and content are required' }, { status: 400 });
+      return NextResponse.json(
+        { message: !slug && rawSlug ? 'slug must produce a non-empty URL segment after normalization' : 'title, slug and content are required' },
+        { status: 400 },
+      );
     }
 
     /** Default published so dashboard-created posts appear on public `/news/{sector}` without an extra save. */
