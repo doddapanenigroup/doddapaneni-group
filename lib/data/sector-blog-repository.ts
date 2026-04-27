@@ -1,4 +1,3 @@
-import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
 import { routing } from '@/i18n/routing';
 import { canonicalDivisionDisplayName } from '@/lib/company-divisions';
@@ -64,7 +63,7 @@ export type SectorBlogCardRow = {
  * Null when sector or post missing, or post does not belong to sector.
  * Public `/news` is English-only: always the canonical `News` row (locale argument ignored for content).
  */
-export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedSectorBlogPost(
+export async function fetchPublishedSectorBlogPost(
   sectorSlug: string,
   blogSlug: string,
   _locale: string = routing.defaultLocale,
@@ -94,7 +93,7 @@ export const fetchPublishedSectorBlogPost = cache(async function fetchPublishedS
     name: canonicalDivisionDisplayName(rel.slug, rel.name),
   };
   return { ...base, sector: sectorPayload };
-});
+}
 
 export type PublishedArticleRouteHint =
   | { status: 'missing' }

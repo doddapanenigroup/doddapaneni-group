@@ -1,4 +1,3 @@
-import { cache } from 'react';
 import { connectDb, prisma } from '@/lib/db';
 import {
   canonicalDivisionDisplayName,
@@ -38,8 +37,8 @@ const sectorPublicSelect = {
   isLive: true,
 } as const;
 
-/** Cached: sector landing, division layout, blog post resolution (same request deduped). */
-export const getPublicSectorBySlug = cache(async function getPublicSectorBySlug(
+/** Always read from DB so admin/DB updates are visible immediately. */
+export async function getPublicSectorBySlug(
   sectorSlug: string,
 ): Promise<PublicSector | null> {
   await connectDb();
@@ -48,7 +47,7 @@ export const getPublicSectorBySlug = cache(async function getPublicSectorBySlug(
     select: sectorPublicSelect,
   });
   return row ? publicSectorRow(row) : null;
-});
+}
 
 export async function listPublicSectorsBySlugs(
   slugs: readonly string[],
@@ -70,12 +69,12 @@ export async function listPublicSectorsBySlugs(
   );
 }
 
-/** Single query for all 12 division sectors; React `cache` dedupes metadata + page in one request. */
-export const getCompanyDivisionSectorsMap = cache(async function getCompanyDivisionSectorsMap(): Promise<
+/** Single query for all 12 division sectors (fresh on each request). */
+export async function getCompanyDivisionSectorsMap(): Promise<
   Map<string, PublicSector>
 > {
   return listPublicSectorsBySlugs(COMPANY_DIVISION_SLUGS);
-});
+}
 
 /** Server-only: `isLive` map for news layouts (uses cached division sectors query). */
 export async function getSectorLiveMapFromDb(): Promise<Record<string, boolean>> {

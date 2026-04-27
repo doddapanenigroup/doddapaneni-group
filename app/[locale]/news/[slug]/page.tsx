@@ -22,7 +22,7 @@ import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-reposito
 import NewsSectorBlogList from '@/components/news/NewsSectorBlogList';
 import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
-export const revalidate = 120;
+export const revalidate = 0;
 const SITE_NAME = 'Doddapaneni Group';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };

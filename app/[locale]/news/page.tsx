@@ -18,7 +18,7 @@ import NewsBlogsHubSections from '@/components/news/NewsBlogsHubSections';
 import type { NewsHubSectionPayload } from '@/components/news/NewsBlogsHubSections';
 import type { NewsSectorPostItem } from '@/components/news/NewsSectorBlogList';
 
-export const revalidate = 120;
+export const revalidate = 0;
 
 type Props = { params: Promise<{ locale: string }> };
 

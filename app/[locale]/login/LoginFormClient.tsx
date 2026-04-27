@@ -157,8 +157,17 @@ export default function LoginFormClient({
         redirect: false,
       });
       authDebug('signIn(credentials) response', { ok: res?.ok, error: res?.error, url: res?.url });
-      if (!res?.ok) {
-        setError('Wrong credentials entered');
+      if (!res || res.error || res.ok !== true) {
+        authDebug('signIn(credentials) rejected', {
+          ok: res?.ok,
+          error: res?.error,
+          status: (res as { status?: number } | undefined)?.status,
+        });
+        if (res?.error === 'CredentialsSignin') {
+          setError('Wrong credentials entered');
+        } else {
+          setError('Login failed. Please check your credentials and try again.');
+        }
         return;
       }
       // Wait until `/api/auth/session` sees the cookie — redirecting earlier causes dashboard → login bounce.
@@ -172,9 +181,7 @@ export default function LoginFormClient({
 
       if (!ready) {
         setInfo('');
-        setError(
-          'The server did not confirm your session (common causes: NEXTAUTH_URL must exactly match this site URL, including https and no trailing slash; or AUTH_SECRET missing on the server). Fix env vars, redeploy, then try again.',
-        );
+        setError('Login succeeded but session was not confirmed. Please refresh once and try again.');
         return;
       }
 
