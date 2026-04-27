@@ -2,6 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Filter } from 'lucide-react';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardInputClass,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type ErrorItem = {
   id: string;
@@ -50,8 +57,8 @@ export default function DeveloperErrorsPanel() {
   const items = data?.items ?? [];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
+    <section className={dashboardPanelClass}>
+      <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
         <AlertTriangle size={20} className="text-slate-600" />
         Error monitoring (ErrorLog)
       </h2>
@@ -61,26 +68,26 @@ export default function DeveloperErrorsPanel() {
           type="date"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={dashboardInputClass}
         />
         <input
           type="date"
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={dashboardInputClass}
         />
         <input
           type="number"
           value={take}
           onChange={(e) => setTake(Number(e.target.value))}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={dashboardInputClass}
           min={10}
           max={200}
         />
         <button
           type="button"
           onClick={() => load()}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-700 text-white px-4 py-2 text-sm hover:bg-slate-800"
+          className={`inline-flex items-center justify-center gap-2 ${dashboardHeaderActionPrimary}`}
         >
           <Filter size={16} />
           Apply filters
@@ -99,7 +106,7 @@ export default function DeveloperErrorsPanel() {
             ) : (
               <div className="space-y-3 max-h-[520px] overflow-auto pr-1">
                 {items.map((e) => (
-                  <div key={e.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  <div key={e.id} className={`overflow-hidden !p-0 ${dashboardNestedCardClass}`}>
                     <div className="p-3 border-b border-slate-100 flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-xs text-slate-500">

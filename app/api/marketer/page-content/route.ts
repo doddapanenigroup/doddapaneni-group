@@ -32,8 +32,53 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const locale = strOrNull(url.searchParams.get('locale')) ?? undefined;
+    const summary =
+      url.searchParams.get('summary') === '1' || url.searchParams.get('summary') === 'true';
 
     await connectDb();
+    if (summary) {
+      const rows = await prisma.pageContent.findMany({
+        where: locale ? { locale } : undefined,
+        orderBy: [{ updatedAt: 'desc' }],
+        select: {
+          id: true,
+          pageKey: true,
+          slug: true,
+          locale: true,
+          title: true,
+          status: true,
+          scheduledPublishAt: true,
+          metaTitle: true,
+          metaDescription: true,
+          keywords: true,
+          canonicalUrl: true,
+          ogTitle: true,
+          ogDescription: true,
+          ogImage: true,
+          updatedAt: true,
+        },
+      });
+      return NextResponse.json({
+        items: rows.map((r) => ({
+          id: r.id,
+          pageKey: r.pageKey,
+          slug: r.slug,
+          locale: r.locale,
+          title: r.title,
+          status: r.status,
+          scheduledPublishAt: r.scheduledPublishAt ? r.scheduledPublishAt.toISOString() : null,
+          metaTitle: r.metaTitle,
+          metaDescription: r.metaDescription,
+          keywords: r.keywords,
+          canonicalUrl: r.canonicalUrl,
+          ogTitle: r.ogTitle,
+          ogDescription: r.ogDescription,
+          ogImage: r.ogImage,
+          updatedAt: r.updatedAt.toISOString(),
+        })),
+      });
+    }
+
     const rows = await prisma.pageContent.findMany({
       where: locale ? { locale } : undefined,
       orderBy: [{ updatedAt: 'desc' }],

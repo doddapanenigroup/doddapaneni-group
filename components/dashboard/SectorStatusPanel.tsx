@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ToggleLeft } from 'lucide-react';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
+import { dashboardPanelClass, dashboardPanelHeaderClass } from '@/lib/dashboard-ui';
 
 type SectorRow = {
   id: string;
@@ -72,16 +73,16 @@ export default function SectorStatusPanel() {
 
   if (loading) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25 p-5">
+      <section className={`${dashboardPanelClass} p-5`}>
         <p className="text-sm text-slate-500">Loading sector status…</p>
       </section>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <div className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900/90 text-white dark:bg-slate-700">
+    <section className={dashboardPanelClass}>
+      <div className={`flex items-center gap-2 ${dashboardPanelHeaderClass}`}>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white dark:bg-indigo-500">
           <ToggleLeft size={18} aria-hidden />
         </span>
         <div>

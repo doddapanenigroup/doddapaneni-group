@@ -29,18 +29,17 @@ import {
   Undo2,
 } from 'lucide-react';
 import { BlogFontSize } from '@/lib/tiptap-blog-font-size';
+import { dashboardIconButtonClass, dashboardInputClass, dashboardNestedCardClass } from '@/lib/dashboard-ui';
 
 const labelClass =
   'mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400';
 
-const toolbarBtn =
-  'inline-flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800';
+const toolbarBtn = `${dashboardIconButtonClass} !h-9 !min-h-0 !w-9 !min-w-9 shrink-0 px-0 disabled:opacity-40`;
 
 const toolbarBtnActive =
   'border-violet-400 bg-violet-50 text-violet-900 ring-1 ring-violet-300/60 dark:border-violet-600 dark:bg-violet-950/50 dark:text-violet-100 dark:ring-violet-800/50';
 
-const toolbarSelect =
-  'h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm text-slate-800 shadow-sm dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100';
+const toolbarSelect = `h-9 w-auto min-w-0 px-2 py-1.5 text-sm ${dashboardInputClass}`;
 
 function normalizeEmptyHtml(html: string): string {
   const t = html.trim();
@@ -70,7 +69,7 @@ function BlogEditorToolbar({ editor, minHeightClass }: { editor: Editor; minHeig
     editor.isActive({ textAlign: a }) === true;
 
   return (
-    <div className="blog-rich-editor flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-600 dark:bg-slate-900">
+    <div className={`blog-rich-editor flex flex-col overflow-hidden !p-0 shadow-sm ${dashboardNestedCardClass}`}>
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50/90 px-2 py-2 dark:border-slate-700 dark:bg-slate-800/80">
         <button
           type="button"
@@ -345,7 +344,7 @@ function BlogRichTiptapInner({ value, onChange, placeholder, minHeightClass }: I
   if (!editor) {
     return (
       <div
-        className={`rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-900 ${minHeightClass}`}
+        className={`!p-0 ${dashboardNestedCardClass} bg-slate-50/90 dark:bg-slate-900/80 ${minHeightClass}`}
         aria-busy
       />
     );

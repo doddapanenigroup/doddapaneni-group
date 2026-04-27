@@ -31,6 +31,18 @@ import MarketerBlogsManager, {
   type MarketerBlogsManagerHandle,
 } from '@/components/dashboard/MarketerBlogsManager';
 import CareersJobsPanel from './CareersJobsPanel';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardInputClass,
+  dashboardInputShellClass,
+  dashboardMainMaxClass,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+  dashboardStageClass,
+  dashboardTabRailClass,
+} from '@/lib/dashboard-ui';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { hasDeveloperAccess } from '@/lib/role-utils';
@@ -45,13 +57,14 @@ type SeoFields = {
   ogImage: string;
 };
 
+/** List rows from `?summary=1` omit `body` (large HTML) until a slug is loaded. */
 type PageContentRow = {
   id: string;
   pageKey: string;
   slug: string;
   locale: string;
   title: string;
-  body: string;
+  body?: string;
   status: 'draft' | 'published';
   scheduledPublishAt: string | null;
   metaTitle: string | null;
@@ -335,12 +348,12 @@ function SeoImprovementsPanel(props: {
 
   return (
     <details className="mt-3">
-      <summary className="cursor-pointer list-none flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
+      <summary className={`cursor-pointer list-none flex items-center justify-between p-3 ${dashboardNestedCardClass}`}>
         <span className="text-sm font-semibold text-slate-800">SEO improvement suggestions</span>
         <span className="text-xs text-slate-500">Non-destructive</span>
       </summary>
 
-      <div className="mt-2 rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+      <div className={`mt-2 space-y-3 p-3 ${dashboardNestedCardClass}`}>
         <div>
           <p className="text-xs font-medium text-slate-700 mb-1">Keywords</p>
           {!hasKeywords ? (
@@ -362,7 +375,7 @@ function SeoImprovementsPanel(props: {
             <button
               type="button"
               onClick={props.onCopyKeywords}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              className={`${dashboardHeaderActionSecondary} py-1.5 text-xs`}
               disabled={!result.suggestedKeywordsCsv}
             >
               Copy suggested keywords
@@ -378,7 +391,7 @@ function SeoImprovementsPanel(props: {
             </p>
           ) : null}
           {result.suggestedMetaDescription ? (
-            <p className="text-sm text-slate-800 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2">
+            <p className={`mt-2 p-2 text-sm text-slate-800 dark:text-slate-100 ${dashboardNestedCardClass}`}>
               Suggested: {result.suggestedMetaDescription}
             </p>
           ) : (
@@ -388,7 +401,7 @@ function SeoImprovementsPanel(props: {
             <button
               type="button"
               onClick={props.onCopyMetaDescription}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+              className={`${dashboardHeaderActionSecondary} py-1.5 text-xs`}
               disabled={!result.suggestedMetaDescription}
             >
               Copy suggested description
@@ -460,6 +473,7 @@ export default function MarketerDashboard({
   // ——— Content pages + SEO ———
   const [pages, setPages] = useState<PageContentRow[]>([]);
   const [pagesLoading, setPagesLoading] = useState(true);
+  const [pageBodyLoading, setPageBodyLoading] = useState(false);
   const [selectedPageSlug, setSelectedPageSlug] = useState('');
   const [creatingPage, setCreatingPage] = useState(false);
   const PAGE_KEY_OPTIONS: { value: string; label: string }[] = [
@@ -497,31 +511,89 @@ export default function MarketerDashboard({
   }, [activeTab, selectedPageSlug]);
 
   useEffect(() => {
-    if (!canPages) {
-      setPages([]);
-      setPagesLoading(false);
-      return;
-    }
-    fetch(`/api/marketer/page-content?locale=${encodeURIComponent(locale)}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
+    let cancelled = false;
+    async function run() {
+      const loadImages = async () => {
+        try {
+          const r = await fetch('/api/marketer/stored-image');
+          const d = r.ok ? await r.json() : null;
+          if (!cancelled) setImages((d?.items ?? []) as StoredImageRow[]);
+        } catch {
+          if (!cancelled) setImages([]);
+        } finally {
+          if (!cancelled) setImagesLoading(false);
+        }
+      };
+
+      if (!canPages) {
+        setPages([]);
+        setPagesLoading(false);
+        await loadImages();
+        return;
+      }
+
+      setPagesLoading(true);
+      setImagesLoading(true);
+      try {
+        const [pagesRes] = await Promise.all([
+          fetch(`/api/marketer/page-content?locale=${encodeURIComponent(locale)}&summary=1`),
+          loadImages(),
+        ]);
+        const d = pagesRes.ok ? await pagesRes.json() : null;
+        if (cancelled) return;
         const items = (d?.items ?? []) as PageContentRow[];
         setPages(items);
-        if (items[0]) selectPage(items[0]);
-      })
-      .catch(() => setPages([]))
-      .finally(() => setPagesLoading(false));
+        if (items[0]) await selectPage(items[0]);
+      } catch {
+        if (!cancelled) setPages([]);
+      } finally {
+        if (!cancelled) setPagesLoading(false);
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+    // selectPage/loadFullPageBody intentionally omitted: stable enough for locale/canPages; avoids refetch loops.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale, canPages]);
 
-  useEffect(() => {
-    fetch('/api/marketer/stored-image')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setImages((d?.items ?? []) as StoredImageRow[]))
-      .catch(() => setImages([]))
-      .finally(() => setImagesLoading(false));
-  }, []);
+  async function loadFullPageBody(slug: string) {
+    setPageBodyLoading(true);
+    try {
+      const res = await fetch(
+        `/api/marketer/page-content/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`
+      );
+      if (!res.ok) return;
+      const data = (await res.json()) as { item?: PageContentRow };
+      const item = data.item;
+      if (!item) return;
+      setPages((prev) => prev.map((p) => (p.slug === item.slug ? { ...p, ...item } : p)));
+      setPageForm((f) => {
+        if (f.slug !== item.slug) return f;
+        return {
+          ...f,
+          pageKey: item.pageKey ?? '',
+          title: item.title ?? '',
+          slug: item.slug ?? '',
+          body: item.body ?? '',
+          status: item.status ?? 'published',
+          scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
+          metaTitle: item.metaTitle ?? '',
+          metaDescription: item.metaDescription ?? '',
+          keywords: item.keywords ?? '',
+          canonicalUrl: item.canonicalUrl ?? '',
+          ogTitle: item.ogTitle ?? '',
+          ogDescription: item.ogDescription ?? '',
+          ogImage: item.ogImage ?? '',
+        };
+      });
+    } finally {
+      setPageBodyLoading(false);
+    }
+  }
 
-  function selectPage(page: PageContentRow) {
+  async function selectPage(page: PageContentRow) {
     setSelectedPageSlug(page.slug);
     setCreatingPage(false);
     setPageForm({
@@ -540,6 +612,9 @@ export default function MarketerDashboard({
       ogDescription: page.ogDescription ?? '',
       ogImage: page.ogImage ?? '',
     });
+    if (page.body === undefined) {
+      await loadFullPageBody(page.slug);
+    }
   }
 
   async function savePageSeo() {
@@ -559,7 +634,7 @@ export default function MarketerDashboard({
       pageKey: item.pageKey,
       slug: item.slug,
       title: item.title,
-      body: item.body,
+      body: item.body ?? '',
       status: item.status,
       scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
       metaTitle: item.metaTitle ?? '',
@@ -611,7 +686,7 @@ export default function MarketerDashboard({
       pageKey: item.pageKey,
       title: item.title,
       slug: item.slug,
-      body: item.body,
+      body: item.body ?? '',
       status: item.status,
       scheduledPublishAt: toDateTimeLocalValue(item.scheduledPublishAt),
       seoNote: '',
@@ -773,71 +848,76 @@ export default function MarketerDashboard({
   }, [pushSaveLayer]);
 
   return (
-    <div className="space-y-8">
+    <div className={`${dashboardMainMaxClass} space-y-6`}>
       <DashboardPageHeader
         icon={Megaphone}
         title={getDashboardTitle(viewerRole)}
         description="Pages, blogs, and media for your locale. Admins and digital marketers use this area; all data is stored in the database."
       />
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="flex items-center gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 text-lg font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 dark:text-slate-100">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white dark:bg-blue-500">
-            <Globe size={18} aria-hidden />
-          </span>
-          Quick links
-        </h2>
-        <div className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={dashboardStageClass}>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+          <aside className="order-2 flex min-w-0 flex-col gap-6 lg:order-none lg:col-span-4 xl:col-span-3">
+            <section className={dashboardPanelClass}>
+              <h2 className={`flex items-center gap-3 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25 dark:bg-indigo-500">
+                  <Globe size={18} aria-hidden />
+                </span>
+                Quick links
+              </h2>
+              <div className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-1 lg:gap-3 lg:p-5">
           <Link
             href={base}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
           >
-            <Globe size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <Globe size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">View site</span>
           </Link>
           <Link
             href={publicPathWithLocale(locale, 'contact')}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
           >
-            <Mail size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <Mail size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
           </Link>
           <Link
             href={publicPathWithLocale(locale, 'team')}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
           >
-            <Users size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <Users size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">Team page</span>
           </Link>
           <Link
             href={publicPathWithLocale(locale, 'careers')}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-blue-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-blue-500/40"
+            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
           >
-            <Target size={22} className="shrink-0 text-blue-700 dark:text-blue-400" />
+            <Target size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">Careers page</span>
           </Link>
           <Link
             href={publicPathForLocale(locale, '/dashboard/analytics')}
-            className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm transition-all hover:border-violet-200/80 hover:shadow-md dark:border-slate-600 dark:bg-slate-800/40 dark:hover:border-violet-500/40"
+            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
           >
-            <BarChart3 size={22} className="shrink-0 text-violet-600 dark:text-violet-400" />
+            <BarChart3 size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
             <span className="font-medium text-slate-800 dark:text-slate-100">Analytics</span>
           </Link>
-        </div>
-      </section>
+              </div>
+            </section>
 
+            {canPages && hasDeveloperAccess(viewerRole) ? <CareersJobsPanel locale={locale} /> : null}
+            <MyActivityPanel />
+          </aside>
 
-      {canPages && hasDeveloperAccess(viewerRole) ? <CareersJobsPanel locale={locale} /> : null}
-
-      <section className="rounded-2xl border border-slate-200/90 bg-slate-100/80 p-1.5 shadow-inner dark:border-slate-700/80 dark:bg-slate-950/60">
+          <div className="order-1 flex min-w-0 flex-col gap-6 lg:order-none lg:col-span-8 xl:col-span-9">
+            <section className={dashboardTabRailClass}>
         <div className="flex flex-wrap gap-1">
           {[
             ...(canPages ? [{ id: 'pages' as const, label: 'Pages' }] : []),
@@ -849,19 +929,19 @@ export default function MarketerDashboard({
               onClick={() => setActiveTab(tab.id)}
               className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-white text-slate-900 shadow-md ring-1 ring-slate-200/80 dark:bg-slate-800 dark:text-white dark:ring-slate-600'
-                  : 'text-slate-600 hover:bg-white/70 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25 dark:bg-indigo-500'
+                  : 'text-slate-600 hover:bg-white/90 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-100'
               }`}
             >
               {tab.label}
             </button>
           ))}
-        </div>
-      </section>
+            </div>
+            </section>
 
       {activeTab === 'pages' && canPages && (
-        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+        <section className={dashboardPanelClass}>
+          <div className={`flex flex-wrap items-center justify-between gap-3 ${dashboardPanelHeaderClass}`}>
             <div>
               <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Pages management + SEO</h2>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Select a page, update content, then save.</p>
@@ -906,10 +986,10 @@ export default function MarketerDashboard({
                       key={p.id}
                       type="button"
                       onClick={() => selectPage(p)}
-                      className={`w-full text-left p-3 rounded-lg border ${
+                      className={`w-full p-3 text-left ${
                         selectedPageSlug === p.slug
-                          ? 'border-slate-700 bg-slate-100'
-                          : 'border-slate-200 bg-white'
+                          ? `border-slate-700 bg-slate-100 ring-2 ring-slate-300/50 dark:border-slate-500 dark:bg-slate-800/80 ${dashboardNestedCardClass}`
+                          : dashboardNestedCardClass
                       }`}
                     >
                       <p className="text-sm font-medium text-slate-900">{p.title}</p>
@@ -928,7 +1008,7 @@ export default function MarketerDashboard({
                   value={pageForm.pageKey}
                   onChange={(e) => setPageForm((f) => ({ ...f, pageKey: e.target.value }))}
                   disabled={!creatingPage}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={dashboardInputClass}
                 >
                   {PAGE_KEY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -940,12 +1020,12 @@ export default function MarketerDashboard({
                   value={pageForm.slug}
                   onChange={(e) => setPageForm((f) => ({ ...f, slug: e.target.value }))}
                   placeholder="Slug (URL)"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={dashboardInputClass}
                 />
                 <select
                   value={pageForm.status}
                   onChange={(e) => setPageForm((f) => ({ ...f, status: e.target.value as 'draft' | 'published' }))}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                  className={`${dashboardInputClass} sm:col-span-2`}
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
@@ -957,7 +1037,7 @@ export default function MarketerDashboard({
                     type="datetime-local"
                     value={pageForm.scheduledPublishAt}
                     onChange={(e) => setPageForm((f) => ({ ...f, scheduledPublishAt: e.target.value }))}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                    className={`${dashboardInputClass} sm:col-span-2`}
                   />
                   <p className="text-xs text-slate-500 sm:col-span-2 -mt-2">
                     Optional: pick a publish date/time. If set to a future time, it will be hidden publicly until due.
@@ -968,29 +1048,33 @@ export default function MarketerDashboard({
                 value={pageForm.title}
                 onChange={(e) => setPageForm((f) => ({ ...f, title: e.target.value }))}
                 placeholder="Page title"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className={dashboardInputClass}
               />
+              {pageBodyLoading ? (
+                <p className="text-xs text-slate-500">Loading page content…</p>
+              ) : null}
               <textarea
                 value={pageForm.body}
                 onChange={(e) => setPageForm((f) => ({ ...f, body: e.target.value }))}
                 placeholder="Page content (rich text / HTML)"
                 rows={6}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                disabled={pageBodyLoading}
+                className={dashboardInputClass}
               />
               <div className="grid sm:grid-cols-2 gap-3">
-                <input value={pageForm.metaTitle} onChange={(e) => setPageForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={pageForm.keywords} onChange={(e) => setPageForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords (comma-separated)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={pageForm.canonicalUrl} onChange={(e) => setPageForm((f) => ({ ...f, canonicalUrl: e.target.value }))} placeholder="Canonical URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
-                <textarea value={pageForm.metaDescription} onChange={(e) => setPageForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
-                <input value={pageForm.ogTitle} onChange={(e) => setPageForm((f) => ({ ...f, ogTitle: e.target.value }))} placeholder="OG title" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <input value={pageForm.ogImage} onChange={(e) => setPageForm((f) => ({ ...f, ogImage: e.target.value }))} placeholder="OG image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                <textarea value={pageForm.ogDescription} onChange={(e) => setPageForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+                <input value={pageForm.metaTitle} onChange={(e) => setPageForm((f) => ({ ...f, metaTitle: e.target.value }))} placeholder="Meta title" className={dashboardInputClass} />
+                <input value={pageForm.keywords} onChange={(e) => setPageForm((f) => ({ ...f, keywords: e.target.value }))} placeholder="Keywords (comma-separated)" className={dashboardInputClass} />
+                <input value={pageForm.canonicalUrl} onChange={(e) => setPageForm((f) => ({ ...f, canonicalUrl: e.target.value }))} placeholder="Canonical URL" className={`${dashboardInputClass} sm:col-span-2`} />
+                <textarea value={pageForm.metaDescription} onChange={(e) => setPageForm((f) => ({ ...f, metaDescription: e.target.value }))} placeholder="Meta description" rows={3} className={`${dashboardInputClass} sm:col-span-2`} />
+                <input value={pageForm.ogTitle} onChange={(e) => setPageForm((f) => ({ ...f, ogTitle: e.target.value }))} placeholder="OG title" className={dashboardInputClass} />
+                <input value={pageForm.ogImage} onChange={(e) => setPageForm((f) => ({ ...f, ogImage: e.target.value }))} placeholder="OG image URL" className={dashboardInputClass} />
+                <textarea value={pageForm.ogDescription} onChange={(e) => setPageForm((f) => ({ ...f, ogDescription: e.target.value }))} placeholder="OG description" rows={2} className={`${dashboardInputClass} sm:col-span-2`} />
               </div>
               <input
                 value={pageForm.seoNote}
                 onChange={(e) => setPageForm((f) => ({ ...f, seoNote: e.target.value }))}
                 placeholder="Note for team (saved in logs)"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className={dashboardInputClass}
               />
               <GoogleSnippetPreview
                 title={pageForm.metaTitle || pageForm.title}
@@ -1034,7 +1118,7 @@ export default function MarketerDashboard({
                 <button
                   type="button"
                   onClick={creatingPage ? createPage : savePageSeo}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm"
+                  className={dashboardHeaderActionPrimary}
                 >
                   {creatingPage ? 'Create page' : 'Save page changes'}
                 </button>
@@ -1042,7 +1126,7 @@ export default function MarketerDashboard({
                   <button
                     type="button"
                     onClick={() => createPreviewLink()}
-                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    className={dashboardHeaderActionSecondary}
                     disabled={previewLoading || creatingPage || !selectedPageSlug}
                   >
                     {previewLoading ? "Generating…" : "Preview draft"}
@@ -1052,7 +1136,7 @@ export default function MarketerDashboard({
                   <button
                     type="button"
                     onClick={deleteSelectedPage}
-                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                    className={dashboardHeaderActionSecondary}
                   >
                     Delete page
                   </button>
@@ -1060,7 +1144,7 @@ export default function MarketerDashboard({
               </div>
               <FeatureGate feature="previewSharing">
                 {previewLink ? (
-                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-3">
+                  <div className={`mt-3 flex flex-wrap items-center justify-between gap-3 p-3 ${dashboardNestedCardClass}`}>
                     <a
                       href={previewLink}
                       target="_blank"
@@ -1073,14 +1157,14 @@ export default function MarketerDashboard({
                       <button
                         type="button"
                         onClick={() => void copyTextToClipboard(previewLink)}
-                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                        className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
                       >
                         Copy link
                       </button>
                       <button
                         type="button"
                         onClick={() => setPreviewLink(null)}
-                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs hover:bg-slate-50"
+                        className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
                       >
                         Clear
                       </button>
@@ -1103,14 +1187,14 @@ export default function MarketerDashboard({
       )}
 
       {((activeTab === 'pages' && canPages) || (activeTab === 'blogs' && canBlogs)) && (
-        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-          <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
+        <section className={dashboardPanelClass}>
+          <div className={`flex items-center gap-2 ${dashboardPanelHeaderClass}`}>
             <ImageIcon size={18} className="text-slate-600" />
             <h2 className="text-lg font-semibold text-slate-800">Media library (StoredImage)</h2>
           </div>
           <div className="p-5 space-y-4">
             <div className="grid sm:grid-cols-3 gap-3 items-center">
-              <label className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 cursor-pointer bg-white">
+              <label className={`cursor-pointer text-sm ${dashboardHeaderActionSecondary}`}>
                 Upload image
                 <input
                   type="file"
@@ -1123,13 +1207,13 @@ export default function MarketerDashboard({
                   }}
                 />
               </label>
-              <div className="sm:col-span-2 flex items-center gap-2 border border-slate-300 rounded-lg px-3 py-2 bg-white">
-                <Search size={16} className="text-slate-500" />
+              <div className={`sm:col-span-2 ${dashboardInputShellClass} items-center gap-2 px-3 py-2`}>
+                <Search size={16} className="shrink-0 text-slate-500" />
                 <input
                   value={imageSearch}
                   onChange={(e) => setImageSearch(e.target.value)}
                   placeholder="Search by file name / alt text"
-                  className="w-full text-sm outline-none bg-transparent"
+                  className="min-w-0 flex-1 border-0 bg-transparent py-1 text-sm text-slate-900 outline-none ring-0 placeholder:text-slate-400 dark:text-slate-100"
                 />
               </div>
             </div>
@@ -1142,7 +1226,7 @@ export default function MarketerDashboard({
                     key={img.id}
                     role="button"
                     tabIndex={0}
-                    className="text-left rounded-lg border border-slate-200 p-2 hover:border-slate-400"
+                    className={`cursor-pointer text-left !p-2 transition hover:opacity-95 ${dashboardNestedCardClass}`}
                     onClick={() => {
                       if (activeTab === 'pages' && canPages) {
                         setPageForm((f) => ({ ...f, ogImage: img.url }));
@@ -1158,7 +1242,7 @@ export default function MarketerDashboard({
                           e.stopPropagation();
                           copyImageUrl(img.url);
                         }}
-                        className="px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-700 text-[11px] hover:bg-slate-50"
+                        className={`py-1 text-[11px] ${dashboardHeaderActionSecondary}`}
                       >
                         Copy URL
                       </button>
@@ -1168,7 +1252,7 @@ export default function MarketerDashboard({
                           e.stopPropagation();
                           deleteImage(img.key);
                         }}
-                        className="p-2 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                        className={`p-2 ${dashboardHeaderActionSecondary}`}
                         aria-label="Delete image"
                         title="Delete image"
                       >
@@ -1187,7 +1271,9 @@ export default function MarketerDashboard({
         </section>
       )}
 
-      <MyActivityPanel />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

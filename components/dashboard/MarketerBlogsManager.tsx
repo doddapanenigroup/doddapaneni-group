@@ -33,6 +33,16 @@ import {
 } from '@/lib/marketer-blog-form';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
 import { getSiteOrigin } from '@/lib/site-origin';
+import {
+  dashboardDashedFoldClass,
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardIconButtonClass,
+  dashboardInputClass,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
 
 type SectorRow = { id: string; name: string; slug: string; description: string | null };
@@ -103,7 +113,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
   ref,
 ) {
   const [blogs, setBlogs] = useState<BlogListRow[]>([]);
-  const [blogsLoading, setBlogsLoading] = useState(true);
+  const [blogsLoading, setBlogsLoading] = useState(false);
   const [sectors, setSectors] = useState<SectorRow[]>([]);
   const [sectorsLoading, setSectorsLoading] = useState(true);
   const [blogSectorFilter, setBlogSectorFilter] = useState('');
@@ -129,17 +139,24 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     setDomReady(true);
   }, []);
 
+  const blogListSectorSelected = blogSectorFilter.trim().length > 0;
+
   const refreshBlogs = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = opts?.silent === true;
+    if (!blogSectorFilter.trim()) {
+      setBlogs([]);
+      if (!silent) setBlogsLoading(false);
+      return;
+    }
     if (!silent) setBlogsLoading(true);
     try {
       const sp = new URLSearchParams();
-      if (blogSectorFilter) sp.set('sectorId', blogSectorFilter);
+      sp.set('sectorId', blogSectorFilter.trim());
       if (blogStatusFilter === 'published' || blogStatusFilter === 'draft') {
         sp.set('status', blogStatusFilter);
       }
       const qs = sp.toString();
-      const res = await fetch(`/api/marketer/news${qs ? `?${qs}` : ''}`);
+      const res = await fetch(`/api/marketer/news?${qs}`);
       const d = res.ok ? await res.json().catch(() => ({})) : {};
       setBlogs((d?.items ?? []) as BlogListRow[]);
     } catch {
@@ -507,7 +524,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
       >
         <div className="pointer-events-none absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" aria-hidden />
         <div className="relative flex h-full w-full min-h-0 flex-1 flex-col overflow-hidden bg-white dark:bg-slate-950">
-          <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-violet-50 to-white px-4 py-3 dark:border-slate-800 dark:from-violet-950/40 dark:to-slate-900 sm:px-6 sm:py-4">
+          <header className={`flex shrink-0 items-start justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 ${dashboardPanelHeaderClass}`}>
             <div className="min-w-0 pr-2">
               <h2
                 id="blog-editor-title"
@@ -527,7 +544,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                   type="button"
                   onClick={() => void createPreviewLinkForBlog()}
                   disabled={previewLoading || blogActionLoading !== null}
-                  className="hidden rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800 sm:inline-flex sm:text-sm"
+                  className={`hidden disabled:opacity-50 sm:inline-flex ${dashboardHeaderActionSecondary} px-3 py-2 text-xs sm:text-sm`}
                 >
                   {previewLoading ? 'Generating…' : 'Preview'}
                 </button>
@@ -535,7 +552,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
               <button
                 type="button"
                 onClick={closeBlogModal}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                className={dashboardIconButtonClass}
                 aria-label="Close editor"
               >
                 <X className="h-5 w-5" strokeWidth={2.25} aria-hidden />
@@ -659,7 +676,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                 <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Featured preview
                 </p>
-                <div className="flex max-h-[min(56vh,480px)] w-full items-center justify-center overflow-auto rounded-xl border border-slate-200 bg-slate-50/90 p-2 dark:border-slate-600 dark:bg-slate-900/60">
+                <div className={`flex max-h-[min(56vh,480px)] w-full items-center justify-center overflow-auto p-2 ${dashboardNestedCardClass}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={blogForm.featuredImage}
@@ -693,13 +710,13 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                   type="button"
                   onClick={() => void createPreviewLinkForBlog()}
                   disabled={previewLoading || blogActionLoading !== null}
-                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 disabled:opacity-50 dark:border-slate-600 dark:text-slate-200"
+                  className={`${dashboardHeaderActionSecondary} disabled:opacity-50`}
                 >
                   {previewLoading ? 'Generating…' : 'Preview draft'}
                 </button>
               </div>
               {previewLink ? (
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/50">
+                <div className={`mt-4 flex flex-wrap items-center justify-between gap-3 p-3 ${dashboardNestedCardClass}`}>
                   <a
                     href={previewLink}
                     target="_blank"
@@ -712,14 +729,14 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     <button
                       type="button"
                       onClick={() => void copyTextToClipboard(previewLink)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs dark:border-slate-600"
+                      className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
                     >
                       Copy link
                     </button>
                     <button
                       type="button"
                       onClick={() => setPreviewLink(null)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs dark:border-slate-600"
+                      className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
                     >
                       Clear
                     </button>
@@ -729,12 +746,12 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
             </FeatureGate>
           </div>
 
-          <footer className="flex shrink-0 flex-col gap-3 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-6 sm:py-4">
+          <footer className="flex shrink-0 flex-col gap-3 border-t border-slate-200/60 bg-gradient-to-r from-slate-50/95 to-white px-4 py-3 backdrop-blur-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-950 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-6 sm:py-4">
             <button
               type="button"
               onClick={closeBlogModal}
               disabled={blogActionLoading !== null}
-              className="order-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800 sm:order-none sm:w-auto sm:px-5 sm:py-2.5"
+              className={`order-1 w-full disabled:opacity-50 sm:order-none sm:w-auto ${dashboardHeaderActionSecondary} px-5 py-2.5 text-sm font-semibold`}
             >
               Cancel
             </button>
@@ -775,7 +792,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     !blogForm.slug.trim() ||
                     !blogForm.content.trim()))
               }
-              className="order-3 w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50 dark:bg-violet-600 dark:hover:bg-violet-500 sm:order-none sm:w-auto sm:px-6 sm:py-2.5"
+              className={`order-3 w-full disabled:opacity-50 sm:order-none sm:w-auto sm:px-6 ${dashboardHeaderActionPrimary}`}
             >
               {blogActionLoading === 'save' || blogActionLoading === 'create' ? (
                 <span className="inline-flex items-center justify-center gap-2">
@@ -798,7 +815,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
 
   return (
     <>
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/30">
+    <section className={dashboardPanelClass}>
       {blogToast ? (
         <div
           role="status"
@@ -825,18 +842,19 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-4 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 via-white to-violet-50/30 p-5 dark:border-slate-800 dark:from-slate-800/45 dark:via-slate-900/85 dark:to-violet-950/20 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6 sm:px-8">
+      <div className={`flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6 sm:px-8 ${dashboardPanelHeaderClass}`}>
         <div className="flex min-w-0 items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-md ring-1 ring-violet-500/30">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 dark:bg-indigo-500">
             <BookOpen size={22} strokeWidth={2} aria-hidden />
           </div>
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">
+            <h2 className="text-lg font-bold tracking-tight text-slate-950 dark:text-white sm:text-xl">
               Blogs
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Posts are grouped by sector (same division as the public <span className="font-mono">/news/…</span>{' '}
-              pages). Use filters, then <strong className="text-slate-800 dark:text-slate-200">Create blog</strong> or{' '}
+              Choose a <strong className="text-slate-800 dark:text-slate-200">sector</strong> (and optional{' '}
+              <strong className="text-slate-800 dark:text-slate-200">status</strong>) to load posts for that division’s{' '}
+              <span className="font-mono">/news/…</span> area. Then <strong className="text-slate-800 dark:text-slate-200">Create blog</strong> or{' '}
               <strong className="text-slate-800 dark:text-slate-200">Edit</strong> /{' '}
               <strong className="text-slate-800 dark:text-slate-200">Delete</strong> on each row.
             </p>
@@ -845,14 +863,14 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         <button
           type="button"
           onClick={openCreateBlogModal}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:shadow-violet-900/40"
+          className={`inline-flex shrink-0 items-center justify-center gap-2 ${dashboardHeaderActionPrimary}`}
         >
           <Plus size={18} strokeWidth={2.5} aria-hidden />
           Create blog
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 border-b border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-950/30 sm:flex-row sm:flex-wrap sm:items-end sm:gap-4 sm:px-6">
+      <div className="flex flex-col gap-4 border-b border-slate-100/90 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/40 sm:flex-row sm:flex-wrap sm:items-end sm:gap-4 sm:px-6">
         <div className="min-w-[10rem] flex-1 sm:max-w-xs">
           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Sector
@@ -860,9 +878,9 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
           <select
             value={blogSectorFilter}
             onChange={(e) => setBlogSectorFilter(e.target.value)}
-            className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+            className={`w-full cursor-pointer ${dashboardInputClass}`}
           >
-            <option value="">All sectors</option>
+            <option value="">Select sector…</option>
             {sectors.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -877,9 +895,9 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
           <select
             value={blogStatusFilter}
             onChange={(e) => setBlogStatusFilter(e.target.value as 'all' | 'published' | 'draft')}
-            className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+            className={`w-full cursor-pointer ${dashboardInputClass}`}
           >
-            <option value="all">All statuses</option>
+            <option value="all">All statuses (this sector)</option>
             <option value="published">Published</option>
             <option value="draft">Draft</option>
           </select>
@@ -898,7 +916,8 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
               value={blogListSearch}
               onChange={(e) => setBlogListSearch(e.target.value)}
               placeholder="Title, slug, sector…"
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-800 shadow-sm dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              disabled={!blogListSectorSelected}
+              className={`w-full py-2.5 pl-9 pr-3 disabled:cursor-not-allowed disabled:opacity-60 ${dashboardInputClass}`}
             />
           </div>
         </div>
@@ -910,8 +929,17 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
             <Loader2 className="h-8 w-8 animate-spin text-violet-500" aria-hidden />
             Loading blogs…
           </div>
+        ) : !blogListSectorSelected ? (
+          <div className={`p-10 text-center text-sm text-slate-600 dark:text-slate-400 ${dashboardDashedFoldClass}`}>
+            <p className="font-medium text-slate-800 dark:text-slate-200">No list loaded yet</p>
+            <p className="mt-2">
+              Select a <span className="font-semibold">sector</span> above. Optionally choose{' '}
+              <span className="font-semibold">Published</span> or <span className="font-semibold">Draft</span> (or leave
+              status on “all” for that sector). The table appears here so the page stays short.
+            </p>
+          </div>
         ) : filteredBlogs.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/80 p-10 text-center text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-400">
+          <div className={`p-10 text-center text-sm text-slate-600 dark:text-slate-400 ${dashboardDashedFoldClass}`}>
             {blogs.length === 0
               ? 'No blogs match these filters. Click “Create blog” to add one.'
               : 'No blogs match your search. Try clearing search or changing filters.'}
@@ -926,7 +954,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     <span className="font-mono text-xs text-slate-500 dark:text-slate-400">/news/{group.slug}</span>
                   ) : null}
                 </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className={`overflow-x-auto !p-0 ${dashboardNestedCardClass}`}>
                   <table className="w-full min-w-[640px] text-left text-sm">
                     <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-400">
                       <tr>
@@ -965,7 +993,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                                 type="button"
                                 onClick={() => void openEditBlogModal(b)}
                                 disabled={blogActionLoading !== null}
-                                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                                className={`inline-flex items-center gap-1 py-1.5 text-xs font-semibold disabled:opacity-50 ${dashboardHeaderActionSecondary}`}
                               >
                                 <Pencil className="h-3.5 w-3.5" aria-hidden />
                                 Edit

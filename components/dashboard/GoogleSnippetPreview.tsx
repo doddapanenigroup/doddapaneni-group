@@ -1,5 +1,7 @@
 'use client';
 
+import { dashboardNestedCardClass } from '@/lib/dashboard-ui';
+
 export default function GoogleSnippetPreview({
   title,
   description,
@@ -12,7 +14,7 @@ export default function GoogleSnippetPreview({
   ogImage?: string | null;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+    <div className={`p-4 ${dashboardNestedCardClass}`}>
       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         Google preview
       </p>
@@ -24,7 +26,7 @@ export default function GoogleSnippetPreview({
         {description || 'Your meta description appears here for search users.'}
       </p>
       {ogImage ? (
-        <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className={`mt-3 overflow-hidden !p-0 ${dashboardNestedCardClass}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ogImage} alt="OG preview" className="h-28 w-full bg-slate-100 object-cover dark:bg-slate-800" />
         </div>

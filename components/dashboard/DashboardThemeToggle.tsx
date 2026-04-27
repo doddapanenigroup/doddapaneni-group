@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from 'lucide-react';
 import { useDashboardTheme } from '@/components/dashboard/DashboardThemeProvider';
+import { dashboardIconButtonClass } from '@/lib/dashboard-ui';
 
 export default function DashboardThemeToggle() {
   const { mode, toggleMode } = useDashboardTheme();
@@ -11,7 +12,7 @@ export default function DashboardThemeToggle() {
     <button
       type="button"
       onClick={toggleMode}
-      className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+      className={dashboardIconButtonClass}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >

@@ -5,6 +5,11 @@ import Cropper from 'react-easy-crop';
 import type { Area } from 'react-easy-crop';
 import { Loader2 } from 'lucide-react';
 import { getCroppedImageWebp } from '@/lib/team-photo-crop-utils';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardNestedCardClass,
+} from '@/lib/dashboard-ui';
 
 type Props = {
   imageSrc: string;
@@ -52,7 +57,7 @@ export default function TeamPhotoCropper({ imageSrc, onCancel, onApply, onError 
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-600 dark:bg-slate-900/40">
+    <div className={`p-3 ${dashboardNestedCardClass}`}>
       <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
         The whole photo is shown. Drag the square to frame the face or area you want. Use zoom to see more of the
         image, then move the square again if needed.
@@ -90,7 +95,7 @@ export default function TeamPhotoCropper({ imageSrc, onCancel, onApply, onError 
           type="button"
           disabled={busy}
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          className={`${dashboardHeaderActionSecondary} disabled:opacity-50`}
         >
           Cancel
         </button>
@@ -98,7 +103,7 @@ export default function TeamPhotoCropper({ imageSrc, onCancel, onApply, onError 
           type="button"
           disabled={busy || !hasCrop}
           onClick={() => void handleApply()}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50 sm:flex-initial min-w-[10rem]"
+          className={`inline-flex min-w-[10rem] flex-1 items-center justify-center gap-2 disabled:opacity-50 sm:flex-initial ${dashboardHeaderActionPrimary}`}
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
           {busy ? 'Uploading…' : 'Use crop & upload'}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, LogIn } from 'lucide-react';
+import { dashboardPanelClass } from '@/lib/dashboard-ui';
 
 type Insights = {
   recentLogins: {
@@ -106,11 +107,10 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
   }
 
   const gap = side ? 'space-y-3' : 'space-y-6';
-  const card =
-    'overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25';
+  const card = dashboardPanelClass;
   const head = side
-    ? 'flex items-center gap-1.5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-2.5 py-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85'
-    : 'flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 text-lg font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85';
+    ? 'flex items-center gap-1.5 border-b border-indigo-100/70 bg-gradient-to-r from-indigo-50/90 to-white px-2.5 py-2 text-xs font-bold text-slate-900 dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:text-slate-100'
+    : 'flex items-center gap-2 border-b border-indigo-100/70 bg-gradient-to-r from-indigo-50/90 to-white p-5 text-lg font-bold text-slate-900 dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:text-slate-100';
   const listMax = side ? 'max-h-52' : 'max-h-[min(24rem,50vh)]';
   const liPad = side ? 'p-2.5' : 'p-4';
   const bodyText = side ? 'text-xs' : 'text-sm';
@@ -119,7 +119,7 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
 
   return (
     <div className={gap}>
-      <section className={side ? `${card} rounded-xl` : card}>
+      <section className={card}>
         <h2 className={head}>
           <Activity size={iconAct} className="shrink-0 text-slate-600" />
           Active sessions
@@ -194,7 +194,7 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
         )}
       </section>
 
-      <section className={side ? `${card} rounded-xl` : card}>
+      <section className={card}>
         <h2 className={head}>
           <LogIn size={iconLog} className="shrink-0 text-slate-600" />
           Recent logins

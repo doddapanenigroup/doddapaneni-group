@@ -3,6 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Save } from 'lucide-react';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardIconButtonClass,
+  dashboardInputClass,
+  dashboardModalBackdropClass,
+  dashboardModalFrameClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type EditContentModalProps = {
   pageKey: string;
@@ -74,8 +83,9 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
-      <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50 shrink-0">
+    <div className={dashboardModalBackdropClass}>
+      <div className={`${dashboardModalFrameClass} max-w-5xl shadow-2xl`}>
+      <div className={`flex shrink-0 items-center justify-between sm:px-6 ${dashboardPanelHeaderClass}`}>
         <div className="min-w-0">
           <h2 className="text-xl font-bold text-slate-900 truncate">Edit code — {label}</h2>
           <p className="text-sm text-slate-500 font-mono truncate mt-0.5" title={editFile}>
@@ -85,7 +95,7 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
         <button
           type="button"
           onClick={onClose}
-          className="p-2 rounded-lg text-slate-500 hover:bg-slate-200 transition-colors shrink-0 ml-2"
+          className={`${dashboardIconButtonClass} ml-2 shrink-0`}
           aria-label="Close"
         >
           <X size={24} />
@@ -104,7 +114,7 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 spellCheck={false}
-                className="flex-1 w-full min-h-[400px] rounded-lg border border-slate-300 px-3 py-2 text-slate-900 font-mono text-sm leading-relaxed resize-none"
+                className={`min-h-[min(60vh,480px)] flex-1 resize-none font-mono text-sm leading-relaxed ${dashboardInputClass}`}
                 placeholder="Loading…"
                 style={{ tabSize: 2 }}
               />
@@ -123,7 +133,7 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                className={`${dashboardHeaderActionPrimary} disabled:opacity-50`}
               >
                 <Save size={18} />
                 {saving ? 'Saving…' : 'Save to file'}
@@ -131,13 +141,14 @@ export default function EditContentModal({ pageKey, label, editFile, onClose }: 
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                className={dashboardHeaderActionSecondary}
               >
                 Cancel
               </button>
             </div>
           </form>
         )}
+      </div>
       </div>
     </div>
   );

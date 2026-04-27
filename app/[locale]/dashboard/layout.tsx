@@ -5,7 +5,7 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';
-import { loadDashboardShellUserRow } from '@/lib/admin-dashboard-users';
+import { normalizeUserRoleFromDb } from '@/lib/admin-dashboard-users';
 
 /** Session + DB-backed shell must not be served from a shared static shell. */
 export const dynamic = 'force-dynamic';
@@ -27,27 +27,7 @@ export default async function DashboardLayout({
     redirect(`${login}?callbackUrl=${encodeURIComponent(dash)}`);
   }
 
-  // Enforce admin "force logout" by comparing JWT issue time against DB revocation time.
-  // This keeps security strong even with JWT sessions (no session table).
-  try {
-    await connectDb();
-    const dbUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { sessionRevokedAt: true },
-    });
-    const issuedAtMs =
-      typeof session.user.sessionIssuedAt === 'number' ? session.user.sessionIssuedAt * 1000 : null;
-    const revokedAtMs = dbUser?.sessionRevokedAt ? dbUser.sessionRevokedAt.getTime() : null;
-    if (issuedAtMs != null && revokedAtMs != null && revokedAtMs > issuedAtMs) {
-      const login = publicPathForLocale(locale, '/login');
-      const dash = publicPathForLocale(locale, '/dashboard');
-      redirect(`${login}?reason=revoked&callbackUrl=${encodeURIComponent(dash)}`);
-    }
-  } catch {
-    // Best-effort: if DB is temporarily unavailable, do not block dashboard rendering here.
-  }
-
-  /** JWT can lag behind `User` after direct DB edits; read the row so header + role match the database. */
+  /** One DB read: session revocation + fresh profile for header (avoids duplicate round-trips per navigation). */
   let shellUser: {
     email: string;
     name: string | null;
@@ -61,17 +41,34 @@ export default async function DashboardLayout({
   };
   try {
     await connectDb();
-    const fresh = await loadDashboardShellUserRow(session.user.id);
-    if (fresh) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        sessionRevokedAt: true,
+        email: true,
+        name: true,
+        username: true,
+        role: true,
+      },
+    });
+    if (dbUser) {
       shellUser = {
-        email: fresh.email,
-        name: fresh.name,
-        username: fresh.username,
-        role: fresh.role,
+        email: dbUser.email,
+        name: dbUser.name,
+        username: dbUser.username,
+        role: normalizeUserRoleFromDb(dbUser.role),
       };
+      const issuedAtMs =
+        typeof session.user.sessionIssuedAt === 'number' ? session.user.sessionIssuedAt * 1000 : null;
+      const revokedAtMs = dbUser.sessionRevokedAt ? dbUser.sessionRevokedAt.getTime() : null;
+      if (issuedAtMs != null && revokedAtMs != null && revokedAtMs > issuedAtMs) {
+        const login = publicPathForLocale(locale, '/login');
+        const dash = publicPathForLocale(locale, '/dashboard');
+        redirect(`${login}?reason=revoked&callbackUrl=${encodeURIComponent(dash)}`);
+      }
     }
   } catch {
-    /* keep session-backed shellUser */
+    // Best-effort: if DB is temporarily unavailable, keep session-backed shellUser and skip revocation check.
   }
 
   return (

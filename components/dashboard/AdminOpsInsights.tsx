@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Megaphone } from 'lucide-react';
+import {
+  dashboardNoticeClass,
+  dashboardNoticeErrorClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type Insights = {
   contentEdits: {
@@ -40,21 +46,19 @@ export default function AdminOpsInsights() {
 
   if (error) {
     return (
-      <p className="rounded-xl border border-red-200 bg-white/90 p-4 text-sm text-red-600">{error}</p>
+      <p className={dashboardNoticeErrorClass}>{error}</p>
     );
   }
   if (!data) {
     return (
-      <p className="rounded-xl border border-slate-200 bg-white/90 p-4 text-sm text-slate-500">
-        Loading operations overview…
-      </p>
+      <p className={dashboardNoticeClass}>Loading operations overview…</p>
     );
   }
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 text-lg font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+      <section className={dashboardPanelClass}>
+        <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
           Developer edits (files &amp; CMS)
         </h2>
         <ul className="max-h-64 divide-y divide-slate-100 overflow-y-auto text-sm dark:divide-slate-800">
@@ -75,8 +79,8 @@ export default function AdminOpsInsights() {
         </ul>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-        <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 text-lg font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+      <section className={dashboardPanelClass}>
+        <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
           <Megaphone size={20} className="text-slate-600" />
           Digital marketer / SEO-related changes
         </h2>

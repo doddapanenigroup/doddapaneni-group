@@ -12,7 +12,13 @@ import AdminSessionsLoginsColumn from './AdminSessionsLoginsColumn';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import CareersJobsPanel from './CareersJobsPanel';
-import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardMainMaxClass,
+  dashboardStageClass,
+  dashboardToolbarStripClass,
+} from '@/lib/dashboard-ui';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 
 type UserRow = {
@@ -109,8 +115,8 @@ export default function AdminDashboard({
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-2 md:justify-end">
+    <div className={`${dashboardMainMaxClass} space-y-6`}>
+      <div className={`${dashboardToolbarStripClass} justify-end xl:sticky xl:top-[4.5rem] xl:z-10`}>
         <button
           type="button"
           disabled={manageModalLoading}
@@ -155,17 +161,26 @@ export default function AdminDashboard({
         />
       )}
 
-      <div className="space-y-8 xl:hidden">
+      <div className="space-y-6 xl:hidden">
         <AdminSessionsLoginsColumn />
       </div>
 
-      <CareersJobsPanel locale={locale} />
-
-      <AdminOpsInsights />
-
-      <SectorStatusPanel />
-
-      <CompaniesAdminPanel />
+      <div className={dashboardStageClass}>
+        <div className="grid gap-6 lg:gap-8 xl:grid-cols-12 xl:items-start">
+          <div className="flex min-w-0 flex-col gap-6 xl:col-span-7 2xl:col-span-8">
+            <CareersJobsPanel locale={locale} />
+          </div>
+          <div className="flex min-w-0 flex-col gap-6 xl:col-span-5 2xl:col-span-4">
+            <SectorStatusPanel />
+          </div>
+          <div className="min-w-0 xl:col-span-12">
+            <AdminOpsInsights />
+          </div>
+          <div className="min-w-0 xl:col-span-12">
+            <CompaniesAdminPanel />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

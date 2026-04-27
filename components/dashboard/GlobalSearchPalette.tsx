@@ -27,6 +27,7 @@ import {
   filterDashboardNavSearchHits,
   type DashboardNavSearchHit,
 } from '@/lib/dashboard-search-nav';
+import { dashboardCommandPaletteClass, dashboardSearchTriggerClass } from '@/lib/dashboard-ui';
 
 type UserHit = { id: string; email: string; name: string | null; username: string | null; role: string };
 type PageHit = { id: string; title: string; slug: string; locale: string; status: string };
@@ -328,15 +329,13 @@ export default function GlobalSearchPalette({
     open && typeof document !== 'undefined'
       ? createPortal(
           <div
-            className="fixed inset-0 z-[100] flex items-start justify-center bg-black/50 p-4 pt-[min(12vh,6rem)] backdrop-blur-sm sm:pt-[10vh]"
+            className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/50 p-4 pt-[min(12vh,6rem)] backdrop-blur-md sm:pt-[10vh] dark:bg-black/55"
             role="presentation"
             onMouseDown={(e) => {
               if (e.target === e.currentTarget) setOpen(false);
             }}
           >
-            <div
-              className="flex w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
-              role="dialog"
+            <div className={`w-full ${dashboardCommandPaletteClass}`} role="dialog"
               aria-modal="true"
               aria-label="Search"
             >
@@ -449,7 +448,7 @@ export default function GlobalSearchPalette({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex h-10 w-full min-w-0 items-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50/80 px-2.5 text-left text-sm text-slate-500 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-400 dark:hover:bg-slate-800 sm:px-3 ${className}`}
+        className={`${dashboardSearchTriggerClass} ${className ?? ''}`}
         aria-label="Open search"
       >
         <Search className="h-4 w-4 shrink-0 opacity-70" />

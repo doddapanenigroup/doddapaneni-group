@@ -9,7 +9,18 @@ import { TEAM_MEMBER_DESCRIPTION_MAX_WORDS, countWords } from '@/lib/team-member
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import DashboardPageHeader from '@/components/dashboard/DashboardPageHeader';
 import TeamPhotoCropper from '@/components/dashboard/TeamPhotoCropper';
-import { dashboardHeaderActionPrimary, dashboardHeaderActionSecondary } from '@/lib/dashboard-ui';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardIconButtonClass,
+  dashboardInputClass,
+  dashboardListFrameClass,
+  dashboardModalBackdropClass,
+  dashboardModalFrameClass,
+  dashboardNestedCardClass,
+  dashboardNoticeErrorClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type Grouped = {
   founder: TeamMemberPublic | null;
@@ -307,7 +318,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
       />
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+        <div className={dashboardNoticeErrorClass}>{error}</div>
       ) : null}
 
       {loading ? (
@@ -327,7 +338,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
           </section>
           <section>
             <h2 className="text-lg font-semibold text-slate-900">Developers</h2>
-            <ul className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+            <ul className={`mt-3 ${dashboardListFrameClass}`}>
               {data.developers.map((m) => (
                 <MemberRow key={m.id} member={m} onEdit={() => openEdit(m)} onDelete={() => removeMember(m.id)} />
               ))}
@@ -336,7 +347,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
           </section>
           <section>
             <h2 className="text-lg font-semibold text-slate-900">Digital marketers</h2>
-            <ul className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+            <ul className={`mt-3 ${dashboardListFrameClass}`}>
               {data.marketers.map((m) => (
                 <MemberRow key={m.id} member={m} onEdit={() => openEdit(m)} onDelete={() => removeMember(m.id)} />
               ))}
@@ -347,18 +358,22 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
       )}
 
       {modalOpen ? (
-        <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-slate-900/50 p-4 sm:items-center">
+        <div className={`z-[10000] ${dashboardModalBackdropClass}`}>
           <div
-            className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:p-6"
+            className={`${dashboardModalFrameClass} max-h-[92vh] max-w-xl overflow-y-auto p-5 shadow-2xl sm:p-6`}
             role="dialog"
             aria-modal="true"
           >
-            <h3 className="text-lg font-semibold text-slate-900">{form.id ? 'Edit team member' : 'Add team member'}</h3>
+            <div className={`-mx-5 -mt-5 mb-4 sm:-mx-6 sm:-mt-6 ${dashboardPanelHeaderClass}`}>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {form.id ? 'Edit team member' : 'Add team member'}
+              </h3>
+            </div>
             <div className="mt-4 space-y-4">
               <label className="block text-sm font-medium text-slate-700">
                 Section
                 <select
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.section}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, section: e.target.value as TeamMemberPublic['section'] }))
@@ -375,7 +390,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
                   type="number"
                   min={0}
                   max={999}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.sortOrder}
                   onChange={(e) => setForm((f) => ({ ...f, sortOrder: parseInt(e.target.value, 10) || 0 }))}
                 />
@@ -383,7 +398,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
               <label className="block text-sm font-medium text-slate-700">
                 Name
                 <input
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 />
@@ -391,7 +406,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
               <label className="block text-sm font-medium text-slate-700">
                 Designation
                 <input
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.designation}
                   onChange={(e) => setForm((f) => ({ ...f, designation: e.target.value }))}
                 />
@@ -400,7 +415,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
                 Description (max {TEAM_MEMBER_DESCRIPTION_MAX_WORDS} words)
                 <textarea
                   rows={5}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 />
@@ -413,7 +428,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
                   Second paragraph — founder only (max {TEAM_MEMBER_DESCRIPTION_MAX_WORDS} words, optional)
                   <textarea
                     rows={4}
-                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className={`mt-1 ${dashboardInputClass}`}
                     value={form.descriptionExtra ?? ''}
                     onChange={(e) => setForm((f) => ({ ...f, descriptionExtra: e.target.value || null }))}
                   />
@@ -425,7 +440,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
               <label className="block text-sm font-medium text-slate-700">
                 Image alt text (optional)
                 <input
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.imageAlt ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, imageAlt: e.target.value }))}
                 />
@@ -476,7 +491,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
                     {form.imageUrl ? (
                       <div className="mt-3">
                         <p className="mb-1 text-xs font-medium text-slate-500">Current photo</p>
-                        <div className="relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                        <div className={`relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden bg-slate-100 !p-0 dark:bg-slate-800 ${dashboardNestedCardClass}`}>
                           <Image
                             src={form.imageUrl}
                             alt=""
@@ -495,7 +510,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
             <div className="mt-6 flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className={dashboardHeaderActionSecondary}
                 onClick={closeMemberModal}
               >
                 Cancel
@@ -503,7 +518,7 @@ export default function TeamAdminClient({ locale, dashboardHref }: { locale: str
               <button
                 type="button"
                 disabled={saving}
-                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
+                className={`inline-flex items-center gap-2 disabled:opacity-50 ${dashboardHeaderActionPrimary}`}
                 onClick={() => void saveModal()}
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -547,10 +562,14 @@ function MemberRow({
           {member.section} · order {member.sortOrder}
         </p>
       </div>
-      <button type="button" className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50" onClick={onEdit}>
+      <button type="button" className={`${dashboardIconButtonClass} h-9 w-9`} onClick={onEdit}>
         <Pencil className="h-4 w-4" />
       </button>
-      <button type="button" className="rounded-lg border border-red-200 p-2 text-red-700 hover:bg-red-50" onClick={onDelete}>
+      <button
+        type="button"
+        className={`${dashboardIconButtonClass} h-9 w-9 border-red-200/80 text-red-700 hover:border-red-300 hover:bg-red-50/80 dark:border-red-900/50 dark:text-red-300 dark:hover:bg-red-950/40`}
+        onClick={onDelete}
+      >
         <Trash2 className="h-4 w-4" />
       </button>
     </li>

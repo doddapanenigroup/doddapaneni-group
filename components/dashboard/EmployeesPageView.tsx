@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, UserCircle, Clock, FileCode } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleLabel } from '@/lib/dashboard-title';
+import { dashboardMainMaxClass, dashboardPanelClass } from '@/lib/dashboard-ui';
 
 type EmployeeSession = {
   logId: string;
@@ -51,7 +52,7 @@ export default function EmployeesPageView({
   }, [employees]);
 
   return (
-    <div className="space-y-6">
+    <div className={`${dashboardMainMaxClass} space-y-6`}>
       <div className="flex items-center gap-4">
         <Link
           href={dashboardHref}
@@ -68,8 +69,8 @@ export default function EmployeesPageView({
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-6 min-h-[480px]">
-        <aside className="w-full lg:w-72 shrink-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-          <div className="p-3 border-b border-slate-200 bg-slate-50/80">
+        <aside className={`w-full shrink-0 lg:w-72 ${dashboardPanelClass}`}>
+          <div className="border-b border-slate-200 bg-slate-50/90 p-3 dark:border-slate-800 dark:bg-slate-900/60">
             <h2 className="text-sm font-semibold text-slate-700">Employee list</h2>
           </div>
           <nav className="p-2 max-h-[420px] overflow-y-auto">
@@ -110,7 +111,7 @@ export default function EmployeesPageView({
           </nav>
         </aside>
 
-        <main className="flex-1 min-w-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <main className={`min-w-0 flex-1 ${dashboardPanelClass}`}>
           {!selected ? (
             <div className="p-8 text-center text-slate-500">
               <UserCircle size={48} className="mx-auto mb-3 text-slate-300" />

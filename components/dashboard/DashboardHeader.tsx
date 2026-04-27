@@ -9,9 +9,7 @@ import DashboardThemeToggle from '@/components/dashboard/DashboardThemeToggle';
 import DashboardNotificationBell from '@/components/dashboard/DashboardNotificationBell';
 import GlobalSearchPalette from '@/components/dashboard/GlobalSearchPalette';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
-
-const iconActionClass =
-  'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
+import { dashboardIconButtonClass, dashboardTopBarClass } from '@/lib/dashboard-ui';
 
 export default function DashboardHeader({
   user,
@@ -21,18 +19,18 @@ export default function DashboardHeader({
   locale: string;
 }) {
   return (
-    <header className="sticky top-0 z-20 w-full border-b border-slate-200/90 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.06)] backdrop-blur-md dark:border-slate-800/90 dark:bg-slate-950/95">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-3.5 sm:px-6 lg:flex-row lg:items-center lg:gap-6 lg:px-8 lg:py-3.5 xl:px-10">
+    <header className={dashboardTopBarClass}>
+      <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-3.5 sm:px-6 lg:flex-row lg:items-center lg:gap-8 lg:px-8 lg:py-4 xl:px-10">
         {/* Identity */}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-indigo-600/90 dark:text-indigo-400">
             Doddapaneni Group
           </p>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">
+            <h1 className="truncate text-lg font-bold tracking-tight text-slate-950 dark:text-white sm:text-xl">
               {getDashboardTitle(user.role)}
             </h1>
-            <span className="inline-flex shrink-0 items-center rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-700 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200">
+            <span className="inline-flex shrink-0 items-center rounded-full bg-indigo-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm dark:bg-indigo-500">
               {getRoleLabel(user.role)}
             </span>
           </div>
@@ -44,7 +42,7 @@ export default function DashboardHeader({
         </div>
 
         {/* Toolbar */}
-        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-2.5 lg:shrink-0">
+        <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 lg:shrink-0">
           <span
             className="mr-1 hidden max-w-[22rem] truncate text-xs text-slate-600 dark:text-slate-400 xl:inline"
             title={[user.name, user.username ? `@${user.username}` : null, user.email].filter(Boolean).join(' · ')}
@@ -64,7 +62,7 @@ export default function DashboardHeader({
 
           <Link
             href={publicPathForLocale(locale, '/')}
-            className={iconActionClass}
+            className={dashboardIconButtonClass}
             title="Public site"
             aria-label="Public site"
           >
@@ -72,7 +70,7 @@ export default function DashboardHeader({
           </Link>
           <Link
             href={publicPathForLocale(locale, '/dashboard/security')}
-            className={iconActionClass}
+            className={dashboardIconButtonClass}
             title="Change your password (current password required; no email code)"
             aria-label="Change password"
           >
@@ -91,7 +89,7 @@ export default function DashboardHeader({
               }
               await signOut({ callbackUrl: publicPathForLocale(locale, '/login') });
             }}
-            className={iconActionClass}
+            className={dashboardIconButtonClass}
             title="Sign out"
             aria-label="Sign out"
           >

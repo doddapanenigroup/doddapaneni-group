@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { Settings, RefreshCw } from 'lucide-react';
+import {
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type EnvCheck = {
   key: string;
@@ -37,8 +42,8 @@ export default function DeveloperEnvPanel() {
   }, []);
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
+    <section className={dashboardPanelClass}>
+      <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
         <Settings size={20} className="text-slate-600" />
         Environment validation
       </h2>
@@ -77,7 +82,7 @@ export default function DeveloperEnvPanel() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-slate-200 overflow-hidden">
+            <div className={`overflow-hidden !p-0 ${dashboardNestedCardClass}`}>
               <div className="bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">Checks</div>
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {data.checks.map((c) => (
@@ -103,7 +108,7 @@ export default function DeveloperEnvPanel() {
             </div>
 
             {data.safeEnv && data.safeEnv.length > 0 ? (
-              <div className="rounded-xl border border-slate-200 overflow-hidden mt-4">
+              <div className={`mt-4 overflow-hidden !p-0 ${dashboardNestedCardClass}`}>
                 <div className="bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">Safe environment preview</div>
                 <ul className="divide-y divide-slate-100 dark:divide-slate-800 max-h-80 overflow-auto">
                   {data.safeEnv.map((row) => (

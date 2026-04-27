@@ -14,6 +14,12 @@ import DeveloperCachePanel from './DeveloperCachePanel';
 import DeveloperAuditPanel from './DeveloperAuditPanel';
 import DashboardPageHeader from './DashboardPageHeader';
 import CareersJobsPanel from './CareersJobsPanel';
+import {
+  dashboardDashedFoldClass,
+  dashboardMainMaxClass,
+  dashboardPanelClass,
+  dashboardStageClass,
+} from '@/lib/dashboard-ui';
 import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
 
 type SitePage = {
@@ -23,9 +29,6 @@ type SitePage = {
   editFile: string;
   icon: React.ReactNode;
 };
-
-const panelClass =
-  'overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900/95';
 
 export default function DeveloperDashboard({
   locale,
@@ -56,7 +59,7 @@ export default function DeveloperDashboard({
   const isDeveloperView = viewerRole === 'DEVELOPER';
 
   return (
-    <div className="mx-auto max-w-6xl space-y-3 pb-4">
+    <div className={`${dashboardMainMaxClass} space-y-5 pb-6`}>
       <DashboardPageHeader
         icon={Code2}
         title={getDashboardTitle(viewerRole)}
@@ -81,30 +84,33 @@ export default function DeveloperDashboard({
         }
       />
 
-      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-800/20">
-        <button
-          type="button"
-          onClick={() => setCareersOpen((o) => !o)}
-          className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-800 dark:text-slate-100"
-          aria-expanded={careersOpen}
-        >
-          <span>Careers & job listings</span>
-          <ChevronDown
-            className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${careersOpen ? 'rotate-180' : ''}`}
-            aria-hidden
-          />
-        </button>
-        {careersOpen ? (
-          <div className="border-t border-slate-200/80 p-2 dark:border-slate-700 sm:p-3">
-            <CareersJobsPanel locale={locale} />
+      <div className={dashboardStageClass}>
+        <div className="mb-6 max-w-3xl">
+          <div className={dashboardDashedFoldClass}>
+            <button
+              type="button"
+              onClick={() => setCareersOpen((o) => !o)}
+              className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 dark:text-slate-100"
+              aria-expanded={careersOpen}
+            >
+              <span>Careers & job listings</span>
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${careersOpen ? 'rotate-180' : ''}`}
+                aria-hidden
+              />
+            </button>
+            {careersOpen ? (
+              <div className="border-t border-slate-200/80 p-2 dark:border-slate-700 sm:p-3">
+                <CareersJobsPanel locale={locale} />
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:items-start">
-        <div className="min-w-0 space-y-3">
-          <section className={panelClass}>
-            <div className="border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start xl:gap-8">
+          <div className="min-w-0 space-y-6 xl:col-span-5 2xl:col-span-4">
+          <section className={dashboardPanelClass}>
+            <div className="border-b border-slate-100 bg-slate-50/95 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60">
               <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-800">
                 <BookOpen size={16} className="text-slate-600" />
                 How to change the code
@@ -127,8 +133,8 @@ export default function DeveloperDashboard({
             </div>
           </section>
 
-          <section className={panelClass}>
-            <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+          <section className={dashboardPanelClass}>
+            <h2 className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/95 px-4 py-3 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/60">
               <Languages size={16} className="text-slate-600" />
               Multi-lingual — automatic translation
             </h2>
@@ -193,8 +199,8 @@ export default function DeveloperDashboard({
           </section>
         </div>
 
-        <section className={`min-w-0 ${panelClass}`}>
-          <h2 className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white px-3 py-2.5 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+        <section className={`min-w-0 xl:col-span-7 2xl:col-span-8 ${dashboardPanelClass}`}>
+          <h2 className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/95 px-4 py-3 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/60">
             <Globe size={16} className="shrink-0 text-slate-600" />
             Site pages — every page on the website
           </h2>
@@ -249,31 +255,36 @@ export default function DeveloperDashboard({
             ))}
           </div>
         </section>
+        </div>
       </div>
 
-      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-800/20">
-        <button
-          type="button"
-          onClick={() => setToolsOpen((o) => !o)}
-          className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-800 dark:text-slate-100"
-          aria-expanded={toolsOpen}
-        >
-          <span>Monitoring, environment, cache & activity</span>
-          <ChevronDown
-            className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${toolsOpen ? 'rotate-180' : ''}`}
-            aria-hidden
-          />
-        </button>
-        {toolsOpen ? (
-          <div className="space-y-3 border-t border-slate-200/80 p-2 sm:space-y-2 sm:p-2">
-            <DeveloperErrorsPanel />
-            <DeveloperBuildDeploymentsPanel />
-            <DeveloperEnvPanel />
-            <DeveloperCachePanel />
-            <DeveloperAuditPanel />
-            <MyActivityPanel />
-          </div>
-        ) : null}
+      <div className={`${dashboardStageClass} mt-6`}>
+        <div className={dashboardDashedFoldClass}>
+          <button
+            type="button"
+            onClick={() => setToolsOpen((o) => !o)}
+            className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 dark:text-slate-100"
+            aria-expanded={toolsOpen}
+          >
+            <span>Monitoring, environment, cache & activity</span>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${toolsOpen ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          </button>
+          {toolsOpen ? (
+            <div className="grid grid-cols-1 gap-4 border-t border-slate-200/80 p-3 sm:grid-cols-2 xl:grid-cols-3 xl:p-4">
+              <DeveloperErrorsPanel />
+              <DeveloperBuildDeploymentsPanel />
+              <DeveloperEnvPanel />
+              <DeveloperCachePanel />
+              <DeveloperAuditPanel />
+              <div className="sm:col-span-2 xl:col-span-3">
+                <MyActivityPanel />
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {editingPage && (

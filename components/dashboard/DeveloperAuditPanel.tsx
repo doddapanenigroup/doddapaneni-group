@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import {
+  dashboardInputClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type AuditItem = {
   id: string;
@@ -44,8 +49,8 @@ export default function DeveloperAuditPanel() {
   }, [query]);
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <div className="p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center justify-between gap-4">
+    <section className={dashboardPanelClass}>
+      <div className={`flex items-center justify-between gap-4 ${dashboardPanelHeaderClass}`}>
         <div>
           <h2 className="text-lg font-semibold text-slate-800">Audit log</h2>
           <p className="text-xs text-slate-500 mt-1">Critical actions (append-only, immutable).</p>
@@ -54,7 +59,7 @@ export default function DeveloperAuditPanel() {
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
           placeholder="Filter by action (e.g. user.delete)"
-          className="w-72 max-w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+          className={`w-72 max-w-full ${dashboardInputClass}`}
         />
       </div>
 

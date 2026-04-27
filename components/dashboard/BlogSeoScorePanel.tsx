@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { dashboardNestedCardClass } from '@/lib/dashboard-ui';
 
 type Props = {
   title: string;
@@ -67,7 +68,7 @@ export default function BlogSeoScorePanel(props: Props) {
     tone === 'emerald' ? 'bg-emerald-600' : tone === 'amber' ? 'bg-amber-600' : 'bg-rose-600';
 
   return (
-    <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+    <div className={`mt-4 p-4 ${dashboardNestedCardClass}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">

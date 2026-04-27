@@ -19,12 +19,12 @@ export default function DashboardShell({
   return (
     <DashboardThemeProvider>
       <DashboardShortcutsProvider>
-        <div className="min-h-screen bg-[#eef1f6] dark:bg-slate-950">
+        <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
           <AutoLogoutOnUnauthenticated locale={locale} />
           <DashboardHeader user={user} locale={locale} />
-          <div className="mx-auto flex w-full max-w-[1400px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-10 xl:px-14">
+          <div className="mx-auto flex w-full max-w-[1600px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:gap-8 lg:px-8 xl:px-12">
             <DashboardSidebar locale={locale} role={user.role} />
-            <main className="min-w-0 flex-1 pb-10 sm:pb-12 md:pb-14">{children}</main>
+            <main className="min-w-0 flex-1 pb-12 sm:pb-14 md:pb-16">{children}</main>
           </div>
         </div>
       </DashboardShortcutsProvider>

@@ -3,9 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell } from 'lucide-react';
-
-const iconActionClass =
-  'relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
+import { dashboardIconButtonClass, dashboardPopoverClass } from '@/lib/dashboard-ui';
 
 type NotifItem = {
   id: string;
@@ -128,7 +126,7 @@ export default function DashboardNotificationBell() {
             void load();
           }
         }}
-        className={iconActionClass}
+        className={`${dashboardIconButtonClass} relative`}
         title="Notifications"
         aria-label="Notifications"
         aria-haspopup="dialog"
@@ -144,7 +142,7 @@ export default function DashboardNotificationBell() {
 
       {open ? (
         <div
-          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(20rem,calc(100vw-1.5rem))] max-h-96 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-900"
+          className={`absolute right-0 top-[calc(100%+8px)] z-50 max-h-96 ${dashboardPopoverClass}`}
           role="dialog"
           aria-label="Notifications"
         >

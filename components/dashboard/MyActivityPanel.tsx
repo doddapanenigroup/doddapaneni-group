@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { History } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { hasDeveloperAccess, hasMarketerAccess, isMarketer } from '@/lib/role-utils';
+import { dashboardNestedCardClass, dashboardPanelClass, dashboardPanelHeaderClass } from '@/lib/dashboard-ui';
 
 type ActivityPayload = {
   role: Role;
@@ -36,7 +37,7 @@ function EditsBlock({ data }: { data: ActivityPayload }) {
           data.contentEdits.map((e) => (
             <li
               key={e.id}
-              className="border border-slate-100 dark:border-slate-700 rounded-lg p-2 bg-slate-50/80 dark:bg-slate-800/50"
+              className={`p-2 ${dashboardNestedCardClass}`}
             >
               <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{e.kind}</span>{' '}
               {e.targetPath}
@@ -54,7 +55,7 @@ function EditsBlock({ data }: { data: ActivityPayload }) {
 function MarketingBlock({ data }: { data: ActivityPayload }) {
   return (
     <>
-      <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center gap-2">
+      <h2 className={`flex items-center gap-2 p-5 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
         <History size={20} className="text-slate-600 dark:text-slate-400" />
         Your marketing &amp; SEO activity
       </h2>
@@ -65,7 +66,7 @@ function MarketingBlock({ data }: { data: ActivityPayload }) {
           data.marketingActivity.map((m) => (
             <li
               key={m.id}
-              className="border border-slate-100 dark:border-slate-700 rounded-lg p-3 bg-slate-50/80 dark:bg-slate-800/50"
+              className={`p-3 ${dashboardNestedCardClass}`}
             >
               <span className="font-medium capitalize">{m.action}</span> {m.entity}
               <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -100,7 +101,7 @@ export default function MyActivityPanel() {
 
   if (isMarketer(data.role) && !showDevGrid && showMarketing) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+      <section className={dashboardPanelClass}>
         <MarketingBlock data={data} />
       </section>
     );
@@ -109,8 +110,8 @@ export default function MyActivityPanel() {
   return (
     <div className="space-y-6">
       {showDevGrid ? (
-        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center gap-2">
+        <section className={dashboardPanelClass}>
+          <h2 className={`flex items-center gap-2 p-5 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
             <History size={20} className="text-slate-600 dark:text-slate-400" />
             Your recent activity
           </h2>
@@ -121,7 +122,7 @@ export default function MyActivityPanel() {
       ) : null}
 
       {showMarketing && (!isMarketer(data.role) || showDevGrid) ? (
-        <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
+        <section className={dashboardPanelClass}>
           <MarketingBlock data={data} />
         </section>
       ) : null}

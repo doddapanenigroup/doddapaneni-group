@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { connectDb, prisma } from '@/lib/db';
 import type { Role } from '@/lib/constants';
 import { canAccessEmployeesDashboard } from '@/lib/dashboard-access';
-import type { LoginLog, Role as PrismaRole, User as DbUser } from '@/lib/prisma-generated';
+import type { Role as PrismaRole } from '@/lib/prisma-generated';
 import { getRoleOrder } from '@/lib/constants';
 import EmployeesPageView from '../../../../components/dashboard/EmployeesPageView';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
@@ -44,17 +44,33 @@ export default async function EmployeesPage({ params }: Props) {
   const userDocs = await prisma.user.findMany({
     where: { role: { in: employeeRoles as PrismaRole[] } },
     orderBy: [{ name: 'asc' }, { email: 'asc' }],
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      name: true,
+      role: true,
+    },
   });
-  const userIds = userDocs.map((u: DbUser) => u.id);
+  const userIds = userDocs.map((u) => u.id);
 
-  const loginLogDocs = await prisma.loginLog.findMany({
-    where: { userId: { in: userIds } },
-    orderBy: { loggedAt: 'desc' },
-    take: 200,
-  });
+  const loginLogDocs =
+    userIds.length === 0
+      ? []
+      : await prisma.loginLog.findMany({
+          where: { userId: { in: userIds } },
+          orderBy: { loggedAt: 'desc' },
+          take: 200,
+          select: {
+            id: true,
+            userId: true,
+            loggedAt: true,
+            loggedOutAt: true,
+          },
+        });
 
   const logsByUserId = loginLogDocs.reduce(
-    (acc: Record<string, EmployeeSession[]>, log: LoginLog) => {
+    (acc: Record<string, EmployeeSession[]>, log: (typeof loginLogDocs)[number]) => {
       const uid = String(log.userId);
       if (!acc[uid]) acc[uid] = [];
       const end = log.loggedOutAt ? new Date(log.loggedOutAt).getTime() : Date.now();
@@ -75,7 +91,7 @@ export default async function EmployeesPage({ params }: Props) {
   const ACTIVE_SESSION_MAX_AGE_MS = 60 * 60 * 1000;
   const now = Date.now();
   const employees: EmployeeWithStats[] = userDocs
-    .map((u: DbUser) => {
+    .map((u) => {
       const sessions = logsByUserId[u.id] ?? [];
       const isActive = sessions.some(
         (s: EmployeeSession) =>

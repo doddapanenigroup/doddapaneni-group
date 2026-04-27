@@ -4,6 +4,7 @@ import { useImperativeHandle, forwardRef } from 'react';
 import type { TranslationPatch } from '@/lib/marketer-news-fields';
 import type { BlogFormState, BlogListRow } from '@/lib/marketer-blog-form';
 import { BlogRichContentField } from '@/components/dashboard/BlogRichContentField';
+import { dashboardInputClass, dashboardNestedCardClass } from '@/lib/dashboard-ui';
 
 type SectorOption = { id: string; name: string; slug: string };
 
@@ -26,12 +27,10 @@ type Props = {
   onUploadFeatured: (file: File) => Promise<void>;
 };
 
-const fieldClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/15 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500';
+const fieldClass = dashboardInputClass;
 const labelClass =
   'mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400';
-const detailsShell =
-  'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950/50';
+const detailsShell = `overflow-hidden !p-0 ${dashboardNestedCardClass}`;
 const summaryBtn =
   'cursor-pointer list-none bg-slate-50/95 px-4 py-3 text-sm font-semibold text-slate-800 transition marker:content-none hover:bg-slate-100 dark:bg-slate-800/50 dark:text-slate-100 dark:hover:bg-slate-800 [&::-webkit-details-marker]:hidden';
 
@@ -251,7 +250,7 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
           {blogForm.featuredImage?.trim() ? (
             <div className="sm:col-span-2">
               <p className={labelClass}>Featured preview (full image, not cropped)</p>
-              <div className="flex max-h-[min(72vh,600px)] w-full items-center justify-center overflow-auto rounded-xl border border-slate-200 bg-slate-50/90 p-2 dark:border-slate-600 dark:bg-slate-900/60">
+              <div className={`flex max-h-[min(72vh,600px)] w-full items-center justify-center overflow-auto p-2 ${dashboardNestedCardClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={blogForm.featuredImage}
@@ -329,12 +328,12 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
         </div>
       </details>
 
-      <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+      <p className={`px-3 py-2.5 text-xs text-slate-600 dark:text-slate-400 ${dashboardNestedCardClass}`}>
         Public <span className="font-mono">/news</span> shows this English article for all languages. Per-locale
         article translation and alternate article URLs are disabled.
       </p>
 
-      <div className="rounded-xl border border-slate-200 bg-violet-50/30 p-4 dark:border-slate-700 dark:bg-violet-950/20">
+      <div className={`bg-violet-50/30 p-4 dark:bg-violet-950/20 ${dashboardNestedCardClass}`}>
         <label className={labelClass}>Team note (activity log only)</label>
         <input
           className={fieldClass}

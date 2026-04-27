@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { Trash2, RefreshCw } from 'lucide-react';
 import { routing } from '@/i18n/routing';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardInputClass,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 export default function DeveloperCachePanel() {
   const [pathsText, setPathsText] = useState('/en\n/en/news\n/en/about');
@@ -56,8 +63,8 @@ export default function DeveloperCachePanel() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
+    <section className={dashboardPanelClass}>
+      <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
         <Trash2 size={20} className="text-slate-600" />
         Cache control (manual revalidation)
       </h2>
@@ -97,7 +104,7 @@ export default function DeveloperCachePanel() {
               value={pathsText}
               onChange={(e) => setPathsText(e.target.value)}
               rows={6}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono"
+              className={`w-full font-mono ${dashboardInputClass}`}
               placeholder="/en&#10;/en/news"
             />
           </div>
@@ -107,7 +114,7 @@ export default function DeveloperCachePanel() {
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
               rows={6}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono"
+              className={`w-full font-mono ${dashboardInputClass}`}
               placeholder="content&#10;blog"
             />
           </div>
@@ -118,7 +125,7 @@ export default function DeveloperCachePanel() {
             type="button"
             onClick={() => run()}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-700 text-white px-4 py-2 text-sm hover:bg-slate-800 disabled:opacity-50"
+            className={`inline-flex items-center justify-center gap-2 disabled:opacity-50 ${dashboardHeaderActionPrimary}`}
           >
             <RefreshCw size={16} />
             {loading ? 'Revalidating…' : 'Clear cache'}
@@ -135,7 +142,7 @@ export default function DeveloperCachePanel() {
         </div>
 
         {result?.ok && result.results ? (
-          <details className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <details className={`p-3 ${dashboardNestedCardClass}`}>
             <summary className="cursor-pointer text-sm text-slate-700">View results</summary>
             <pre className="mt-2 text-[11px] text-slate-700 whitespace-pre-wrap break-words">
               {JSON.stringify(result.results, null, 2)}

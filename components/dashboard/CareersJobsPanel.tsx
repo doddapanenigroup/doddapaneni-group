@@ -3,6 +3,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Briefcase, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import { routing } from '@/i18n/routing';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardIconButtonClass,
+  dashboardInputClass,
+  dashboardNestedCardClass,
+  dashboardNoticeErrorClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 import { publicPathWithLocale } from '@/lib/public-path-with-locale';
 import {
   CAREER_SPOKEN_LANGUAGE_CODES,
@@ -211,13 +221,12 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
   const currentTr = form?.translations.find((t) => t.locale === editLocale);
 
   return (
-    <section
-      id="careers-jobs-admin"
-      className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25"
-    >
-      <div className="flex flex-col gap-3 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100">
-          <Briefcase size={22} className="text-blue-600 dark:text-blue-400" />
+    <section id="careers-jobs-admin" className={dashboardPanelClass}>
+      <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${dashboardPanelHeaderClass}`}>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-slate-100">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25 dark:bg-indigo-500">
+            <Briefcase size={20} aria-hidden />
+          </span>
           Careers — job listings
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -225,14 +234,14 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
             href={publicPathWithLocale(locale, 'careers')}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+            className={dashboardHeaderActionSecondary}
           >
             View public page
           </a>
           <button
             type="button"
             onClick={() => startNew()}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className={`inline-flex items-center gap-2 ${dashboardHeaderActionPrimary}`}
           >
             <Plus size={18} />
             New role
@@ -257,10 +266,10 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                 return (
                   <li
                     key={job.id}
-                    className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm ${
+                    className={`flex items-center justify-between gap-2 px-3 py-2.5 text-sm transition-colors ${
                       selectedId === job.id
-                        ? 'border-blue-400 bg-blue-50/80 dark:border-blue-500 dark:bg-slate-800'
-                        : 'border-slate-200 dark:border-slate-600'
+                        ? `border-indigo-300 bg-indigo-50/90 ring-2 ring-indigo-200/60 dark:border-indigo-500/50 dark:bg-indigo-950/40 dark:ring-indigo-900/40 ${dashboardNestedCardClass}`
+                        : dashboardNestedCardClass
                     }`}
                   >
                     <button
@@ -276,7 +285,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                     <button
                       type="button"
                       onClick={() => void remove(job.id)}
-                      className="shrink-0 rounded-lg p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                      className={`${dashboardIconButtonClass} h-9 w-9 shrink-0 border-red-200/80 text-red-600 hover:bg-red-50/80 dark:border-red-900/50 dark:hover:bg-red-950/40`}
                       aria-label="Delete job"
                     >
                       <Trash2 size={18} />
@@ -288,7 +297,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
           )}
         </div>
 
-        <div className="rounded-xl border border-slate-200/90 bg-slate-50/50 p-4 dark:border-slate-600 dark:bg-slate-800/40">
+        <div className={`p-5 ${dashboardNestedCardClass} border-indigo-100/80 bg-gradient-to-b from-slate-50/90 to-white dark:border-slate-600 dark:from-slate-800/50 dark:to-slate-900/30`}>
           {!form ? (
             <p className="text-sm text-slate-600 dark:text-slate-400">
               Select a role or create a new one. Add copy in each language you support; visitors see the best match for
@@ -297,7 +306,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
           ) : (
             <div className="space-y-4">
               {error ? (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950/50 dark:text-red-200">
+                <p className={dashboardNoticeErrorClass}>
                   {error}
                 </p>
               ) : null}
@@ -305,7 +314,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                   URL slug
                   <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                    className={`mt-1 ${dashboardInputClass}`}
                     value={form.slug}
                     onChange={(e) => setForm({ ...form, slug: e.target.value })}
                     placeholder="full-stack-developer"
@@ -315,7 +324,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                   Sort order
                   <input
                     type="number"
-                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                    className={`mt-1 ${dashboardInputClass}`}
                     value={form.sortOrder}
                     onChange={(e) =>
                       setForm({ ...form, sortOrder: Number(e.target.value) || 0 })
@@ -326,7 +335,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                 Status
                 <select
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                  className={`mt-1 ${dashboardInputClass}`}
                   value={form.status}
                   onChange={(e) =>
                     setForm({ ...form, status: e.target.value === 'draft' ? 'draft' : 'published' })
@@ -337,7 +346,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                 </select>
               </label>
 
-              <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 dark:border-slate-600 dark:bg-slate-900">
+              <div className={`px-3 py-3 ${dashboardNestedCardClass}`}>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Application languages
                 </p>
@@ -404,7 +413,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Title
                     <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                      className={`mt-1 ${dashboardInputClass}`}
                       value={currentTr.title}
                       onChange={(e) => updateTranslation({ title: e.target.value })}
                     />
@@ -412,7 +421,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Subtitle (e.g. location · employment type)
                     <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                      className={`mt-1 ${dashboardInputClass}`}
                       value={currentTr.subtitle}
                       onChange={(e) => updateTranslation({ subtitle: e.target.value })}
                     />
@@ -421,7 +430,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                     Description
                     <textarea
                       rows={5}
-                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                      className={`mt-1 ${dashboardInputClass}`}
                       value={currentTr.description}
                       onChange={(e) => updateTranslation({ description: e.target.value })}
                     />
@@ -429,7 +438,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Apply button label
                     <input
-                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900"
+                      className={`mt-1 ${dashboardInputClass}`}
                       value={currentTr.applyLabel}
                       onChange={(e) => updateTranslation({ applyLabel: e.target.value })}
                     />
@@ -444,7 +453,7 @@ export default function CareersJobsPanel({ locale }: { locale: string }) {
                 type="button"
                 disabled={saving}
                 onClick={() => void save()}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-500"
+                className={`inline-flex items-center gap-2 disabled:opacity-60 ${dashboardHeaderActionPrimary}`}
               >
                 {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                 {selectedId === 'new' ? 'Create role' : 'Save changes'}

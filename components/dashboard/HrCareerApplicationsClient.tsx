@@ -2,6 +2,14 @@
 
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, Download, Loader2, RefreshCw } from 'lucide-react';
+import {
+  dashboardDashedFoldClass,
+  dashboardHeaderActionSecondary,
+  dashboardNestedCardClass,
+  dashboardNoticeErrorClass,
+  dashboardPanelClass,
+  dashboardStageClass,
+} from '@/lib/dashboard-ui';
 
 export type CareerApplicationListItem = {
   id: string;
@@ -69,66 +77,68 @@ export default function HrCareerApplicationsClient() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Applications with stored resumes can be downloaded here. Older rows may have details only
-          (no file in the database).
-        </p>
-        <button
-          type="button"
-          onClick={() => void load()}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
-        >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-          Refresh
-        </button>
-      </div>
+    <div className={`${dashboardStageClass} space-y-0`}>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+        <aside className="order-2 flex flex-col gap-4 lg:sticky lg:top-24 lg:order-none lg:col-span-4 xl:col-span-3">
+          <div className={`p-4 ${dashboardNestedCardClass}`}>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              Applications with stored resumes can be downloaded here. Older rows may have details only
+              (no file in the database).
+            </p>
+            <button
+              type="button"
+              onClick={() => void load()}
+              disabled={loading}
+              className={`mt-4 inline-flex w-full items-center justify-center gap-2 disabled:opacity-50 ${dashboardHeaderActionSecondary}`}
+            >
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+              Refresh
+            </button>
+          </div>
+        </aside>
 
-      {error ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-200">
-          {error}
-        </p>
-      ) : null}
+        <div className="order-1 min-w-0 space-y-5 lg:order-none lg:col-span-8 xl:col-span-9">
+          {error ? (
+            <p className={dashboardNoticeErrorClass}>
+              {error}
+            </p>
+          ) : null}
 
-      {loading && items.length === 0 ? (
-        <div className="flex items-center justify-center py-20 text-slate-500">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : null}
+          {loading && items.length === 0 ? (
+            <div className={`flex min-h-[12rem] items-center justify-center text-slate-500 ${dashboardDashedFoldClass}`}>
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : null}
 
-      {!loading && items.length === 0 && !error ? (
-        <p className="rounded-xl border border-slate-200 bg-white px-4 py-8 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-400">
-          No applications yet. Submissions from the public careers form will show up here.
-        </p>
-      ) : null}
+          {!loading && items.length === 0 && !error ? (
+            <p className={`px-4 py-10 text-center text-slate-600 dark:text-slate-400 ${dashboardNestedCardClass}`}>
+              No applications yet. Submissions from the public careers form will show up here.
+            </p>
+          ) : null}
 
-      {items.length > 0 ? (
-        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900/40">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/60">
-                  <th className="w-8 px-3 py-3" aria-hidden />
-                  <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">
-                    Date
-                  </th>
-                  <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Name</th>
-                  <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Email</th>
-                  <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Role / job</th>
-                  <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Resume</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((row) => {
-                  const isOpen = expanded.has(row.id);
-                  const entries = Object.entries(row.details).filter(
-                    ([k]) => k !== 'resumeFileName' && k !== 'resumeSize',
-                  );
-                  return (
-                    <Fragment key={row.id}>
-                      <tr className="border-b border-slate-100 dark:border-slate-800">
+          {items.length > 0 ? (
+            <div className={dashboardPanelClass}>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/60">
+                      <th className="w-8 px-3 py-3" aria-hidden />
+                      <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Date</th>
+                      <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Name</th>
+                      <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Email</th>
+                      <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Role / job</th>
+                      <th className="px-3 py-3 font-semibold text-slate-800 dark:text-slate-100">Resume</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((row) => {
+                      const isOpen = expanded.has(row.id);
+                      const entries = Object.entries(row.details).filter(
+                        ([k]) => k !== 'resumeFileName' && k !== 'resumeSize',
+                      );
+                      return (
+                        <Fragment key={row.id}>
+                          <tr className="border-b border-slate-100 dark:border-slate-800">
                         <td className="px-3 py-2 align-top">
                           <button
                             type="button"
@@ -203,12 +213,14 @@ export default function HrCareerApplicationsClient() {
                       ) : null}
                     </Fragment>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }

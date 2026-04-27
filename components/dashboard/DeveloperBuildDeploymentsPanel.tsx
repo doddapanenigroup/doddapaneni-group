@@ -2,6 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Rocket, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type DeploymentRow = {
   id: string;
@@ -58,8 +65,8 @@ export default function DeveloperBuildDeploymentsPanel() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <h2 className="text-lg font-semibold text-slate-800 p-5 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85 flex items-center gap-2">
+    <section className={dashboardPanelClass}>
+      <h2 className={`flex items-center gap-2 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
         <Rocket size={20} className="text-slate-600" />
         Build &amp; deployments
       </h2>
@@ -73,7 +80,7 @@ export default function DeveloperBuildDeploymentsPanel() {
             type="button"
             onClick={() => void triggerBuild()}
             disabled={buildBusy}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-800 text-white px-4 py-2 text-sm font-medium hover:bg-slate-900 disabled:opacity-50"
+            className={`inline-flex items-center justify-center gap-2 disabled:opacity-50 ${dashboardHeaderActionPrimary}`}
           >
             <Rocket size={16} />
             {buildBusy ? 'Triggering…' : 'Trigger build'}
@@ -81,7 +88,7 @@ export default function DeveloperBuildDeploymentsPanel() {
           <button
             type="button"
             onClick={() => void load()}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900"
+            className={`inline-flex items-center justify-center gap-2 ${dashboardHeaderActionSecondary}`}
           >
             <RefreshCw size={16} />
             Refresh list
@@ -102,7 +109,7 @@ export default function DeveloperBuildDeploymentsPanel() {
             {items.map((d) => {
               const isOpen = openId === d.id;
               return (
-                <li key={d.id} className="rounded-xl border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/30">
+                <li key={d.id} className={`!p-0 ${dashboardNestedCardClass}`}>
                   <button
                     type="button"
                     onClick={() => setOpenId(isOpen ? null : d.id)}
@@ -127,7 +134,7 @@ export default function DeveloperBuildDeploymentsPanel() {
                   {isOpen ? (
                     <div className="border-t border-slate-200 px-3 py-2 dark:border-slate-700">
                       <p className="text-[11px] text-slate-500 mb-1">ID: {d.id}</p>
-                      <pre className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words max-h-64 overflow-auto rounded bg-white dark:bg-slate-950 p-2 border border-slate-200 dark:border-slate-700">
+                      <pre className={`max-h-64 overflow-auto whitespace-pre-wrap break-words p-2 text-xs text-slate-700 dark:text-slate-300 ${dashboardNestedCardClass}`}>
                         {d.logs}
                       </pre>
                     </div>

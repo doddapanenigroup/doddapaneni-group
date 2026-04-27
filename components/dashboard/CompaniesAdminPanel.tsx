@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Building2, ImagePlus, Pencil, PlusCircle, Save, Trash2, X } from 'lucide-react';
 import { COMPANY_DIVISION_SLUGS, pickCanonicalSectorRows } from '@/lib/company-divisions';
+import {
+  dashboardHeaderActionSecondary,
+  dashboardInputClass,
+  dashboardListFrameClass,
+  dashboardNestedCardClass,
+  dashboardPanelClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 
 type SectorRow = { id: string; name: string; slug: string; isLive: boolean };
 
@@ -291,15 +299,15 @@ export default function CompaniesAdminPanel() {
 
   if (loading) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25 p-5">
+      <section className={`${dashboardPanelClass} p-5`}>
         <p className="text-sm text-slate-500">Loading companies…</p>
       </section>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.07)] backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-black/25">
-      <div className="flex items-center gap-2 border-b border-slate-100/95 bg-gradient-to-r from-slate-50/98 to-white p-5 dark:border-slate-800 dark:from-slate-800/45 dark:to-slate-900/85">
+    <section className={dashboardPanelClass}>
+      <div className={`flex items-center gap-2 ${dashboardPanelHeaderClass}`}>
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900/90 text-white dark:bg-slate-700">
           <Building2 size={18} aria-hidden />
         </span>
@@ -320,7 +328,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="DealsMedi"
             />
           </label>
@@ -329,7 +337,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.slug}
               onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="company-slug"
             />
           </label>
@@ -338,7 +346,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.websiteUrl}
               onChange={(e) => setForm((f) => ({ ...f, websiteUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://example.com"
             />
           </label>
@@ -347,7 +355,7 @@ export default function CompaniesAdminPanel() {
             <select
               value={form.sectorSlug}
               onChange={(e) => setForm((f) => ({ ...f, sectorSlug: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
             >
               {COMPANY_DIVISION_SLUGS.map((slug) => {
                 const row = sectors.find((s) => s.slug.trim().toLowerCase() === slug);
@@ -379,7 +387,7 @@ export default function CompaniesAdminPanel() {
                 }}
               />
               {form.logoImage ? (
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                <div className={`flex items-center gap-2 p-2 ${dashboardNestedCardClass}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={form.logoImage}
@@ -426,7 +434,7 @@ export default function CompaniesAdminPanel() {
                 }}
               />
               {form.heroImage ? (
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                <div className={`flex items-center gap-2 p-2 ${dashboardNestedCardClass}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={form.heroImage}
@@ -461,7 +469,7 @@ export default function CompaniesAdminPanel() {
           <textarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            className="mt-1 min-h-28 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            className={`mt-1 min-h-28 ${dashboardInputClass}`}
             placeholder="Short summary shown on sector page."
           />
         </label>
@@ -471,7 +479,7 @@ export default function CompaniesAdminPanel() {
           <textarea
             value={form.aboutContent}
             onChange={(e) => setForm((f) => ({ ...f, aboutContent: e.target.value }))}
-            className="mt-1 min-h-32 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            className={`mt-1 min-h-32 ${dashboardInputClass}`}
             placeholder="Write 1–3 paragraphs. Use blank lines to separate paragraphs."
           />
         </label>
@@ -482,7 +490,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.facebookUrl}
               onChange={(e) => setForm((f) => ({ ...f, facebookUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://facebook.com/…"
             />
           </label>
@@ -491,7 +499,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.instagramUrl}
               onChange={(e) => setForm((f) => ({ ...f, instagramUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://instagram.com/…"
             />
           </label>
@@ -500,7 +508,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.xUrl}
               onChange={(e) => setForm((f) => ({ ...f, xUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://x.com/…"
             />
           </label>
@@ -509,7 +517,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.youtubeUrl}
               onChange={(e) => setForm((f) => ({ ...f, youtubeUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://youtube.com/…"
             />
           </label>
@@ -518,7 +526,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.linkedinUrl}
               onChange={(e) => setForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://linkedin.com/company/…"
             />
           </label>
@@ -527,7 +535,7 @@ export default function CompaniesAdminPanel() {
             <input
               value={form.pinterestUrl}
               onChange={(e) => setForm((f) => ({ ...f, pinterestUrl: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className={`mt-1 ${dashboardInputClass}`}
               placeholder="https://pinterest.com/…"
             />
           </label>
@@ -553,7 +561,7 @@ export default function CompaniesAdminPanel() {
         {companies.length === 0 ? (
           <p className="text-sm text-slate-500">No companies yet.</p>
         ) : (
-          <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200 overflow-hidden bg-white">
+          <ul className={dashboardListFrameClass}>
             {companies.map((c) => (
               <li key={c.id} className="p-4">
                 {editCompanyId === c.id ? (
@@ -562,19 +570,19 @@ export default function CompaniesAdminPanel() {
                       <input
                         value={editForm.name}
                         onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Company name"
                       />
                       <input
                         value={editForm.slug}
                         onChange={(e) => setEditForm((f) => ({ ...f, slug: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-mono"
+                        className={`${dashboardInputClass} font-mono`}
                         placeholder="company-slug"
                       />
                       <select
                         value={editForm.sectorSlug}
                         onChange={(e) => setEditForm((f) => ({ ...f, sectorSlug: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                       >
                         {COMPANY_DIVISION_SLUGS.map((slug) => {
                           const label = sectors.find((s) => s.slug === slug)?.name ?? slug;
@@ -588,69 +596,69 @@ export default function CompaniesAdminPanel() {
                       <input
                         value={editForm.logoImage}
                         onChange={(e) => setEditForm((f) => ({ ...f, logoImage: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Logo URL"
                       />
                       <input
                         value={editForm.heroImage}
                         onChange={(e) => setEditForm((f) => ({ ...f, heroImage: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Hero image URL"
                       />
                       <input
                         value={editForm.websiteUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, websiteUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Website URL"
                       />
                     </div>
                     <textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                      className="min-h-20 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      className={`min-h-20 ${dashboardInputClass}`}
                       placeholder="Description"
                     />
                     <textarea
                       value={editForm.aboutContent}
                       onChange={(e) => setEditForm((f) => ({ ...f, aboutContent: e.target.value }))}
-                      className="min-h-28 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      className={`min-h-28 ${dashboardInputClass}`}
                       placeholder="About content (paragraphs separated by blank lines)"
                     />
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                       <input
                         value={editForm.facebookUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, facebookUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Facebook URL"
                       />
                       <input
                         value={editForm.instagramUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, instagramUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Instagram URL"
                       />
                       <input
                         value={editForm.xUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, xUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="X URL"
                       />
                       <input
                         value={editForm.youtubeUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, youtubeUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="YouTube URL"
                       />
                       <input
                         value={editForm.linkedinUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="LinkedIn URL"
                       />
                       <input
                         value={editForm.pinterestUrl}
                         onChange={(e) => setEditForm((f) => ({ ...f, pinterestUrl: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Pinterest URL"
                       />
                     </div>
@@ -667,7 +675,7 @@ export default function CompaniesAdminPanel() {
                       <button
                         type="button"
                         onClick={cancelEditCompany}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        className={`inline-flex items-center gap-2 ${dashboardHeaderActionSecondary}`}
                       >
                         <X size={16} />
                         Cancel
@@ -711,7 +719,7 @@ export default function CompaniesAdminPanel() {
                       <button
                         type="button"
                         onClick={() => startEditCompany(c)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        className={`inline-flex items-center gap-2 ${dashboardHeaderActionSecondary}`}
                       >
                         <Pencil size={16} />
                         Edit
@@ -720,7 +728,7 @@ export default function CompaniesAdminPanel() {
                         type="button"
                         onClick={() => deleteCompany(c.id)}
                         disabled={deletingId === c.id}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                        className={`inline-flex items-center gap-2 disabled:opacity-50 ${dashboardHeaderActionSecondary}`}
                       >
                         <Trash2 size={16} />
                         Delete

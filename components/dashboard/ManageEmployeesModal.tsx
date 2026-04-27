@@ -6,6 +6,19 @@ import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import { getRoleLabel } from '@/lib/dashboard-title';
+import {
+  dashboardHeaderActionPrimary,
+  dashboardHeaderActionSecondary,
+  dashboardIconButtonClass,
+  dashboardInputClass,
+  dashboardInputShellClass,
+  dashboardModalBackdropClass,
+  dashboardModalFrameClass,
+  dashboardListFrameClass,
+  dashboardNestedCardClass,
+  dashboardNoticeErrorClass,
+  dashboardPanelHeaderClass,
+} from '@/lib/dashboard-ui';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 
 type UserRow = {
@@ -181,8 +194,9 @@ export default function ManageEmployeesModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
-      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 bg-slate-50 shrink-0">
+    <div className={dashboardModalBackdropClass}>
+      <div className={`${dashboardModalFrameClass} shadow-2xl`}>
+      <div className={`flex shrink-0 items-center justify-between sm:px-6 ${dashboardPanelHeaderClass}`}>
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Users size={24} className="text-slate-600" />
           {modalTitle}
@@ -190,14 +204,14 @@ export default function ManageEmployeesModal({
         <button
           type="button"
           onClick={onClose}
-          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+          className={dashboardIconButtonClass}
           aria-label="Close"
         >
           <X size={24} />
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4">
+      <div className="mx-auto w-full max-w-5xl flex-1 space-y-4 overflow-auto p-4 sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-slate-600">{sortedEmployees.length} employee(s)</p>
             {canAdd ? (
@@ -212,7 +226,7 @@ export default function ManageEmployeesModal({
                   setShowForm(true);
                 }
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 shadow-md transition-colors"
+              className={`flex items-center gap-2 ${dashboardHeaderActionPrimary}`}
             >
               <Plus size={18} />
               Add employee
@@ -221,7 +235,7 @@ export default function ManageEmployeesModal({
           </div>
 
           {showForm && canAdd && (
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div className={`space-y-3 p-4 ${dashboardNestedCardClass}`}>
                 <form onSubmit={handleCreateEmployee} className="space-y-3">
                   <p className="text-sm text-slate-600">
                     Create a dashboard user with email, username, and password. They can sign in on the same login page.
@@ -234,7 +248,7 @@ export default function ManageEmployeesModal({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        className={dashboardInputClass}
                         placeholder="employee@example.com"
                       />
                     </div>
@@ -251,7 +265,7 @@ export default function ManageEmployeesModal({
                         maxLength={48}
                         pattern="[-A-Za-z0-9._]+"
                         title="Letters, numbers, dots, underscores, hyphens"
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        className={dashboardInputClass}
                         placeholder="e.g. jane.doe"
                         autoComplete="off"
                       />
@@ -268,8 +282,8 @@ export default function ManageEmployeesModal({
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
-                        className="flex w-full min-w-0 items-center rounded-lg border border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
-                        inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-slate-900 outline-none ring-0"
+                        className={dashboardInputShellClass}
+                        inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-900 outline-none ring-0 dark:text-slate-100"
                         placeholder="••••••••"
                         autoComplete="new-password"
                       />
@@ -280,7 +294,7 @@ export default function ManageEmployeesModal({
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        className={dashboardInputClass}
                         placeholder="Full name"
                       />
                     </div>
@@ -291,7 +305,7 @@ export default function ManageEmployeesModal({
                       <select
                         value={role}
                         onChange={(e) => setRole(e.target.value as Role)}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 text-sm"
+                        className={dashboardInputClass}
                       >
                         {sortedCreatableRoles.map((r) => (
                           <option key={r} value={r}>{getRoleLabel(r)}</option>
@@ -299,12 +313,12 @@ export default function ManageEmployeesModal({
                       </select>
                     </div>
                   </div>
-                  {message && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{message}</p>}
+                  {message ? <p className={dashboardNoticeErrorClass}>{message}</p> : null}
                   <div className="flex gap-2 flex-wrap">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                      className={`${dashboardHeaderActionPrimary} disabled:opacity-50`}
                     >
                       {loading ? 'Creating…' : 'Create employee'}
                     </button>
@@ -314,7 +328,7 @@ export default function ManageEmployeesModal({
                         setShowForm(false);
                         resetAddForm();
                       }}
-                      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                      className={dashboardHeaderActionSecondary}
                     >
                       Cancel
                     </button>
@@ -326,7 +340,7 @@ export default function ManageEmployeesModal({
           {changePasswordUserId && (() => {
             const target = sortedEmployees.find((e) => e.id === changePasswordUserId);
             return (
-              <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
+              <div className={`flex flex-wrap items-center gap-3 p-4 ${dashboardNestedCardClass}`}>
                 <KeyRound size={20} className="text-slate-600 shrink-0" />
                 <span className="text-sm text-slate-700">
                   New password for{' '}
@@ -343,8 +357,8 @@ export default function ManageEmployeesModal({
                     onChange={(e) => setChangePasswordValue(e.target.value)}
                     placeholder="Min 6 characters"
                     minLength={6}
-                    className="flex w-full min-w-0 items-center rounded-lg border border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
-                    inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-slate-900 outline-none ring-0"
+                    className={dashboardInputShellClass}
+                    inputClassName="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-slate-900 outline-none ring-0 dark:text-slate-100"
                     autoComplete="new-password"
                   />
                 </div>
@@ -352,14 +366,14 @@ export default function ManageEmployeesModal({
                   type="button"
                   onClick={handleChangePasswordSubmit}
                   disabled={changePasswordLoading || changePasswordValue.trim().length < 6}
-                  className="px-3 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                  className={`${dashboardHeaderActionPrimary} disabled:opacity-50`}
                 >
                   {changePasswordLoading ? 'Updating…' : 'Update'}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setChangePasswordUserId(null); setChangePasswordValue(''); setMessage(''); }}
-                  className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm"
+                  className={dashboardHeaderActionSecondary}
                 >
                   Cancel
                 </button>
@@ -367,7 +381,7 @@ export default function ManageEmployeesModal({
             );
           })()}
 
-          <div className="border border-slate-200 rounded-xl overflow-hidden">
+          <div className={dashboardListFrameClass}>
             <table className="w-full text-sm">
               <thead className="bg-slate-100 border-b border-slate-200">
                 <tr>
@@ -417,7 +431,7 @@ export default function ManageEmployeesModal({
                               <button
                                 type="button"
                                 onClick={() => { setChangePasswordUserId(u.id); setChangePasswordValue(''); setMessage(''); }}
-                                className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-colors"
+                                className={`${dashboardIconButtonClass} h-9 w-9 disabled:opacity-50`}
                                 title="Change password"
                               >
                                 <KeyRound size={18} />
@@ -428,7 +442,7 @@ export default function ManageEmployeesModal({
                               type="button"
                               onClick={() => handleDelete(u.id)}
                               disabled={deletingId === u.id}
-                              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-colors"
+                              className={`${dashboardIconButtonClass} h-9 w-9 disabled:opacity-50`}
                               title="Delete employee"
                             >
                               <Trash2 size={18} />
@@ -445,6 +459,7 @@ export default function ManageEmployeesModal({
               </tbody>
             </table>
           </div>
+      </div>
       </div>
     </div>
   );
