@@ -30,17 +30,13 @@ export function getEnvStatus(): {
   const checks: EnvCheck[] = [];
 
   // DB
-  const dbUrl = (
-    process.env.DATABASE_URL ||
-    process.env.TURSO_DATABASE_URL ||
-    ""
-  ).trim();
+  const dbUrl = (process.env.DATABASE_URL || "").trim();
   checks.push({
     key: "DATABASE_URL",
     label: "Database connection",
     valid: isNonEmpty(dbUrl),
     severity: "required",
-    hint: "Primary: DATABASE_URL (libsql://… or file:./dev.db). Prisma CLI uses this only. TURSO_AUTH_TOKEN for remote. Optional fallback: TURSO_DATABASE_URL.",
+    hint: "Set DATABASE_URL to file:./dev.db (local) or libsql://… (Turso). Remote URLs need TURSO_AUTH_TOKEN.",
   });
 
   // Auth

@@ -425,7 +425,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message:
-            'Could not reach the database. Check DATABASE_URL (or TURSO_DATABASE_URL), TURSO_AUTH_TOKEN, and that your Turso database is reachable.',
+            'Could not reach the database. Check DATABASE_URL and TURSO_AUTH_TOKEN (for libsql://), and that the database is reachable.',
         },
         { status: 503 },
       );

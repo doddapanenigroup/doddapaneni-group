@@ -33,10 +33,12 @@ export default defineConfig({
   engine: "js",
   async adapter() {
     if (process.env.PRISMA_PUSH_TARGET === "turso") {
-      const url = (process.env.TURSO_DATABASE_URL || "").trim();
+      const url = (process.env.DATABASE_URL || "").trim();
       const authToken = (process.env.TURSO_AUTH_TOKEN || "").trim();
-      if (!url) {
-        throw new Error("Turso push: set TURSO_DATABASE_URL to your libsql://… URL.");
+      if (!url || (!url.startsWith("libsql:") && !url.startsWith("https:"))) {
+        throw new Error(
+          "Turso push: set DATABASE_URL=libsql://… (or https://…) and TURSO_AUTH_TOKEN for this command.",
+        );
       }
       if (!authToken) {
         throw new Error("Turso push: set TURSO_AUTH_TOKEN.");
@@ -44,11 +46,9 @@ export default defineConfig({
       return new PrismaLibSQL({ url, authToken });
     }
 
-    const raw = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || "").trim();
+    const raw = (process.env.DATABASE_URL || "").trim();
     if (!raw) {
-      throw new Error(
-        "Set DATABASE_URL (file:./dev.db or libsql://…) or TURSO_DATABASE_URL for Prisma CLI commands.",
-      );
+      throw new Error("Set DATABASE_URL (file:./dev.db or libsql://…) for Prisma CLI commands.");
     }
     if (raw.toLowerCase().startsWith("file:")) {
       return new PrismaLibSQL({

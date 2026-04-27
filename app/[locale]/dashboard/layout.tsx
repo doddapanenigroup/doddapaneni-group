@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { connectDb, prisma } from '@/lib/db';
@@ -16,6 +17,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
+  unstable_noStore();
   const session = await auth();
   const { locale } = await params;
 

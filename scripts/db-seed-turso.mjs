@@ -1,7 +1,7 @@
 /**
  * Run scripts/seed.mjs against Turso.
  *
- * The seed script uses DATABASE_URL first — set it to your Turso URL for this process.
+ * Requires **DATABASE_URL=libsql://…** and **TURSO_AUTH_TOKEN** in .env.
  *
  * Usage: npm run db:seed:turso
  */
@@ -14,11 +14,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 config({ path: path.join(root, '.env.local'), quiet: true });
 config({ path: path.join(root, '.env'), quiet: true });
 
-const tursoUrl = (process.env.TURSO_DATABASE_URL || '').trim();
+const url = (process.env.DATABASE_URL || '').trim();
 const token = (process.env.TURSO_AUTH_TOKEN || '').trim();
 
-if (!tursoUrl || !token) {
-  console.error('Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN (same as db:push:turso).');
+if (!url || (!url.startsWith('libsql:') && !url.startsWith('https:'))) {
+  console.error('Set DATABASE_URL=libsql://… and TURSO_AUTH_TOKEN for db:seed:turso');
+  process.exit(1);
+}
+
+if (!token) {
+  console.error('Set TURSO_AUTH_TOKEN');
   process.exit(1);
 }
 
@@ -27,7 +32,7 @@ const r = spawnSync('node', [path.join(root, 'scripts', 'seed.mjs')], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    DATABASE_URL: tursoUrl,
+    DATABASE_URL: url,
     TURSO_AUTH_TOKEN: token,
   },
 });

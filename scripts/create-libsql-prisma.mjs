@@ -22,15 +22,9 @@ function resolveLibsqlDatabaseUrl(url) {
  * (dotenv must run before the first call).
  */
 export function createLibsqlPrismaClient(options = {}) {
-  const rawUrl = (
-    process.env.DATABASE_URL ||
-    process.env.TURSO_DATABASE_URL ||
-    ''
-  ).trim();
+  const rawUrl = (process.env.DATABASE_URL || '').trim();
   if (!rawUrl) {
-    throw new Error(
-      'Set DATABASE_URL (same as Prisma schema / db push). Optional: TURSO_DATABASE_URL if DATABASE_URL is unset.',
-    );
+    throw new Error('Set DATABASE_URL (file:./dev.db or libsql://…). Remote needs TURSO_AUTH_TOKEN.');
   }
   const url = resolveLibsqlDatabaseUrl(rawUrl);
   const authToken = process.env.TURSO_AUTH_TOKEN?.trim();

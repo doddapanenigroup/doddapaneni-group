@@ -73,9 +73,9 @@ function formatInET(date) {
 }
 
 async function main() {
-  const url = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
+  const url = (process.env.DATABASE_URL || '').trim();
   if (!url) {
-    console.error('DATABASE_URL (or TURSO_DATABASE_URL) is required in .env.local');
+    console.error('DATABASE_URL is required in .env or .env.local');
     process.exit(1);
   }
   console.log('Connecting to database…', url.replace(/:[^:@]+@/, ':****@'));

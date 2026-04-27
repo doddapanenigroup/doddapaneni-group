@@ -1,16 +1,11 @@
 /**
- * Apply schema to your *remote* Turso DB.
+ * Apply schema to Turso: same as `prisma db push`, but expects **DATABASE_URL** to already be your
+ * remote libsql URL (see .env.example). Sets PRISMA_PUSH_TARGET so prisma.config.ts uses the adapter.
  *
- * Prisma 6 validates `schema.prisma` SQLite `url` as `file:` only. Remote LibSQL
- * is handled via `prisma.config.ts` (engine js + adapter) when PRISMA_PUSH_TARGET=turso.
- *
- * Requires in .env / .env.local:
- *   DATABASE_URL=file:./dev.db          (keeps schema valid; local dev DB path)
- *   TURSO_DATABASE_URL=libsql://...
- *   TURSO_AUTH_TOKEN=...
- *
- * Usage: npm run db:push:turso
- *        npm run db:push:turso -- --accept-data-loss
+ * Usage:
+ *   Put in .env:  DATABASE_URL=libsql://your-db-....turso.io   TURSO_AUTH_TOKEN=...
+ *   Then:        npm run db:push:turso
+ *   Or one-off:  DATABASE_URL=libsql://... TURSO_AUTH_TOKEN=... npm run db:push:turso
  */
 import { config } from 'dotenv';
 import path from 'node:path';
@@ -21,16 +16,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 config({ path: path.join(root, '.env.local'), quiet: true });
 config({ path: path.join(root, '.env'), quiet: true });
 
-const tursoUrl = (process.env.TURSO_DATABASE_URL || '').trim();
+const url = (process.env.DATABASE_URL || '').trim();
 const token = (process.env.TURSO_AUTH_TOKEN || '').trim();
 
-if (!tursoUrl) {
-  console.error(`Missing TURSO_DATABASE_URL.
+if (!url || (!url.startsWith('libsql:') && !url.startsWith('https:'))) {
+  console.error(`db:push:turso requires DATABASE_URL to be your Turso URL (not a file).
 
-Keep DATABASE_URL=file:./dev.db in .env (required by Prisma schema validation).
-Add:
-
-  TURSO_DATABASE_URL="libsql://your-db-....turso.io"
+Set in .env:
+  DATABASE_URL="libsql://your-db-....turso.io"
   TURSO_AUTH_TOKEN="..."   # turso db tokens create <db-name>
 
 Then: npm run db:push:turso
@@ -38,18 +31,13 @@ Then: npm run db:push:turso
   process.exit(1);
 }
 
-if (!tursoUrl.startsWith('libsql:') && !tursoUrl.startsWith('https:')) {
-  console.error('TURSO_DATABASE_URL should be a libsql:// or https:// (Turso) URL.');
-  process.exit(1);
-}
-
 if (!token) {
-  console.error('Missing TURSO_AUTH_TOKEN (required for remote libsql://).');
+  console.error('Missing TURSO_AUTH_TOKEN (required for libsql://).');
   process.exit(1);
 }
 
 console.info(
-  '[db-push:turso] Prisma may show "SQLite database dev.db" and warn that schema `url` is ignored — that is expected: the LibSQL adapter uses TURSO_DATABASE_URL for this run.',
+  '[db-push:turso] Using DATABASE_URL (libsql). Prisma may still print a placeholder schema `url` warning — that is OK.\n',
 );
 
 const prismaArgs = ['prisma', 'db', 'push', ...process.argv.slice(2)];
@@ -59,8 +47,6 @@ const r = spawnSync('npx', prismaArgs, {
   env: {
     ...process.env,
     PRISMA_PUSH_TARGET: 'turso',
-    TURSO_DATABASE_URL: tursoUrl,
-    TURSO_AUTH_TOKEN: token,
   },
 });
 

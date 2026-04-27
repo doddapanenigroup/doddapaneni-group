@@ -26,9 +26,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
     if (process.env.NODE_ENV === 'development') {
-      const raw = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
-      const label = raw.toLowerCase().startsWith('file:') ? `local file (${raw.slice(0, 48)}…)` : 'remote libsql';
-      console.info('[api/users GET] reading users from', label);
+      const raw = (process.env.DATABASE_URL || '').trim();
+      const label = raw.toLowerCase().startsWith('file:') ? `local file (${raw.slice(0, 48)}…)` : raw ? 'libsql/https' : '(unset)';
+      console.info('[api/users GET] DATABASE_URL →', label);
     }
     const users = await loadAdminDashboardUserRows();
     return NextResponse.json(
@@ -132,13 +132,9 @@ export async function POST(request: Request) {
     });
 
     if (process.env.NODE_ENV === 'development') {
-      const raw = (process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || '').trim();
-      const label = raw.toLowerCase().startsWith('file:')
-        ? resolveLibsqlDatabaseUrl(raw)
-        : raw
-          ? 'remote (libsql/https)'
-          : '(unset)';
-      console.info('[api/users] created', doc.email, '→ DB:', label);
+      const raw = (process.env.DATABASE_URL || '').trim();
+      const label = raw.toLowerCase().startsWith('file:') ? resolveLibsqlDatabaseUrl(raw) : raw ? 'libsql/https' : '(unset)';
+      console.info('[api/users] created', doc.email, '→ DATABASE_URL:', label);
     }
 
     const user = {
