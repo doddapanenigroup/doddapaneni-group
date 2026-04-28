@@ -110,7 +110,7 @@ export default async function NewsHubPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="relative overflow-hidden border-b border-blue-950/20 bg-blue-900 px-4 pt-20 pb-6 sm:px-6 sm:pt-20 sm:pb-8 md:pt-20 md:pb-8 lg:px-8">
+      <header className="relative overflow-hidden bg-blue-900 px-4 pt-20 pb-6 sm:px-6 sm:pt-20 sm:pb-8 md:pt-20 md:pb-8 lg:px-8">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
@@ -124,9 +124,7 @@ export default async function NewsHubPage({ params }: Props) {
           </h1>
         </div>
       </header>
-      <div className="mt-4 border-t border-blue-100/80 sm:mt-5">
-        <NewsBlogsHubSections locale={locale} sections={sections} t={t} />
-      </div>
+      <NewsBlogsHubSections locale={locale} sections={sections} t={t} />
     </div>
   );
 }
