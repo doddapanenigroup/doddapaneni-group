@@ -49,15 +49,17 @@ export default function BlogPostClient({
   const articleBody = (
     <>
       {image ? (
-        <section className="relative w-full overflow-hidden bg-slate-100">
-          <div className="relative mx-auto h-[min(52vh,560px)] w-full min-h-[220px] sm:min-h-[260px] md:min-h-[340px] md:h-[min(58vh,640px)] lg:min-h-[400px] lg:h-[min(60vh,720px)]">
+        <section className="w-full bg-white">
+          {/* Intrinsic height + object-contain: full image visible (no edge crop). Optional bands match page background (white). */}
+          <div className="mx-auto w-full max-w-6xl bg-white px-3 py-3 sm:px-5 sm:py-4 lg:px-8">
             <Image
               src={image}
               alt={title}
-              sizes="(max-width: 1024px) 100vw, min(100vw, 896px)"
               width={1920}
               height={1080}
-              className="h-full w-full object-contain object-center"
+              sizes="(max-width: 1024px) 100vw, min(100vw, 1152px)"
+              style={{ height: 'auto', width: '100%' }}
+              className="mx-auto block max-h-[min(85vh,920px)] w-full object-contain object-center"
               loading="eager"
               fetchPriority="high"
             />
