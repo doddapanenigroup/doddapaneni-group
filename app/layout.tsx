@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@buildwebseo1',
+    site: '@DoddapanenGroup',
   },
 };
 

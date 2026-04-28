@@ -61,10 +61,10 @@ export default function Footer() {
   };
 
   const socialLinks = {
-    facebook: 'https://www.facebook.com/profile.php?id=61572087282491',
-    instagram: 'https://www.instagram.com/buildwebseo1/',
-    pinterest: 'https://in.pinterest.com/buildwebseo1/',
-    twitter: 'https://x.com/buildwebseo1',
+    facebook: 'https://www.facebook.com/profile.php?id=61588007971937',
+    instagram: 'https://www.instagram.com/doddapanenigroup/',
+    pinterest: 'https://in.pinterest.com/doddapanenigroup/',
+    twitter: 'https://x.com/DoddapanenGroup',
     linkedin: 'https://www.linkedin.com/in/doddapaneni-group-b9a775359/',
     youtube: 'https://www.youtube.com/@DoddapaneniGroup',
     telegram: 'https://t.me/doddapanenigroup',
