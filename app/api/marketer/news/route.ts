@@ -312,26 +312,30 @@ export async function POST(request: Request) {
     // Fire-and-forget translation sync so save/create returns quickly for UI.
     scheduleBlogTranslationSync(doc.id);
 
-    await Promise.all([
-      logMarketingActivity({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        entity: 'blog',
-        entityId: doc.id,
-        action: 'create',
-        seoNote: strOrNull(body.seoNote),
-        payload: { title: doc.title, slug: doc.slug, status: doc.status, sectorId: doc.sectorId },
-      }),
-      logContentEdit({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        kind: 'blog',
-        targetPath: doc.slug,
-        summary: `create title length ${doc.title.length}, content length ${doc.content.length}`,
-      }),
-    ]);
+    try {
+      await Promise.all([
+        logMarketingActivity({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          entity: 'blog',
+          entityId: doc.id,
+          action: 'create',
+          seoNote: strOrNull(body.seoNote),
+          payload: { title: doc.title, slug: doc.slug, status: doc.status, sectorId: doc.sectorId },
+        }),
+        logContentEdit({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          kind: 'blog',
+          targetPath: doc.slug,
+          summary: `create title length ${doc.title.length}, content length ${doc.content.length}`,
+        }),
+      ]);
+    } catch (e) {
+      console.error('[marketer/blog POST] audit log failed (article was still created):', e);
+    }
 
     if (doc.status === 'published') {
       void notifyContentPublished({

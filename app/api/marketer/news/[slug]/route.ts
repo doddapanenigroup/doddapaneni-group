@@ -183,39 +183,43 @@ export async function PATCH(
     // Fire-and-forget translation sync so save returns quickly for the dashboard UI.
     scheduleBlogTranslationSync(out.id);
 
-    await Promise.all([
-      logMarketingActivity({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        entity: 'blog',
-        entityId: out.id,
-        action: 'update',
-        seoNote: strOrNull(body.seoNote),
-        payload: {
-          before: {
-            slug: existing.slug,
-            title: existing.title,
-            status: existing.status,
-            sectorId: existing.sectorId ?? null,
+    try {
+      await Promise.all([
+        logMarketingActivity({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          entity: 'blog',
+          entityId: out.id,
+          action: 'update',
+          seoNote: strOrNull(body.seoNote),
+          payload: {
+            before: {
+              slug: existing.slug,
+              title: existing.title,
+              status: existing.status,
+              sectorId: existing.sectorId ?? null,
+            },
+            after: {
+              slug: out.slug,
+              title: out.title,
+              status: out.status,
+              sectorId: out.sectorId ?? null,
+            },
           },
-          after: {
-            slug: out.slug,
-            title: out.title,
-            status: out.status,
-            sectorId: out.sectorId ?? null,
-          },
-        },
-      }),
-      logContentEdit({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        kind: 'blog',
-        targetPath: out.slug,
-        summary: `update title length ${out.title.length}, content length ${out.content.length}`,
-      }),
-    ]);
+        }),
+        logContentEdit({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          kind: 'blog',
+          targetPath: out.slug,
+          summary: `update title length ${out.title.length}, content length ${out.content.length}`,
+        }),
+      ]);
+    } catch (e) {
+      console.error('[marketer/blog PATCH] audit log failed (article was still saved):', e);
+    }
 
     if (existing.status !== 'published' && out.status === 'published') {
       void notifyContentPublished({
@@ -289,34 +293,38 @@ export async function DELETE(
     await prisma.news.delete({ where: { slug: s } });
 
     await deleteOrphanedStoredImagesForKeys(storedImageKeys);
-    await Promise.all([
-      logMarketingActivity({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        entity: 'blog',
-        entityId: existing.id,
-        action: 'delete',
-        payload: { slug: existing.slug, title: existing.title },
-      }),
-      logContentEdit({
-        userId: session.user.id,
-        userEmail: session.user.email ?? '',
-        userRole: session.user.role ?? '',
-        kind: 'blog',
-        targetPath: existing.slug,
-        summary: 'delete',
-      }),
-      writeAuditLog({
-        request,
-        actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
-        action: 'content.news.delete',
-        targetType: 'News',
-        targetId: existing.id,
-        targetLabel: existing.slug,
-        payload: { slug: existing.slug, title: existing.title },
-      }),
-    ]);
+    try {
+      await Promise.all([
+        logMarketingActivity({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          entity: 'blog',
+          entityId: existing.id,
+          action: 'delete',
+          payload: { slug: existing.slug, title: existing.title },
+        }),
+        logContentEdit({
+          userId: session.user.id,
+          userEmail: session.user.email ?? '',
+          userRole: session.user.role ?? '',
+          kind: 'blog',
+          targetPath: existing.slug,
+          summary: 'delete',
+        }),
+        writeAuditLog({
+          request,
+          actor: { id: session.user.id, email: session.user.email ?? null, role: session.user.role ?? null },
+          action: 'content.news.delete',
+          targetType: 'News',
+          targetId: existing.id,
+          targetLabel: existing.slug,
+          payload: { slug: existing.slug, title: existing.title },
+        }),
+      ]);
+    } catch (e) {
+      console.error('[marketer/blog DELETE] audit log failed (article was still deleted):', e);
+    }
 
     revalidateCmsPublicSurfaces();
     revalidateNewsPostPublicPaths({

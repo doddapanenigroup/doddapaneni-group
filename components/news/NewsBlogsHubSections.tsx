@@ -51,8 +51,8 @@ function HubPostCard({
         locale={NEWS_PUBLIC_LINK_LOCALE}
         className="flex min-w-0 flex-col"
       >
-        {/* Full-width strip matches card width — avoids clipped edges from overflow-hidden + w-auto quirks */}
-        <div className="shrink-0 rounded-t-md bg-slate-100 leading-none">
+        {/* Intrinsic image height — no fixed frame, so no gray letterboxing strip above the title. */}
+        <div className="shrink-0 overflow-hidden rounded-t-md bg-slate-100 leading-none">
           {post.image ? (
             <Image
               src={post.image}
@@ -60,17 +60,18 @@ function HubPostCard({
               width={1200}
               height={675}
               sizes={thumbSizes}
-              className="block h-auto max-h-52 w-full object-contain object-center transition duration-300 group-hover:opacity-95 sm:max-h-56"
+              style={{ height: 'auto', width: '100%' }}
+              className="block max-h-52 w-full object-contain object-center transition duration-300 group-hover:opacity-95 sm:max-h-56"
             />
           ) : (
-            <div className="flex min-h-16 w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 px-3 py-3">
+            <div className="flex min-h-24 w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 px-3 py-6">
               <span className="max-w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider text-white/90 sm:text-[11px]">
                 {sectorLabel}
               </span>
             </div>
           )}
         </div>
-        <div className="flex w-full min-w-0 flex-col p-2 sm:p-2.5">
+        <div className="flex w-full min-w-0 flex-col px-2 pb-2 pt-1 sm:px-2.5 sm:pb-2.5 sm:pt-1.5">
           <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 sm:text-[10px]">{sectorLabel}</p>
           <h3 className="mt-0.5 line-clamp-2 text-xs font-bold leading-snug text-slate-900 group-hover:text-blue-800 sm:text-sm">
             {post.title}
@@ -114,7 +115,7 @@ export default function NewsBlogsHubSections({ locale, sections, t }: Props) {
             {section.posts.length === 0 ? (
               <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-600 sm:text-sm">{t('emptySectorBody')}</p>
             ) : (
-              <div className="mt-2.5 flex flex-wrap justify-start gap-x-px gap-y-px sm:gap-x-1 sm:gap-y-1">
+              <div className="mt-2.5 flex flex-wrap items-start justify-start gap-x-px gap-y-px sm:gap-x-1 sm:gap-y-1">
                 {section.posts.map((post) => (
                   <HubPostCard
                     key={post.slug}

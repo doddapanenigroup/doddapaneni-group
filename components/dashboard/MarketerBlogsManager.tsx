@@ -141,30 +141,37 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
 
   const blogListSectorSelected = blogSectorFilter.trim().length > 0;
 
-  const refreshBlogs = useCallback(async (opts?: { silent?: boolean }) => {
-    const silent = opts?.silent === true;
-    if (!blogSectorFilter.trim()) {
-      setBlogs([]);
-      if (!silent) setBlogsLoading(false);
-      return;
-    }
-    if (!silent) setBlogsLoading(true);
-    try {
-      const sp = new URLSearchParams();
-      sp.set('sectorId', blogSectorFilter.trim());
-      if (blogStatusFilter === 'published' || blogStatusFilter === 'draft') {
-        sp.set('status', blogStatusFilter);
+  const refreshBlogs = useCallback(
+    async (opts?: { silent?: boolean; sectorIdOverride?: string | null }) => {
+      const silent = opts?.silent === true;
+      const sector =
+        typeof opts?.sectorIdOverride === 'string' && opts.sectorIdOverride.trim()
+          ? opts.sectorIdOverride.trim()
+          : blogSectorFilter.trim();
+      if (!sector) {
+        setBlogs([]);
+        if (!silent) setBlogsLoading(false);
+        return;
       }
-      const qs = sp.toString();
-      const res = await fetch(`/api/marketer/news?${qs}`);
-      const d = res.ok ? await res.json().catch(() => ({})) : {};
-      setBlogs((d?.items ?? []) as BlogListRow[]);
-    } catch {
-      if (!silent) setBlogs([]);
-    } finally {
-      if (!silent) setBlogsLoading(false);
-    }
-  }, [blogSectorFilter, blogStatusFilter]);
+      if (!silent) setBlogsLoading(true);
+      try {
+        const sp = new URLSearchParams();
+        sp.set('sectorId', sector);
+        if (blogStatusFilter === 'published' || blogStatusFilter === 'draft') {
+          sp.set('status', blogStatusFilter);
+        }
+        const qs = sp.toString();
+        const res = await fetch(`/api/marketer/news?${qs}`);
+        const d = res.ok ? await res.json().catch(() => ({})) : {};
+        setBlogs((d?.items ?? []) as BlogListRow[]);
+      } catch {
+        if (!silent) setBlogs([]);
+      } finally {
+        if (!silent) setBlogsLoading(false);
+      }
+    },
+    [blogSectorFilter, blogStatusFilter],
+  );
 
   useEffect(() => {
     void refreshBlogs();
@@ -335,12 +342,15 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         return;
       }
       const item = data.item;
+      if (item.sectorId) {
+        setBlogSectorFilter(item.sectorId);
+      }
       const slim = blogListRowForState(item);
       setBlogs((prev) => {
         const rest = prev.filter((b) => b.id !== slim.id && b.slug !== slim.slug);
         return [slim, ...rest];
       });
-      void refreshBlogs({ silent: true });
+      void refreshBlogs({ silent: true, sectorIdOverride: item.sectorId ?? null });
       let msg = 'Post created and saved.';
       if (item.status !== 'published') {
         msg +=
@@ -395,8 +405,36 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         return;
       }
       if (!data.item) {
-        // DB save may still succeed when response body is empty/truncated; keep UX deterministic.
-        setBlogToast({ type: 'success', message: 'Article Saved.' });
+        const slugNow = editingNewsSlug ?? blogForm.slug.trim();
+        const verify = slugNow
+          ? await fetch(`/api/marketer/news/${encodeURIComponent(slugNow)}`).then((r) =>
+              r.ok ? r.json().catch(() => null) : null,
+            )
+          : null;
+        const recovered = verify?.item as BlogListRow | undefined;
+        if (recovered) {
+          setBlogToast({
+            type: 'success',
+            message: 'Article saved (response body was incomplete; loaded from server).',
+          });
+          if (recovered.sectorId) setBlogSectorFilter(recovered.sectorId);
+          const slim = blogListRowForState(recovered);
+          setBlogs((prev) => {
+            const idx = prev.findIndex((b) => b.slug === slim.slug || b.id === slim.id);
+            if (idx === -1) return [slim, ...prev];
+            const next = [...prev];
+            next[idx] = { ...next[idx], ...slim };
+            return next;
+          });
+          void refreshBlogs({ silent: true, sectorIdOverride: recovered.sectorId ?? null });
+          closeBlogModal();
+          return;
+        }
+        setBlogToast({
+          type: 'error',
+          message:
+            'Save returned OK but no article payload — refresh the page and check the sector filter. If it persists, contact support.',
+        });
         closeBlogModal();
         void refreshBlogs({ silent: true });
         return;
@@ -412,6 +450,9 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         msg += ` Visible on /news/${item.sector.slug} (hard refresh if the list looks old).`;
       }
       setBlogToast({ type: 'success', message: msg });
+      if (item.sectorId) {
+        setBlogSectorFilter(item.sectorId);
+      }
       setEditingNewsSlug(item.slug);
       setBlogForm(blogFromApiToForm(item, item.sectorId ?? blogSectorFilter));
       setBlogs((prev) => {
@@ -421,7 +462,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         next[idx] = { ...next[idx], ...slim, slug: slim.slug };
         return next;
       });
-      void refreshBlogs({ silent: true });
+      void refreshBlogs({ silent: true, sectorIdOverride: item.sectorId ?? null });
       closeBlogModal();
     } catch {
       const err = 'Save failed (network or server error).';
