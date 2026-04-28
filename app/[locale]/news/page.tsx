@@ -93,7 +93,7 @@ export default async function NewsHubPage({ params }: Props) {
 
     const posts: NewsSectorPostItem[] = rows.map((r) => {
       const raw = (r.metaDescription?.trim() || r.ogDescription?.trim()) ?? '';
-      const excerpt = raw.length > 200 ? `${raw.slice(0, 200)}…` : raw || r.title;
+      const excerpt = raw.length > 120 ? `${raw.slice(0, 120)}…` : raw || r.title;
       const readMinutes = Math.max(1, Math.ceil(excerpt.split(/\s+/).filter(Boolean).length / 220));
       return {
         slug: r.slug,
@@ -124,7 +124,7 @@ export default async function NewsHubPage({ params }: Props) {
           </h1>
         </div>
       </header>
-      <div className="mt-6 border-t border-blue-100/80 sm:mt-8">
+      <div className="mt-4 border-t border-blue-100/80 sm:mt-5">
         <NewsBlogsHubSections locale={locale} sections={sections} t={t} />
       </div>
     </div>
