@@ -236,6 +236,10 @@ const nextConfig: NextConfig = {
       'next-auth/react',
     ],
     validateRSCRequestHeaders: true,
+    /** Lets multipart uploads reach Route Handlers without truncation on some hosts (matches marketer `stored-image` ~10MB cap + overhead). */
+    serverActions: {
+      bodySizeLimit: '12mb',
+    },
   },
   async headers() {
     const loginNoStore = [

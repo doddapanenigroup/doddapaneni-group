@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { Session } from 'next-auth';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -11,7 +12,63 @@ import { hasMarketerAccess } from '@/lib/role-utils';
 
 export const runtime = 'nodejs';
 
+/** Large uploads / Sharp work — avoid cutting off on default serverless timeouts (e.g. Vercel). */
+export const maxDuration = 60;
+
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+
+/** Bound decode dimensions / memory for huge camera originals before WebP encode. */
+const MAX_DIMENSION_PX = 4096;
+
+function auditStoredImageBestEffort(
+  userId: string,
+  userEmail: string,
+  userRole: string,
+  saved: {
+    id: string;
+    key: string;
+    fileName: string | null;
+    altText: string | null;
+    size: number | null;
+    mimeType: string;
+  },
+  seoNote: string | null,
+) {
+  void (async () => {
+    try {
+      await logMarketingActivity({
+        userId,
+        userEmail,
+        userRole,
+        entity: 'stored_image',
+        entityId: saved.id,
+        action: 'create',
+        seoNote,
+        payload: {
+          key: saved.key,
+          fileName: saved.fileName,
+          altText: saved.altText,
+          size: saved.size,
+          mimeType: saved.mimeType,
+        },
+      });
+    } catch (e) {
+      console.error('[stored-image] logMarketingActivity failed (upload still saved):', e);
+    }
+    try {
+      await logContentEdit({
+        userId,
+        userEmail,
+        userRole,
+        kind: 'stored_image',
+        targetPath: saved.key,
+        summary: `upload ${saved.fileName ?? saved.key}`,
+      });
+    } catch (e) {
+      console.error('[stored-image] logContentEdit failed (upload still saved):', e);
+    }
+  })();
+}
 
 function allowMarketer(session: { user?: { role?: string } } | null) {
   return hasMarketerAccess(session?.user?.role as any);
@@ -29,8 +86,10 @@ function safeBaseName(name: string) {
 }
 
 export async function POST(req: Request) {
+  let sessionForCapture: Session | null = null;
   try {
     const session = await auth();
+    sessionForCapture = session;
     if (!session?.user?.id || !allowMarketer(session)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
@@ -39,7 +98,14 @@ export async function POST(req: Request) {
     try {
       form = await req.formData();
     } catch {
-      return NextResponse.json({ message: 'Invalid form data' }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            'Could not read the upload (network dropped or body too large). Try a smaller JPG/PNG under 10MB with a stable connection.',
+          code: 'FORM_PARSE',
+        },
+        { status: 400 },
+      );
     }
 
     const file = form.get('file');
@@ -63,9 +129,20 @@ export async function POST(req: Request) {
     const buf = Buffer.from(arrayBuffer);
     let webp: Buffer;
     try {
-      webp = await sharp(buf, { failOn: 'none' }).webp({ quality: 82 }).toBuffer();
+      webp = await sharp(buf, { failOn: 'none' })
+        .rotate()
+        .resize(MAX_DIMENSION_PX, MAX_DIMENSION_PX, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toBuffer();
     } catch {
-      return NextResponse.json({ message: 'Failed to process image' }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            'Could not process this image (unsupported format or corrupted file). Try JPG or PNG, or re-export from Photos.',
+          code: 'IMAGE_PROCESS',
+        },
+        { status: 400 },
+      );
     }
 
     const altText = strOrNull(form.get('altText'));
@@ -92,31 +169,13 @@ export async function POST(req: Request) {
       },
     });
 
-    await logMarketingActivity({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      entity: 'stored_image',
-      entityId: saved.id,
-      action: 'create',
+    auditStoredImageBestEffort(
+      session.user.id,
+      session.user.email ?? '',
+      session.user.role ?? '',
+      saved,
       seoNote,
-      payload: {
-        key: saved.key,
-        fileName: saved.fileName,
-        altText: saved.altText,
-        size: saved.size,
-        mimeType: saved.mimeType,
-      },
-    });
-
-    await logContentEdit({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      userRole: session.user.role ?? '',
-      kind: 'stored_image',
-      targetPath: saved.key,
-      summary: `upload ${saved.fileName ?? saved.key}`,
-    });
+    );
 
     return NextResponse.json({
       ok: true,
@@ -132,10 +191,16 @@ export async function POST(req: Request) {
       request: req,
       statusCode: 500,
       context: 'marketer/stored-image/POST',
-      user: null,
+      user: sessionForCapture?.user
+        ? {
+            id: sessionForCapture.user.id ?? '',
+            email: sessionForCapture.user.email,
+            role: sessionForCapture.user.role as string | undefined,
+          }
+        : null,
     });
     console.error('Marketer stored-image POST error:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json({ message: 'Server error', code: 'INTERNAL' }, { status: 500 });
   }
 }
 
