@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { Link } from '@/i18n/navigation';
 import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
@@ -265,6 +266,14 @@ export default function LoginFormClient({
             {loading ? 'Logging in…' : 'Login'}
           </button>
         </form>
+        <p className="mt-6 text-center">
+          <Link
+            href="/"
+            className="text-sm text-slate-600 underline decoration-slate-300 underline-offset-[3px] transition hover:text-blue-700 hover:decoration-blue-600 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+          >
+            Back to home
+          </Link>
+        </p>
       </div>
     </div>
   );
