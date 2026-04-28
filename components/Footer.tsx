@@ -8,7 +8,22 @@ import {
   brandLogoSrc,
   brandLogoSrcSet,
 } from '@/lib/brand-logo';
-import { Facebook, Instagram, X, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, MessageCircle, X, Youtube } from 'lucide-react';
+
+function TelegramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+    </svg>
+  );
+}
+
 function PinterestIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -46,11 +61,14 @@ export default function Footer() {
   };
 
   const socialLinks = {
-    facebook: 'https://www.facebook.com/profile.php?id=61588007971937',
-    twitter: 'https://x.com/DoddapanenGroup',
-    instagram: 'https://www.instagram.com/doddapanrnigroup/',
-    whatsapp: 'https://whatsapp.com/channel/0029VbCMxCGKmCPKKsU0zo33',
-    pinterest: 'https://www.pinterest.com/doddapanenigroup/',
+    facebook: 'https://www.facebook.com/profile.php?id=61572087282491',
+    instagram: 'https://www.instagram.com/buildwebseo1/',
+    pinterest: 'https://in.pinterest.com/buildwebseo1/',
+    twitter: 'https://x.com/buildwebseo1',
+    linkedin: 'https://www.linkedin.com/in/doddapaneni-group-b9a775359/',
+    youtube: 'https://www.youtube.com/@DoddapaneniGroup',
+    telegram: 'https://t.me/doddapanenigroup',
+    whatsapp: 'https://whatsapp.com/channel/0029Vb7YdGMAYlULkrnG3g2V',
   };
 
   const siteLinks = [
@@ -160,15 +178,6 @@ export default function Footer() {
                 <Facebook size={18} className="md:h-6 md:w-6" />
               </a>
               <a
-                href={socialLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-300 transition-colors hover:text-white"
-                aria-label="Twitter"
-              >
-                <X size={18} className="md:h-6 md:w-6" />
-              </a>
-              <a
                 href={socialLinks.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -178,13 +187,31 @@ export default function Footer() {
                 <Instagram size={18} className="md:h-6 md:w-6" />
               </a>
               <a
-                href={socialLinks.whatsapp}
+                href={socialLinks.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-300 transition-colors hover:text-white"
-                aria-label="WhatsApp"
+                aria-label="X"
               >
-                <MessageCircle size={18} className="md:h-6 md:w-6" />
+                <X size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} className="md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="YouTube"
+              >
+                <Youtube size={18} className="md:h-6 md:w-6" />
               </a>
               <a
                 href={socialLinks.pinterest}
@@ -194,6 +221,24 @@ export default function Footer() {
                 aria-label="Pinterest"
               >
                 <PinterestIcon className="h-[18px] w-[18px] md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="Telegram"
+              >
+                <TelegramIcon className="h-[18px] w-[18px] md:h-6 md:w-6" />
+              </a>
+              <a
+                href={socialLinks.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 transition-colors hover:text-white"
+                aria-label="WhatsApp channel"
+              >
+                <MessageCircle size={18} className="md:h-6 md:w-6" />
               </a>
             </div>
           </div>

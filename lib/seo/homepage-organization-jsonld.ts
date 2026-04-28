@@ -10,10 +10,14 @@ const ORG_NAME = 'Doddapaneni Group';
 
 /** Social profiles confirmed on the public site (extend when new channels go live). */
 const SAME_AS = [
-  'https://www.facebook.com/profile.php?id=61588007971937',
-  'https://x.com/DoddapanenGroup',
-  'https://www.instagram.com/doddapanrnigroup/',
-  'https://www.pinterest.com/doddapanenigroup/',
+  'https://www.facebook.com/profile.php?id=61572087282491',
+  'https://www.instagram.com/buildwebseo1/',
+  'https://in.pinterest.com/buildwebseo1/',
+  'https://x.com/buildwebseo1',
+  'https://www.linkedin.com/in/doddapaneni-group-b9a775359/',
+  'https://www.youtube.com/@DoddapaneniGroup',
+  'https://t.me/doddapanenigroup',
+  'https://whatsapp.com/channel/0029Vb7YdGMAYlULkrnG3g2V',
 ];
 
 /**
