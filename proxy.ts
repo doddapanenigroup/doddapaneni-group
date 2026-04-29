@@ -11,6 +11,9 @@ const PREFIX_LOCALE_SET: Set<string> = new Set(
 /** Match `next.config.ts`: bfcache-friendly document policy; edge still skips caching HTML. */
 const DOCUMENT_CACHE_CONTROL = 'private, max-age=0, must-revalidate';
 
+const APEX_HOST = 'doddapanenigroup.net';
+const WWW_HOST = `www.${APEX_HOST}`;
+
 function applyDocumentCacheHeaders(res: NextResponse) {
   res.headers.set('Cache-Control', DOCUMENT_CACHE_CONTROL);
   res.headers.set('CDN-Cache-Control', 'private, no-store');
@@ -24,7 +27,29 @@ function applyDocumentCacheHeaders(res: NextResponse) {
  * Legacy `/en/…` redirects to the same path without `/en` (308).
  */
 export function proxy(request: NextRequest) {
+  const raw =
+    request.headers.get('x-forwarded-host')?.split(',')[0]?.trim() ??
+    request.headers.get('host') ??
+    '';
+  const host = raw.split(':')[0]?.toLowerCase() ?? '';
+  if (host === WWW_HOST) {
+    const u = request.nextUrl.clone();
+    u.hostname = APEX_HOST;
+    u.protocol = 'https:';
+    u.port = '';
+    return NextResponse.redirect(u, 308);
+  }
+
   const { pathname } = request.nextUrl;
+
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/_vercel')
+  ) {
+    return NextResponse.next();
+  }
+
   const segments = pathname.split('/').filter(Boolean);
   const first = segments[0];
   const isPrefixedLocale = !!first && PREFIX_LOCALE_SET.has(first);
@@ -85,8 +110,9 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   /**
-   * Skip Next internals, API, and paths whose first segment contains a dot
-   * (`/robots.txt`, static assets) so locale rewrites never turn them into HTML.
+   * Include `/api` and `/_next` so `www` → apex applies there too (fixes CORS when the edge
+   * otherwise answers API on `www`). Skip dotted static paths (`/file.webp`) and `_vercel`.
+   * After the host check, API / Next internals pass through with `NextResponse.next()`.
    */
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!_vercel|.*\\..*).*)', '/'],
 };

@@ -5,18 +5,26 @@ import {
   isLoginEmailDeliveryConfigured,
   smtpFailureUserMessage,
 } from '@/lib/email';
-
-/**
- * Careers sends two SMTP messages (inbox + attachment, then applicant). On Vercel, this raises the
- * serverless limit; on self-hosted (e.g. DigitalOcean + nginx), ensure proxy timeouts exceed this path
- * (e.g. proxy_read_timeout 120s or higher for `/api/careers/apply`).
- */
-export const maxDuration = 120;
 import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import { routing } from '@/i18n/routing';
 import { normalizeLanguagesKnownForJob, parseApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
 import { handleCorsOptions, withCors } from '@/lib/site-origin-cors';
+
+/**
+ * Careers sends two SMTP messages (inbox + attachment, then applicant). On **DigitalOcean**
+ * (Droplet + nginx, or DO load balancer), 504 usually means the **proxy** timed out before Node
+ * finished — raise `proxy_read_timeout` / LB idle timeout (see `docs/nginx-doddapaneni-group.conf`).
+ * `maxDuration` is enforced on Vercel-like hosts; on plain Node it mainly documents the target budget.
+ */
+export const maxDuration = 120;
+
+/** Keep total SMTP time under `maxDuration` (two inbox retries + applicant mail). */
+const CAREERS_SMTP = {
+  connectionTimeoutMs: 14_000,
+  greetingTimeoutMs: 14_000,
+  socketTimeoutMs: 26_000,
+} as const;
 
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -272,11 +280,7 @@ export async function POST(request: Request) {
     }
 
     const fromAddr = getSmtpUser();
-    const transporter = createMailTransporter({
-      connectionTimeoutMs: 22_000,
-      greetingTimeoutMs: 22_000,
-      socketTimeoutMs: 90_000,
-    });
+    const transporter = createMailTransporter(CAREERS_SMTP);
     if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
       console.warn('[careers/apply] Outbound email not configured or transport unavailable.');
       if (isCareersDevRelaxed()) {
