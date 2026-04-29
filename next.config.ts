@@ -65,6 +65,7 @@ function apiMediaRemotePatterns(): NonNullable<
     out.push({ protocol, hostname: h, pathname: '/api/media/**' });
   };
 
+  /** Past CMS/markdown may still embed absolute `www` media URLs; canonical site URL is apex only. */
   add('www.doddapanenigroup.net');
   add('doddapanenigroup.net');
 

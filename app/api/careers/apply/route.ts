@@ -16,6 +16,7 @@ import { connectDb, prisma } from '@/lib/db';
 import { recordApiRequest } from '@/lib/request-monitor';
 import { routing } from '@/i18n/routing';
 import { normalizeLanguagesKnownForJob, parseApplyLanguageCodesCsv } from '@/lib/career-apply-languages';
+import { handleCorsOptions, withCors } from '@/lib/site-origin-cors';
 
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -106,16 +107,18 @@ function isLikelyDatabaseError(error: unknown): boolean {
 }
 
 export async function POST(request: Request) {
+  const jsonRes = (body: unknown, init?: ResponseInit) =>
+    withCors(NextResponse.json(body, init), request);
   try {
     recordApiRequest({ request, userId: null });
     const ct = request.headers.get('content-type') || '';
     if (!ct.includes('multipart/form-data')) {
-      return NextResponse.json({ message: 'Expected multipart form data.' }, { status: 400 });
+      return jsonRes({ message: 'Expected multipart form data.' }, { status: 400 });
     }
 
     const form = await request.formData();
     if (getStr(form, 'fax').length > 0) {
-      return NextResponse.json({ message: 'Invalid input' }, { status: 400 });
+      return jsonRes({ message: 'Invalid input' }, { status: 400 });
     }
 
     const jobSlug = getStr(form, 'jobSlug').toLowerCase();
@@ -137,30 +140,30 @@ export async function POST(request: Request) {
     const locale = (getStr(form, 'locale') || routing.defaultLocale).toLowerCase();
 
     if (getStr(form, 'declarationAccurate') !== '1' || getStr(form, 'declarationLegal') !== '1') {
-      return NextResponse.json({ message: 'Please confirm both declarations.' }, { status: 400 });
+      return jsonRes({ message: 'Please confirm both declarations.' }, { status: 400 });
     }
     if (!jobSlug || !name || !email || !simpleEmail(email)) {
-      return NextResponse.json({ message: 'Name and a valid email are required.' }, { status: 400 });
+      return jsonRes({ message: 'Name and a valid email are required.' }, { status: 400 });
     }
     if (!positionApplied) {
-      return NextResponse.json({ message: 'Position applied for is required.' }, { status: 400 });
+      return jsonRes({ message: 'Position applied for is required.' }, { status: 400 });
     }
     if (keySkills.length < 10) {
-      return NextResponse.json({ message: 'Please enter your key skills (at least 10 characters).' }, { status: 400 });
+      return jsonRes({ message: 'Please enter your key skills (at least 10 characters).' }, { status: 400 });
     }
     if (whyApply.length < 20) {
-      return NextResponse.json({ message: 'Please explain why you want to apply (at least 20 characters).' }, { status: 400 });
+      return jsonRes({ message: 'Please explain why you want to apply (at least 20 characters).' }, { status: 400 });
     }
 
     const resume = form.get('resume');
     if (!resume || !(resume instanceof File) || resume.size === 0) {
-      return NextResponse.json({ message: 'Please upload your resume (PDF or Word).' }, { status: 400 });
+      return jsonRes({ message: 'Please upload your resume (PDF or Word).' }, { status: 400 });
     }
     if (resume.size > MAX_RESUME_BYTES) {
-      return NextResponse.json({ message: 'Resume must be 5 MB or smaller.' }, { status: 400 });
+      return jsonRes({ message: 'Resume must be 5 MB or smaller.' }, { status: 400 });
     }
     if (!isAllowedResume(resume)) {
-      return NextResponse.json({ message: 'Resume must be a .pdf, .doc, or .docx file.' }, { status: 400 });
+      return jsonRes({ message: 'Resume must be a .pdf, .doc, or .docx file.' }, { status: 400 });
     }
 
     await connectDb();
@@ -180,11 +183,11 @@ export async function POST(request: Request) {
       });
     } catch (e) {
       console.error('[careers/apply] DB', e);
-      return NextResponse.json({ message: 'Careers are temporarily unavailable.' }, { status: 503 });
+      return jsonRes({ message: 'Careers are temporarily unavailable.' }, { status: 503 });
     }
 
     if (!job?.translations.length) {
-      return NextResponse.json({ message: 'This role is not open for applications.' }, { status: 404 });
+      return jsonRes({ message: 'This role is not open for applications.' }, { status: 404 });
     }
 
     const jobLanguages = parseApplyLanguageCodesCsv(job.applyLanguageCodesCsv);
@@ -193,7 +196,7 @@ export async function POST(request: Request) {
       .filter((v): v is string => typeof v === 'string');
     const languagesKnown = normalizeLanguagesKnownForJob(rawLangSelections, jobLanguages);
     if (languagesKnown.length === 0) {
-      return NextResponse.json(
+      return jsonRes(
         { message: 'Select at least one language you know, from the options listed for this role.' },
         { status: 400 },
       );
@@ -262,10 +265,10 @@ export async function POST(request: Request) {
         await persistSubmission();
       } catch (dbErr) {
         console.error('[careers/apply] DB save failed', dbErr);
-        return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+        return jsonRes({ message: 'Could not save application.' }, { status: 500 });
       }
       console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
-      return NextResponse.json({ ok: true }, { status: 200 });
+      return jsonRes({ ok: true }, { status: 200 });
     }
 
     const fromAddr = getSmtpUser();
@@ -284,11 +287,11 @@ export async function POST(request: Request) {
           await persistSubmission();
         } catch (dbErr) {
           console.error('[careers/apply] DB save failed', dbErr);
-          return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+          return jsonRes({ message: 'Could not save application.' }, { status: 500 });
         }
-        return NextResponse.json({ ok: true }, { status: 200 });
+        return jsonRes({ ok: true }, { status: 200 });
       }
-      return NextResponse.json(
+      return jsonRes(
         {
           ok: false,
           code: 'MAIL_NOT_CONFIGURED',
@@ -391,11 +394,11 @@ export async function POST(request: Request) {
           await persistSubmission();
         } catch (dbErr) {
           console.error('[careers/apply] DB save failed after SMTP failure', dbErr);
-          return NextResponse.json({ message: 'Could not save application.' }, { status: 500 });
+          return jsonRes({ message: 'Could not save application.' }, { status: 500 });
         }
-        return NextResponse.json({ ok: true }, { status: 200 });
+        return jsonRes({ ok: true }, { status: 200 });
       }
-      return NextResponse.json(
+      return jsonRes(
         {
           ok: false,
           code: 'INBOX_DELIVERY_FAILED',
@@ -418,11 +421,11 @@ export async function POST(request: Request) {
       console.error('[careers/apply] applicant confirmation sendMail failed (inbox already received application):', smtpFailureUserMessage(e));
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return jsonRes({ ok: true }, { status: 200 });
   } catch (error) {
     console.error('[careers/apply]', error);
     if (isLikelyDatabaseError(error)) {
-      return NextResponse.json(
+      return jsonRes(
         {
           message:
             'Could not reach the database. Check DATABASE_URL and TURSO_AUTH_TOKEN (for libsql://), and that the database is reachable.',
@@ -430,6 +433,10 @@ export async function POST(request: Request) {
         { status: 503 },
       );
     }
-    return NextResponse.json({ message: 'Something went wrong. Please try again.' }, { status: 500 });
+    return jsonRes({ message: 'Something went wrong. Please try again.' }, { status: 500 });
   }
+}
+
+export async function OPTIONS(request: Request) {
+  return handleCorsOptions(request, { methods: 'POST, OPTIONS' });
 }

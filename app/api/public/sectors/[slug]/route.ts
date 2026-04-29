@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getPublicSectorBySlug } from '@/lib/data/sector-repository';
 import { listPublishedBlogsForSectorPage } from '@/lib/data/sector-blog-repository';
 import { routing } from '@/i18n/routing';
+import { corsHeadersForRequest, handleCorsOptions } from '@/lib/site-origin-cors';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,17 +11,22 @@ type Props = { params: Promise<{ slug: string }> };
 /**
  * Public sector by slug. Optional `?news=1` or `?blogs=1` (legacy) returns recent published posts.
  */
+export async function OPTIONS(request: Request) {
+  return handleCorsOptions(request, { methods: 'GET, OPTIONS' });
+}
+
 export async function GET(request: Request, { params }: Props) {
   const { slug: raw } = await params;
   const slug = raw.trim().toLowerCase();
+  const cors = corsHeadersForRequest(request);
   if (!slug) {
-    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400, headers: cors });
   }
 
   const now = new Date();
   const sector = await getPublicSectorBySlug(slug);
   if (!sector) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Not found' }, { status: 404, headers: cors });
   }
 
   const url = new URL(request.url);
@@ -36,7 +42,12 @@ export async function GET(request: Request, { params }: Props) {
   if (!wantBlogs) {
     return NextResponse.json(
       { sector },
-      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          ...cors,
+        },
+      },
     );
   }
 
@@ -55,6 +66,11 @@ export async function GET(request: Request, { params }: Props) {
       /** @deprecated use `news` */
       blogs: { total, items: rows },
     },
-    { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        ...cors,
+      },
+    },
   );
 }
