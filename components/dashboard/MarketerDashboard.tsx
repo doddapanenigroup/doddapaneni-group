@@ -1,13 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import {
-  Megaphone,
-  Globe,
-  Mail,
-  Target,
   Plus,
   Trash2,
   Pencil,
@@ -16,21 +11,17 @@ import {
   ExternalLink,
   Image as ImageIcon,
   Search,
-  BarChart3,
-  Users,
   Loader2,
 } from 'lucide-react';
-import MyActivityPanel from './MyActivityPanel';
 import { useDashboardShortcuts } from '@/components/dashboard/DashboardShortcutsProvider';
 import type { Role } from '@/lib/constants';
-import { getDashboardTitle } from '@/lib/dashboard-title';
 import FeatureGate from '@/components/FeatureGate';
-import DashboardPageHeader from './DashboardPageHeader';
 import GoogleSnippetPreview from '@/components/dashboard/GoogleSnippetPreview';
 import MarketerBlogsManager, {
   type MarketerBlogsManagerHandle,
 } from '@/components/dashboard/MarketerBlogsManager';
 import CareersJobsPanel from './CareersJobsPanel';
+import { useMarketerNav } from '@/components/dashboard/MarketerNavProvider';
 import {
   dashboardHeaderActionPrimary,
   dashboardHeaderActionSecondary,
@@ -41,9 +32,8 @@ import {
   dashboardPanelClass,
   dashboardPanelHeaderClass,
   dashboardStageClass,
-  dashboardTabRailClass,
 } from '@/lib/dashboard-ui';
-import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
+import { publicPathWithLocale } from '@/lib/public-path-with-locale';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { hasDeveloperAccess } from '@/lib/role-utils';
 
@@ -449,23 +439,10 @@ export default function MarketerDashboard({
   canPages: boolean;
   canBlogs: boolean;
 }) {
-  const base = publicPathForLocale(locale, '/');
   const { data: sessionData } = useSession();
   const { pushSaveLayer } = useDashboardShortcuts();
   const authorLabel = sessionData?.user?.email ?? sessionData?.user?.name ?? '—';
-  const [activeTab, setActiveTab] = useState<'pages' | 'blogs'>(() =>
-    canPages ? 'pages' : 'blogs',
-  );
-
-  useEffect(() => {
-    if (canPages) return;
-    setActiveTab((t) => (t === 'pages' ? 'blogs' : t));
-  }, [canPages]);
-
-  useEffect(() => {
-    if (canBlogs) return;
-    setActiveTab((t) => (t === 'blogs' ? 'pages' : t));
-  }, [canBlogs]);
+  const { section, setSection, registerMarketerCaps } = useMarketerNav();
 
   const [previewLink, setPreviewLink] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -505,10 +482,16 @@ export default function MarketerDashboard({
   const [uploading, setUploading] = useState(false);
   const blogsManagerRef = useRef<MarketerBlogsManagerHandle>(null);
 
+  useLayoutEffect(() => {
+    registerMarketerCaps({ canPages, canBlogs });
+    setSection(canPages ? 'pages' : canBlogs ? 'blogs' : 'media');
+    return () => registerMarketerCaps({ canPages: false, canBlogs: false });
+  }, [canPages, canBlogs, registerMarketerCaps, setSection]);
+
   useEffect(() => {
     // Clear preview link when switching contexts.
     setPreviewLink(null);
-  }, [activeTab, selectedPageSlug]);
+  }, [section, selectedPageSlug]);
 
   useEffect(() => {
     let cancelled = false;
@@ -833,10 +816,10 @@ export default function MarketerDashboard({
 
   const marketerSaveRef = useRef<() => void>(() => {});
   marketerSaveRef.current = () => {
-    if (activeTab === 'pages' && canPages) {
+    if (section === 'pages' && canPages) {
       if (creatingPage) void createPage();
       else if (selectedPageSlug) void savePageSeo();
-    } else if (activeTab === 'blogs' && canBlogs) {
+    } else if (section === 'blogs' && canBlogs) {
       blogsManagerRef.current?.requestSave();
     }
   };
@@ -847,99 +830,18 @@ export default function MarketerDashboard({
     });
   }, [pushSaveLayer]);
 
+  const showMarketerAside = canPages && hasDeveloperAccess(viewerRole);
+
   return (
     <div className={`${dashboardMainMaxClass} space-y-6`}>
-      <DashboardPageHeader
-        icon={Megaphone}
-        title={getDashboardTitle(viewerRole)}
-        description="Pages, blogs, and media for your locale. Admins and digital marketers use this area; all data is stored in the database."
-      />
-
       <div className={dashboardStageClass}>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
-          <aside className="order-2 flex min-w-0 flex-col gap-6 lg:order-none lg:col-span-4 xl:col-span-3">
-            <section className={dashboardPanelClass}>
-              <h2 className={`flex items-center gap-3 text-lg font-semibold text-slate-800 dark:text-slate-100 ${dashboardPanelHeaderClass}`}>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25 dark:bg-indigo-500">
-                  <Globe size={18} aria-hidden />
-                </span>
-                Quick links
-              </h2>
-              <div className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-1 lg:gap-3 lg:p-5">
-          <Link
-            href={base}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
+          <div
+            className={`flex min-w-0 flex-col gap-6 ${
+              showMarketerAside ? 'lg:col-span-8 xl:col-span-9' : 'lg:col-span-12'
+            }`}
           >
-            <Globe size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-medium text-slate-800 dark:text-slate-100">View site</span>
-          </Link>
-          <Link
-            href={publicPathWithLocale(locale, 'contact')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
-          >
-            <Mail size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-medium text-slate-800 dark:text-slate-100">Contact page</span>
-          </Link>
-          <Link
-            href={publicPathWithLocale(locale, 'team')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
-          >
-            <Users size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-medium text-slate-800 dark:text-slate-100">Team page</span>
-          </Link>
-          <Link
-            href={publicPathWithLocale(locale, 'careers')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
-          >
-            <Target size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-medium text-slate-800 dark:text-slate-100">Careers page</span>
-          </Link>
-          <Link
-            href={publicPathForLocale(locale, '/dashboard/analytics')}
-            className={`flex items-center gap-3 !p-4 ${dashboardNestedCardClass}`}
-          >
-            <BarChart3 size={22} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-medium text-slate-800 dark:text-slate-100">Analytics</span>
-          </Link>
-              </div>
-            </section>
-
-            {canPages && hasDeveloperAccess(viewerRole) ? <CareersJobsPanel locale={locale} /> : null}
-            <MyActivityPanel />
-          </aside>
-
-          <div className="order-1 flex min-w-0 flex-col gap-6 lg:order-none lg:col-span-8 xl:col-span-9">
-            <section className={dashboardTabRailClass}>
-        <div className="flex flex-wrap gap-1">
-          {[
-            ...(canPages ? [{ id: 'pages' as const, label: 'Pages' }] : []),
-            ...(canBlogs ? [{ id: 'blogs' as const, label: 'Blogs' }] : []),
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
-                activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25 dark:bg-indigo-500'
-                  : 'text-slate-600 hover:bg-white/90 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-100'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-            </div>
-            </section>
-
-      {activeTab === 'pages' && canPages && (
+      {section === 'pages' && canPages && (
         <section className={dashboardPanelClass}>
           <div className={`flex flex-wrap items-center justify-between gap-3 ${dashboardPanelHeaderClass}`}>
             <div>
@@ -1177,7 +1079,7 @@ export default function MarketerDashboard({
         </section>
       )}
 
-      {activeTab === 'blogs' && canBlogs && (
+      {section === 'blogs' && canBlogs && (
         <MarketerBlogsManager
           ref={blogsManagerRef}
           locale={locale}
@@ -1186,7 +1088,7 @@ export default function MarketerDashboard({
         />
       )}
 
-      {((activeTab === 'pages' && canPages) || (activeTab === 'blogs' && canBlogs)) && (
+      {section === 'media' && (canPages || canBlogs) && (
         <section className={dashboardPanelClass}>
           <div className={`flex items-center gap-2 ${dashboardPanelHeaderClass}`}>
             <ImageIcon size={18} className="text-slate-600" />
@@ -1228,10 +1130,12 @@ export default function MarketerDashboard({
                     tabIndex={0}
                     className={`cursor-pointer text-left !p-2 transition hover:opacity-95 ${dashboardNestedCardClass}`}
                     onClick={() => {
-                      if (activeTab === 'pages' && canPages) {
-                        setPageForm((f) => ({ ...f, ogImage: img.url }));
-                      } else if (activeTab === 'blogs' && canBlogs) {
+                      if (canBlogs && !canPages) {
                         blogsManagerRef.current?.applyImageFromLibrary(img.url);
+                      } else if (canPages && !canBlogs) {
+                        setPageForm((f) => ({ ...f, ogImage: img.url }));
+                      } else {
+                        void copyImageUrl(img.url);
                       }
                     }}
                   >
@@ -1272,6 +1176,12 @@ export default function MarketerDashboard({
       )}
 
           </div>
+
+          {showMarketerAside ? (
+            <aside className="flex min-w-0 flex-col gap-6 lg:col-span-4 xl:col-span-3">
+              <CareersJobsPanel locale={locale} />
+            </aside>
+          ) : null}
         </div>
       </div>
     </div>

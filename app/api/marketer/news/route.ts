@@ -21,72 +21,18 @@ import { isNewsSlugUniqueViolation } from '@/lib/prisma-news-unique';
 import { scheduleBlogTranslationSync } from '@/lib/blog-translations-sync';
 import { normalizeStoredNewsSlug } from '@/lib/news-slug-normalize';
 
-/** List view: omit heavy HTML bodies so the dashboard can load many posts without huge JSON or OOM/timeouts. */
+/**
+ * Dashboard list only: smallest select + sector join (no translations, no SEO blobs, no author).
+ * Full rows load via GET /api/marketer/news/[slug] when opening the editor.
+ */
 const marketerNewsListSelect = {
   id: true,
   title: true,
   slug: true,
-  excerpt: true,
-  featuredImage: true,
-  featuredImageAlt: true,
-  bannerImage: true,
-  galleryImageUrls: true,
-  embeddedVideoUrl: true,
-  infographicUrls: true,
-  authorId: true,
-  authorDisplayName: true,
-  authorBio: true,
   sectorId: true,
   status: true,
-  publishedAt: true,
-  scheduledPublishAt: true,
-  metaTitle: true,
-  metaDescription: true,
-  keywords: true,
-  focusKeyword: true,
-  secondaryKeywords: true,
-  canonicalUrl: true,
-  breadcrumbTitle: true,
-  metaRobots: true,
-  categorySlugs: true,
-  tags: true,
-  subCategory: true,
-  contentType: true,
-  ogTitle: true,
-  ogDescription: true,
-  ogImage: true,
-  viewCount: true,
-  likeCount: true,
-  shareCount: true,
-  commentsEnabled: true,
-  readingTimeMinutes: true,
-  articleSchemaJson: true,
-  faqSchemaJson: true,
-  howToSchemaJson: true,
-  relatedPostSlugs: true,
-  pillarSlug: true,
-  outboundLinksJson: true,
-  createdAt: true,
   updatedAt: true,
-  author: { select: { id: true, email: true, name: true } },
   sector: { select: { id: true, name: true, slug: true } },
-  translations: {
-    select: {
-      id: true,
-      newsId: true,
-      locale: true,
-      title: true,
-      excerpt: true,
-      translatedSlug: true,
-      hreflangJson: true,
-      metaTitle: true,
-      metaDescription: true,
-      ogTitle: true,
-      ogDescription: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  },
 } satisfies Prisma.NewsSelect;
 
 function strOrNull(v: unknown): string | null {
@@ -122,19 +68,6 @@ async function resolveSectorIdOrError(raw: unknown): Promise<
   return { ok: true, sectorId };
 }
 
-async function resolveSectorIdFilter(raw: unknown): Promise<
-  { ok: true; sectorId: string | null } | { ok: false; status: number; message: string }
-> {
-  const sectorId = strOrNull(raw);
-  if (!sectorId) return { ok: true, sectorId: null };
-  const sector = await prisma.sector.findUnique({
-    where: { id: sectorId },
-    select: { id: true },
-  });
-  if (!sector) return { ok: false, status: 400, message: 'Invalid sectorId filter' };
-  return { ok: true, sectorId };
-}
-
 export async function GET(request: Request) {
   try {
     const session = await auth();
@@ -146,10 +79,7 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const status = strOrNull(url.searchParams.get('status'));
-    const sectorIdFilter = await resolveSectorIdFilter(url.searchParams.get('sectorId'));
-    if (!sectorIdFilter.ok) {
-      return NextResponse.json({ message: sectorIdFilter.message }, { status: sectorIdFilter.status });
-    }
+    const sectorIdFilter = strOrNull(url.searchParams.get('sectorId'));
 
     const blogs = await prisma.news.findMany({
       where: {
@@ -159,7 +89,7 @@ export async function GET(request: Request) {
         status === 'archived'
           ? { status: status as 'draft' | 'published' | 'scheduled' | 'archived' }
           : {}),
-        ...(sectorIdFilter.sectorId ? { sectorId: sectorIdFilter.sectorId } : {}),
+        ...(sectorIdFilter ? { sectorId: sectorIdFilter } : {}),
       },
       orderBy: [{ updatedAt: 'desc' }],
       select: marketerNewsListSelect,

@@ -191,6 +191,19 @@ function contentTypeFromApi(v: unknown): BlogContentTypeForm {
   return 'blog';
 }
 
+/** Omitted from marketer create/update JSON so PATCH does not null out columns the simplified UI no longer edits. */
+export function marketerBlogFormApiPayload(form: BlogFormState): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...form };
+  delete out.breadcrumbTitle;
+  delete out.canonicalUrl;
+  delete out.galleryImageUrls;
+  delete out.infographicUrls;
+  delete out.ogTitle;
+  delete out.ogImage;
+  delete out.ogDescription;
+  return out;
+}
+
 export function blogFromApiToForm(b: BlogListRow | null | undefined, sectorDefault: string): BlogFormState {
   if (!b) return emptyBlogForm({ sectorId: sectorDefault });
   return emptyBlogForm({

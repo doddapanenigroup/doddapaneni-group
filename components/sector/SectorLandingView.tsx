@@ -19,6 +19,7 @@ import {
 } from '@/lib/company-divisions';
 import SectorUnavailable from '@/components/sector/SectorUnavailable';
 import SectorFeaturedBrandsGrid from '@/components/sector/SectorFeaturedBrandsGrid';
+import NewsCardFeaturedThumb from '@/components/news/NewsCardFeaturedThumb';
 import { newsArticlePath } from '@/lib/news-paths';
 import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 import { listCompaniesBySectorSlug } from '@/lib/data/company-repository';
@@ -276,12 +277,10 @@ export default async function SectorLandingView({ locale, sectorSlug, page }: Pr
                       >
                         <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                           {imageSrc ? (
-                            <Image
+                            <NewsCardFeaturedThumb
                               src={imageSrc}
                               alt={post.title}
-                              fill
                               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                              className="object-cover"
                               loading="lazy"
                               fetchPriority="low"
                             />

@@ -120,9 +120,14 @@ export async function PATCH(
     await connectDb();
     const existing = await prisma.news.findUnique({
       where: { slug: currentSlug },
-      include: { sector: { select: { slug: true } } },
+      include: {
+        sector: { select: { slug: true } },
+        translations: { select: { content: true, excerpt: true } },
+      },
     });
     if (!existing) return NextResponse.json({ message: 'News article not found' }, { status: 404 });
+
+    const oldImageKeys = collectStoredImageKeysFromNews(existing);
 
     const data = newsPatchDataFromBody(body);
     if ('sectorId' in body) {
@@ -167,17 +172,21 @@ export async function PATCH(
       console.error(`[marketer/blog] patch translation patch failed newsId=${doc.id}`, e);
     }
 
-    let out = doc;
-    if (patches.length > 0) {
-      const finalDoc = await prisma.news.findUnique({
+    const out =
+      (await prisma.news.findUnique({
         where: { id: doc.id },
         include: {
           author: { select: { id: true, email: true, name: true } },
           sector: { select: { id: true, name: true, slug: true } },
           translations: true,
         },
-      });
-      out = finalDoc ?? doc;
+      })) ?? doc;
+
+    const newImageKeys = collectStoredImageKeysFromNews(out);
+    const newKeySet = new Set(newImageKeys);
+    const droppedImageKeys = oldImageKeys.filter((k) => !newKeySet.has(k));
+    if (droppedImageKeys.length) {
+      await deleteOrphanedStoredImagesForKeys(droppedImageKeys);
     }
 
     // Fire-and-forget translation sync so save returns quickly for the dashboard UI.

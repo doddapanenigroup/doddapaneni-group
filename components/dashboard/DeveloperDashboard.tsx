@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Code2, FileText, Globe, Mail, ExternalLink, BookOpen, Pencil, Languages, Users } from 'lucide-react';
 import EditContentModal from './EditContentModal';
-import MyActivityPanel from './MyActivityPanel';
 import type { Role } from '@/lib/constants';
 import { getDashboardTitle } from '@/lib/dashboard-title';
 import DeveloperErrorsPanel from './DeveloperErrorsPanel';
@@ -279,9 +278,6 @@ export default function DeveloperDashboard({
               <DeveloperEnvPanel />
               <DeveloperCachePanel />
               <DeveloperAuditPanel />
-              <div className="sm:col-span-2 xl:col-span-3">
-                <MyActivityPanel />
-              </div>
             </div>
           ) : null}
         </div>

@@ -40,6 +40,11 @@ export async function isFeatureEnabled(name: FeatureName): Promise<boolean> {
   return defaultEnabled(name);
 }
 
+/** Same as {@link isFeatureEnabled} without an async boundary — use on hot paths (e.g. preview shell TTFB). */
+export function isFeatureEnabledSync(name: FeatureName): boolean {
+  return defaultEnabled(name);
+}
+
 /**
  * When scheduling is disabled, forbid creating/updating with a future `scheduledPublishAt`.
  * Scheduling is enabled by default (no DB flag).

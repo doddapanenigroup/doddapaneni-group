@@ -6,6 +6,12 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import AutoLogoutOnUnauthenticated from '@/components/dashboard/AutoLogoutOnUnauthenticated';
 import { DashboardShortcutsProvider } from '@/components/dashboard/DashboardShortcutsProvider';
+import { DashboardSidebarBelowProvider } from '@/components/dashboard/DashboardSidebarBelowProvider';
+import { DashboardActivitySheetProvider } from '@/components/dashboard/DashboardActivitySheetProvider';
+import DashboardActivityModal from '@/components/dashboard/DashboardActivityModal';
+import DashboardActivityMobileBar from '@/components/dashboard/DashboardActivityMobileBar';
+import { MarketerNavProvider } from '@/components/dashboard/MarketerNavProvider';
+import MarketerSectionMobileBar from '@/components/dashboard/MarketerSectionMobileBar';
 
 export default function DashboardShell({
   user,
@@ -19,14 +25,23 @@ export default function DashboardShell({
   return (
     <DashboardThemeProvider>
       <DashboardShortcutsProvider>
-        <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
-          <AutoLogoutOnUnauthenticated locale={locale} />
-          <DashboardHeader user={user} locale={locale} />
-          <div className="mx-auto flex w-full max-w-[1600px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:gap-8 lg:px-8 xl:px-12">
-            <DashboardSidebar locale={locale} role={user.role} />
-            <main className="min-w-0 flex-1 pb-12 sm:pb-14 md:pb-16">{children}</main>
-          </div>
-        </div>
+        <DashboardActivitySheetProvider>
+          <MarketerNavProvider>
+            <DashboardSidebarBelowProvider>
+              <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+                <AutoLogoutOnUnauthenticated locale={locale} />
+                <DashboardHeader user={user} locale={locale} />
+                <DashboardActivityMobileBar role={user.role} />
+                <MarketerSectionMobileBar />
+                <div className="mx-auto flex w-full max-w-[1600px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:gap-8 lg:px-8 xl:px-12">
+                  <DashboardSidebar locale={locale} role={user.role} />
+                  <main className="min-w-0 flex-1 pb-12 sm:pb-14 md:pb-16">{children}</main>
+                </div>
+                <DashboardActivityModal />
+              </div>
+            </DashboardSidebarBelowProvider>
+          </MarketerNavProvider>
+        </DashboardActivitySheetProvider>
       </DashboardShortcutsProvider>
     </DashboardThemeProvider>
   );

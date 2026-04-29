@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { mediaUrl } from '@/lib/media';
 
 /** Only delete objects we uploaded to StoredImage (marketer uploads use `uploads/` prefix). */
 function isUploadsStorageKey(key: string): boolean {
@@ -81,23 +82,30 @@ export function collectStoredImageKeysFromNews(row: NewsForImageCleanup): string
   return [...set];
 }
 
+/** Public path as saved on News rows (relative). Avoid bare `key` in `contains` — substring false positives. */
+function canonicalMediaNeedleForKey(key: string): string {
+  return mediaUrl(key);
+}
+
 async function isMediaKeyStillReferenced(key: string): Promise<boolean> {
+  if (!isUploadsStorageKey(key)) return true;
+  const needle = canonicalMediaNeedleForKey(key);
   const [newsHits, trHits] = await Promise.all([
     prisma.news.count({
       where: {
         OR: [
-          { featuredImage: { contains: key } },
-          { bannerImage: { contains: key } },
-          { ogImage: { contains: key } },
-          { galleryImageUrls: { contains: key } },
-          { infographicUrls: { contains: key } },
-          { content: { contains: key } },
+          { featuredImage: { contains: needle } },
+          { bannerImage: { contains: needle } },
+          { ogImage: { contains: needle } },
+          { galleryImageUrls: { contains: needle } },
+          { infographicUrls: { contains: needle } },
+          { content: { contains: needle } },
         ],
       },
     }),
     prisma.newsTranslation.count({
       where: {
-        OR: [{ content: { contains: key } }, { excerpt: { contains: key } }],
+        OR: [{ content: { contains: needle } }, { excerpt: { contains: needle } }],
       },
     }),
   ]);

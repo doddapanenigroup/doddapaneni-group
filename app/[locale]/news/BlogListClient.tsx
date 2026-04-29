@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from '@/i18n/navigation';
-import Image from 'next/image';
+import NewsCardFeaturedThumb from '@/components/news/NewsCardFeaturedThumb';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import MotionLazy from '@/components/motion/MotionLazy';
@@ -47,19 +47,18 @@ export default function BlogListClient({ locale, blog, posts }: Props) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
+                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-200"
                 >
                   <Link href={post.href ?? `/news/${post.slug}`} locale={NEWS_PUBLIC_LINK_LOCALE}>
                     <div className="relative h-48 w-full shrink-0 overflow-hidden bg-slate-100">
                       {post.image ? (
-                        <Image
+                        <NewsCardFeaturedThumb
                           src={post.image}
                           alt={post.title}
-                          fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover"
                           loading="lazy"
                           fetchPriority="low"
+                          className="transition duration-300 group-hover:opacity-95"
                         />
                       ) : (
                         <div className="h-full w-full bg-slate-200" />

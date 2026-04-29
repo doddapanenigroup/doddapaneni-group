@@ -10,6 +10,7 @@ import {
   forwardRef,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import {
   BookOpen,
   Plus,
@@ -28,6 +29,7 @@ import { MarketerBlogFields, type MarketerBlogFieldsHandle } from '@/components/
 import {
   blogFromApiToForm,
   emptyBlogForm,
+  marketerBlogFormApiPayload,
   type BlogFormState,
   type BlogListRow,
 } from '@/lib/marketer-blog-form';
@@ -43,7 +45,13 @@ import {
   dashboardPanelClass,
   dashboardPanelHeaderClass,
 } from '@/lib/dashboard-ui';
-import { publicPathWithLocale } from '@/lib/public-path-with-locale';
+import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
+import {
+  BLOG_LIVE_PREVIEW_MSG_V,
+  blogLivePreviewChannelName,
+  normalizeBlogPreviewImage,
+  type BlogLivePreviewPayload,
+} from '@/lib/blog-live-preview';
 
 type SectorRow = { id: string; name: string; slug: string; description: string | null };
 
@@ -130,14 +138,30 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
   const [editingNewsSlug, setEditingNewsSlug] = useState<string | null>(null);
   const [blogForm, setBlogForm] = useState<BlogFormState>(() => emptyBlogForm());
   const blogFieldsRef = useRef<MarketerBlogFieldsHandle>(null);
+  const featuredImageUploadInFlight = useRef(false);
   const [uploading, setUploading] = useState(false);
-  const [previewLink, setPreviewLink] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [livePreviewChannelId, setLivePreviewChannelId] = useState<string | null>(null);
+  const livePreviewBcRef = useRef<BroadcastChannel | null>(null);
+  const didAutoSelectSectorRef = useRef(false);
   const [domReady, setDomReady] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setDomReady(true);
   }, []);
+
+  /** Warm the live preview route chunk so the new tab opens faster. */
+  useEffect(() => {
+    router.prefetch(publicPathForLocale(locale, '/preview/live'));
+  }, [locale, router]);
+
+  /** Default to the first sector once so the list loads immediately; user can still pick “Select sector…”. */
+  useEffect(() => {
+    if (sectorsLoading || sectors.length === 0) return;
+    if (didAutoSelectSectorRef.current) return;
+    didAutoSelectSectorRef.current = true;
+    setBlogSectorFilter((prev) => (prev.trim() === '' ? sectors[0].id : prev));
+  }, [sectorsLoading, sectors]);
 
   const blogListSectorSelected = blogSectorFilter.trim().length > 0;
 
@@ -235,25 +259,31 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [filteredBlogs]);
 
+  function cleanupLiveBlogPreview() {
+    livePreviewBcRef.current?.close();
+    livePreviewBcRef.current = null;
+    setLivePreviewChannelId(null);
+  }
+
   function closeBlogModal() {
+    cleanupLiveBlogPreview();
     setBlogModalOpen(false);
-    setPreviewLink(null);
     setEditingNewsSlug(null);
     setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
   }
 
   function openCreateBlogModal() {
+    cleanupLiveBlogPreview();
     setBlogModalMode('create');
     setEditingNewsSlug(null);
     setBlogForm(emptyBlogForm({ sectorId: blogSectorFilter }));
-    setPreviewLink(null);
     setBlogModalOpen(true);
   }
 
   async function openEditBlogModal(blog: BlogListRow) {
+    cleanupLiveBlogPreview();
     setBlogModalMode('edit');
     setEditingNewsSlug(blog.slug);
-    setPreviewLink(null);
     setBlogModalOpen(true);
     setBlogLoadingSlug(blog.slug);
     if (typeof blog.content === 'string') {
@@ -286,13 +316,60 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     }
   }
 
-  async function copyTextToClipboard(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      setBlogToast({ type: 'error', message: 'Copy failed.' });
-    }
+  function postLiveBlogPreviewPayload(bc: BroadcastChannel, form: BlogFormState) {
+    const raw = form.featuredImage?.trim() ?? '';
+    const featured = raw ? normalizeBlogPreviewImage(form.featuredImage) ?? raw : null;
+    const payload: BlogLivePreviewPayload = {
+      title: form.title,
+      content: form.content,
+      featuredImage: featured,
+      slug: form.slug.trim(),
+    };
+    bc.postMessage({ v: BLOG_LIVE_PREVIEW_MSG_V, payload });
   }
+
+  function openLiveBlogPreview() {
+    if (typeof window === 'undefined') return;
+    livePreviewBcRef.current?.close();
+    livePreviewBcRef.current = null;
+    setLivePreviewChannelId(null);
+
+    const ch =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+    const bc = new BroadcastChannel(blogLivePreviewChannelName(ch));
+    livePreviewBcRef.current = bc;
+    setLivePreviewChannelId(ch);
+
+    const path = publicPathForLocale(locale, `preview/live?ch=${encodeURIComponent(ch)}`);
+    const url = `${window.location.origin}${path}`;
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      bc.close();
+      livePreviewBcRef.current = null;
+      setLivePreviewChannelId(null);
+      setBlogToast({
+        type: 'error',
+        message: 'Pop-up blocked. Allow pop-ups for this site to open the live preview.',
+      });
+      return;
+    }
+    postLiveBlogPreviewPayload(bc, blogForm);
+    window.setTimeout(() => postLiveBlogPreviewPayload(bc, blogForm), 50);
+    window.setTimeout(() => postLiveBlogPreviewPayload(bc, blogForm), 400);
+  }
+
+  useEffect(() => {
+    if (!blogModalOpen || !livePreviewChannelId) return;
+    const bc = livePreviewBcRef.current;
+    if (!bc) return;
+    const id = window.setTimeout(() => {
+      postLiveBlogPreviewPayload(bc, blogForm);
+    }, 100);
+    return () => window.clearTimeout(id);
+  }, [blogForm, blogModalOpen, livePreviewChannelId]);
 
   async function createBlogPost(forceDraft = false) {
     if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim()) {
@@ -311,7 +388,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         ? blogFieldsRef.current.getTranslationPatches()
         : [];
     const body = {
-      ...blogForm,
+      ...marketerBlogFormApiPayload(blogForm),
       ...(forceDraft ? { status: 'draft' as const } : {}),
       translationPatches: patches,
     };
@@ -378,7 +455,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         ? blogFieldsRef.current.getTranslationPatches()
         : [];
     const payload: Record<string, unknown> = {
-      ...blogForm,
+      ...marketerBlogFormApiPayload(blogForm),
       ...(forceDraft ? { status: 'draft' as const } : {}),
       featuredImage: blogForm.featuredImage || null,
       translationPatches: patches,
@@ -502,45 +579,6 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     }
   }
 
-  async function createPreviewLinkForBlog() {
-    const slug = editingNewsSlug || blogForm.slug.trim();
-    if (!slug) {
-      setBlogToast({ type: 'error', message: 'Enter a slug or save the post before preview.' });
-      return;
-    }
-    setPreviewLoading(true);
-    setPreviewLink(null);
-    try {
-      const payload = JSON.stringify({ kind: 'blog', slug, locale });
-      let res = await fetch('/api/preview/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-      });
-      if (res.status === 404) {
-        // Backward-compatible alias for deployments that expose `/api/preview` only.
-        res = await fetch('/api/preview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payload,
-        });
-      }
-      const data = (await res.json().catch(() => ({}))) as { url?: string; message?: string };
-      if (!res.ok) {
-        setBlogToast({
-          type: 'error',
-          message: data?.message ?? `Failed to create preview link (${res.status}).`,
-        });
-        return;
-      }
-      if (data?.url) setPreviewLink(data.url);
-    } catch {
-      setBlogToast({ type: 'error', message: 'Failed to create preview link' });
-    } finally {
-      setPreviewLoading(false);
-    }
-  }
-
   function requestSaveFromShortcut() {
     if (!blogModalOpen) return;
     if (blogModalMode === 'create') void createBlogPost(false);
@@ -551,7 +589,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     requestSave: requestSaveFromShortcut,
     applyImageFromLibrary: (url: string) => {
       if (!blogModalOpen) return;
-      setBlogForm((f) => ({ ...f, featuredImage: url, ogImage: f.ogImage || url }));
+      setBlogForm((f) => ({ ...f, featuredImage: url }));
     },
   }));
 
@@ -583,11 +621,11 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
               <FeatureGate feature="previewSharing">
                 <button
                   type="button"
-                  onClick={() => void createPreviewLinkForBlog()}
-                  disabled={previewLoading || blogActionLoading !== null}
+                  onClick={() => openLiveBlogPreview()}
+                  disabled={blogActionLoading !== null}
                   className={`hidden disabled:opacity-50 sm:inline-flex ${dashboardHeaderActionSecondary} px-3 py-2 text-xs sm:text-sm`}
                 >
-                  {previewLoading ? 'Generating…' : 'Preview'}
+                  Preview
                 </button>
               </FeatureGate>
               <button
@@ -616,6 +654,8 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                   : null
               }
               onUploadFeatured={async (file: File) => {
+                if (featuredImageUploadInFlight.current) return;
+                featuredImageUploadInFlight.current = true;
                 setUploading(true);
                 try {
                   const form = new FormData();
@@ -642,24 +682,24 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     return;
                   }
                   const url = data.url ?? '';
-                  const nextOg = blogForm.ogImage?.trim() ? blogForm.ogImage.trim() : url;
                   setBlogForm((f) => ({
                     ...f,
                     featuredImage: url,
-                    ogImage: f.ogImage?.trim() ? f.ogImage : url,
                   }));
-                  setImages((prev) => [
-                    {
-                      id: data.id ?? `${Date.now()}`,
+                  setImages((prev) => {
+                    const row: StoredImageRow = {
+                      id: data.id ?? data.key ?? `${Date.now()}`,
                       key: data.key ?? '',
                       url,
                       fileName: data.fileName ?? null,
                       altText: data.altText ?? null,
                       size: data.size ?? null,
                       updatedAt: new Date().toISOString(),
-                    },
-                    ...prev,
-                  ]);
+                    };
+                    const k = row.key;
+                    if (!k) return [row, ...prev];
+                    return [row, ...prev.filter((x) => x.key !== k)];
+                  });
 
                   const slug = editingNewsSlug;
                   if (slug && url) {
@@ -672,7 +712,6 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         featuredImage: url,
-                        ogImage: nextOg,
                         translationPatches: patches,
                       }),
                     });
@@ -708,6 +747,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     });
                   }
                 } finally {
+                  featuredImageUploadInFlight.current = false;
                   setUploading(false);
                 }
               }}
@@ -732,7 +772,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                 title={blogForm.metaTitle || blogForm.title}
                 description={blogForm.metaDescription}
                 url={`${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
-                ogImage={blogForm.ogImage || blogForm.featuredImage}
+                ogImage={blogForm.featuredImage}
               />
               <BlogSeoScorePanel
                 title={blogForm.title}
@@ -742,48 +782,20 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                 keywords={blogForm.keywords}
                 focusKeyword={blogForm.focusKeyword}
                 content={blogForm.content}
-                ogImage={blogForm.ogImage || blogForm.featuredImage || null}
+                ogImage={blogForm.featuredImage || null}
               />
             </div>
             <FeatureGate feature="previewSharing">
               <div className="mt-4 flex flex-col gap-2 sm:hidden">
                 <button
                   type="button"
-                  onClick={() => void createPreviewLinkForBlog()}
-                  disabled={previewLoading || blogActionLoading !== null}
+                  onClick={() => openLiveBlogPreview()}
+                  disabled={blogActionLoading !== null}
                   className={`${dashboardHeaderActionSecondary} disabled:opacity-50`}
                 >
-                  {previewLoading ? 'Generating…' : 'Preview draft'}
+                  Preview in new tab
                 </button>
               </div>
-              {previewLink ? (
-                <div className={`mt-4 flex flex-wrap items-center justify-between gap-3 p-3 ${dashboardNestedCardClass}`}>
-                  <a
-                    href={previewLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-sm text-blue-700 hover:underline dark:text-blue-400"
-                  >
-                    {previewLink}
-                  </a>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void copyTextToClipboard(previewLink)}
-                      className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
-                    >
-                      Copy link
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewLink(null)}
-                      className={`py-1.5 text-xs ${dashboardHeaderActionSecondary}`}
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-              ) : null}
             </FeatureGate>
           </div>
 

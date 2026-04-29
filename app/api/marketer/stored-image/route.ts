@@ -121,9 +121,7 @@ export async function POST(req: Request) {
 
     const originalName = typeof file.name === 'string' ? file.name : 'image';
     const base = safeBaseName(path.basename(originalName, path.extname(originalName)));
-    const suffix = crypto.randomBytes(6).toString('hex');
-    const fileName = `${base}-${suffix}.webp`;
-    const storageKey = `uploads/${fileName}`;
+    const fileName = `${base}.webp`;
 
     const arrayBuffer = await file.arrayBuffer();
     const buf = Buffer.from(arrayBuffer);
@@ -144,6 +142,10 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+
+    /** One row per identical encoded bytes (re-uploads / double-submit reuse the same key). */
+    const hashHex = crypto.createHash('sha256').update(webp).digest('hex');
+    const storageKey = `uploads/h${hashHex}.webp`;
 
     const altText = strOrNull(form.get('altText'));
     const seoNote = strOrNull(form.get('seoNote'));

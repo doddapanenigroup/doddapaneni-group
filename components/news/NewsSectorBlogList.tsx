@@ -1,12 +1,12 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import { useTranslations } from '@/lib/dictionary-react';
 import MotionLazy from '@/components/motion/MotionLazy';
 import NewsSectorNewsNav from '@/components/news/NewsSectorNewsNav';
+import NewsCardFeaturedThumb from '@/components/news/NewsCardFeaturedThumb';
 import { newsArticlePath } from '@/lib/news-paths';
 import { NEWS_PUBLIC_LINK_LOCALE } from '@/lib/news-ui-locale';
 
@@ -73,17 +73,15 @@ export default function NewsSectorBlogList({
                     locale={NEWS_PUBLIC_LINK_LOCALE}
                     className="flex h-full flex-col"
                   >
-                    <div className="relative h-52 w-full shrink-0 overflow-hidden bg-blue-50">
+                    <div className="relative h-52 w-full shrink-0 overflow-hidden bg-slate-100">
                       {post.image ? (
-                        <Image
+                        <NewsCardFeaturedThumb
                           src={post.image}
                           alt={post.title}
-                          width={1200}
-                          height={600}
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                           loading="lazy"
                           fetchPriority="low"
+                          className="transition duration-300 group-hover:opacity-95"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-900 to-blue-800">
