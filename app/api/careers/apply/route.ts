@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import type { Transporter } from 'nodemailer';
+import type Mail from 'nodemailer/lib/mailer';
 import {
   createMailTransporter,
   getSmtpUser,
@@ -12,18 +14,16 @@ import { normalizeLanguagesKnownForJob, parseApplyLanguageCodesCsv } from '@/lib
 import { handleCorsOptions, withCors } from '@/lib/site-origin-cors';
 
 /**
- * Careers sends two SMTP messages (inbox + attachment, then applicant). On **DigitalOcean**
- * (Droplet + nginx, or DO load balancer), 504 usually means the **proxy** timed out before Node
- * finished — raise `proxy_read_timeout` / LB idle timeout (see `docs/nginx-doddapaneni-group.conf`).
- * `maxDuration` is enforced on Vercel-like hosts; on plain Node it mainly documents the target budget.
+ * HTTP handler finishes right after DB write; SMTP runs in the background so proxies (nginx on
+ * DigitalOcean) do not return 504 while Yahoo/Gmail accept large attachments.
  */
-export const maxDuration = 120;
+export const maxDuration = 60;
 
-/** Keep total SMTP time under `maxDuration` (two inbox retries + applicant mail). */
-const CAREERS_SMTP = {
-  connectionTimeoutMs: 14_000,
-  greetingTimeoutMs: 14_000,
-  socketTimeoutMs: 26_000,
+/** Used only for background `sendMail` — does not block the JSON response. */
+const CAREERS_SMTP_BACKGROUND = {
+  connectionTimeoutMs: 22_000,
+  greetingTimeoutMs: 22_000,
+  socketTimeoutMs: 55_000,
 } as const;
 
 function esc(s: string) {
@@ -32,15 +32,10 @@ function esc(s: string) {
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
-/** `next dev` only — never true on a normal production build (`next start` / Docker). */
 function isCareersDevRelaxed(): boolean {
   return process.env.NODE_ENV === 'development';
 }
 
-/**
- * Some providers (Yahoo, Gmail) drop or hide mail To: the same address you SMTP-auth as. A plus-alias
- * delivers to the same inbox with a different envelope recipient.
- */
 const SAME_MAILBOX_PLUS_ALIAS_DOMAINS = new Set([
   'yahoo.com',
   'yahoo.co.uk',
@@ -58,7 +53,6 @@ const SAME_MAILBOX_PLUS_ALIAS_DOMAINS = new Set([
   'googlemail.com',
 ]);
 
-/** When applications inbox === SMTP login on a supported domain, rewrite to local+tag@domain. */
 function careersAdminRecipientForSmtp(smtpFrom: string, notifyTo: string): string {
   const from = smtpFrom.trim().toLowerCase();
   const raw = notifyTo.trim();
@@ -93,7 +87,6 @@ function simpleEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
-/** Local testing only: save applications without SMTP. Never enable in production. */
 function isCareersApplyDevSkipEmail(): boolean {
   return (
     process.env.NODE_ENV === 'development' &&
@@ -112,6 +105,36 @@ function isLikelyDatabaseError(error: unknown): boolean {
     /PrismaClient(Initialization|KnownRequest|RustPanic)Error/.test(ctor) ||
     /Can't reach database server|P1001|P1000|P1017|P1013|Invalid.*prisma/i.test(blob)
   );
+}
+
+/**
+ * Admin inbox (resume attachment) first, then applicant confirmation — same order as before, but
+ * after the HTTP response so gateways do not time out.
+ */
+function scheduleCareersEmails(transporter: Transporter, adminMail: Mail.Options, userMail: Mail.Options) {
+  void (async () => {
+    let inboxOk = false;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await transporter.sendMail(adminMail);
+        inboxOk = true;
+        break;
+      } catch (e) {
+        console.error(
+          `[careers/apply] background inbox sendMail attempt ${attempt + 1} failed:`,
+          smtpFailureUserMessage(e),
+        );
+      }
+    }
+    if (!inboxOk) {
+      console.error('[careers/apply] background: admin/inbox email failed after retries (application is in DB).');
+    }
+    try {
+      await transporter.sendMail(userMail);
+    } catch (e) {
+      console.error('[careers/apply] background applicant confirmation failed:', smtpFailureUserMessage(e));
+    }
+  })();
 }
 
 export async function POST(request: Request) {
@@ -253,58 +276,6 @@ export async function POST(request: Request) {
     };
 
     const contentType = (attachment.contentType || 'application/octet-stream').trim().slice(0, 200);
-    const persistSubmission = () =>
-      prisma.companyFormSubmission.create({
-        data: {
-          formType: 'careers_apply',
-          companySlug: null,
-          sectorSlug: job.slug,
-          email,
-          fullName: name,
-          payloadJson: JSON.stringify(payload),
-          resumeData: resumeBuffer,
-          resumeContentType: contentType,
-          resumeDataPresent: true,
-        },
-      });
-
-    if (skipEmailDev) {
-      try {
-        await persistSubmission();
-      } catch (dbErr) {
-        console.error('[careers/apply] DB save failed', dbErr);
-        return jsonRes({ message: 'Could not save application.' }, { status: 500 });
-      }
-      console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
-      return jsonRes({ ok: true }, { status: 200 });
-    }
-
-    const fromAddr = getSmtpUser();
-    const transporter = createMailTransporter(CAREERS_SMTP);
-    if (!isLoginEmailDeliveryConfigured() || !transporter || !fromAddr) {
-      console.warn('[careers/apply] Outbound email not configured or transport unavailable.');
-      if (isCareersDevRelaxed()) {
-        console.warn(
-          '[careers/apply] DEV only: saving application without email (set EMAIL_USER + EMAIL_PASS + SMTP_* to test SMTP).',
-        );
-        try {
-          await persistSubmission();
-        } catch (dbErr) {
-          console.error('[careers/apply] DB save failed', dbErr);
-          return jsonRes({ message: 'Could not save application.' }, { status: 500 });
-        }
-        return jsonRes({ ok: true }, { status: 200 });
-      }
-      return jsonRes(
-        {
-          ok: false,
-          code: 'MAIL_NOT_CONFIGURED',
-          message:
-            'Online applications are temporarily unavailable. Please try again later or reach out to us directly.',
-        },
-        { status: 503 },
-      );
-    }
 
     const row = (label: string, val: string) =>
       `<tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;width:160px;font-weight:600;color:#555;">${esc(label)}</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;white-space:pre-wrap;">${esc(val)}</td></tr>`;
@@ -331,33 +302,70 @@ export async function POST(request: Request) {
         ${row('Resume file', safeResumeName)}
       </table>`;
 
-    const userMailOptions = {
-      from: `"Doddapaneni Group" <${fromAddr}>`,
-      to: email,
-      replyTo: fromAddr,
-      subject: `We received your application — ${jobTitle}`,
-      text: `Hello ${name},\n\nThank you for applying. We received your details and resume (${safeResumeName}) for: ${jobTitle}.\n\nOur team will review your application and contact you if there is a match.\n\nBest regards,\nDoddapaneni Group`,
-      html: `
-        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;color:#333;line-height:1.6;">
-          <h2 style="color:#1e3a8a;border-bottom:2px solid #eee;padding-bottom:10px;">Application received</h2>
-          <p>Hello <strong>${esc(name)}</strong>,</p>
-          <p>Thank you for applying for <strong>${esc(jobTitle)}</strong>. We received your form and resume <strong>${esc(safeResumeName)}</strong>.</p>
-          <p>Our team will review your application and reach out if there is a good fit.</p>
-          <div style="border-top:1px solid #eee;padding-top:16px;margin-top:20px;font-size:14px;color:#666;">
-            <p style="margin:0;">Best regards,</p>
-            <p style="margin:6px 0 0;font-weight:bold;color:#1e3a8a;">Doddapaneni Group</p>
-          </div>
-        </div>`,
-    };
+    if (skipEmailDev) {
+      try {
+        await prisma.companyFormSubmission.create({
+          data: {
+            formType: 'careers_apply',
+            companySlug: null,
+            sectorSlug: job.slug,
+            email,
+            fullName: name,
+            payloadJson: JSON.stringify(payload),
+            resumeData: resumeBuffer,
+            resumeContentType: contentType,
+            resumeDataPresent: true,
+          },
+        });
+      } catch (dbErr) {
+        console.error('[careers/apply] DB save failed', dbErr);
+        return jsonRes({ message: 'Could not save application.' }, { status: 500 });
+      }
+      console.warn('[careers/apply] CAREERS_APPLY_DEV_NO_EMAIL: saved application without sending email.');
+      return jsonRes({ ok: true }, { status: 200 });
+    }
 
-    /** Inbox for applications + resume. Defaults to EMAIL_USER; override with CAREERS_ADMIN_NOTIFY_EMAIL (e.g. Gmail). */
+    const fromAddr = getSmtpUser();
+    const transporter = createMailTransporter(CAREERS_SMTP_BACKGROUND);
+    const mailOk = isLoginEmailDeliveryConfigured() && transporter != null && !!fromAddr;
+
+    try {
+      await prisma.companyFormSubmission.create({
+        data: {
+          formType: 'careers_apply',
+          companySlug: null,
+          sectorSlug: job.slug,
+          email,
+          fullName: name,
+          payloadJson: JSON.stringify(payload),
+          resumeData: resumeBuffer,
+          resumeContentType: contentType,
+          resumeDataPresent: true,
+        },
+      });
+    } catch (dbErr) {
+      console.error('[careers/apply] DB save failed', dbErr);
+      return jsonRes({ message: 'Could not save application.' }, { status: 500 });
+    }
+
+    if (!mailOk) {
+      if (isCareersDevRelaxed()) {
+        console.warn(
+          '[careers/apply] DEV: no SMTP; application saved only. Set EMAIL_USER + EMAIL_PASS + SMTP_* to send mail.',
+        );
+      } else {
+        console.warn('[careers/apply] SMTP not configured; application saved — HR can see it in the dashboard.');
+      }
+      return jsonRes({ ok: true }, { status: 200 });
+    }
+
     const notifyToRaw = process.env.CAREERS_ADMIN_NOTIFY_EMAIL?.trim() || fromAddr;
-    const notifyTo = careersAdminRecipientForSmtp(fromAddr, notifyToRaw);
+    const notifyTo = careersAdminRecipientForSmtp(fromAddr!, notifyToRaw);
     if (notifyTo !== notifyToRaw) {
       console.warn(`[careers/apply] Using plus-alias for applications inbox (${notifyToRaw} → ${notifyTo}).`);
     }
 
-    const adminMailOptions = {
+    const adminMail: Mail.Options = {
       from: `"DG Careers" <${fromAddr}>`,
       to: notifyTo,
       replyTo: email,
@@ -373,57 +381,26 @@ export async function POST(request: Request) {
         </div>`,
     };
 
-    /** Inbox first (with resume), then persist, then applicant confirmation — avoids Yahoo dropping the second self-addressed message. */
-    let lastInboxErr: unknown;
-    let inboxDelivered = false;
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await transporter.sendMail(adminMailOptions);
-        inboxDelivered = true;
-        break;
-      } catch (e) {
-        lastInboxErr = e;
-        console.error(`[careers/apply] inbox sendMail attempt ${attempt + 1} failed:`, smtpFailureUserMessage(e));
-      }
-    }
+    const userMail: Mail.Options = {
+      from: `"Doddapaneni Group" <${fromAddr}>`,
+      to: email,
+      replyTo: fromAddr!,
+      subject: `We received your application — ${jobTitle}`,
+      text: `Hello ${name},\n\nThank you for applying. We received your details and resume (${safeResumeName}) for: ${jobTitle}.\n\nOur team will review your application and contact you if there is a match.\n\nBest regards,\nDoddapaneni Group`,
+      html: `
+        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;color:#333;line-height:1.6;">
+          <h2 style="color:#1e3a8a;border-bottom:2px solid #eee;padding-bottom:10px;">Application received</h2>
+          <p>Hello <strong>${esc(name)}</strong>,</p>
+          <p>Thank you for applying for <strong>${esc(jobTitle)}</strong>. We received your form and resume <strong>${esc(safeResumeName)}</strong>.</p>
+          <p>Our team will review your application and reach out if there is a good fit.</p>
+          <div style="border-top:1px solid #eee;padding-top:16px;margin-top:20px;font-size:14px;color:#666;">
+            <p style="margin:0;">Best regards,</p>
+            <p style="margin:6px 0 0;font-weight:bold;color:#1e3a8a;">Doddapaneni Group</p>
+          </div>
+        </div>`,
+    };
 
-    if (!inboxDelivered) {
-      console.error('[careers/apply] inbox delivery failed after retries:', smtpFailureUserMessage(lastInboxErr));
-      /** Local dev: bad or blocked SMTP is common; still persist so forms can be tested without a working inbox. */
-      if (isCareersDevRelaxed()) {
-        console.warn(
-          '[careers/apply] DEV: inbox SMTP failed after retries; saving application without email. Fix EMAIL_*/SMTP_* or set CAREERS_APPLY_DEV_NO_EMAIL=1 to skip sending intentionally.',
-        );
-        try {
-          await persistSubmission();
-        } catch (dbErr) {
-          console.error('[careers/apply] DB save failed after SMTP failure', dbErr);
-          return jsonRes({ message: 'Could not save application.' }, { status: 500 });
-        }
-        return jsonRes({ ok: true }, { status: 200 });
-      }
-      return jsonRes(
-        {
-          ok: false,
-          code: 'INBOX_DELIVERY_FAILED',
-          message:
-            'We could not complete your submission at this time. Please try again in a few minutes, or contact us if you need assistance.',
-        },
-        { status: 503 },
-      );
-    }
-
-    try {
-      await persistSubmission();
-    } catch (dbErr) {
-      console.error('[careers/apply] DB save failed after inbox mail succeeded', dbErr);
-    }
-
-    try {
-      await transporter.sendMail(userMailOptions);
-    } catch (e) {
-      console.error('[careers/apply] applicant confirmation sendMail failed (inbox already received application):', smtpFailureUserMessage(e));
-    }
+    scheduleCareersEmails(transporter, adminMail, userMail);
 
     return jsonRes({ ok: true }, { status: 200 });
   } catch (error) {
