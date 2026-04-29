@@ -17,6 +17,6 @@ export function getSiteOrigin(): string {
     }
   }
 
-  /** Public default; override with `NEXT_PUBLIC_SITE_URL` / `SITE_URL` (www vs apex). */
-  return 'https://www.doddapanenigroup.net';
+  /** Public default (apex); override with `NEXT_PUBLIC_SITE_URL` / `SITE_URL`. */
+  return 'https://doddapanenigroup.net';
 }
