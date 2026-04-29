@@ -87,7 +87,11 @@ export default function DashboardHeader({
               } catch {
                 // ignore
               }
-              await signOut({ callbackUrl: publicPathForLocale(locale, '/login') });
+              const loginPath = publicPathForLocale(locale, '/login');
+              // Do not rely on signOut's default redirect: Auth.js may return `data.url`
+              // built from NEXTAUTH_URL/AUTH_URL, which is often still localhost in prod.
+              await signOut({ redirect: false, callbackUrl: loginPath });
+              window.location.assign(`${window.location.origin}${loginPath}`);
             }}
             className={dashboardIconButtonClass}
             title="Sign out"
