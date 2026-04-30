@@ -42,10 +42,12 @@ function toDeviceLabel(ua: string | null) {
 type Props = {
   /** Narrow dashboard sidebar (`w-64`): tighter typography and scroll areas. */
   variant?: 'default' | 'sidebar';
+  /** Show only one list (default: both). */
+  view?: 'both' | 'sessions' | 'logins';
 };
 
 /** Active sessions + recent logins (admin APIs). */
-export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props) {
+export default function AdminSessionsLoginsColumn({ variant = 'default', view = 'both' }: Props) {
   const side = variant === 'sidebar';
   const [data, setData] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -117,8 +119,12 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
   const iconAct = side ? 15 : 20;
   const iconLog = side ? 15 : 20;
 
+  const showSessions = view === 'both' || view === 'sessions';
+  const showLogins = view === 'both' || view === 'logins';
+
   return (
     <div className={gap}>
+      {showSessions ? (
       <section className={card}>
         <h2 className={head}>
           <Activity size={iconAct} className="shrink-0 text-slate-600" />
@@ -193,7 +199,9 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
           </ul>
         )}
       </section>
+      ) : null}
 
+      {showLogins ? (
       <section className={card}>
         <h2 className={head}>
           <LogIn size={iconLog} className="shrink-0 text-slate-600" />
@@ -234,6 +242,7 @@ export default function AdminSessionsLoginsColumn({ variant = 'default' }: Props
           </ul>
         )}
       </section>
+      ) : null}
     </div>
   );
 }

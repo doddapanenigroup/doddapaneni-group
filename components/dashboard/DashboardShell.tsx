@@ -12,6 +12,8 @@ import DashboardActivityModal from '@/components/dashboard/DashboardActivityModa
 import DashboardActivityMobileBar from '@/components/dashboard/DashboardActivityMobileBar';
 import { MarketerNavProvider } from '@/components/dashboard/MarketerNavProvider';
 import MarketerSectionMobileBar from '@/components/dashboard/MarketerSectionMobileBar';
+import { AdminNavProvider } from '@/components/dashboard/AdminNavProvider';
+import AdminSectionMobileBar from '@/components/dashboard/AdminSectionMobileBar';
 
 export default function DashboardShell({
   user,
@@ -26,21 +28,24 @@ export default function DashboardShell({
     <DashboardThemeProvider>
       <DashboardShortcutsProvider>
         <DashboardActivitySheetProvider>
-          <MarketerNavProvider>
-            <DashboardSidebarBelowProvider>
-              <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
-                <AutoLogoutOnUnauthenticated locale={locale} />
-                <DashboardHeader user={user} locale={locale} />
-                <DashboardActivityMobileBar role={user.role} />
-                <MarketerSectionMobileBar />
-                <div className="mx-auto flex w-full max-w-[1600px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:gap-8 lg:px-8 xl:px-12">
-                  <DashboardSidebar locale={locale} role={user.role} />
-                  <main className="min-w-0 flex-1 pb-12 sm:pb-14 md:pb-16">{children}</main>
+          <AdminNavProvider>
+            <MarketerNavProvider>
+              <DashboardSidebarBelowProvider>
+                <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+                  <AutoLogoutOnUnauthenticated locale={locale} />
+                  <DashboardHeader user={user} locale={locale} />
+                  <DashboardActivityMobileBar role={user.role} />
+                  <AdminSectionMobileBar role={user.role} />
+                  <MarketerSectionMobileBar />
+                  <div className="mx-auto flex w-full max-w-[1600px] items-start gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:gap-8 lg:px-8 xl:px-12">
+                    <DashboardSidebar locale={locale} role={user.role} />
+                    <main className="min-w-0 flex-1 pb-12 sm:pb-14 md:pb-16">{children}</main>
+                  </div>
+                  <DashboardActivityModal />
                 </div>
-                <DashboardActivityModal />
-              </div>
-            </DashboardSidebarBelowProvider>
-          </MarketerNavProvider>
+              </DashboardSidebarBelowProvider>
+            </MarketerNavProvider>
+          </AdminNavProvider>
         </DashboardActivitySheetProvider>
       </DashboardShortcutsProvider>
     </DashboardThemeProvider>

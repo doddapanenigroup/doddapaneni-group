@@ -2,20 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { UserCog, UserCircle, Pencil, Contact, Briefcase } from 'lucide-react';
 import type { Role } from '@/lib/constants';
 import { getRoleOrder } from '@/lib/constants';
 import ManageEmployeesModal from './ManageEmployeesModal';
-import AdminOpsInsights from './AdminOpsInsights';
 import AdminSessionsLoginsColumn from './AdminSessionsLoginsColumn';
 import SectorStatusPanel from './SectorStatusPanel';
 import CompaniesAdminPanel from './CompaniesAdminPanel';
 import CareersJobsPanel from './CareersJobsPanel';
+import { useAdminNav } from './AdminNavProvider';
+import { isAdminMainSection } from '@/lib/admin-dashboard-nav';
 import {
   dashboardHeaderActionPrimary,
   dashboardHeaderActionSecondary,
+  dashboardHeroClass,
   dashboardMainMaxClass,
+  dashboardPanelHeaderClass,
   dashboardStageClass,
   dashboardToolbarStripClass,
 } from '@/lib/dashboard-ui';
@@ -35,6 +38,24 @@ type UserRow = {
 
 const EMPLOYEE_ROLES: Role[] = ['ADMIN', 'DEVELOPER', 'DIGITAL_MARKETER', 'HR'];
 
+function AdminOverviewPanel() {
+  return (
+    <div className={dashboardHeroClass}>
+      <div className={dashboardPanelHeaderClass}>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Admin overview</h2>
+      </div>
+      <div className="space-y-3 px-5 py-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+        <p>
+          Manage internal accounts from the toolbar above, and use{' '}
+          <span className="font-medium text-slate-700 dark:text-slate-300">Navigate</span> in the sidebar for
+          careers, sector visibility, companies, and session tools. Developer and marketer activity logs have
+          their own pages (50 entries per page with pagination).
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard({
   users: initialUsers,
   locale,
@@ -45,6 +66,8 @@ export default function AdminDashboard({
   currentUserId: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { section, setSection } = useAdminNav();
   const [users, setUsers] = useState(initialUsers);
   const [showManageModal, setShowManageModal] = useState(false);
   const [manageModalLoading, setManageModalLoading] = useState(false);
@@ -57,6 +80,15 @@ export default function AdminDashboard({
     if (showManageModal) return;
     setUsers(initialUsers);
   }, [initialUsers, showManageModal]);
+
+  useEffect(() => {
+    const raw = searchParams.get('section');
+    if (raw && isAdminMainSection(raw)) {
+      setSection(raw);
+    } else if (!raw) {
+      setSection('overview');
+    }
+  }, [searchParams, setSection]);
 
   async function openManageEmployeesModal() {
     setManageModalLoading(true);
@@ -114,6 +146,29 @@ export default function AdminDashboard({
     if (!res.ok) throw new Error(json.message ?? 'Failed to update password');
   }
 
+  let main: React.ReactNode;
+  switch (section) {
+    case 'careers':
+      main = <CareersJobsPanel locale={locale} />;
+      break;
+    case 'sector':
+      main = <SectorStatusPanel />;
+      break;
+    case 'companies':
+      main = <CompaniesAdminPanel />;
+      break;
+    case 'active-sessions':
+      main = <AdminSessionsLoginsColumn view="sessions" />;
+      break;
+    case 'recent-logins':
+      main = <AdminSessionsLoginsColumn view="logins" />;
+      break;
+    case 'overview':
+    default:
+      main = <AdminOverviewPanel />;
+      break;
+  }
+
   return (
     <div className={`${dashboardMainMaxClass} space-y-6`}>
       <div className={`${dashboardToolbarStripClass} justify-end xl:sticky xl:top-[4.5rem] xl:z-10`}>
@@ -161,26 +216,7 @@ export default function AdminDashboard({
         />
       )}
 
-      <div className="space-y-6 xl:hidden">
-        <AdminSessionsLoginsColumn />
-      </div>
-
-      <div className={dashboardStageClass}>
-        <div className="grid gap-6 lg:gap-8 xl:grid-cols-12 xl:items-start">
-          <div className="flex min-w-0 flex-col gap-6 xl:col-span-7 2xl:col-span-8">
-            <CareersJobsPanel locale={locale} />
-          </div>
-          <div className="flex min-w-0 flex-col gap-6 xl:col-span-5 2xl:col-span-4">
-            <SectorStatusPanel />
-          </div>
-          <div className="min-w-0 xl:col-span-12">
-            <AdminOpsInsights />
-          </div>
-          <div className="min-w-0 xl:col-span-12">
-            <CompaniesAdminPanel />
-          </div>
-        </div>
-      </div>
+      <div className={dashboardStageClass}>{main}</div>
     </div>
   );
 }

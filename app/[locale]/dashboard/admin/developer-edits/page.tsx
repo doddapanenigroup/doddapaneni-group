@@ -4,23 +4,20 @@ import { redirect } from 'next/navigation';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import type { Role } from '@/lib/constants';
 import { canAccessAdminDashboard } from '@/lib/dashboard-access';
-import AdminDashboard from '@/components/dashboard/AdminDashboard';
-import { loadAdminDashboardUserRows } from '@/lib/admin-dashboard-users';
+import AdminActivityLogsPage from '@/components/dashboard/AdminActivityLogsPage';
 
 type Props = { params: Promise<{ locale: string }> };
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function AdminDashboardPage({ params }: Props) {
+export default async function AdminDeveloperEditsPage({ params }: Props) {
   const session = await auth();
   const { locale } = await params;
 
   if (!session?.user || !canAccessAdminDashboard(session.user.role as Role | null | undefined)) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
-
-  const users = await loadAdminDashboardUserRows();
 
   return (
     <Suspense
@@ -30,7 +27,7 @@ export default async function AdminDashboardPage({ params }: Props) {
         </div>
       }
     >
-      <AdminDashboard users={users} locale={locale} currentUserId={session.user.id} />
+      <AdminActivityLogsPage locale={locale} kind="content-edits" />
     </Suspense>
   );
 }

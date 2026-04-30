@@ -21,9 +21,10 @@ import {
   hasMarketerAccess,
   isMarketer,
 } from '@/lib/role-utils';
+import { useAdminNavOptional } from '@/components/dashboard/AdminNavProvider';
+import { buildAdminRoleDashboardLinks, buildAdminSidebarPrimary } from '@/lib/admin-sidebar-categories';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import { dashboardPanelClass, dashboardPanelHeaderClass } from '@/lib/dashboard-ui';
-import AdminSessionsLoginsColumn from '@/components/dashboard/AdminSessionsLoginsColumn';
 import { DashboardSidebarBelowSlot } from '@/components/dashboard/DashboardSidebarBelowProvider';
 import { useDashboardActivitySheetOptional } from '@/components/dashboard/DashboardActivitySheetProvider';
 import { useMarketerNavOptional } from '@/components/dashboard/MarketerNavProvider';
@@ -72,11 +73,20 @@ export default function DashboardSidebar({
   role: Role;
 }) {
   const pathname = usePathname();
-  const items = dashboardItems(locale).filter((item) => item.roles.includes(role));
   const adminBaseHref = publicPathForLocale(locale, '/dashboard/admin');
-  const onAdminSection =
-    pathname === adminBaseHref || pathname.startsWith(`${adminBaseHref}/`);
-  const showAdminSessionsInSidebar = hasAdminAccess(role) && onAdminSection;
+  /** Admins open Developer / Marketer / HR only via Workspaces (avoid duplicate top-row dashboard links). */
+  const items = dashboardItems(locale)
+    .filter((item) => item.roles.includes(role))
+    .filter((item) => {
+      if (role !== 'ADMIN') return true;
+      return item.href === adminBaseHref;
+    });
+  const onAdminMainDashboard = pathname === adminBaseHref;
+  const adminNav = useAdminNavOptional();
+  const showAdminSectionNav =
+    hasAdminAccess(role) &&
+    adminNav != null &&
+    (pathname === adminBaseHref || pathname.startsWith(`${adminBaseHref}/`));
   const activitySheet = useDashboardActivitySheetOptional();
   const showRecentActivity =
     activitySheet != null && (hasDeveloperAccess(role) || isMarketer(role));
@@ -97,13 +107,20 @@ export default function DashboardSidebar({
     ].join(' ');
   }
 
+  function adminNavBtnClass(active: boolean) {
+    return marketerNavBtnClass(active);
+  }
+
+  const adminPrimaryItems = showAdminSectionNav ? buildAdminSidebarPrimary(locale) : [];
+  const adminRoleLinks = showAdminSectionNav ? buildAdminRoleDashboardLinks(locale) : [];
+
   return (
     <aside className="hidden w-[15.5rem] shrink-0 xl:block">
       <div className="sticky top-[76px] flex max-h-[calc(100vh-5.25rem)] min-h-0 flex-col gap-4 overflow-y-auto [scrollbar-width:thin] pr-0.5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:w-1.5">
         <div className={`shrink-0 ${dashboardPanelClass}`}>
           <div className={`px-4 py-3 ${dashboardPanelHeaderClass}`}>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Navigate
+              {showAdminSectionNav ? 'Admin dashboard' : 'Navigate'}
             </p>
           </div>
           <nav className="space-y-1 p-2.5">
@@ -133,6 +150,67 @@ export default function DashboardSidebar({
               <LayoutDashboard size={16} className="shrink-0 opacity-80" />
               Dashboard home
             </Link>
+            {showAdminSectionNav ? (
+              <>
+                <div
+                  className="mx-2 my-2 border-t border-slate-200 dark:border-slate-700"
+                  role="separator"
+                  aria-hidden
+                />
+                {adminPrimaryItems.map((row) => {
+                  if (row.type === 'link') {
+                    const active = pathname === row.path;
+                    const Icon = row.Icon;
+                    return (
+                      <Link
+                        key={`${row.path}-${row.label}`}
+                        href={row.path}
+                        title={row.label}
+                        className={adminNavBtnClass(active)}
+                      >
+                        <Icon size={16} className={`shrink-0 ${active ? 'text-white' : 'opacity-80'}`} aria-hidden />
+                        <span className="break-words text-left leading-snug">{row.label}</span>
+                      </Link>
+                    );
+                  }
+                  const sectionHref =
+                    row.sectionId === 'overview'
+                      ? adminBaseHref
+                      : `${adminBaseHref}?section=${row.sectionId}`;
+                  const active = onAdminMainDashboard && adminNav!.section === row.sectionId;
+                  const Icon = row.Icon;
+                  return (
+                    <Link
+                      key={row.sectionId}
+                      href={sectionHref}
+                      title={row.label}
+                      className={adminNavBtnClass(active)}
+                    >
+                      <Icon size={16} className={`shrink-0 ${active ? 'text-white' : 'opacity-80'}`} aria-hidden />
+                      <span className="break-words text-left leading-snug">{row.label}</span>
+                    </Link>
+                  );
+                })}
+                <p className="px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 uppercase">
+                  Workspaces
+                </p>
+                {adminRoleLinks.map((item) => {
+                  const Icon = item.Icon;
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={`workspaces-${item.href}`}
+                      href={item.href}
+                      className={adminNavBtnClass(active)}
+                      title={item.label}
+                    >
+                      <Icon size={16} className={`shrink-0 ${active ? 'text-white' : 'opacity-80'}`} aria-hidden />
+                      <span className="break-words text-left leading-snug">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            ) : null}
             {showMarketerSectionNav && marketerNav.caps.canBlogs ? (
               <button
                 type="button"
@@ -186,11 +264,6 @@ export default function DashboardSidebar({
           </nav>
         </div>
         <DashboardSidebarBelowSlot />
-        {showAdminSessionsInSidebar ? (
-          <div className="min-h-0 flex-1 overflow-y-auto pr-0.5 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5">
-            <AdminSessionsLoginsColumn variant="sidebar" />
-          </div>
-        ) : null}
       </div>
     </aside>
   );

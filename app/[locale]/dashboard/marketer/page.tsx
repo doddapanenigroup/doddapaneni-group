@@ -17,17 +17,10 @@ export default async function MarketerDashboardPage({ params }: Props) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
-  // Overlay module permission: if both pages+blogs are denied, block the dashboard.
-  const modulePagesAllowed = await isModuleAllowedForRole(role as any, 'pages');
-  const moduleBlogsAllowed = await isModuleAllowedForRole(role as any, 'blogs');
-  /** Digital marketers use blogs + media only; pages stay on admin/developer. */
-  const canPages = role === 'DIGITAL_MARKETER' ? false : modulePagesAllowed;
-  const canBlogs = moduleBlogsAllowed;
-  if (!canPages && !canBlogs) {
+  const moduleBlogsAllowed = await isModuleAllowedForRole(role as Role, 'blogs');
+  if (!moduleBlogsAllowed) {
     redirect(publicPathForLocale(locale, '/dashboard'));
   }
 
-  return (
-    <MarketerDashboard locale={locale} viewerRole={role as Role} canPages={canPages} canBlogs={canBlogs} />
-  );
+  return <MarketerDashboard locale={locale} canBlogs />;
 }
