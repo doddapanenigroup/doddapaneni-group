@@ -49,17 +49,17 @@ export default function BlogPostClient({
   const articleBody = (
     <>
       {image ? (
-        <section className="w-full bg-white">
-          {/* Intrinsic height + object-contain: full image visible (no edge crop). Optional bands match page background (white). */}
-          <div className="mx-auto w-full max-w-6xl bg-white px-3 py-3 sm:px-5 sm:py-4 lg:px-8">
+        <section className="w-full min-w-0 bg-white">
+          {/* Match article column width so hero aligns with body on desktop + sidebar layouts. */}
+          <div className="mx-auto w-full max-w-4xl bg-white px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
             <Image
               src={image}
               alt={title}
               width={1920}
               height={1080}
-              sizes="(max-width: 1024px) 100vw, min(100vw, 1152px)"
+              sizes="(max-width: 1024px) 100vw, 896px"
               style={{ height: 'auto', width: '100%' }}
-              className="mx-auto block max-h-[min(85vh,920px)] w-full object-contain object-center"
+              className="mx-auto block max-h-[min(80vh,880px)] w-full rounded-lg object-contain object-center sm:max-h-[min(85vh,920px)]"
               loading="eager"
               fetchPriority="high"
             />
@@ -67,7 +67,7 @@ export default function BlogPostClient({
         </section>
       ) : null}
 
-      <section className="bg-white px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+      <section className="bg-white px-4 py-10 sm:px-6 md:py-16 lg:px-8">
         <article className="mx-auto max-w-4xl">
           <div
             className="prose prose-lg max-w-none text-blue-950 prose-headings:text-blue-950 prose-headings:font-bold prose-p:text-blue-900/90 prose-a:font-semibold prose-a:text-blue-900 prose-a:no-underline hover:prose-a:underline prose-strong:text-blue-950 prose-li:text-blue-900/90"
@@ -96,7 +96,7 @@ export default function BlogPostClient({
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen min-w-0 bg-white">
       <section className="bg-blue-900 px-4 pt-20 pb-5 sm:px-6 sm:pt-20 sm:pb-6 md:pt-20 md:pb-7 lg:pb-8">
         <div className="mx-auto max-w-4xl">
           <Link
@@ -137,16 +137,16 @@ export default function BlogPostClient({
       </section>
 
       {sectorNavSlug ? (
-        <div className="mt-6 border-t border-blue-100/80 px-5 pb-16 sm:mt-8 sm:px-8 lg:px-0">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8">
-            <aside className="order-2 shrink-0 lg:order-1 lg:sticky lg:top-20 lg:w-72 lg:shrink-0 lg:pl-12 lg:pr-0 xl:pl-16">
+        <div className="mt-6 border-t border-blue-100/80 pb-14 sm:mt-8 sm:pb-16">
+          <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:items-start lg:gap-8 xl:gap-10 lg:px-8">
+            <aside className="order-2 w-full min-w-0 max-w-full shrink-0 lg:order-1 lg:sticky lg:top-20 lg:w-72 lg:max-w-[18rem]">
               <NewsSectorNewsNav
                 locale={locale}
                 currentSlug={sectorNavSlug}
                 initialSectorLiveMap={initialSectorLiveMap}
               />
             </aside>
-            <div className="order-1 min-w-0 lg:order-2 lg:flex-1 lg:pr-12 xl:pr-16">{articleBody}</div>
+            <div className="order-1 min-w-0 w-full flex-1 lg:order-2">{articleBody}</div>
           </div>
         </div>
       ) : (

@@ -1,10 +1,11 @@
 'use client';
 
-import { useImperativeHandle, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef, useEffect, useRef } from 'react';
 import type { TranslationPatch } from '@/lib/marketer-news-fields';
 import type { BlogFormState, BlogListRow } from '@/lib/marketer-blog-form';
 import { BlogRichContentField } from '@/components/dashboard/BlogRichContentField';
 import { dashboardInputClass, dashboardNestedCardClass } from '@/lib/dashboard-ui';
+import { slugifyFromArticleTitle, slugifyPastedForUrlField } from '@/lib/news-slug-normalize';
 
 type SectorOption = { id: string; name: string; slug: string };
 
@@ -49,6 +50,13 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
   }: Props,
   ref,
 ) {
+  /** When false, title edits keep the slug in sync. Set true when the user edits the slug, or when editing an existing post (stable URL). */
+  const slugDecoupledFromTitleRef = useRef(false);
+
+  useEffect(() => {
+    slugDecoupledFromTitleRef.current = activeBlog != null;
+  }, [activeBlog?.id]);
+
   useImperativeHandle(ref, () => ({
     getTranslationPatches: (): TranslationPatch[] => [],
     hydrateTranslationDrafts: (_byLocale: TranslationDraftHydration) => {
@@ -74,7 +82,16 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
                 <input
                   className={fieldClass}
                   value={blogForm.title}
-                  onChange={(e) => setBlogForm((f) => ({ ...f, title: e.target.value }))}
+                  onChange={(e) => {
+                    const title = e.target.value;
+                    setBlogForm((f) => ({
+                      ...f,
+                      title,
+                      ...(!slugDecoupledFromTitleRef.current
+                        ? { slug: slugifyFromArticleTitle(title) }
+                        : {}),
+                    }));
+                  }}
                   placeholder="Post title"
                 />
               </div>
@@ -83,8 +100,19 @@ export const MarketerBlogFields = forwardRef<MarketerBlogFieldsHandle, Props>(fu
                 <input
                   className={fieldClass}
                   value={blogForm.slug}
-                  onChange={(e) => setBlogForm((f) => ({ ...f, slug: e.target.value }))}
-                  placeholder="best-seo-tools-2026"
+                  onChange={(e) => {
+                    slugDecoupledFromTitleRef.current = true;
+                    setBlogForm((f) => ({ ...f, slug: e.target.value }));
+                  }}
+                  onPaste={(e) => {
+                    const text = e.clipboardData.getData('text/plain');
+                    const normalized = slugifyPastedForUrlField(text);
+                    if (normalized === '') return;
+                    e.preventDefault();
+                    slugDecoupledFromTitleRef.current = true;
+                    setBlogForm((f) => ({ ...f, slug: normalized }));
+                  }}
+                  placeholder="auto-filled from title, or type your own"
                 />
               </div>
               <div>

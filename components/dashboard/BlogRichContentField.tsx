@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef } from 'react';
+import { plainTextPasteToListHtml } from '@/lib/tiptap-plain-text-list-paste';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -278,6 +279,7 @@ type InnerProps = {
 
 function BlogRichTiptapInner({ value, onChange, placeholder, minHeightClass }: InnerProps) {
   const lastEmittedHtml = useRef<string | undefined>(undefined);
+  const editorRef = useRef<Editor | null>(null);
   const onChangeRef = useRef(onChange);
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -310,9 +312,39 @@ function BlogRichTiptapInner({ value, onChange, placeholder, minHeightClass }: I
       shouldRerenderOnTransaction: true,
       extensions,
       content: value?.trim() ? value : '<p></p>',
+      onCreate: ({ editor: ed }) => {
+        editorRef.current = ed;
+      },
+      onDestroy: () => {
+        editorRef.current = null;
+      },
       editorProps: {
         attributes: {
           class: 'tiptap ProseMirror focus:outline-none',
+        },
+        transformPastedHTML(html) {
+          let h = html;
+          const body = h.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+          if (body) h = body[1];
+          h = h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+          return h;
+        },
+        handlePaste(_view, event) {
+          const e = event as ClipboardEvent;
+          const html = e.clipboardData?.getData('text/html') ?? '';
+          const text = e.clipboardData?.getData('text/plain') ?? '';
+
+          if (html && /<[uo]l\b/i.test(html)) {
+            return false;
+          }
+
+          const listHtml = plainTextPasteToListHtml(text);
+          if (listHtml && editorRef.current) {
+            e.preventDefault();
+            editorRef.current.chain().focus().insertContent(listHtml).run();
+            return true;
+          }
+          return false;
         },
       },
       onUpdate: ({ editor: ed }) => {

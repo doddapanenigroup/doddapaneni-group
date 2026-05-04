@@ -67,7 +67,7 @@ export default function NewsSectorNewsNav({ locale: _pageLocale, currentSlug, in
   return (
     <nav
       aria-label={t('sectorNewsNavAriaLabel')}
-      className="rounded-2xl border-2 border-blue-100 bg-white p-4 shadow-[0_2px_12px_rgba(30,58,138,0.06)]"
+      className="w-full max-w-full rounded-2xl border-2 border-blue-100 bg-white p-4 shadow-[0_2px_12px_rgba(30,58,138,0.06)]"
     >
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-blue-900">
         {t('sectorNewsNavHeading')}

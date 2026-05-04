@@ -30,7 +30,7 @@ export default function NewsCardFeaturedThumb({
       fill
       sizes={sizes}
       className={[
-        'max-h-none min-h-full min-w-full max-w-none object-cover object-[center_20%]',
+        'h-full w-full object-cover object-[center_22%]',
         className,
       ]
         .filter(Boolean)

@@ -195,7 +195,7 @@ export default async function NewsSectorListOrArticlePage({ params }: Props) {
             <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-white/90" aria-hidden />
           </div>
         </section>
-        <div className="mt-6 sm:mt-8">
+        <div className="mt-6 min-w-0 sm:mt-8">
           <NewsSectorBlogList
             locale={locale}
             sectorSlug={trimmed}

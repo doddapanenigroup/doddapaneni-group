@@ -40,31 +40,28 @@ function HubPostCard({
       })
     : null;
 
-  /** Match `sizes` to capped card width so Next/Image picks an appropriate decode width. */
+  /** Card sits in a responsive grid; sizes track approximate column width. */
   const thumbSizes =
-    '(max-width: 640px) min(calc(100vw - 2rem), 280px), (max-width: 1024px) 260px, 240px';
+    '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 300px';
 
   return (
-    <article className="group flex w-full min-w-0 max-w-[280px] shrink-0 flex-col rounded-md border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md">
+    <article className="group flex h-full min-w-0 w-full flex-col rounded-md border border-slate-200 bg-white shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md">
       <Link
         href={newsArticlePath(sectorSlug, post.slug)}
         locale={NEWS_PUBLIC_LINK_LOCALE}
-        className="flex min-w-0 flex-col"
+        className="flex h-full min-w-0 flex-col"
       >
-        {/* Intrinsic image height — no fixed frame, so no gray letterboxing strip above the title. */}
-        <div className="shrink-0 overflow-hidden rounded-t-md bg-slate-100 leading-none">
+        <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-t-md bg-slate-100">
           {post.image ? (
             <Image
               src={post.image}
               alt={post.title}
-              width={1200}
-              height={675}
+              fill
               sizes={thumbSizes}
-              style={{ height: 'auto', width: '100%' }}
-              className="block max-h-52 w-full object-contain object-center transition duration-300 group-hover:opacity-95 sm:max-h-56"
+              className="object-cover object-center transition duration-300 group-hover:opacity-95"
             />
           ) : (
-            <div className="flex min-h-24 w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 px-3 py-6">
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 px-3">
               <span className="max-w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider text-white/90 sm:text-[11px]">
                 {sectorLabel}
               </span>
@@ -115,7 +112,7 @@ export default function NewsBlogsHubSections({ locale, sections, t }: Props) {
             {section.posts.length === 0 ? (
               <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-600 sm:text-sm">{t('emptySectorBody')}</p>
             ) : (
-              <div className="mt-2.5 flex flex-wrap items-start justify-start gap-x-px gap-y-px sm:gap-x-1 sm:gap-y-1">
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4">
                 {section.posts.map((post) => (
                   <HubPostCard
                     key={post.slug}
