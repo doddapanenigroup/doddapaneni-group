@@ -16,7 +16,7 @@ export default function GoogleSnippetPreview({
   return (
     <div className={`p-4 ${dashboardNestedCardClass}`}>
       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        Google preview
+        Google preview (link)
       </p>
       <p className="truncate text-sm text-emerald-700 dark:text-emerald-400">{url || 'https://example.com/page-url'}</p>
       <p className="truncate text-[18px] leading-6 text-blue-700 hover:underline dark:text-blue-400">

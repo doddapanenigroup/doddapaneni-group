@@ -191,16 +191,31 @@ function contentTypeFromApi(v: unknown): BlogContentTypeForm {
   return 'blog';
 }
 
-/** Omitted from marketer create/update JSON so PATCH does not null out columns the simplified UI no longer edits. */
+/**
+ * Build JSON body for marketer news create/update.
+ * Optional SEO/media keys are omitted when empty so PATCH does not clear columns the user did not set in-session.
+ */
 export function marketerBlogFormApiPayload(form: BlogFormState): Record<string, unknown> {
   const out: Record<string, unknown> = { ...form };
-  delete out.breadcrumbTitle;
-  delete out.canonicalUrl;
-  delete out.galleryImageUrls;
-  delete out.infographicUrls;
-  delete out.ogTitle;
-  delete out.ogImage;
-  delete out.ogDescription;
+
+  const optionalOnlyWhenSet: (keyof BlogFormState)[] = [
+    'ogTitle',
+    'ogDescription',
+    'ogImage',
+    'galleryImageUrls',
+    'breadcrumbTitle',
+    'canonicalUrl',
+    'infographicUrls',
+  ];
+
+  for (const key of optionalOnlyWhenSet) {
+    const v = form[key];
+    delete out[key];
+    if (typeof v === 'string' && v.trim() !== '') {
+      out[key] = v.trim();
+    }
+  }
+
   return out;
 }
 

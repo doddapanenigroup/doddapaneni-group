@@ -21,10 +21,12 @@ import {
   Search,
   Pencil,
   Trash2,
+  Eye,
+  Upload,
 } from 'lucide-react';
+import { BRAND_LOGO_INTRINSIC, brandLogoSrc, brandLogoSrcSet } from '@/lib/brand-logo';
+import { computeBlogSeoSummary } from '@/components/dashboard/BlogSeoScorePanel';
 import FeatureGate from '@/components/FeatureGate';
-import GoogleSnippetPreview from '@/components/dashboard/GoogleSnippetPreview';
-import BlogSeoScorePanel from '@/components/dashboard/BlogSeoScorePanel';
 import { MarketerBlogFields, type MarketerBlogFieldsHandle } from '@/components/dashboard/MarketerBlogFields';
 import {
   blogFromApiToForm,
@@ -34,7 +36,6 @@ import {
   type BlogListRow,
 } from '@/lib/marketer-blog-form';
 import { pickCanonicalSectorRows } from '@/lib/company-divisions';
-import { getSiteOrigin } from '@/lib/site-origin';
 import {
   dashboardDashedFoldClass,
   dashboardHeaderActionPrimary,
@@ -45,13 +46,15 @@ import {
   dashboardPanelClass,
   dashboardPanelHeaderClass,
 } from '@/lib/dashboard-ui';
-import { publicPathForLocale, publicPathWithLocale } from '@/lib/public-path-with-locale';
+import { publicPathForLocale } from '@/lib/public-path-with-locale';
 import {
   BLOG_LIVE_PREVIEW_MSG_V,
   blogLivePreviewChannelName,
   normalizeBlogPreviewImage,
   type BlogLivePreviewPayload,
 } from '@/lib/blog-live-preview';
+import MarketerAdSlotsModal from '@/components/dashboard/MarketerAdSlotsModal';
+import MarketerAdCategoriesModal from '@/components/dashboard/MarketerAdCategoriesModal';
 
 type SectorRow = { id: string; name: string; slug: string; description: string | null };
 
@@ -143,12 +146,58 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
   const [livePreviewChannelId, setLivePreviewChannelId] = useState<string | null>(null);
   const livePreviewBcRef = useRef<BroadcastChannel | null>(null);
   const didAutoSelectSectorRef = useRef(false);
+  const draftAutosaveAtRef = useRef(Date.now());
+  const [autosaveLabelTick, setAutosaveLabelTick] = useState(0);
+  const [adSlotsModalOpen, setAdSlotsModalOpen] = useState(false);
+  const [adCategoriesModalOpen, setAdCategoriesModalOpen] = useState(false);
+  const [adSlotCount, setAdSlotCount] = useState<number | null>(null);
+  const [adCategoryCount, setAdCategoryCount] = useState<number | null>(null);
   const [domReady, setDomReady] = useState(false);
   const router = useRouter();
+
+  const refreshAdSidebarStats = useCallback(async () => {
+    try {
+      const [r1, r2] = await Promise.all([
+        fetch('/api/marketer/ad-slots', { credentials: 'include' }),
+        fetch('/api/marketer/ad-categories', { credentials: 'include' }),
+      ]);
+      const d1 = r1.ok ? await r1.json().catch(() => ({})) : {};
+      const d2 = r2.ok ? await r2.json().catch(() => ({})) : {};
+      setAdSlotCount(Array.isArray(d1.items) ? d1.items.length : null);
+      setAdCategoryCount(Array.isArray(d2.items) ? d2.items.length : null);
+    } catch {
+      setAdSlotCount(null);
+      setAdCategoryCount(null);
+    }
+  }, []);
 
   useEffect(() => {
     setDomReady(true);
   }, []);
+
+  useEffect(() => {
+    if (!blogModalOpen) return;
+    draftAutosaveAtRef.current = Date.now();
+  }, [blogModalOpen]);
+
+  useEffect(() => {
+    if (!blogModalOpen) return;
+    void refreshAdSidebarStats();
+  }, [blogModalOpen, refreshAdSidebarStats]);
+
+  useEffect(() => {
+    if (!blogModalOpen) return;
+    const id = window.setTimeout(() => {
+      draftAutosaveAtRef.current = Date.now();
+    }, 450);
+    return () => window.clearTimeout(id);
+  }, [blogForm, blogModalOpen]);
+
+  useEffect(() => {
+    if (!blogModalOpen) return;
+    const id = window.setInterval(() => setAutosaveLabelTick((n) => n + 1), 3000);
+    return () => window.clearInterval(id);
+  }, [blogModalOpen]);
 
   /** Warm the live preview route chunk so the new tab opens faster. */
   useEffect(() => {
@@ -593,6 +642,85 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
     },
   }));
 
+  const editorSeoSummary = useMemo(
+    () =>
+      computeBlogSeoSummary({
+        title: blogForm.title,
+        slug: blogForm.slug,
+        metaTitle: blogForm.metaTitle,
+        metaDescription: blogForm.metaDescription,
+        keywords: blogForm.keywords,
+        focusKeyword: blogForm.focusKeyword,
+        content: blogForm.content,
+        ogImage: blogForm.ogImage?.trim() || blogForm.featuredImage?.trim() || null,
+      }),
+    [
+      blogForm.title,
+      blogForm.slug,
+      blogForm.metaTitle,
+      blogForm.metaDescription,
+      blogForm.keywords,
+      blogForm.focusKeyword,
+      blogForm.content,
+      blogForm.ogImage,
+      blogForm.featuredImage,
+    ],
+  );
+
+  async function uploadStoredImage(file: File): Promise<string | null> {
+    const form = new FormData();
+    form.append('file', file);
+    if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
+    const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
+    const data = (await res.json().catch(() => ({}))) as {
+      url?: string;
+      key?: string;
+      id?: string;
+      fileName?: string | null;
+      altText?: string | null;
+      size?: number | null;
+      message?: string;
+    };
+    if (!res.ok) {
+      setBlogToast({
+        type: 'error',
+        message:
+          typeof data.message === 'string' && data.message.trim()
+            ? data.message.trim()
+            : 'Image upload failed.',
+      });
+      return null;
+    }
+    const url = data.url ?? '';
+    if (url) {
+      setImages((prev) => {
+        const row: StoredImageRow = {
+          id: data.id ?? data.key ?? `${Date.now()}`,
+          key: data.key ?? '',
+          url,
+          fileName: data.fileName ?? null,
+          altText: data.altText ?? null,
+          size: data.size ?? null,
+          updatedAt: new Date().toISOString(),
+        };
+        const k = row.key;
+        if (!k) return [row, ...prev];
+        return [row, ...prev.filter((x) => x.key !== k)];
+      });
+    }
+    return url || null;
+  }
+
+  function formatDraftAutosaveLabel(): string {
+    void autosaveLabelTick;
+    const sec = Math.floor((Date.now() - draftAutosaveAtRef.current) / 1000);
+    if (sec < 5) return 'Auto-saved · just now';
+    if (sec < 60) return `Auto-saved · ${sec}s ago`;
+    const m = Math.floor(sec / 60);
+    if (m < 60) return `Auto-saved · ${m}m ago`;
+    return `Auto-saved · ${Math.floor(m / 60)}h ago`;
+  }
+
   const blogEditorModal =
     blogModalOpen ? (
       <div
@@ -602,32 +730,62 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
         aria-labelledby="blog-editor-title"
       >
         <div className="pointer-events-none absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" aria-hidden />
-        <div className="relative flex h-full w-full min-h-0 flex-1 flex-col overflow-hidden bg-white dark:bg-slate-950">
-          <header className={`flex shrink-0 items-start justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 ${dashboardPanelHeaderClass}`}>
-            <div className="min-w-0 pr-2">
-              <h2
-                id="blog-editor-title"
-                className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl"
-              >
-                {blogModalMode === 'create' ? 'Create blog' : 'Edit blog'}
-              </h2>
-              <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                {sectorsLoading
-                  ? 'Loading sectors…'
-                  : 'Only the form below scrolls. Use the footer to save, save as draft, or cancel.'}
-              </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-              <FeatureGate feature="previewSharing">
-                <button
-                  type="button"
-                  onClick={() => openLiveBlogPreview()}
-                  disabled={blogActionLoading !== null}
-                  className={`hidden disabled:opacity-50 sm:inline-flex ${dashboardHeaderActionSecondary} px-3 py-2 text-xs sm:text-sm`}
+        <div className="relative flex h-full w-full min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-slate-950">
+          <header
+            className={`grid shrink-0 grid-cols-1 gap-3 border-b border-slate-200 px-4 py-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4 sm:px-6 sm:py-4 lg:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)] ${dashboardPanelHeaderClass}`}
+          >
+            <div className="flex min-w-0 items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={brandLogoSrc(320)}
+                srcSet={brandLogoSrcSet}
+                sizes="120px"
+                width={BRAND_LOGO_INTRINSIC.width}
+                height={BRAND_LOGO_INTRINSIC.height}
+                alt=""
+                className="mt-0.5 h-9 w-auto max-w-[140px] shrink-0 object-contain sm:h-10"
+              />
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                  Doddapaneni Group
+                </p>
+                <h2
+                  id="blog-editor-title"
+                  className="text-base font-semibold tracking-tight text-slate-900 dark:text-white sm:text-lg"
                 >
-                  Preview
-                </button>
-              </FeatureGate>
+                  Content, SEO &amp; Media Dashboard
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
+                  {sectorsLoading
+                    ? 'Loading sectors…'
+                    : 'Create, optimize and publish your content in one place.'}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 justify-self-center lg:justify-self-auto">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-100">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                {formatDraftAutosaveLabel()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3 sm:justify-end lg:min-w-[11rem]">
+              <div
+                className={`inline-flex max-w-[14rem] items-center gap-2 rounded-xl border px-2.5 py-1.5 text-xs font-semibold sm:max-w-none ${
+                  editorSeoSummary.tone === 'emerald'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/35 dark:text-emerald-100'
+                    : editorSeoSummary.tone === 'amber'
+                      ? 'border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/35 dark:text-amber-100'
+                      : 'border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/35 dark:text-rose-100'
+                }`}
+              >
+                <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="leading-tight">
+                  {editorSeoSummary.label === 'Good' ? 'Good · Well optimized!' : `${editorSeoSummary.label} · SEO score ${editorSeoSummary.score}`}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={closeBlogModal}
@@ -639,180 +797,261 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
             </div>
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 sm:px-6 sm:py-6">
-            <MarketerBlogFields
-              ref={blogFieldsRef}
-              blogForm={blogForm}
-              setBlogForm={setBlogForm}
-              sectors={sectors}
-              sectorsLoading={sectorsLoading}
-              authorLabel={authorLabel}
-              uploading={uploading}
-              activeBlog={
-                blogModalMode === 'edit' && editingNewsSlug
-                  ? (blogs.find((x) => x.slug === editingNewsSlug) ?? null)
-                  : null
-              }
-              onUploadFeatured={async (file: File) => {
-                if (featuredImageUploadInFlight.current) return;
-                featuredImageUploadInFlight.current = true;
-                setUploading(true);
-                try {
-                  const form = new FormData();
-                  form.append('file', file);
-                  if (blogForm.title.trim()) form.append('altText', blogForm.title.trim());
-                  const res = await fetch('/api/marketer/stored-image', { method: 'POST', body: form });
-                  const data = (await res.json().catch(() => ({}))) as {
-                    url?: string;
-                    key?: string;
-                    id?: string;
-                    fileName?: string | null;
-                    altText?: string | null;
-                    size?: number | null;
-                    message?: string;
-                  };
-                  if (!res.ok) {
-                    setBlogToast({
-                      type: 'error',
-                      message:
-                        typeof data.message === 'string' && data.message.trim()
-                          ? data.message.trim()
-                          : 'Image upload failed.',
-                    });
-                    return;
-                  }
-                  const url = data.url ?? '';
-                  setBlogForm((f) => ({
-                    ...f,
-                    featuredImage: url,
-                  }));
-                  setImages((prev) => {
-                    const row: StoredImageRow = {
-                      id: data.id ?? data.key ?? `${Date.now()}`,
-                      key: data.key ?? '',
-                      url,
-                      fileName: data.fileName ?? null,
-                      altText: data.altText ?? null,
-                      size: data.size ?? null,
-                      updatedAt: new Date().toISOString(),
-                    };
-                    const k = row.key;
-                    if (!k) return [row, ...prev];
-                    return [row, ...prev.filter((x) => x.key !== k)];
-                  });
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 sm:px-6 sm:py-6 lg:min-w-0 lg:flex-[3]">
+              <MarketerBlogFields
+                ref={blogFieldsRef}
+                blogForm={blogForm}
+                setBlogForm={setBlogForm}
+                sectors={sectors}
+                sectorsLoading={sectorsLoading}
+                authorLabel={authorLabel}
+                uploading={uploading}
+                locale={locale}
+                activeBlog={
+                  blogModalMode === 'edit' && editingNewsSlug
+                    ? (blogs.find((x) => x.slug === editingNewsSlug) ?? null)
+                    : null
+                }
+                onUploadFeatured={async (file: File) => {
+                  if (featuredImageUploadInFlight.current) return;
+                  featuredImageUploadInFlight.current = true;
+                  setUploading(true);
+                  try {
+                    const url = await uploadStoredImage(file);
+                    if (!url) return;
+                    setBlogForm((f) => ({
+                      ...f,
+                      featuredImage: url,
+                    }));
 
-                  const slug = editingNewsSlug;
-                  if (slug && url) {
-                    const patches =
-                      typeof blogFieldsRef.current?.getTranslationPatches === 'function'
-                        ? blogFieldsRef.current.getTranslationPatches()
-                        : [];
-                    const patchRes = await fetch(`/api/marketer/news/${encodeURIComponent(slug)}`, {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        featuredImage: url,
-                        translationPatches: patches,
-                      }),
-                    });
-                    const patchData = (await patchRes.json().catch(() => ({}))) as {
-                      item?: BlogListRow;
-                      message?: string;
-                    };
-                    if (patchRes.ok && patchData.item) {
-                      const item = patchData.item;
-                      setBlogs((prev) =>
-                        prev.map((b) =>
-                          b.slug === slug ? { ...blogListRowForState(item), translations: item.translations } : b,
-                        ),
-                      );
-                      void refreshBlogs({ silent: true });
+                    const slug = editingNewsSlug;
+                    if (slug && url) {
+                      const patches =
+                        typeof blogFieldsRef.current?.getTranslationPatches === 'function'
+                          ? blogFieldsRef.current.getTranslationPatches()
+                          : [];
+                      const patchRes = await fetch(`/api/marketer/news/${encodeURIComponent(slug)}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          featuredImage: url,
+                          translationPatches: patches,
+                        }),
+                      });
+                      const patchData = (await patchRes.json().catch(() => ({}))) as {
+                        item?: BlogListRow;
+                        message?: string;
+                      };
+                      if (patchRes.ok && patchData.item) {
+                        const item = patchData.item;
+                        setBlogs((prev) =>
+                          prev.map((b) =>
+                            b.slug === slug ? { ...blogListRowForState(item), translations: item.translations } : b,
+                          ),
+                        );
+                        void refreshBlogs({ silent: true });
+                        setBlogToast({
+                          type: 'success',
+                          message: 'Featured image saved as WebP and attached to this post.',
+                        });
+                      } else {
+                        setBlogToast({
+                          type: 'error',
+                          message:
+                            typeof patchData.message === 'string' && patchData.message.trim()
+                              ? patchData.message.trim()
+                              : 'Image stored, but updating the post failed. Use Publish to attach the URL.',
+                        });
+                      }
+                    } else if (url) {
                       setBlogToast({
                         type: 'success',
-                        message: 'Featured image saved as WebP and attached to this post.',
-                      });
-                    } else {
-                      setBlogToast({
-                        type: 'error',
-                        message:
-                          typeof patchData.message === 'string' && patchData.message.trim()
-                            ? patchData.message.trim()
-                            : 'Image stored, but updating the post failed. Use Save to attach the URL.',
+                        message: 'Image saved as WebP in the library. Publish the post to attach it.',
                       });
                     }
-                  } else if (url) {
-                    setBlogToast({
-                      type: 'success',
-                      message: 'Image saved as WebP in the library. Save the post to attach it.',
-                    });
+                  } finally {
+                    featuredImageUploadInFlight.current = false;
+                    setUploading(false);
                   }
-                } finally {
-                  featuredImageUploadInFlight.current = false;
-                  setUploading(false);
-                }
-              }}
-            />
-            {blogForm.featuredImage ? (
-              <div className="mt-4">
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Featured preview
-                </p>
-                <div className={`flex max-h-[min(56vh,480px)] w-full items-center justify-center overflow-auto p-2 ${dashboardNestedCardClass}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={blogForm.featuredImage}
-                    alt="Featured preview"
-                    className="h-auto max-h-[min(56vh,480px)] w-full max-w-full object-contain object-center dark:border-slate-700"
-                  />
-                </div>
-              </div>
-            ) : null}
-            <div className="mt-4">
-              <GoogleSnippetPreview
-                title={blogForm.metaTitle || blogForm.title}
-                description={blogForm.metaDescription}
-                url={`${getSiteOrigin().replace(/\/$/, '')}${publicPathWithLocale(locale, 'news', blogForm.slug || 'sample-post')}`}
-                ogImage={blogForm.featuredImage}
-              />
-              <BlogSeoScorePanel
-                title={blogForm.title}
-                slug={blogForm.slug}
-                metaTitle={blogForm.metaTitle}
-                metaDescription={blogForm.metaDescription}
-                keywords={blogForm.keywords}
-                focusKeyword={blogForm.focusKeyword}
-                content={blogForm.content}
-                ogImage={blogForm.featuredImage || null}
+                }}
+                onUploadOg={async (file: File) => {
+                  if (featuredImageUploadInFlight.current) return;
+                  featuredImageUploadInFlight.current = true;
+                  setUploading(true);
+                  try {
+                    const url = await uploadStoredImage(file);
+                    if (url) setBlogForm((f) => ({ ...f, ogImage: url }));
+                  } finally {
+                    featuredImageUploadInFlight.current = false;
+                    setUploading(false);
+                  }
+                }}
+                onUploadBanner={async (file: File) => {
+                  if (featuredImageUploadInFlight.current) return;
+                  featuredImageUploadInFlight.current = true;
+                  setUploading(true);
+                  try {
+                    const url = await uploadStoredImage(file);
+                    if (url) setBlogForm((f) => ({ ...f, bannerImage: url }));
+                  } finally {
+                    featuredImageUploadInFlight.current = false;
+                    setUploading(false);
+                  }
+                }}
+                onAppendGalleryImage={async (file: File) => {
+                  if (featuredImageUploadInFlight.current) return;
+                  featuredImageUploadInFlight.current = true;
+                  setUploading(true);
+                  try {
+                    const url = await uploadStoredImage(file);
+                    if (!url) return;
+                    setBlogForm((f) => {
+                      const parts = (f.galleryImageUrls ?? '')
+                        .split(/[\n,]+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean);
+                      if (parts.length >= 8) return f;
+                      return { ...f, galleryImageUrls: [...parts, url].slice(0, 8).join('\n') };
+                    });
+                  } finally {
+                    featuredImageUploadInFlight.current = false;
+                    setUploading(false);
+                  }
+                }}
               />
             </div>
-            <FeatureGate feature="previewSharing">
-              <div className="mt-4 flex flex-col gap-2 sm:hidden">
+
+            <aside className="hidden w-full max-w-none shrink-0 overflow-y-auto border-t border-slate-200 bg-slate-50/90 px-4 py-5 dark:border-slate-800 dark:bg-slate-900/50 lg:block lg:min-w-[min(20rem,26vw)] lg:max-w-md lg:flex-1 lg:border-l lg:border-t-0 xl:min-w-[22rem]">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Sidebar reference
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {[
+                  {
+                    label: 'Definitions',
+                    value:
+                      adSlotCount != null && adCategoryCount != null
+                        ? String(adSlotCount + adCategoryCount)
+                        : '—',
+                    accent: 'bg-white dark:bg-slate-900',
+                  },
+                  {
+                    label: 'Ad slots',
+                    value: adSlotCount != null ? String(adSlotCount) : '—',
+                    accent: 'bg-emerald-50 dark:bg-emerald-950/30',
+                  },
+                  {
+                    label: 'Categories',
+                    value: adCategoryCount != null ? String(adCategoryCount) : '—',
+                    accent: 'bg-white dark:bg-slate-900',
+                  },
+                  {
+                    label: 'Placements',
+                    value: adSlotCount != null ? String(adSlotCount) : '—',
+                    accent: 'bg-white dark:bg-slate-900',
+                  },
+                ].map((card) => (
+                  <div
+                    key={card.label}
+                    className={`rounded-xl border border-slate-200 px-3 py-2.5 shadow-sm dark:border-slate-700 ${card.accent}`}
+                  >
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      {card.label}
+                    </p>
+                    <p className="mt-1 text-xl font-bold tabular-nums text-slate-900 dark:text-white">{card.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className={`mt-4 space-y-2 ${dashboardNestedCardClass}`}>
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">Ad sizes (reference)</p>
+                <ul className="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400">
+                  <li className="flex justify-between gap-2">
+                    <span>Leaderboard</span>
+                    <span className="font-mono text-slate-500">728 × 90</span>
+                  </li>
+                  <li className="flex justify-between gap-2">
+                    <span>Medium rectangle</span>
+                    <span className="font-mono text-slate-500">300 × 250</span>
+                  </li>
+                  <li className="flex justify-between gap-2">
+                    <span>Billboard</span>
+                    <span className="font-mono text-slate-500">970 × 250</span>
+                  </li>
+                </ul>
                 <button
                   type="button"
-                  onClick={() => openLiveBlogPreview()}
-                  disabled={blogActionLoading !== null}
-                  className={`${dashboardHeaderActionSecondary} disabled:opacity-50`}
+                  className="mt-2 w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700"
+                  onClick={() => setAdSlotsModalOpen(true)}
                 >
-                  Preview in new tab
+                  Manage ad slots
                 </button>
               </div>
-            </FeatureGate>
+              <div className={`mt-4 ${dashboardNestedCardClass}`}>
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">Placement map</p>
+                <div className="mt-2 space-y-1 rounded-lg border border-dashed border-slate-200 bg-white p-3 text-[10px] text-slate-500 dark:border-slate-600 dark:bg-slate-950/40 dark:text-slate-400">
+                  <div className="rounded border border-slate-200 px-2 py-1 text-center dark:border-slate-600">Header top</div>
+                  <div className="rounded border border-slate-200 px-2 py-3 text-center dark:border-slate-600">
+                    Article body
+                  </div>
+                  <div className="grid grid-cols-3 gap-1">
+                    <div className="rounded border border-slate-200 py-2 text-center dark:border-slate-600">Sidebar</div>
+                    <div className="col-span-2 rounded border border-slate-200 py-2 text-center dark:border-slate-600">
+                      Below fold
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="mt-3 w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700"
+                  onClick={() => setAdCategoriesModalOpen(true)}
+                >
+                  Manage category ads
+                </button>
+              </div>
+              <div className={`mt-4 overflow-x-auto ${dashboardNestedCardClass}`}>
+                <p className="mb-2 text-xs font-semibold text-slate-800 dark:text-slate-100">Recommended sizes</p>
+                <table className="w-full text-left text-[11px] text-slate-600 dark:text-slate-400">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                      <th className="pb-1.5 pr-2 font-semibold">Placement</th>
+                      <th className="pb-1.5 font-semibold">Size</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    <tr>
+                      <td className="py-1.5">Header banner</td>
+                      <td className="font-mono py-1.5">728 × 90</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5">In-content</td>
+                      <td className="font-mono py-1.5">300 × 250</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5">Sidebar</td>
+                      <td className="font-mono py-1.5">300 × 600</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </aside>
           </div>
 
-          <footer className="flex shrink-0 flex-col gap-3 border-t border-slate-200/60 bg-gradient-to-r from-slate-50/95 to-white px-4 py-3 backdrop-blur-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-950 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-6 sm:py-4">
+          <footer className="flex shrink-0 flex-col gap-2 border-t border-slate-200/80 bg-white px-4 py-3 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-3 sm:px-6 sm:py-3">
+            <FeatureGate feature="previewSharing">
+              <button
+                type="button"
+                onClick={() => openLiveBlogPreview()}
+                disabled={blogActionLoading !== null}
+                className={`order-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:order-none sm:w-auto`}
+              >
+                <Eye className="h-4 w-4" aria-hidden />
+                Preview
+              </button>
+            </FeatureGate>
             <button
               type="button"
-              onClick={closeBlogModal}
-              disabled={blogActionLoading !== null}
-              className={`order-1 w-full disabled:opacity-50 sm:order-none sm:w-auto ${dashboardHeaderActionSecondary} px-5 py-2.5 text-sm font-semibold`}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                void (blogModalMode === 'create' ? createBlogPost(true) : saveBlogPost(true))
-              }
+              onClick={() => void (blogModalMode === 'create' ? createBlogPost(true) : saveBlogPost(true))}
               disabled={
                 blogActionLoading !== null ||
                 (blogModalMode === 'create' &&
@@ -821,7 +1060,7 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     !blogForm.slug.trim() ||
                     !blogForm.content.trim()))
               }
-              className="order-2 w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-950 transition hover:bg-amber-100 disabled:opacity-50 dark:border-amber-900/50 dark:bg-amber-950/35 dark:text-amber-100 dark:hover:bg-amber-950/55 sm:order-none sm:w-auto sm:px-5 sm:py-2.5"
+              className="order-1 w-full rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:order-none sm:w-auto"
             >
               {blogActionLoading === 'draft' ? (
                 <span className="inline-flex items-center justify-center gap-2">
@@ -829,14 +1068,12 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                   Saving draft…
                 </span>
               ) : (
-                'Draft'
+                'Save draft'
               )}
             </button>
             <button
               type="button"
-              onClick={() =>
-                void (blogModalMode === 'create' ? createBlogPost(false) : saveBlogPost(false))
-              }
+              onClick={() => void (blogModalMode === 'create' ? createBlogPost(false) : saveBlogPost(false))}
               disabled={
                 blogActionLoading !== null ||
                 (blogModalMode === 'create' &&
@@ -845,20 +1082,18 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
                     !blogForm.slug.trim() ||
                     !blogForm.content.trim()))
               }
-              className={`order-3 w-full disabled:opacity-50 sm:order-none sm:w-auto sm:px-6 ${dashboardHeaderActionPrimary}`}
+              className="order-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#3b82f6] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-50 sm:order-none sm:w-auto"
             >
               {blogActionLoading === 'save' || blogActionLoading === 'create' ? (
                 <span className="inline-flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                  Saving…
-                </span>
-              ) : blogModalMode === 'create' ? (
-                <span className="inline-flex items-center justify-center gap-2">
-                  <Plus className="h-4 w-4" aria-hidden />
-                  Save
+                  Publishing…
                 </span>
               ) : (
-                'Save'
+                <>
+                  <Upload className="h-4 w-4" aria-hidden />
+                  Publish
+                </>
               )}
             </button>
           </footer>
@@ -1075,6 +1310,20 @@ const MarketerBlogsManager = forwardRef<MarketerBlogsManagerHandle, Props>(funct
 
     </section>
     {domReady && blogEditorModal ? createPortal(blogEditorModal, document.body) : null}
+    <MarketerAdSlotsModal
+      open={adSlotsModalOpen}
+      onClose={() => setAdSlotsModalOpen(false)}
+      onSaved={() => {
+        void refreshAdSidebarStats();
+      }}
+    />
+    <MarketerAdCategoriesModal
+      open={adCategoriesModalOpen}
+      onClose={() => setAdCategoriesModalOpen(false)}
+      onSaved={() => {
+        void refreshAdSidebarStats();
+      }}
+    />
     </>
   );
 });

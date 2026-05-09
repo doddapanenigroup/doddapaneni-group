@@ -470,3 +470,34 @@ model CronTaskLock {
 
   @@map("cron_task_lock")
 }
+
+/// Reference placements for the marketer SEO dashboard (sidebar “placement map” / size guides).
+model MarketingAdSlot {
+  id                 String   @id @default(cuid())
+  slug               String   @unique @map("slug")
+  label              String     @map("label")
+  description        String?    @map("description")
+  recommendedWidth   Int?       @map("recommended_width")
+  recommendedHeight  Int?       @map("recommended_height")
+  /// Wireframe region key: header_top, article_body, sidebar, below_fold, etc.
+  diagramRegion      String?    @map("diagram_region")
+  sortOrder          Int        @default(0) @map("sort_order")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+
+  @@index([sortOrder])
+  @@map("marketing_ad_slot")
+}
+
+/// Topic buckets for “category ads” targeting in the marketer dashboard.
+model MarketingAdCategory {
+  id        String   @id @default(cuid())
+  slug      String   @unique @map("slug")
+  label     String   @map("label")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([sortOrder])
+  @@map("marketing_ad_category")
+}

@@ -5,6 +5,7 @@ import { DashboardThemeProvider } from '@/components/dashboard/DashboardThemePro
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import AutoLogoutOnUnauthenticated from '@/components/dashboard/AutoLogoutOnUnauthenticated';
+import DashboardBrowserSessionGate from '@/components/dashboard/DashboardBrowserSessionGate';
 import { DashboardShortcutsProvider } from '@/components/dashboard/DashboardShortcutsProvider';
 import { DashboardSidebarBelowProvider } from '@/components/dashboard/DashboardSidebarBelowProvider';
 import { DashboardActivitySheetProvider } from '@/components/dashboard/DashboardActivitySheetProvider';
@@ -32,6 +33,7 @@ export default function DashboardShell({
             <MarketerNavProvider>
               <DashboardSidebarBelowProvider>
                 <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+                  <DashboardBrowserSessionGate locale={locale} />
                   <AutoLogoutOnUnauthenticated locale={locale} />
                   <DashboardHeader user={user} locale={locale} />
                   <DashboardActivityMobileBar role={user.role} />

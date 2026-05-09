@@ -385,6 +385,13 @@ function BlogRichTiptapInner({ value, onChange, placeholder, minHeightClass }: I
   return <BlogEditorToolbar editor={editor} minHeightClass={minHeightClass} />;
 }
 
+function statsFromHtml(html: string): { words: number; chars: number } {
+  const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const chars = plain.length;
+  const words = plain ? plain.split(/\s+/).filter(Boolean).length : 0;
+  return { words, chars };
+}
+
 type Props = {
   instanceKey: string;
   label: string;
@@ -394,6 +401,7 @@ type Props = {
   minHeightClass?: string;
   embedded?: boolean;
   showHint?: boolean;
+  showStats?: boolean;
   'aria-label'?: string;
 };
 
@@ -409,17 +417,28 @@ export function BlogRichContentField({
   minHeightClass = 'min-h-[26rem] sm:min-h-[30rem]',
   embedded = false,
   showHint = true,
+  showStats = true,
   'aria-label': ariaLabel,
 }: Props) {
   const fieldId = useId();
+  const stats = useMemo(() => statsFromHtml(value ?? ''), [value]);
 
   return (
     <div className={embedded ? '' : 'sm:col-span-2'}>
-      {label ? (
-        <label htmlFor={fieldId} className={labelClass}>
-          {label}
-        </label>
-      ) : null}
+      <div className="mb-1.5 flex flex-wrap items-end justify-between gap-2">
+        {label ? (
+          <label htmlFor={fieldId} className={labelClass + ' mb-0'}>
+            {label}
+          </label>
+        ) : (
+          <span />
+        )}
+        {showStats ? (
+          <span className="text-[11px] font-medium tabular-nums text-slate-500 dark:text-slate-400">
+            {stats.words.toLocaleString()} words · {stats.chars.toLocaleString()} characters
+          </span>
+        ) : null}
+      </div>
       <div id={label ? fieldId : undefined} aria-label={!label && ariaLabel ? ariaLabel : undefined}>
         <BlogRichTiptapInner
           key={instanceKey}

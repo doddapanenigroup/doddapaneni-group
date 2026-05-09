@@ -13,6 +13,7 @@ import PasswordInputWithToggle from '@/components/PasswordInputWithToggle';
 import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { publicPathForLocale } from '@/lib/public-path-with-locale';
+import { DASHBOARD_BROWSER_SESSION_KEY } from '@/lib/dashboard-browser-session';
 
 const AUTH_DEBUG =
   process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' || process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true';
@@ -120,6 +121,11 @@ export default function LoginFormClient({
     if (hasNavigatedRef.current) return;
     hasNavigatedRef.current = true;
     authDebug('auto-redirect-authenticated', { to: publicPathForLocale(locale, '/dashboard') });
+    try {
+      sessionStorage.setItem(DASHBOARD_BROWSER_SESSION_KEY, crypto.randomUUID());
+    } catch {
+      /* ignore quota / private mode */
+    }
     router.replace(publicPathForLocale(locale, '/dashboard'));
   }, [status, locale, router, pathname, stayOnLogin]);
 
@@ -187,6 +193,11 @@ export default function LoginFormClient({
       }
 
       authDebug('redirect-after-login', { to: callbackUrl });
+      try {
+        sessionStorage.setItem(DASHBOARD_BROWSER_SESSION_KEY, crypto.randomUUID());
+      } catch {
+        /* ignore */
+      }
       window.location.href = `${window.location.origin}${callbackUrl}`;
     } catch {
       setError('Something went wrong. Please try again.');
