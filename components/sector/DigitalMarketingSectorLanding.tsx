@@ -44,8 +44,8 @@ export default async function DigitalMarketingSectorLanding({ locale }: Props) {
 
   const serviceCards = [
     { icon: Search, title: t('serviceSeoTitle'), body: t('serviceSeoBody') },
-    { icon: Megaphone, title: t('servicePpcTitle'), body: t('servicePpcBody') },
     { icon: Share2, title: t('serviceSocialTitle'), body: t('serviceSocialBody') },
+    { icon: Megaphone, title: t('servicePpcTitle'), body: t('servicePpcBody') },
     { icon: FileText, title: t('serviceContentTitle'), body: t('serviceContentBody') },
     { icon: Mail, title: t('serviceEmailTitle'), body: t('serviceEmailBody') },
   ] as const;
@@ -62,7 +62,15 @@ export default async function DigitalMarketingSectorLanding({ locale }: Props) {
     { icon: TrendingUp, title: t('processOptTitle'), body: t('processOptBody') },
   ] as const;
 
-   const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4'), t('benefit5')];
+  const benefits = [
+    t('benefit1'),
+    t('benefit2'),
+    t('benefit3'),
+    t('benefit4'),
+    t('benefit5'),
+    t('benefit6'),
+    t('benefit7'),
+  ];
   const comprehensiveP2 = t('sectionComprehensiveP2').trim();
 
   return (

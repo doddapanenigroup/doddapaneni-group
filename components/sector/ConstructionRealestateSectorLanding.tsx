@@ -6,12 +6,16 @@ import {
   Building2,
   Clock,
   ClipboardList,
+  Code2,
+  Cpu,
   DraftingCompass,
   Hammer,
   HardHat,
   Home,
   Layers,
+  Leaf,
   MapPinned,
+  Megaphone,
   PackageCheck,
   ShieldCheck,
 } from 'lucide-react';
@@ -48,7 +52,10 @@ export default async function ConstructionRealestateSectorLanding({ locale }: Pr
     { icon: MapPinned, title: t('servicePropertyDevTitle'), body: t('servicePropertyDevBody') },
     { icon: HardHat, title: t('serviceInfraTitle'), body: t('serviceInfraBody') },
     { icon: Building2, title: t('serviceConsultingTitle'), body: t('serviceConsultingBody') },
-    { icon: ClipboardList, title: t('serviceMgmtTitle'), body: t('serviceMgmtBody') },
+    { icon: Cpu, title: t('serviceTechTitle'), body: t('serviceTechBody') },
+    { icon: Leaf, title: t('serviceSustainTitle'), body: t('serviceSustainBody') },
+    { icon: Megaphone, title: t('serviceMarketingTitle'), body: t('serviceMarketingBody') },
+    { icon: Code2, title: t('serviceSoftwareTitle'), body: t('serviceSoftwareBody') },
   ] as const;
 
   const whyCards = [
@@ -63,7 +70,16 @@ export default async function ConstructionRealestateSectorLanding({ locale }: Pr
     { icon: PackageCheck, title: t('processDeliveryTitle'), body: t('processDeliveryBody') },
   ] as const;
 
-  const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4'), t('benefit5')];
+  const benefits = [
+    t('benefit1'),
+    t('benefit2'),
+    t('benefit3'),
+    t('benefit4'),
+    t('benefit5'),
+    t('benefit6'),
+    t('benefit7'),
+    t('benefit8'),
+  ];
 
   return (
     <div className="min-h-screen bg-white">

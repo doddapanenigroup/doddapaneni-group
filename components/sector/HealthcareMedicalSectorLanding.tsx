@@ -7,11 +7,12 @@ import {
   Building2,
   ClipboardList,
   Cpu,
-  HeartPulse,
   Layers,
+  Megaphone,
   MonitorSmartphone,
   Package,
   Rocket,
+  Shield,
   SlidersHorizontal,
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
@@ -45,7 +46,9 @@ export default async function HealthcareMedicalSectorLanding({ locale }: Props) 
     { icon: Package, title: t('serviceEquipmentTitle'), body: t('serviceEquipmentBody') },
     { icon: MonitorSmartphone, title: t('serviceItTitle'), body: t('serviceItBody') },
     { icon: Building2, title: t('serviceHospitalTitle'), body: t('serviceHospitalBody') },
-    { icon: HeartPulse, title: t('servicePatientTitle'), body: t('servicePatientBody') },
+    { icon: Cpu, title: t('serviceAiTitle'), body: t('serviceAiBody') },
+    { icon: Shield, title: t('serviceSecurityTitle'), body: t('serviceSecurityBody') },
+    { icon: Megaphone, title: t('serviceMarketingTitle'), body: t('serviceMarketingBody') },
   ] as const;
 
   const whyCards = [
@@ -60,7 +63,16 @@ export default async function HealthcareMedicalSectorLanding({ locale }: Props) 
     { icon: Activity, title: t('processMonitorTitle'), body: t('processMonitorBody') },
   ] as const;
 
-  const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4'), t('benefit5')];
+  const benefits = [
+    t('benefit1'),
+    t('benefit2'),
+    t('benefit3'),
+    t('benefit4'),
+    t('benefit5'),
+    t('benefit6'),
+    t('benefit7'),
+    t('benefit8'),
+  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -107,7 +119,7 @@ export default async function HealthcareMedicalSectorLanding({ locale }: Props) 
             <p className="leading-relaxed">{t('sectionComprehensiveP1')}</p>
             <p className="leading-relaxed">{t('sectionComprehensiveP2')}</p>
           </div>
-          <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+          <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {serviceCards.map(({ icon: Icon, title, body }) => (
               <li
                 key={title}

@@ -3,6 +3,12 @@
  * Skips Blog.posts.*.content (use translate-blog-content.mjs for that).
  * Run from project root: node scripts/translate-all-locales.mjs
  *
+ * npm shortcuts (after editing messages/en.json, run i18n:content-sync):
+ *   npm run i18n:translate-sectors   — sector landings (IT/AI, marketing, healthcare, construction)
+ *   npm run i18n:translate-forms     — CompanyForms, DivisionTopics
+ *   npm run i18n:translate-legal     — Privacy, Terms, Disclaimer
+ *   npm run i18n:translate-pages     — Team, Contact, About, Home, Careers, DealsMedi
+ *   npm run i18n:translate           — all keys (very long; use TRANSLATE_ONLY_PREFIXES to narrow)
  * Env:
  *   TRANSLATE_DELAY_MS=500 (default)
  *   TRANSLATE_LOCALES=te,hi (optional, only these)
@@ -10,8 +16,10 @@
  *   TRANSLATE_ENGINE=lingva (default) | mymemory — Lingva is a Google Translate front-end and avoids MyMemory 429s.
  *   LINGVA_BASE=https://lingva.ml (optional mirror)
  * If you see HTTP 429 on mymemory, switch to lingva or set TRANSLATE_DELAY_MS=2000.
+ * When ENGINE=lingva, MyMemory is used automatically if Lingva fails after retries (keeps hi/es runs from stalling).
  */
 
+import { spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -103,7 +111,8 @@ async function translateTextLingva(text, targetLocale, sourceLocale = SOURCE) {
     const pathSeg = encodeURIComponent(chunk);
     const url = `${LINGVA_BASE}/api/v1/${sourceLocale}/${targetLocale}/${pathSeg}`;
     let lastErr;
-    for (let attempt = 0; attempt < 4; attempt++) {
+    const maxAttempts = 8;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const res = await fetch(url, {signal: AbortSignal.timeout(45_000)});
       if (res.ok) {
         const data = await res.json();
@@ -112,9 +121,9 @@ async function translateTextLingva(text, targetLocale, sourceLocale = SOURCE) {
         break;
       }
       lastErr = new Error(`HTTP ${res.status}`);
-      if ((res.status === 429 || res.status === 503) && attempt < 3) {
-        const backoff = (attempt + 1) * 5000;
-        console.warn(`  Lingva ${res.status}, waiting ${backoff / 1000}s...`);
+      if ((res.status === 429 || res.status === 503) && attempt < maxAttempts - 1) {
+        const backoff = Math.min(90_000, 4000 * 2 ** attempt);
+        console.warn(`  Lingva ${res.status}, waiting ${Math.round(backoff / 1000)}s...`);
         await delay(backoff);
       } else {
         throw lastErr;
@@ -158,9 +167,15 @@ async function translateTextMymemory(text, targetLocale, sourceLocale = SOURCE) 
 }
 
 async function translateText(text, targetLocale, sourceLocale = SOURCE) {
-  return TRANSLATE_ENGINE === 'mymemory'
-    ? translateTextMymemory(text, targetLocale, sourceLocale)
-    : translateTextLingva(text, targetLocale, sourceLocale);
+  if (TRANSLATE_ENGINE === 'mymemory') {
+    return translateTextMymemory(text, targetLocale, sourceLocale);
+  }
+  try {
+    return await translateTextLingva(text, targetLocale, sourceLocale);
+  } catch (err) {
+    console.warn(`  Lingva failed (${err.message}); trying MyMemory fallback…`);
+    return translateTextMymemory(text, targetLocale, sourceLocale);
+  }
 }
 
 function shouldSkipKey(keyPath, value) {
@@ -232,6 +247,16 @@ async function main() {
     saveJSON(filePath, data);
     console.log(`${locale}.json: ${translated} translated, ${skipped} skipped.`);
   }
+
+  const root = path.join(__dirname, '..');
+  const syncScript = path.join(__dirname, 'sync-content-translations.mjs');
+  console.log('\nSyncing content/translations from messages (app reads these bundles)…');
+  const syncResult = spawnSync(process.execPath, [syncScript], { stdio: 'inherit', cwd: root });
+  if (syncResult.status !== 0) {
+    console.error('sync-content-translations.mjs failed; run: node scripts/sync-content-translations.mjs');
+    process.exit(syncResult.status ?? 1);
+  }
+
   console.log('\nDone. Run node scripts/translate-blog-content.mjs to translate blog post bodies.');
 }
 
