@@ -209,3 +209,15 @@ body {
 .dark .blog-rich-editor .tiptap-editor-surface .ProseMirror p.is-empty::before {
   color: rgb(100 116 139);
 }
+
+input[type='date'],
+input[type='date']::placeholder,
+input[type='date']::-webkit-date-and-time-value,
+input[type='date']::-webkit-datetime-edit,
+input[type='date']::-webkit-datetime-edit-fields-wrapper,
+input[type='date']::-webkit-datetime-edit-text,
+input[type='date']::-webkit-datetime-edit-day-field,
+input[type='date']::-webkit-datetime-edit-month-field,
+input[type='date']::-webkit-datetime-edit-year-field {
+  text-transform: uppercase;
+}
