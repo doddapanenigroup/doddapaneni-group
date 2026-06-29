@@ -14,6 +14,10 @@ export default async function TeamPage({ params }: Props) {
 
   await connectDb();
   const team = await getTeamMembersGrouped();
+  // Hide Lokesh from the developers list
+team.developers = team.developers.filter(
+  (member) => member.name !== "Lokesh"
+);
 
   return <TeamPageClient team={team} />;
 }
